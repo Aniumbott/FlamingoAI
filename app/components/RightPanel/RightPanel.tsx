@@ -60,73 +60,75 @@ export default function RightPanel(props: {
         }}
       >
         <div>
-          <UserAvatar />
-        </div>
-        <div style={{ marginTop: "-25rem" }}>
-          <ActionIcon
-            style={buttonStyle(0)}
-            variant="subtle"
-            aria-label="Settings"
-            radius={0}
-            color="white"
-            onClick={() => {
-              !rightOpened ? toggleRight() : "";
-              setActive(0);
-            }}
-          >
-            <IconCategory
-              style={{ width: "70%", height: "70%" }}
-              stroke={1.5}
-            />
-          </ActionIcon>
+          <div>
+            <UserAvatar />
+          </div>
+          <div style={{ marginTop: "8rem" }}>
+            <ActionIcon
+              style={buttonStyle(0)}
+              variant="subtle"
+              aria-label="Settings"
+              radius={0}
+              color="white"
+              onClick={() => {
+                !rightOpened ? toggleRight() : "";
+                setActive(0);
+              }}
+            >
+              <IconCategory
+                style={{ width: "70%", height: "70%" }}
+                stroke={1.5}
+              />
+            </ActionIcon>
 
-          <ActionIcon
-            style={buttonStyle(1)}
-            variant="subtle"
-            aria-label="Settings"
-            radius={0}
-            color="white"
-            onClick={() => {
-              !rightOpened ? toggleRight() : "";
-              setActive(1);
-            }}
-          >
-            <IconTrendingUp
-              style={{ width: "70%", height: "70%" }}
-              stroke={1.5}
-            />
-          </ActionIcon>
+            <ActionIcon
+              style={buttonStyle(1)}
+              variant="subtle"
+              aria-label="Settings"
+              radius={0}
+              color="white"
+              onClick={() => {
+                !rightOpened ? toggleRight() : "";
+                setActive(1);
+              }}
+            >
+              <IconTrendingUp
+                style={{ width: "70%", height: "70%" }}
+                stroke={1.5}
+              />
+            </ActionIcon>
 
-          <ActionIcon
-            style={buttonStyle(2)}
-            variant="subtle"
-            aria-label="Settings"
-            radius={0}
-            color="white"
-            onClick={() => {
-              !rightOpened ? toggleRight() : "";
-              setActive(2);
-            }}
-          >
-            <IconMessages
-              style={{ width: "70%", height: "70%" }}
-              stroke={1.5}
-            />
-          </ActionIcon>
+            <ActionIcon
+              style={buttonStyle(2)}
+              variant="subtle"
+              aria-label="Settings"
+              radius={0}
+              color="white"
+              onClick={() => {
+                !rightOpened ? toggleRight() : "";
+                setActive(2);
+              }}
+            >
+              <IconMessages
+                style={{ width: "70%", height: "70%" }}
+                stroke={1.5}
+              />
+            </ActionIcon>
 
-          <ActionIcon
-            style={buttonStyle(3)}
-            variant="subtle"
-            aria-label="Settings"
-            radius={0}
-            color="white"
-            onClick={() => {
-              !rightOpened ? toggleRight() : "";
-              setActive(3);
-            }}
-          >
-            <IconHelp style={{ width: "70%", height: "70%" }} stroke={1.5} />
-          </ActionIcon>
+            <ActionIcon
+              style={buttonStyle(3)}
+              variant="subtle"
+              aria-label="Settings"
+              radius={0}
+              color="white"
+              onClick={() => {
+                !rightOpened ? toggleRight() : "";
+                setActive(3);
+              }}
+            >
+              <IconHelp style={{ width: "70%", height: "70%" }} stroke={1.5} />
+            </ActionIcon>
+          </div>
         </div>
         <div>
           {darkMode ? (
