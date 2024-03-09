@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "@mantine/core";
+import { Button, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 
 type MenuButtonProps = {
@@ -7,6 +7,7 @@ type MenuButtonProps = {
     title: string;
     description: string;
     icon: React.ReactNode;
+    // onClickAction?: () => void;
   };
 };
 
@@ -18,8 +19,8 @@ const MyButton = (props: MenuButtonProps) => {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline" }
-          : { color: "black", variant: "transparent" })}
+          ? { color: "green", variant: "outline", fz: "xl" }
+          : { color: "0F172A", variant: "transparent" })}
         justify="flex-start"
         styles={{
           root: {
@@ -27,13 +28,18 @@ const MyButton = (props: MenuButtonProps) => {
             height: "auto",
           },
         }}
+        // onClick={props.properties.onClickAction}
       >
-        <div className="flex flex-col text-left text-sm">
-          <p className="font-semibold ">{props.properties.title}</p>
-          <p className="text-gray-500 text-xs font-medium ">
-            {props.properties.description}
-          </p>
-        </div>
+        <Stack gap={1} align="start">
+          <Text fw={"600"} fz={"sm"}>
+            {props.properties.title}
+          </Text>
+          {props.properties.description && (
+            <Text fz={"xs"} fw={"500"} c={"gray.7"}>
+              {props.properties.description}
+            </Text>
+          )}
+        </Stack>
       </Button>
     </div>
   );
