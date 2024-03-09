@@ -1,5 +1,5 @@
 import React from "react";
-import { Menu, Button, Text, rem, Popover } from "@mantine/core";
+import { Menu } from "@mantine/core";
 import MyButton from "./MenuButton";
 
 type MenuBodyProps = {
@@ -35,9 +35,7 @@ const MenuBody = (props: MenuBodyProps) => {
         },
       }}
     >
-      <Menu.Target>
-        {props.target}
-      </Menu.Target>
+      <Menu.Target>{props.target}</Menu.Target>
 
       <Menu.Dropdown>
         {props.children.map((item, index) => (

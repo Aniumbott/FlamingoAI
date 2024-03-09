@@ -6,6 +6,9 @@ import {
   CloseButton,
   Text,
   Divider,
+  Input,
+  Accordion,
+  ScrollArea,
 } from "@mantine/core";
 import {
   IconCategory,
@@ -16,9 +19,12 @@ import {
   IconMoon,
   IconLayoutSidebarLeftExpand,
   IconLayoutSidebarRightExpand,
+  IconSearch,
+  IconCaretRightFilled,
 } from "@tabler/icons-react";
 import style from "./RightPanel.module.css";
 import UserAvatar from "./UserAvatar";
+import LibraryAccordianItem from "./LibraryAccordianItem";
 
 export default function RightPanel(props: {
   rightOpened: boolean;
@@ -35,6 +41,7 @@ export default function RightPanel(props: {
       borderLeft: active == ind ? "3px solid #f0f0f0" : "",
     };
   };
+
   return (
     <>
       {/* RightPanel Navigation */}
@@ -183,7 +190,7 @@ export default function RightPanel(props: {
         </div>
       </Card>
       {/* Ralaven Content */}
-      {active == 0 ? savedPrompts(toggleRight) : <></>}
+      {active == 0 ? <SavedPrompts toggleRight={toggleRight} /> : <></>}
       {active == 1 ? reports(toggleRight) : <></>}
       {active == 2 ? comments(toggleRight) : <></>}
       {active == 3 ? help(toggleRight) : <></>}
@@ -191,7 +198,180 @@ export default function RightPanel(props: {
   );
 }
 
-const savedPrompts = (toggleRight: () => void) => {
+function SavedPrompts(props: { toggleRight: () => void }) {
+  const { toggleRight } = props;
+  const [system, setSystem] = useState({
+    title: "System Library",
+    content: [
+      {
+        id: "1jkjhhhjkh",
+        type: "folder",
+        title: "Folder 1",
+        content: [
+          {
+            id: "1u89jij",
+            type: "prompt",
+            title: "Prompt 1",
+            content: "This is the content of prompt 1",
+          },
+          {
+            id: "2jjginou9",
+            type: "folder",
+            title: "Folder 2",
+            content: [
+              {
+                id: "1jbuiujoij",
+                type: "prompt",
+                title: "Prompt 2",
+                content: "This is the content of prompt 2",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "1jkjhhhjkh",
+        type: "folder",
+        title: "Folder 2",
+        content: [
+          {
+            id: "1u89jij",
+            type: "prompt",
+            title: "Prompt 1",
+            content: "This is the content of prompt 1",
+          },
+          {
+            id: "2jjginou9",
+            type: "folder",
+            title: "Folder 2",
+            content: [
+              {
+                id: "1jbuiujoij",
+                type: "prompt",
+                title: "Prompt 2",
+                content: "This is the content of prompt 2",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+  const [workspace, setWorkspace] = useState({
+    title: "Workspace Library",
+    content: [
+      {
+        id: "1jkjhhhjkh",
+        type: "folder",
+        title: "Folder 1",
+        content: [
+          {
+            id: "1u89jij",
+            type: "prompt",
+            title: "Prompt 1",
+            content: "This is the content of prompt 1",
+          },
+          {
+            id: "2jjginou9",
+            type: "folder",
+            title: "Folder 2",
+            content: [
+              {
+                id: "1jbuiujoij",
+                type: "prompt",
+                title: "Prompt 2",
+                content: "This is the content of prompt 2",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "1jkjhhhjkh",
+        type: "folder",
+        title: "Folder 2",
+        content: [
+          {
+            id: "1u89jij",
+            type: "prompt",
+            title: "Prompt 1",
+            content: "This is the content of prompt 1",
+          },
+          {
+            id: "2jjginou9",
+            type: "folder",
+            title: "Folder 2",
+            content: [
+              {
+                id: "1jbuiujoij",
+                type: "prompt",
+                title: "Prompt 2",
+                content: "This is the content of prompt 2",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+  const [personal, setPersonal] = useState({
+    title: "Personal Library",
+    content: [
+      {
+        id: "1jkjhhhjkh",
+        type: "folder",
+        title: "Folder 1",
+        content: [
+          {
+            id: "1u89jij",
+            type: "prompt",
+            title: "Prompt 1",
+            content: "This is the content of prompt 1",
+          },
+          {
+            id: "2jjginou9",
+            type: "folder",
+            title: "Folder 2",
+            content: [
+              {
+                id: "1jbuiujoij",
+                type: "prompt",
+                title: "Prompt 2",
+                content: "This is the content of prompt 2",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        id: "1jkjhhhjkh",
+        type: "folder",
+        title: "Folder 2",
+        content: [
+          {
+            id: "1u89jij",
+            type: "prompt",
+            title: "Prompt 1",
+            content: "This is the content of prompt 1",
+          },
+          {
+            id: "2jjginou9",
+            type: "folder",
+            title: "Folder 2",
+            content: [
+              {
+                id: "1jbuiujoij",
+                type: "prompt",
+                title: "Prompt 2",
+                content: "This is the content of prompt 2",
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  });
+
   return (
     <>
       <div className={style.activeTitle}>
@@ -199,9 +379,28 @@ const savedPrompts = (toggleRight: () => void) => {
         <CloseButton onClick={toggleRight} />
       </div>
       <Divider my="md" />
+      <Input
+        placeholder="Search Prompts..."
+        leftSection={<IconSearch size={16} />}
+        style={{ margin: "0 1rem" }}
+      />
+      <ScrollArea h={"100%"} scrollbarSize={0} style={{ marginTop: "2rem" }}>
+        <Accordion
+          chevronPosition="left"
+          className={style.parent}
+          classNames={{ chevron: style.chevron }}
+          chevron={<IconCaretRightFilled className={style.icon} />}
+        >
+          <LibraryAccordianItem item={system} />
+
+          <LibraryAccordianItem item={workspace} />
+
+          <LibraryAccordianItem item={personal} />
+        </Accordion>
+      </ScrollArea>
     </>
   );
-};
+}
 
 const reports = (toggleRight: () => void) => {
   return (

@@ -6,7 +6,7 @@ import { IconLayoutSidebarRightExpand } from "@tabler/icons-react";
 // import { MantineLogo } from '@mantinex/mantine-logo';
 import { useDisclosure } from "@mantine/hooks";
 import NavigationBar from "./components/NavigationBar";
-import RightPanel from "./components/RightPanel";
+import RightPanel from "./components/RightPanel/RightPanel";
 import LeftPanel from "./components/Leftpanel";
 
 const Home = () => {
@@ -16,15 +16,16 @@ const Home = () => {
   return (
     <AppShell
       // header={{ height: 60 }}
-      aside={{
-        width: 270,
-        breakpoint: "md",
-        collapsed: { desktop: !rightOpened },
-      }}
+
       navbar={{
         width: 270,
         breakpoint: "sm",
         collapsed: { desktop: !leftOpened },
+      }}
+      aside={{
+        width: 325,
+        breakpoint: "md",
+        collapsed: { desktop: !rightOpened },
       }}
       padding="md"
     >

@@ -39,7 +39,6 @@ export default function UserAvatar() {
         <Menu.Divider />
 
         <Menu.Item
-          style={{ hover: { backgroundColor: "red"! } }}
           leftSection={<IconUser style={{ width: rem(14), height: rem(14) }} />}
         >
           Profile
