@@ -29,7 +29,7 @@ const Home = () => {
       }}
       padding="md"
     >
-      <AppShell.Navbar p="md" style={{ margin: 0 }}>
+      <AppShell.Navbar p="0.5rem" style={{ margin: 0 }}>
         <div className="flex justify-between">
           <Title order={3}>TeamGPT</Title>
           <ActionIcon

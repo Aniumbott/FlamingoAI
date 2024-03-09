@@ -8,6 +8,7 @@ type MenuBodyProps = {
       title: string;
       description: string;
       icon: React.ReactNode;
+      onClickAction?: () => void;
     }
   ];
   target: React.ReactNode;
@@ -16,6 +17,7 @@ type MenuBodyProps = {
 const MenuBody = (props: MenuBodyProps) => {
   return (
     <Menu
+    position="top-start"
       width={300}
       styles={{
         dropdown: {
@@ -39,7 +41,7 @@ const MenuBody = (props: MenuBodyProps) => {
 
       <Menu.Dropdown>
         {props.children.map((item, index) => (
-          <Menu.Item key={index}>
+          <Menu.Item key={index} onClick={item.onClickAction}>
             <MyButton properties={item} />
           </Menu.Item>
         ))}
