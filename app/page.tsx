@@ -1,33 +1,59 @@
-'use client';
+"use client";
 
-import React from 'react'
-import { AppShell, Group, Burger } from '@mantine/core'
+import React, { useEffect, useState } from "react";
+import { AppShell, Group, Title, ActionIcon } from "@mantine/core";
+import { IconLayoutSidebarRightExpand } from "@tabler/icons-react";
 // import { MantineLogo } from '@mantinex/mantine-logo';
-import { useDisclosure } from '@mantine/hooks'
-import NavigationBar from './components/NavigationBar'
+import { useDisclosure } from "@mantine/hooks";
+import NavigationBar from "./components/NavigationBar";
+import RightPanel from "./components/RightPanel";
+import LeftPanel from "./components/Leftpanel";
 
 const Home = () => {
-  const [opened, { toggle }] = useDisclosure();
+  const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
+  const [rightOpened, { toggle: toggleRight }] = useDisclosure(true);
+
   return (
     <AppShell
       // header={{ height: 60 }}
-      navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+      aside={{
+        width: 270,
+        breakpoint: "md",
+        collapsed: { desktop: !rightOpened },
+      }}
+      navbar={{
+        width: 270,
+        breakpoint: "sm",
+        collapsed: { desktop: !leftOpened },
+      }}
       padding="md"
     >
-      <AppShell.Navbar p="md">
-        Navbar
-        {Array(15)
-          .fill(0)
-          .map((_, index) => (
-            <div>{index}</div> 
-            // <Skeleton key={index} h={28} mt="sm" animate={false} />
-          ))}
-      </AppShell.Navbar>
-      <AppShell.Main>
-      <NavigationBar/>
-      </AppShell.Main>
-      </AppShell>
-  )
-}
+      <AppShell.Navbar p="md" style={{ margin: 0 }}>
+        <div className="flex justify-between">
+          <Title order={3}>TeamGPT</Title>
+          <ActionIcon
+            variant="subtle"
+            color="grey"
+            aria-label="Settings"
+            onClick={toggleLeft}
+          >
+            <IconLayoutSidebarRightExpand
+              style={{ width: "90%", height: "90%" }}
+              stroke={1.5}
+            />
+          </ActionIcon>
+        </div>
 
-export default Home
+        <LeftPanel />
+      </AppShell.Navbar>
+      <AppShell.Aside>
+        <RightPanel rightOpened={rightOpened} toggleRight={toggleRight} />
+      </AppShell.Aside>
+      <AppShell.Main style={{ paddingTop: 0 }}>
+        <NavigationBar leftOpened={leftOpened} toggleLeft={toggleLeft} />
+      </AppShell.Main>
+    </AppShell>
+  );
+};
+
+export default Home;

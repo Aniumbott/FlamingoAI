@@ -1,51 +1,86 @@
-// 'use client';
+import {
+  Autocomplete,
+  Group,
+  rem,
+  ActionIcon,
+  Title,
+  Button,
+} from "@mantine/core";
+import {
+  IconSearch,
+  IconLayoutSidebarLeftExpand,
+  IconUsersPlus,
+  IconRocket,
+} from "@tabler/icons-react";
+import classes from "./HeaderSearch.module.css";
 
-import { Autocomplete, Group, Burger, rem } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { IconSearch } from '@tabler/icons-react';
-// import { MantineLogo } from '@mantinex/mantine-logo';
-import classes from './HeaderSearch.module.css';
-
-const links = [
-  { link: '/about', label: 'Features' },
-  { link: '/pricing', label: 'Pricing' },
-  { link: '/learn', label: 'Learn' },
-  { link: '/community', label: 'Community' },
-];
-
-export default function NavigationBar() {
-  const [opened, { toggle }] = useDisclosure(false);
-
-  const items = links.map((link) => (
-    <a
-      key={link.label}
-      href={link.link}
-      className={classes.link}
-      onClick={(event) => event.preventDefault()}
-    >
-      {link.label}
-    </a>
-  ));
-
+export default function NavigationBar(props: {
+  leftOpened: boolean;
+  toggleLeft: () => void;
+}) {
+  const { leftOpened, toggleLeft } = props;
   return (
     <header className={classes.header}>
       <div className={classes.inner}>
         <Group>
-          <Burger opened={opened} onClick={toggle} size="sm" hiddenFrom="sm" />
-          {/* <MantineLogo size={28} /> */}
-        </Group>
+          {!leftOpened ? (
+            <Group>
+              <Title order={4}>TeamGPT</Title>
+              <ActionIcon
+                variant="subtle"
+                color="grey"
+                aria-label="Settings"
+                onClick={toggleLeft}
+              >
+                <IconLayoutSidebarLeftExpand
+                  style={{ width: "90%", height: "90%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Group>
+          ) : (
+            <></>
+          )}
 
-        <Group>
-          <Group ml={50} gap={5} className={classes.links} visibleFrom="sm">
-            {items}
-          </Group>
           <Autocomplete
+            variant="unstyled"
             className={classes.search}
             placeholder="Search"
-            leftSection={<IconSearch style={{ width: rem(16), height: rem(16) }} stroke={1.5} />}
-            data={['React', 'Angular', 'Vue', 'Next.js', 'Riot.js', 'Svelte', 'Blitz.js']}
+            leftSection={
+              <IconSearch
+                style={{ width: rem(16), height: rem(16) }}
+                stroke={1.5}
+              />
+            }
+            data={[
+              "React",
+              "Angular",
+              "Vue",
+              "Next.js",
+              "Riot.js",
+              "Svelte",
+              "Blitz.js",
+            ]}
             visibleFrom="xs"
           />
+        </Group>
+        <Group style={{ marginRight: "3rem" }}>
+          <Button
+            leftSection={<IconUsersPlus size={20} />}
+            variant="subtle"
+            color="grey"
+            radius="md"
+          >
+            Invite
+          </Button>
+          <Button
+            leftSection={<IconRocket size={20} />}
+            variant="subtle"
+            color="grey"
+            radius="md"
+          >
+            Upgrade
+          </Button>
         </Group>
       </div>
     </header>
