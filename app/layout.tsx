@@ -24,6 +24,7 @@ export default function RootLayout({
     <html lang="en">
       <head>
         <ColorSchemeScript />
+        <title>Team GPT PRO !!!</title>
       </head>
       <body className={inter.className}>
         <MantineProvider defaultColorScheme="dark">{children}</MantineProvider>

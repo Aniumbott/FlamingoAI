@@ -35,7 +35,7 @@ export default function LibraryAccordianItem(props: Props) {
             {item.title}
           </Text>
         </Accordion.Control>
-        <ActionIcon size="lg" variant="subtle" aria-label="Sort" color="white">
+        <ActionIcon size="lg" variant="subtle" aria-label="Sort" color="light">
           <PromptMenu />
         </ActionIcon>
       </Center>

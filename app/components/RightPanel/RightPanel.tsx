@@ -9,6 +9,8 @@ import {
   Input,
   Accordion,
   ScrollArea,
+  useMantineColorScheme,
+  Paper,
 } from "@mantine/core";
 import {
   IconCategory,
@@ -31,6 +33,7 @@ export default function RightPanel(props: {
   toggleRight: () => void;
 }) {
   const { rightOpened, toggleRight } = props;
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
   const [active, setActive] = useState(0);
   const [darkMode, setDarkMode] = useState(true);
   const buttonStyle = (ind: Number) => {
@@ -38,14 +41,14 @@ export default function RightPanel(props: {
       width: "100%",
       height: "3rem",
       padding: "0.5rem",
-      borderLeft: active == ind ? "3px solid #f0f0f0" : "",
+      borderLeft: active == ind ? "3px solid var(--mantine-color-teal-5)" : "",
     };
   };
 
   return (
     <>
       {/* RightPanel Navigation */}
-      <Card
+      <Paper
         style={{
           height: "100%",
           width: "3rem",
@@ -57,6 +60,7 @@ export default function RightPanel(props: {
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "space-between",
+          borderLeft: "1px solid var(--app-shell-border-color)",
         }}
       >
         <div>
@@ -66,10 +70,10 @@ export default function RightPanel(props: {
           <div style={{ marginTop: "8rem" }}>
             <ActionIcon
               style={buttonStyle(0)}
-              variant="subtle"
+              variant={active == 0 ? "light" : "subtle"}
               aria-label="Settings"
               radius={0}
-              color="white"
+              color={active == 0 ? "teal" : "light"}
               onClick={() => {
                 !rightOpened ? toggleRight() : "";
                 setActive(0);
@@ -83,10 +87,10 @@ export default function RightPanel(props: {
 
             <ActionIcon
               style={buttonStyle(1)}
-              variant="subtle"
+              variant={active == 1 ? "light" : "subtle"}
               aria-label="Settings"
               radius={0}
-              color="white"
+              color={active == 1 ? "teal" : "light"}
               onClick={() => {
                 !rightOpened ? toggleRight() : "";
                 setActive(1);
@@ -100,10 +104,10 @@ export default function RightPanel(props: {
 
             <ActionIcon
               style={buttonStyle(2)}
-              variant="subtle"
+              variant={active == 2 ? "light" : "subtle"}
               aria-label="Settings"
               radius={0}
-              color="white"
+              color={active == 2 ? "teal" : "light"}
               onClick={() => {
                 !rightOpened ? toggleRight() : "";
                 setActive(2);
@@ -117,10 +121,10 @@ export default function RightPanel(props: {
 
             <ActionIcon
               style={buttonStyle(3)}
-              variant="subtle"
+              variant={active == 3 ? "light" : "subtle"}
               aria-label="Settings"
               radius={0}
-              color="white"
+              color={active == 3 ? "teal" : "light"}
               onClick={() => {
                 !rightOpened ? toggleRight() : "";
                 setActive(3);
@@ -131,14 +135,14 @@ export default function RightPanel(props: {
           </div>
         </div>
         <div>
-          {darkMode ? (
+          {colorScheme == "dark" ? (
             <ActionIcon
               style={buttonStyle(999)}
               variant="subtle"
               aria-label="Settings"
               radius={0}
-              color="white"
-              onClick={() => setDarkMode(!darkMode)}
+              color="light"
+              onClick={() => setColorScheme("light")}
             >
               <IconSun style={{ width: "70%", height: "70%" }} stroke={1.5} />
             </ActionIcon>
@@ -148,8 +152,8 @@ export default function RightPanel(props: {
               variant="subtle"
               aria-label="Settings"
               radius={0}
-              color="white"
-              onClick={() => setDarkMode(!darkMode)}
+              color="light"
+              onClick={() => setColorScheme("dark")}
             >
               <IconMoon style={{ width: "70%", height: "70%" }} stroke={1.5} />
             </ActionIcon>
@@ -160,7 +164,7 @@ export default function RightPanel(props: {
               variant="subtle"
               aria-label="Settings"
               radius={0}
-              color="white"
+              color="light"
               onClick={() => {
                 toggleRight();
                 rightOpened ? setActive(-1) : "";
@@ -177,7 +181,7 @@ export default function RightPanel(props: {
               variant="subtle"
               aria-label="Settings"
               radius={0}
-              color="white"
+              color="light"
               onClick={() => {
                 toggleRight();
                 !rightOpened ? setActive(0) : "";
@@ -190,7 +194,7 @@ export default function RightPanel(props: {
             </ActionIcon>
           )}
         </div>
-      </Card>
+      </Paper>
       {/* Ralaven Content */}
       {active == 0 ? <SavedPrompts toggleRight={toggleRight} /> : <></>}
       {active == 1 ? reports(toggleRight) : <></>}
