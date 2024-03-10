@@ -5,6 +5,8 @@ import style from ".././Modals.module.css";
 import { useState } from "react";
 import { useScrollIntoView } from "@mantine/hooks";
 import ChatAuth from "./ChatAuth";
+import WorkspaceSetup from "./WorkspaceSetup";
+import AdvancedSetup from "./AdvancedSetup";
 
 export default function Workspace(props: { opened: boolean; setOpened: any }) {
   const { opened, setOpened } = props;
@@ -46,6 +48,8 @@ export default function Workspace(props: { opened: boolean; setOpened: any }) {
         {/* Right Container */}
         <div className={style.rightContainer}>
           <ChatAuth activeTab={activeTab} setActiveTab={setActiveTab} />
+          <WorkspaceSetup activeTab={activeTab} setActiveTab={setActiveTab} />
+          <AdvancedSetup activeTab={activeTab} setActiveTab={setActiveTab} />
         </div>
       </div>
       {/* Modal content */}
