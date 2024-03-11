@@ -8,6 +8,7 @@ import {
   Stack,
   Group,
   ThemeIcon,
+  Divider,
 } from "@mantine/core";
 import {
   IconSettings,
@@ -29,10 +30,12 @@ import {
   IconNews,
   IconFolderRoot,
 } from "@tabler/icons-react";
-import MyButton from "./Menu/MenuButton";
 import MenuBody from "./Menu/MenuBody";
 import { useHover } from "@mantine/hooks";
 import PersonalChats from "./Menu/PersonalChats";
+import SingleMenu from "./Menu/SingleMenu";
+import InvitePeople from "./Modals/InvitePeople";
+import WorkspaceBranding from "./Modals/WorkspaceBranding";
 
 const WorkspaceTarget = (hovered: boolean) => (
   <Button
@@ -58,6 +61,7 @@ const WorkspaceTarget = (hovered: boolean) => (
           variant: "transparent",
           rightSection: <IconSettings color="white" />,
         })}
+    
     color="#05a87a"
   >
     Poorvank Workspace
@@ -97,6 +101,10 @@ const WorkspaceMenu: any = [
   {
     title: "Workspace Branding",
     icon: <IconBriefcase />,
+  },
+  {
+    title: "Create New Workspace",
+    icon: <IconBuilding />,
   },
 ];
 
@@ -161,12 +169,15 @@ const LeftPanel = () => {
   const { hovered: filterHover, ref: filterRef } = useHover();
   const [selectedFilter, setSelectedFilter] = useState(FilterMenu[0]);
 
+  const [openInviteModal, setOpenInviteModal] = useState(false); 
+  const [openBrandingModal, setOpenBrandingModal] = useState(false);
+
   const handleSelect = (item: any) => {
     setSelectedFilter(item);
   };
   return (
-    <Stack align="stretch" justify="center" mt={10}>
-      <MenuBody
+    <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
+      <SingleMenu
         children={WorkspaceMenu}
         target={<div ref={ref}>{WorkspaceTarget(hovered)}</div>}
       />
@@ -176,7 +187,6 @@ const LeftPanel = () => {
         wrap="nowrap"
         grow
         preventGrowOverflow={false}
-        style={{ height: "100%" }}
         gap={10}
       >
         <MenuBody
@@ -194,9 +204,9 @@ const LeftPanel = () => {
           color="#047857"
           wrap="nowrap"
           justify="flex-start"
-          gap={3}          
-          w={'10%'}
-          >
+          gap={1}
+          w={"10%"}
+        >
           <Button color="#047857" px={"xs"}>
             <IconPlus size={20} />
           </Button>
@@ -210,7 +220,12 @@ const LeftPanel = () => {
           />
         </Group>
       </Group>
-      {/* <PersonalChats /> */}
+
+      <PersonalChats />
+      <Divider orientation="horizontal" />
+      
+      <InvitePeople opened={openInviteModal} setOpened={setOpenInviteModal} /> 
+      <WorkspaceBranding opened={openBrandingModal} setOpened={setOpenBrandingModal} />
     </Stack>
   );
 };

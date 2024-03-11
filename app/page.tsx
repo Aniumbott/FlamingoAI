@@ -7,7 +7,7 @@ import { IconLayoutSidebarRightExpand } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import NavigationBar from "./components/NavigationBar";
 import RightPanel from "./components/RightPanel/RightPanel";
-import LeftPanel from "./components/Leftpanel";
+import LeftPanel from "./components/LeftPanel/Leftpanel";
 
 const Home = () => {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);

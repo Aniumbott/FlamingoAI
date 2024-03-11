@@ -10,6 +10,7 @@ import {
   IconSortDescendingLetters,
   IconSortAscending,
   IconSortDescending,
+  IconAlignJustified,
 } from "@tabler/icons-react";
 
 type Props = {
@@ -51,6 +52,12 @@ export default function LibraryAccordianItem(props: Props) {
                 >
                   <FolderItem item={subItem} />
                 </Accordion>
+              </div>
+            );
+          else if (subItem.type == "chat")
+            return (
+              <div key={subIndex}>
+                <ChatItem item={subItem} />
               </div>
             );
           else
@@ -113,7 +120,7 @@ const PromptMenu = () => {
 
 const FolderLabel = (props: { title: string; isOpened: boolean }) => {
   return (
-    <div className="flex justify-start">
+    <div className="flex justify-start items-center">
       {props.isOpened ? (
         <IconFolderOpen
           style={{
@@ -161,6 +168,12 @@ const FolderItem = (props: { item: AccordionItem }) => {
                   </Accordion>
                 </div>
               );
+            else if (subItem.type == "chat")
+              return (
+                <div key={subIndex}>
+                  <ChatItem item={subItem} />
+                </div>
+              );
             else
               return (
                 <div key={subIndex}>
@@ -184,6 +197,26 @@ const PromptItem = (props: { item: AccordionItem }) => {
             width: "1rem",
             height: "1rem",
             color: "var(--mantine-color-teal-3)",
+          }}
+        />
+        <Text size="sm" style={{ marginLeft: "0.5rem" }}>
+          {item.title}
+        </Text>
+      </div>
+    </>
+  );
+};
+
+const ChatItem = (props: { item: AccordionItem }) => {
+  const { item } = props;
+  return (
+    <>
+      <div className={style.prompt}>
+        <IconAlignJustified
+          color="gray"
+          style={{
+            width: "1rem",
+            height: "1rem",
           }}
         />
         <Text size="sm" style={{ marginLeft: "0.5rem" }}>
