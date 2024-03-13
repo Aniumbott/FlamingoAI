@@ -330,7 +330,7 @@ function SavedPrompts(props: { toggleRight: () => void }) {
         content: [
           {
             id: "1u89jij",
-            type: "prompt",
+            type: "chat",
             title: "Prompt 1",
             content: "This is the content of prompt 1",
           },

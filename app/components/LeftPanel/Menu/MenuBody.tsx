@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Stack, Text } from "@mantine/core";
+import { Menu, Button, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 
 type MenuButtonProps = {
@@ -9,6 +9,53 @@ type MenuButtonProps = {
     icon: React.ReactNode;
     // onClickAction?: () => void;
   };
+};
+
+type MenuBodyProps = {
+  children: [
+    {
+      title: string;
+      description: string;
+      icon: React.ReactNode;
+      onClickAction?: () => void;
+    }
+  ];
+  target: React.ReactNode;
+};
+
+const MenuBody = (props: MenuBodyProps) => {
+  return (
+    <Menu
+      position="top-start"
+      width={300}
+      styles={{
+        dropdown: {
+          backgroundColor: "#ffffff",
+        },
+        item: {
+          backgroundColor: "#ffffff",
+          color: "#000000",
+          hover: {
+            backgroundColor: "#000000",
+          },
+          height: "auto",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          padding: "0px",
+        },
+      }}
+    >
+      <Menu.Target>{props.target}</Menu.Target>
+      <Menu.Dropdown>
+        {props.children.map((item, index) => (
+          <Menu.Item key={index} onClick={item.onClickAction}>
+            <MyButton properties={item} />
+          </Menu.Item>
+        ))}
+      </Menu.Dropdown>
+    </Menu>
+  );
 };
 
 const MyButton = (props: MenuButtonProps) => {
@@ -45,4 +92,4 @@ const MyButton = (props: MenuButtonProps) => {
   );
 };
 
-export default MyButton;
+export default MenuBody;
