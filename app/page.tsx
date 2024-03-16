@@ -1,13 +1,14 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { AppShell, Group, Title, ActionIcon } from "@mantine/core";
+import { AppShell, Group, Title, ActionIcon, Button } from "@mantine/core";
 import { IconLayoutSidebarRightExpand } from "@tabler/icons-react";
 // import { MantineLogo } from '@mantinex/mantine-logo';
 import { useDisclosure } from "@mantine/hooks";
 import NavigationBar from "./components/NavigationBar";
 import RightPanel from "./components/RightPanel/RightPanel";
 import LeftPanel from "./components/LeftPanel/Leftpanel";
+import { UserButton } from "@clerk/nextjs";
 
 const Home = () => {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
@@ -52,6 +53,30 @@ const Home = () => {
       </AppShell.Aside>
       <AppShell.Main style={{ paddingTop: 0 }}>
         <NavigationBar leftOpened={leftOpened} toggleLeft={toggleLeft} />
+        <UserButton />
+        <Button
+          onClick={() => {
+            fetch("/api/profile", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                name: "My Name",
+                primary_email: "mymail@gmail.com",
+              }),
+            }).then(
+              (res) => {
+                console.log("res", res);
+              },
+              (err) => {
+                console.log("err", err);
+              }
+            );
+          }}
+        >
+          PROFILE POST REQ!!!
+        </Button>
       </AppShell.Main>
     </AppShell>
   );

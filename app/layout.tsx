@@ -7,6 +7,7 @@ import "@mantine/core/styles.css";
 // import "@mantine/modals/styles.css";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import { ClerkProvider } from "@clerk/nextjs";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,14 +22,18 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <head>
-        <ColorSchemeScript />
-        <title>Team GPT PRO !!!</title>
-      </head>
-      <body className={inter.className}>
-        <MantineProvider defaultColorScheme="dark">{children}</MantineProvider>
-      </body>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <head>
+          <ColorSchemeScript />
+          <title>Team GPT PRO !!!</title>
+        </head>
+        <body className={inter.className}>
+          <MantineProvider defaultColorScheme="dark">
+            {children}
+          </MantineProvider>
+        </body>
+      </html>
+    </ClerkProvider>
   );
 }
