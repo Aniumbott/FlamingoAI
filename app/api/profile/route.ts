@@ -4,32 +4,30 @@ import User from "../../models/User";
 import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 
-export async function POST(req: NextApiRequest, res: NextApiResponse) {
-  console.log("hit get post", new Date().getSeconds());
+export async function POST(req: any, res: NextApiResponse) {
+  console.log("hit post", new Date().getSeconds());
   try {
     const body = await req.json();
-
-    console.log("req", req);
-
+    console.log("req", body);
     await dbConnect();
-
     const post = await User.create({
       name: body.name,
-      primary_email: body.primary_email,
+      email: body.email,
+      clerk_user_id: body.clerk_user_id,
+      photo_url: body.photo_url,  
     });
-    return new NextResponse("Added User");
+    return NextResponse.json({ post }, { status: 200 });
   } catch (error) {
-    console.log("error from route", error);
-    return new NextResponse("Error");
+    return NextResponse.error();
   }
 }
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+export async function GET(req: any, res: NextApiResponse) {
   console.log("hit get", new Date().getSeconds());
   try {
     await dbConnect();
     const Users = await User.find();
-    return new NextResponse(Users.join(), { status: 200 });
+    return NextResponse.json(Users, { status: 200 });
   } catch (error) {
     console.log("error from route", error);
     return new NextResponse("Error");

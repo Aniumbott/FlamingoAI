@@ -62,17 +62,21 @@ const Home = () => {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                name: "My Name",
-                primary_email: "mymail@gmail.com",
+                clerk_user_id: "123",
+                name: "Poorvank Shah",
+                email: "poorvank@gmail.com",
+                photo_url: "https://www.google.com",
               }),
-            }).then(
-              (res) => {
-                console.log("res", res);
-              },
-              (err) => {
-                console.log("err", err);
-              }
-            );
+            })
+              .then((res) => res.json())
+              .then(
+                (data) => {
+                  console.log("data", data);
+                },
+                (err) => {
+                  console.log("err", err);
+                }
+              );
           }}
         >
           PROFILE POST REQ!!!

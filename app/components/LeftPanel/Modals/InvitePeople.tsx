@@ -151,6 +151,7 @@ const InviteForm = (props: { setActive: any }) => {
         description="Enter or paste one or more email addresses, separated by spaces or commas"
         multiline={true}
         error={error}
+        // inputMode="email"
       >
         <Pill.Group>
           {emails.map((email, index) => (
@@ -165,6 +166,7 @@ const InviteForm = (props: { setActive: any }) => {
           <PillsInput.Field
             pointer={true}
             placeholder="Enter email"
+            inputMode="email"
             value={inputValue}
             onChange={(event) => setInputValue(event.currentTarget.value)}
             onKeyDown={(event) => {
