@@ -26,7 +26,36 @@ export async function GET(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const chats = await Chat.find();
-    return NextResponse.json({'hello': chats }, { status: 200 });
+    return NextResponse.json({ chats }, { status: 200 });
+  } catch (error: any) {
+    console.log("error from route", error);
+    return NextResponse.json(error.message, { status: 500 });
+  }
+}
+
+export async function PUT(req: any, res: NextApiResponse) {
+  console.log("hit put chat");
+  try {
+    await dbConnect();
+    const body = await req.json();
+    const chat = await Chat.findByIdAndUpdate(body.id, body, { new: true });
+    return NextResponse.json({ chat }, { status: 200 });
+  } catch (error: any) {
+    console.log("error from route", error);
+    return NextResponse.json(error.message, { status: 500 });
+  }
+}
+
+export async function DELETE(req: any, res: NextApiResponse) {
+  console.log("hit delete chat");
+  try {
+    await dbConnect();
+    const body = await req.json();
+    const chat = await Chat.findByIdAndDelete(body.id);
+    return NextResponse.json(
+      { message: "Chat deleted successfully" },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.log("error from route", error);
     return NextResponse.json(error.message, { status: 500 });
