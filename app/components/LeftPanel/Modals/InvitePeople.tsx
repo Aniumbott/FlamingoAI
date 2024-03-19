@@ -1,3 +1,4 @@
+import { OrganizationProfile } from "@clerk/nextjs";
 import {
   ActionIcon,
   Avatar,
@@ -56,55 +57,67 @@ const InvitePeople = (props: { opened: boolean; setOpened: any }) => {
       opened={props.opened}
       onClose={() => props.setOpened(false)}
       centered
+      withCloseButton={false}
       radius={"md"}
-      padding={20}
+      // padding={20}
       size={"80%"}
     >
-      {active === "inviteform" ? (
-        <InviteForm setActive={setActive} />
-      ) : (
-        <Stack gap={15} h={"70vh"}>
-          <Stack gap={1}>
-            <Title>Members</Title>
-            <Text>View and manage workspace members</Text>
-          </Stack>
-          <Stack gap={0}>
-            <Group>
-              <Button
-                variant="transparent"
-                onClick={() => setActive("members")}
-                style={
-                  active === "members"
-                    ? { borderBottom: "2px solid white", color: "white" }
-                    : { color: "#C9C9C9" }
-                }
-                radius={0}
-              >
-                Members
-              </Button>
-              <Button
-                variant="transparent"
-                onClick={() => setActive("invitations")}
-                style={
-                  active === "invitations"
-                    ? { borderBottom: "2px solid white", color: "white" }
-                    : { color: "#C9C9C9" }
-                }
-                radius={0}
-              >
-                Invitation
-              </Button>
-            </Group>
-            <Divider />
-          </Stack>
-          {active === "members" ? (
-            <MembersTable />
-          ) : (
-            <InvitationsTable setActive={setActive} />
-          )}
-        </Stack>
-      )}
+      <OrganizationProfile  />
     </Modal>
+
+    // <Modal
+    //   opened={props.opened}
+    //   onClose={() => props.setOpened(false)}
+    //   centered
+    //   radius={"md"}
+    //   padding={20}
+    //   size={"80%"}
+    // >
+    //   {active === "inviteform" ? (
+    //     <InviteForm setActive={setActive} />
+    //   ) : (
+    //     <Stack gap={15} h={"70vh"}>
+    //       <Stack gap={1}>
+    //         <Title>Members</Title>
+    //         <Text>View and manage workspace members</Text>
+    //       </Stack>
+    //       <Stack gap={0}>
+    //         <Group>
+    //           <Button
+    //             variant="transparent"
+    //             onClick={() => setActive("members")}
+    //             style={
+    //               active === "members"
+    //                 ? { borderBottom: "2px solid white", color: "white" }
+    //                 : { color: "#C9C9C9" }
+    //             }
+    //             radius={0}
+    //           >
+    //             Members
+    //           </Button>
+    //           <Button
+    //             variant="transparent"
+    //             onClick={() => setActive("invitations")}
+    //             style={
+    //               active === "invitations"
+    //                 ? { borderBottom: "2px solid white", color: "white" }
+    //                 : { color: "#C9C9C9" }
+    //             }
+    //             radius={0}
+    //           >
+    //             Invitation
+    //           </Button>
+    //         </Group>
+    //         <Divider />
+    //       </Stack>
+    //       {active === "members" ? (
+    //         <MembersTable />
+    //       ) : (
+    //         <InvitationsTable setActive={setActive} />
+    //       )}
+    //     </Stack>
+    //   )}
+    // </Modal>
   );
 };
 
@@ -134,11 +147,7 @@ const InviteForm = (props: { setActive: any }) => {
           <IconUser />
           Members
         </Button>
-        <Button
-          variant="subtle"
-          c={"white"}
-          p={0}
-        >
+        <Button variant="subtle" c={"white"} p={0}>
           Invite Members
         </Button>
       </Breadcrumbs>
@@ -187,7 +196,7 @@ const InviteForm = (props: { setActive: any }) => {
       <NativeSelect
         label="Role"
         value={role}
-        data={["Member","Admin"]}
+        data={["Member", "Admin"]}
         onChange={(event) => setRole(event.currentTarget.value)}
         w={"30%"}
       />

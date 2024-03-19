@@ -5,11 +5,27 @@ import PersonalChats from "./Menu/PersonalChats";
 import SingleMenu from "./Menu/WorkspaceMenu";
 import FilterMenuComponent from "./Menu/FilterMenu";
 import NewMenuComponent from "./Menu/NewMenu";
+import { ClerkLoaded, ClerkLoading, OrganizationSwitcher } from "@clerk/nextjs";
 
 const LeftPanel = () => {
   return (
     <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
       <SingleMenu />
+      {/* <ClerkLoading>
+        <div>Loading</div>
+      </ClerkLoading> */}
+      {/* <ClerkLoaded> */}
+        <OrganizationSwitcher
+          appearance={{
+            variables: {
+              colorText: "green",
+              colorBackground: "white",
+              colorPrimary: "green",
+              colorAlphaShade: "#05a87a",
+            },
+          }}
+        />
+      {/* </ClerkLoaded> */}
       <Group
         justify="flex-start"
         wrap="nowrap"
