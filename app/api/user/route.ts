@@ -14,7 +14,7 @@ export async function POST(req: any, res: NextApiResponse) {
       name: body.name,
       email: body.email,
       clerk_user_id: body.clerk_user_id,
-      photo_url: body.photo_url,  
+      photo_url: body.photo_url,
     });
     return NextResponse.json({ post }, { status: 200 });
   } catch (error) {

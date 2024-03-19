@@ -21,10 +21,10 @@ const memberSchema = new Mongoose.Schema(
       type: Date,
       required: true,
     },
-    invited_at: {
-      type: Date,
-      required: false,
-    },
+    // invited_at: { Can be replaced by createdAt or timestamp
+    //   type: Date,
+    //   required: false,
+    // },
   },
   {
     timestamps: true,

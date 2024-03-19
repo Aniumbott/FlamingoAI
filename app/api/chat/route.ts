@@ -22,11 +22,10 @@ export async function POST(req: any, res: NextApiResponse) {
 }
 
 export async function GET(req: any, res: NextApiResponse) {
-  console.log("hit get chat");
   try {
     await dbConnect();
-    const chats = await Chat.find();
-    return NextResponse.json({'hello': chats }, { status: 200 });
+    const chats = await Chat.find({ workspace_id: req.query.workspace_id });
+    return NextResponse.json({ hello: chats }, { status: 200 });
   } catch (error: any) {
     console.log("error from route", error);
     return NextResponse.json(error.message, { status: 500 });

@@ -171,8 +171,8 @@ const PersonalChats = () => {
     setSharedChats({ ...sharedChats, content: sharedChatItems });
   }, []);
   useEffect(() => {
-    console.log("personalChats", personalChats);
-    console.log("sharedChats", sharedChats);
+    // console.log("personalChats", personalChats);
+    // console.log("sharedChats", sharedChats);
   }, [personalChats, sharedChats]);
 
   return (
