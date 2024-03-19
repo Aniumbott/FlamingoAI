@@ -24,10 +24,6 @@ export async function POST(req: any, res: NextApiResponse) {
 export async function GET(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
-<<<<<<< HEAD
-    const chats = await Chat.find({ workspace_id: req.query.workspace_id });
-    return NextResponse.json({ hello: chats }, { status: 200 });
-=======
     const chats = await Chat.find();
     return NextResponse.json({ chats }, { status: 200 });
   } catch (error: any) {
@@ -59,7 +55,6 @@ export async function DELETE(req: any, res: NextApiResponse) {
       { message: "Chat deleted successfully" },
       { status: 200 }
     );
->>>>>>> e5337a0a68731ce396281602c024cdb80d1476fd
   } catch (error: any) {
     console.log("error from route", error);
     return NextResponse.json(error.message, { status: 500 });
