@@ -13,6 +13,7 @@ import SetPassword from "./SetPassword";
 import AddTwoFactor from "./AddTwoFactor";
 import DeleteAccount from "./DeleteAccount";
 import Home from "./Home";
+import { UserProfile } from "@clerk/nextjs";
 
 export default function Profile(props: { opened: boolean; setOpened: any }) {
   const { opened, setOpened } = props;
@@ -32,68 +33,77 @@ export default function Profile(props: { opened: boolean; setOpened: any }) {
       opened={opened}
       onClose={() => setOpened(false)}
       centered
-      size={900}
+      size={"100%"}
       padding={0}
-      withCloseButton={false}
     >
-      <div className={style.modal}>
-        {/* Left Container */}
-        <div className={style.leftContainer}>
-          <Button
-            leftSection={
-              <IconUser style={{ width: rem(14), height: rem(14) }} />
-            }
-            justify="start"
-            variant={activeTab === "account" ? "filled" : "subtle"}
-            onClick={() => {
-              setActiveTab("account");
-              setActive("home");
-              scrollIntoView();
-            }}
-            color="gray"
-          >
-            Account
-          </Button>
-          <Button
-            mt={10}
-            leftSection={
-              <IconShieldCheckFilled
-                style={{ width: rem(14), height: rem(14) }}
-              />
-            }
-            justify="start"
-            variant={activeTab === "security" ? "filled" : "subtle"}
-            onClick={() => {
-              setActiveTab("security");
-              setActive("home");
-              scrollIntoView();
-            }}
-            color="gray"
-          >
-            Security
-          </Button>
-        </div>
-
-        {/* Right Container */}
-        <div className={style.rightContainer}>
-          <Home
-            activeTab={activeTab}
-            active={active}
-            setActive={setActive}
-            targetRef={targetRef}
-            scrollableRef={scrollableRef}
-          />
-          <EditProfile active={active} setActive={setActive} />
-          <AddEmail active={active} setActive={setActive} />
-          <RemoveEmail active={active} setActive={setActive} />
-          <RemoveConnected active={active} setActive={setActive} />
-          <AddConnected active={active} setActive={setActive} />
-          <SetPassword active={active} setActive={setActive} />
-          <AddTwoFactor active={active} setActive={setActive} />
-          <DeleteAccount active={active} setActive={setActive} />
-        </div>
-      </div>
-      {/* Modal content */}
+      <UserProfile />
     </Modal>
+    // <Modal
+    //   opened={opened}
+    //   onClose={() => setOpened(false)}
+    //   centered
+    //   size={900}
+    //   padding={0}
+    //   withCloseButton={false}
+    // >
+    //   <div className={style.modal}>
+    //     {/* Left Container */}
+    //     <div className={style.leftContainer}>
+    //       <Button
+    //         leftSection={
+    //           <IconUser style={{ width: rem(14), height: rem(14) }} />
+    //         }
+    //         justify="start"
+    //         variant={activeTab === "account" ? "filled" : "subtle"}
+    //         onClick={() => {
+    //           setActiveTab("account");
+    //           setActive("home");
+    //           scrollIntoView();
+    //         }}
+    //         color="gray"
+    //       >
+    //         Account
+    //       </Button>
+    //       <Button
+    //         mt={10}
+    //         leftSection={
+    //           <IconShieldCheckFilled
+    //             style={{ width: rem(14), height: rem(14) }}
+    //           />
+    //         }
+    //         justify="start"
+    //         variant={activeTab === "security" ? "filled" : "subtle"}
+    //         onClick={() => {
+    //           setActiveTab("security");
+    //           setActive("home");
+    //           scrollIntoView();
+    //         }}
+    //         color="gray"
+    //       >
+    //         Security
+    //       </Button>
+    //     </div>
+
+    //     {/* Right Container */}
+    //     <div className={style.rightContainer}>
+    //       <Home
+    //         activeTab={activeTab}
+    //         active={active}
+    //         setActive={setActive}
+    //         targetRef={targetRef}
+    //         scrollableRef={scrollableRef}
+    //       />
+    //       <EditProfile active={active} setActive={setActive} />
+    //       <AddEmail active={active} setActive={setActive} />
+    //       <RemoveEmail active={active} setActive={setActive} />
+    //       <RemoveConnected active={active} setActive={setActive} />
+    //       <AddConnected active={active} setActive={setActive} />
+    //       <SetPassword active={active} setActive={setActive} />
+    //       <AddTwoFactor active={active} setActive={setActive} />
+    //       <DeleteAccount active={active} setActive={setActive} />
+    //     </div>
+    //   </div>
+    //   {/* Modal content */}
+    // </Modal>
   );
 }

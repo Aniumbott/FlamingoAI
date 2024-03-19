@@ -30,6 +30,6 @@ export async function GET(req: any, res: NextApiResponse) {
     return NextResponse.json(Users, { status: 200 });
   } catch (error) {
     console.log("error from route", error);
-    return new NextResponse("Error");
+    return NextResponse.json("Internal Server Error", {status: 500});
   }
 }

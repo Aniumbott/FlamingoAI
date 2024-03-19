@@ -139,6 +139,25 @@ interface ChatItem {
 }
 
 const PersonalChats = () => {
+  // const [apiChats, setapiChats] = useState([]);
+
+  useEffect(() => {
+    const fetchChats = async () => {
+      try {
+        const response = await fetch("/api/chat");
+        console.log(response)
+        const data = await response.json();
+        console.log(data);
+        // const response = await axios.get('/api/chat');
+        // setChats(response.data);
+      } catch (error) {
+        console.error("Failed to fetch chats:", error);
+      }
+    };
+    console.log("fetching chats");
+    fetchChats();
+  }, []);
+
   const [personalChats, setPersonalChats] = useState<Chats>({
     title: "PERSONAL",
     content: [],
