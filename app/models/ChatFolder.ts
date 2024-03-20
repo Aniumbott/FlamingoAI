@@ -4,9 +4,9 @@ import * as Mongoose from "mongoose";
 const ChatFolderSchema = new Mongoose.Schema(
   {
     name: { type: String, required: true },
-    user_id: { type: Mongoose.Types.ObjectId, ref: "User", required: true },
+    createdBy: { type: Mongoose.Types.ObjectId, ref: "User", required: true },
     scope: { type: String, enum: ["public", "private"], required: true },
-    sub_folders: [
+    subFolders: [
       {
         type: Mongoose.Types.ObjectId,
         ref: "ChatFolder",
@@ -25,9 +25,9 @@ const ChatFolderSchema = new Mongoose.Schema(
 
 interface IChatFolder {
   name: string;
-  user_id: Mongoose.Types.ObjectId;
+  userId: Mongoose.Types.ObjectId;
   scope: string;
-  sub_folders: Mongoose.Types.ObjectId;
+  subFolders: Mongoose.Types.ObjectId;
   chats: Mongoose.Types.ObjectId[];
   // workspace_id: Mongoose.Types.ObjectId;
 }

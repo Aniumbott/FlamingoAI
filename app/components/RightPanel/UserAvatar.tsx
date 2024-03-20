@@ -16,11 +16,15 @@ import {
 import { useState } from "react";
 import Profile from "./Modals/Profile/Profile";
 import Workspace from "./Modals/Workspace/Workspace";
+import { useClerk } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
 
 export default function UserAvatar() {
   const [profileModalOpened, setProfileModalOpened] = useState(false);
   const [workspaceModalOpened, setWorkspaceModalOpened] = useState(false);
   const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const { signOut } = useClerk();
+  const router = useRouter();
   return (
     <>
       <Profile opened={profileModalOpened} setOpened={setProfileModalOpened} />
@@ -99,6 +103,11 @@ export default function UserAvatar() {
           <Menu.Item
             leftSection={
               <IconLogout style={{ width: rem(14), height: rem(14) }} />
+            }
+            onClick={() =>
+              signOut(() => {
+                router.push("/");
+              })
             }
           >
             Sign Out

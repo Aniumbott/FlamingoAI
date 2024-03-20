@@ -8,11 +8,12 @@ export async function POST(req: any, res: NextApiResponse) {
     const body = await req.json();
     await dbConnect();
     const post = await Chat.create({
-      name: body.name,
-      user_id: body.user_id,
+      name: "New Chat",
+      createdBy: body.createdBy,
       scope: body.scope,
-      parent_folder: body.parent_folder,
-      archived: body.archived,
+      parentFolder: body.parentFolder || "",
+      workspaceId: body.workspaceId,
+      participants: [body.createdBy],
     });
     return NextResponse.json({ post }, { status: 200 });
   } catch (error: any) {
@@ -24,7 +25,21 @@ export async function POST(req: any, res: NextApiResponse) {
 export async function GET(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
-    const chats = await Chat.find();
+    const body = await req.json();
+    // find by workspaceId and socpe
+    let chats;
+    if (body.scope === "public") {
+      chats = await Chat.find({
+        workspaceId: body.workspaceId,
+        scope: body.scope,
+      });
+    } else if (body.scope === "private") {
+      chats = await Chat.find({
+        workspaceId: body.workspaceId,
+        scope: body.scope,
+        createdBy: body.createdBy,
+      });
+    }
     return NextResponse.json({ chats }, { status: 200 });
   } catch (error: any) {
     console.log("error from route", error);

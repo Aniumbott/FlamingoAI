@@ -25,3 +25,21 @@ body {
     text-wrap: balance;
   }
 }
+
+.modal-body {
+  background-color: transparent !important;
+}
+
+.cl-internal-rx251b,
+.cl-internal-1ee916m {
+  margin: 0;
+}
+
+.cl-internal-b3fm6y,
+.cl-internal-8nk38b {
+  display: none;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}

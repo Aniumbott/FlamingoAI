@@ -89,7 +89,7 @@
 
 // export default Home;
 
-import { ClerkLoaded, ClerkLoading, OrganizationList, SignIn } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkLoading, OrganizationList } from "@clerk/nextjs";
 import { Stack } from "@mantine/core";
 import React from "react";
 
@@ -100,11 +100,12 @@ const page = () => {
         <div>Loading you organization list</div>
       </ClerkLoading>
       {/* <ClerkLoaded> */}
-        <OrganizationList
-          afterCreateOrganizationUrl="/workspace/:slug"
-          afterSelectPersonalUrl="/user/:id"
-          afterSelectOrganizationUrl="/workspace/:slug"
-        />
+      <OrganizationList
+        hidePersonal
+        afterCreateOrganizationUrl="/workspace/:slug"
+        afterSelectPersonalUrl="/user/:id"
+        afterSelectOrganizationUrl="/workspace/:slug"
+      />
       {/* </ClerkLoaded> */}
     </Stack>
   );

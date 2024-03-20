@@ -1,4 +1,5 @@
 import { OrganizationProfile } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import {
   ActionIcon,
   Avatar,
@@ -15,6 +16,7 @@ import {
   Table,
   Text,
   Title,
+  useMantineColorScheme,
 } from "@mantine/core";
 import {
   IconDots,
@@ -52,17 +54,22 @@ const InvitationData = [
 
 const InvitePeople = (props: { opened: boolean; setOpened: any }) => {
   const [active, setActive] = useState("members");
+  const { colorScheme } = useMantineColorScheme();
   return (
     <Modal
       opened={props.opened}
       onClose={() => props.setOpened(false)}
       centered
       withCloseButton={false}
-      radius={"md"}
-      // padding={20}
-      size={"80%"}
+      radius={"lg"}
+      padding={0}
+      size={"auto"}
     >
-      <OrganizationProfile  />
+      <OrganizationProfile
+        appearance={{
+          baseTheme: colorScheme === "dark" ? dark : undefined,
+        }}
+      />
     </Modal>
 
     // <Modal
