@@ -26,7 +26,8 @@ import {
 } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import style from "../../RightPanel/RightPanel.module.css";
-
+import { getChats } from "@/app/controllers/chat";
+import { IChatDocument } from "@/app/models/Chat";
 const chats: Chats = {
   title: "Chats",
   content: [
@@ -144,19 +145,21 @@ const PersonalChats = () => {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        const response = await fetch("/api/chat");
-        console.log(response)
-        const data = await response.json();
-        console.log(data);
-        // const response = await axios.get('/api/chat');
-        // setChats(response.data);
+        setPublicChats((await getChats("public")).chats);
+        setPrivateChats((await getChats("private")).chats);
       } catch (error) {
         console.error("Failed to fetch chats:", error);
       }
     };
     console.log("fetching chats");
     fetchChats();
+
+    // const intervalId = setInterval(fetchChats, 60000);
+    // return () => clearInterval(intervalId);
   }, []);
+
+  const [publicChats, setPublicChats] = useState<IChatDocument[]>([]);
+  const [privateChats, setPrivateChats] = useState<IChatDocument[]>([]);
 
   const [personalChats, setPersonalChats] = useState<Chats>({
     title: "PERSONAL",
@@ -196,6 +199,9 @@ const PersonalChats = () => {
 
   return (
     <ScrollArea scrollbarSize={0}>
+      {publicChats.length > 0 && publicChats.map((chat) => <div>{chat.name}</div>)}
+      {privateChats.length > 0 && privateChats.map((chat) => <div>{chat.name}</div>)}
+        
       <Accordion
         chevronPosition="left"
         className={style.parent}

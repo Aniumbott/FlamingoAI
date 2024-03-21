@@ -1,18 +1,15 @@
 import * as Mongoose from "mongoose";
-import { IChatDocument } from "../models/Chat";
+import { IChatFolderDocument } from "../models/ChatFolder";
 
 const createdBy = "user_2dsZmTZTBij5xjWmPjvirpXKtsL";
 const workspaceId = "org_2dsZqn6iZka7bixMpUXGc9oa8at";
 
 type Scope = "public" | "private";
 
-async function createChat(
-  scope: Scope,
-  parentFolder: Mongoose.Types.ObjectId | null
-) {
-  const data = await fetch("/api/chat", {
+async function createChatFolder(scope: Scope) {
+  const data = await fetch("/api/chatFolder", {
     method: "POST",
-    body: JSON.stringify({ createdBy, scope, workspaceId, parentFolder }),
+    body: JSON.stringify({ createdBy, scope, workspaceId }),
     headers: {
       "Content-Type": "application/json",
     },
@@ -22,7 +19,7 @@ async function createChat(
   return response;
 }
 
-async function getChats(scope: Scope) {
+async function getChatFolders(scope: Scope) {
   const data = await fetch(
     `/api/chat/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}`,
     {
@@ -36,7 +33,7 @@ async function getChats(scope: Scope) {
   return response;
 }
 
-async function updateChat(id: String, body: any) {
+async function updateChatFolders(id: String, body: any) {
   const data = await fetch("/api/chat", {
     method: "PUT",
     body: JSON.stringify({ id, ...body }),
@@ -48,7 +45,7 @@ async function updateChat(id: String, body: any) {
   return response;
 }
 
-async function deleteChat(chat: IChatDocument) {
+async function deleteChatFolders(chat: IChatFolderDocument) {
   // call controller to delete messages message ref array
 
   const data = await fetch("/api/chat", {
@@ -62,4 +59,4 @@ async function deleteChat(chat: IChatDocument) {
   return response;
 }
 
-export { createChat, getChats, updateChat, deleteChat };
+export { createChatFolder, getChatFolders, updateChatFolders, deleteChatFolders };

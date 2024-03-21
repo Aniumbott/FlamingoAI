@@ -15,6 +15,8 @@ import {
   IconStar,
   IconUsers,
 } from "@tabler/icons-react";
+import { createChat } from "@/app/controllers/chat";
+import { createChatFolder } from "@/app/controllers/folders";
 
 type MenuData = {
   title: string;
@@ -60,16 +62,16 @@ const NewMenu = () => {
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item>
+        <Menu.Item onClick={createPublicChat}>
           <MenuButton properties={NewMenuData[0]} />
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item onClick={createPrivateChat}>
           <MenuButton properties={NewMenuData[1]} />
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item onClick={createPublicFolder}>
           <MenuButton properties={NewMenuData[2]} />
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item onClick={createPrivateFolder}>
           <MenuButton properties={NewMenuData[3]} />
         </Menu.Item>
         <Menu.Item>
@@ -79,6 +81,30 @@ const NewMenu = () => {
     </Menu>
   );
 };
+
+const createPublicChat = async () => {
+  console.log("creating public chat");
+  const res = await createChat("public", null);
+  console.log("res", res);
+};
+
+const createPrivateChat = async () => {
+  console.log("creating private chat");
+  const res = await createChat("private", null);
+  console.log("res", res);
+};
+
+const createPublicFolder = async () => {
+  console.log("creating public folder");
+  const res = await createChatFolder("public");
+  console.log("res", res);
+}
+
+const createPrivateFolder = async () => {
+  console.log("creating private folder");
+  const res = await createChatFolder("private");
+  console.log("res", res);
+}
 
 const MenuButton = (props: MenuButtonProps) => {
   const { hovered, ref } = useHover();
