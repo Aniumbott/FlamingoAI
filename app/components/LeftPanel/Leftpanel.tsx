@@ -19,7 +19,7 @@ const LeftPanel = () => {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   return (
     <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
-      <Group justify="space-around">
+      <Group justify="space-between" align="center" grow preventGrowOverflow={false}>
         <OrganizationSwitcher
           hidePersonal
           appearance={{

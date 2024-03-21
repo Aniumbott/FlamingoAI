@@ -1,38 +1,29 @@
-import * as Mongoose from "mongoose";
 import {
   Accordion,
   AccordionControl,
   AccordionPanel,
   ActionIcon,
-  Center,
-  Divider,
   Group,
-  Menu,
   ScrollArea,
   Text,
-  rem,
 } from "@mantine/core";
 import {
-  IconAlignJustified,
   IconCaretRightFilled,
-  IconDots,
-  IconFolderFilled,
-  IconFolderOpen,
   IconFolderPlus,
   IconPlus,
-  IconSortAscending,
-  IconSortAscendingLetters,
-  IconSortDescending,
-  IconSortDescendingLetters,
 } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import style from "../RightPanel/RightPanel.module.css";
-import { createChat, getChats } from "@/app/controllers/chat";
+import { getChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
-import { createChatFolder, getChatFolders } from "@/app/controllers/folders";
+import { getChatFolders } from "@/app/controllers/folders";
 import ChatItem from "./ChatItem";
 import FolderItem from "./FolderItem";
+import PromptMenu from "./Menu/PromptMenu";
+import { newChat } from "./ChatItem";
+import { newFolder } from "./FolderItem";
+
 const chats: Chats = {
   title: "Chats",
   content: [
@@ -126,20 +117,6 @@ const chats: Chats = {
     },
   ],
 };
-// type AccordionItem = {
-//   id: string;
-//   title: string;
-//   content: any[];
-// };
-
-// interface ChatFolder {
-//   name: string;
-//   createdBy: string;
-//   workspaceId: string;
-//   scope: string;
-//   subFolders: ChatFolder[];
-//   chats: IChatDocument[];
-// }
 
 interface Chats {
   title: string;
@@ -180,8 +157,6 @@ const PersonalChats = () => {
       try {
         setPublicFolders((await getChatFolders("public")).chatFolder);
         setPrivateFolders((await getChatFolders("private")).chatFolder);
-        console.log("publicFolders", publicFolders);
-        console.log("privateFolders", privateFolders);
       } catch (error) {
         console.error("Failed to fetch folders:", error);
       }
@@ -227,21 +202,7 @@ const PersonalChats = () => {
   }, [privateChats, publicChats]);
 
   return (
-    <ScrollArea scrollbarSize={0} pb={"10"}>
-      {/* <div className="text-lg font-bold">Public Folders</div>
-      {publicFolders.length > 0 &&
-        publicFolders.map((folder, key) => <div key={key}>{folder.name}</div>)}
-      <div className="text-lg font-bold">Private Folders</div>
-      {privateFolders.length > 0 &&
-        privateFolders.map((folder, key) => <div key={key}>{folder.name}</div>)}
-
-      <div className="text-lg font-bold">Public Chats</div>
-      {publicChats.length > 0 &&
-        publicChats.map((chat, key) => <div key={key}>{chat.name}</div>)}
-      <div className="text-lg font-bold">Private Chats</div>
-      {privateChats.length > 0 &&
-        privateChats.map((chat, key) => <div key={key}>{chat.name}</div>)} */}
-
+    <ScrollArea scrollbarSize={3} pb={"10"}>
       <Accordion
         chevronPosition="left"
         className={style.parent}
@@ -253,26 +214,6 @@ const PersonalChats = () => {
             <AccordianLabel title={"SHARED"} scope="public" />
           </Accordion.Control>
           <AccordionPanel>
-            {/* {sharedChats.content.map((subItem, subIndex) => {
-              if (subItem.type == "folder")
-                return (
-                  <div key={subIndex}>
-                    <Accordion
-                      chevronPosition="left"
-                      classNames={{ chevron: style.chevron }}
-                      chevron={<IconCaretRightFilled className={style.icon} />}
-                    >
-                      <FolderItem item={subItem} />
-                    </Accordion>
-                  </div>
-                );
-              else
-                return (
-                  <div key={subIndex}>
-                     <ChatItem item={subItem} /> 
-                  </div>
-                );
-            })} */}
             {publicFolders.map((folder, key) => (
               <Accordion
                 chevronPosition="left"
@@ -280,7 +221,7 @@ const PersonalChats = () => {
                 chevron={<IconCaretRightFilled className={style.icon} />}
                 key={key}
               >
-                <FolderItem folder={folder} />
+                <FolderItem folder={folder} scope={"public"} />
               </Accordion>
             ))}
             {publicChats.map((chat, key) => (
@@ -294,26 +235,6 @@ const PersonalChats = () => {
             <AccordianLabel title={"PERSONAL"} scope="private" />
           </AccordionControl>
           <AccordionPanel>
-            {/* {personalChats.content.map((subItem, subIndex) => {
-              if (subItem.type == "folder")
-                return (
-                  <div key={subIndex}>
-                    <Accordion
-                      chevronPosition="left"
-                      classNames={{ chevron: style.chevron }}
-                      chevron={<IconCaretRightFilled className={style.icon} />}
-                    >
-                      <FolderItem item={subItem} />
-                    </Accordion>
-                  </div>
-                );
-              else
-                return (
-                  <div key={subIndex}>
-                    <ChatItem item={subItem} />
-                  </div>
-                );
-            })} */}
             {privateFolders.map((folder, key) => (
               <Accordion
                 chevronPosition="left"
@@ -321,7 +242,7 @@ const PersonalChats = () => {
                 chevron={<IconCaretRightFilled className={style.icon} />}
                 key={key}
               >
-                <FolderItem folder={folder} />
+                <FolderItem folder={folder} scope={"private"} />
               </Accordion>
             ))}
             {privateChats.map((chat, key) => (
@@ -332,21 +253,6 @@ const PersonalChats = () => {
       </Accordion>
     </ScrollArea>
   );
-};
-
-const newChat = async (
-  scope: "private" | "public",
-  parentFolder: Mongoose.Types.ObjectId | null
-) => {
-  console.log("creating new chat");
-  const res = await createChat(scope, parentFolder);
-  console.log("res", res);
-};
-
-const newFolder = async (scope: "public" | "private") => {
-  console.log("creating new folder");
-  const res = await createChatFolder(scope);
-  console.log("res", res);
 };
 
 const AccordianLabel = (props: {
@@ -390,7 +296,7 @@ const AccordianLabel = (props: {
           }}
           onClick={(event) => {
             event.stopPropagation();
-            newFolder(props.scope);
+            newFolder(props.scope, null);
             // Add any additional logic for the ActionIcon click here
           }}
         >
@@ -418,49 +324,4 @@ const AccordianLabel = (props: {
   );
 };
 
-const PromptMenu = () => {
-  return (
-    <Menu>
-      <Menu.Target>
-        <IconDots style={{ width: "70%", height: "70%" }} stroke={1.5} />
-      </Menu.Target>
-
-      <Menu.Dropdown>
-        <Menu.Label>Sort</Menu.Label>
-        <Menu.Item
-          leftSection={
-            <IconSortAscendingLetters
-              style={{ width: rem(14), height: rem(14) }}
-            />
-          }
-        >
-          Name A-Z
-        </Menu.Item>
-        <Menu.Item
-          leftSection={
-            <IconSortDescendingLetters
-              style={{ width: rem(14), height: rem(14) }}
-            />
-          }
-        >
-          Name Z-A
-        </Menu.Item>
-        <Menu.Item
-          leftSection={
-            <IconSortAscending style={{ width: rem(14), height: rem(14) }} />
-          }
-        >
-          Oldest First
-        </Menu.Item>
-        <Menu.Item
-          leftSection={
-            <IconSortDescending style={{ width: rem(14), height: rem(14) }} />
-          }
-        >
-          Newest First
-        </Menu.Item>
-      </Menu.Dropdown>
-    </Menu>
-  );
-};
 export default PersonalChats;

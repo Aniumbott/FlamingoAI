@@ -2,11 +2,13 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { dbConnect } from "@/app/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import Chat from "@/app/models/Chat";
+import ChatFolder from "@/app/models/ChatFolder";
 
 export async function POST(req: any, res: NextApiResponse) {
   try {
     const body = await req.json();
     await dbConnect();
+    console.log("body", body);
     const chat = await Chat.create({
       name: "New Chat",
       createdBy: body.createdBy,
@@ -15,6 +17,15 @@ export async function POST(req: any, res: NextApiResponse) {
       workspaceId: body.workspaceId,
       participants: [body.createdBy],
     });
+
+    // If parentFolder was provided, add the new chat ID to the parent folder's chats array
+    if (body.parentFolder) {
+      await ChatFolder.findByIdAndUpdate(body.parentFolder, {
+        $push: { chats: chat._id },
+      });
+      console.log("pushed ", chat._id, "to parent folder ", body.parentFolder);
+    }
+
     return NextResponse.json({ chat }, { status: 200 });
   } catch (error: any) {
     console.log("error at POST in Chat route", error);
@@ -40,12 +51,14 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
       chats = await Chat.find({
         workspaceId: workspaceId,
         scope: scope,
+        parentFolder: null,
       });
     } else if (scope === "private") {
       chats = await Chat.find({
         workspaceId: workspaceId,
         scope: scope,
         createdBy: createdBy,
+        parentFolder: null,
       });
     }
     return NextResponse.json({ chats }, { status: 200 });

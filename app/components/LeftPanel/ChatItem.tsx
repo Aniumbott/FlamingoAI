@@ -3,6 +3,17 @@ import { useRouter, usePathname } from "next/navigation";
 import { IconAlignJustified } from "@tabler/icons-react";
 import { Text } from "@mantine/core";
 import style from "../RightPanel/RightPanel.module.css";
+import Mongoose from "mongoose";
+import { createChat } from "@/app/controllers/chat";
+
+export const newChat = async (
+  scope: "private" | "public",
+  parentFolder: Mongoose.Types.ObjectId | null
+) => {
+  console.log("creating new chat");
+  const res = await createChat(scope, parentFolder);
+  console.log("res", res);
+};
 
 export default function ChatItem(props: { item: IChatDocument }) {
   const router = useRouter();
