@@ -7,7 +7,7 @@ const workspaceId = "org_2dsZqn6iZka7bixMpUXGc9oa8at";
 type Scope = "public" | "private";
 
 async function createChatFolder(scope: Scope) {
-  const data = await fetch("/api/chatFolder", {
+  const data = await fetch("/api/chatfolder", {
     method: "POST",
     body: JSON.stringify({ createdBy, scope, workspaceId }),
     headers: {
@@ -21,7 +21,7 @@ async function createChatFolder(scope: Scope) {
 
 async function getChatFolders(scope: Scope) {
   const data = await fetch(
-    `/api/chat/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}`,
+    `/api/chatfolder/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}`,
     {
       method: "GET",
       headers: {
@@ -30,6 +30,7 @@ async function getChatFolders(scope: Scope) {
     }
   );
   const response = await data.json();
+  console.log("response", response)
   return response;
 }
 

@@ -10,6 +10,7 @@ export async function POST(req: any, res: NextApiResponse) {
     const chatFolder = await ChatFolder.create({
       name: "New Folder",
       createdBy: body.createdBy,
+      workspaceId: body.workspaceId,
       scope: body.scope,
       subFolders: body.subFolders,
       chats: body.chats,

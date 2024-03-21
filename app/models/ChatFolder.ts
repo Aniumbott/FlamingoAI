@@ -1,12 +1,13 @@
 import { Document, Model } from "mongoose";
 import * as Mongoose from "mongoose";
+import { IChatDocument } from "./Chat";
 
 const ChatFolderSchema = new Mongoose.Schema(
   {
     name: { type: String, required: true },
     createdBy: { type: String, ref: "User", required: true },
     scope: { type: String, enum: ["public", "private"], required: true },
-    workspaceId: { type: String, ref: "Workspace", required: true, },
+    workspaceId: { type: String, ref: "Workspace", required: true },
     subFolders: [
       {
         type: Mongoose.Types.ObjectId,
@@ -27,8 +28,8 @@ interface IChatFolder {
   createdBy: string;
   workspaceId: string;
   scope: string;
-  subFolders: Mongoose.Types.ObjectId[];
-  chats: Mongoose.Types.ObjectId[];
+  subFolders: Mongoose.Types.ObjectId[] | IChatFolderDocument[];
+  chats: Mongoose.Types.ObjectId[] | IChatDocument[];
 }
 
 interface IChatFolderDocument extends IChatFolder, Document {}
