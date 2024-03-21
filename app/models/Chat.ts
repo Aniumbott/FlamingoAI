@@ -8,8 +8,8 @@ const ChatSchema = new Mongoose.Schema(
     scope: { type: String, enum: ["public", "private"], required: true },
     parentFolder: {
       type: Mongoose.Types.ObjectId || null,
-      ref: "ChatFolder",
-      required: false,
+      ref: "chat_folders",
+      required: true,
     },
     archived: { type: Boolean, required: false, default: false },
 

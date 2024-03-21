@@ -6,10 +6,13 @@ const workspaceId = "org_2dsZqn6iZka7bixMpUXGc9oa8at";
 
 type Scope = "public" | "private";
 
-async function createChatFolder(scope: Scope) {
+async function createChatFolder(
+  scope: Scope,
+  parentFolder: Mongoose.Types.ObjectId | null
+) {
   const data = await fetch("/api/chatfolder", {
     method: "POST",
-    body: JSON.stringify({ createdBy, scope, workspaceId }),
+    body: JSON.stringify({ createdBy, scope, workspaceId, parentFolder }),
     headers: {
       "Content-Type": "application/json",
     },
@@ -30,7 +33,7 @@ async function getChatFolders(scope: Scope) {
     }
   );
   const response = await data.json();
-  console.log("response", response)
+  console.log("response", response);
   return response;
 }
 
@@ -60,4 +63,9 @@ async function deleteChatFolders(chat: IChatFolderDocument) {
   return response;
 }
 
-export { createChatFolder, getChatFolders, updateChatFolders, deleteChatFolders };
+export {
+  createChatFolder,
+  getChatFolders,
+  updateChatFolders,
+  deleteChatFolders,
+};

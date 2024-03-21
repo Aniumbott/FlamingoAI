@@ -32,6 +32,7 @@ import { IChatDocument } from "@/app/models/Chat";
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
 import { createChatFolder, getChatFolders } from "@/app/controllers/folders";
 import { ObjectId } from "mongodb";
+import { useHover } from "@mantine/hooks";
 const chats: Chats = {
   title: "Chats",
   content: [
@@ -179,8 +180,6 @@ const PersonalChats = () => {
       try {
         setPublicFolders((await getChatFolders("public")).chatFolder);
         setPrivateFolders((await getChatFolders("private")).chatFolder);
-        console.log("publicFolders", publicFolders);
-        console.log("privateFolders", privateFolders);
       } catch (error) {
         console.error("Failed to fetch folders:", error);
       }
@@ -226,7 +225,7 @@ const PersonalChats = () => {
   }, [privateChats, publicChats]);
 
   return (
-    <ScrollArea scrollbarSize={0} pb={"10"}>
+    <ScrollArea scrollbarSize={3} pb={"10"}>
       {/* <div className="text-lg font-bold">Public Folders</div>
       {publicFolders.length > 0 &&
         publicFolders.map((folder, key) => <div key={key}>{folder.name}</div>)}
@@ -279,7 +278,7 @@ const PersonalChats = () => {
                 chevron={<IconCaretRightFilled className={style.icon} />}
                 key={key}
               >
-                <FolderItem folder={folder} />
+                <FolderItem folder={folder} scope={"public"} />
               </Accordion>
             ))}
             {publicChats.map((chat, key) => (
@@ -320,7 +319,7 @@ const PersonalChats = () => {
                 chevron={<IconCaretRightFilled className={style.icon} />}
                 key={key}
               >
-                <FolderItem folder={folder} />
+                <FolderItem folder={folder} scope={"private"} />
               </Accordion>
             ))}
             {privateChats.map((chat, key) => (
@@ -342,9 +341,12 @@ const newChat = async (
   console.log("res", res);
 };
 
-const newFolder = async (scope: "public" | "private") => {
+const newFolder = async (
+  scope: "public" | "private",
+  parentFolder: Mongoose.Types.ObjectId | null
+) => {
   console.log("creating new folder");
-  const res = await createChatFolder(scope);
+  const res = await createChatFolder(scope, parentFolder);
   console.log("res", res);
 };
 
@@ -389,7 +391,7 @@ const AccordianLabel = (props: {
           }}
           onClick={(event) => {
             event.stopPropagation();
-            newFolder(props.scope);
+            newFolder(props.scope,null);
             // Add any additional logic for the ActionIcon click here
           }}
         >
@@ -417,58 +419,137 @@ const AccordianLabel = (props: {
   );
 };
 
-const FolderLabel = (props: { title: string; isOpened: boolean }) => {
+const FolderLabel = (props: {
+  folder: IChatFolderDocument;
+  scope: "public" | "private";
+  isOpened: boolean;
+  isHovered: boolean;
+}) => {
   return (
-    <div className="flex justify-start items-center">
-      {props.isOpened ? (
-        <IconFolderOpen
+    // <div className="flex justify-start items-center">
+    <Group
+      wrap="nowrap"
+      justify="space-between"
+      preventGrowOverflow={false}
+    >
+      <Group wrap="nowrap" gap={2} align="center">
+        {props.isOpened ? (
+          <IconFolderOpen
+            style={{
+              width: "1rem",
+              height: "1rem",
+              color: "var(--mantine-color-yellow-3)",
+            }}
+          />
+        ) : (
+          <IconFolderFilled
+            style={{
+              width: "1rem",
+              height: "1rem",
+              color: "var(--mantine-color-yellow-3)",
+            }}
+          />
+        )}
+        <Text size="sm" w={100} ml={8} truncate="end" >
+          {props.folder.name} {" "}
+          {props.folder._id.slice(-2)}
+        </Text>
+      </Group>
+      {props.isHovered && (
+        <Group wrap="nowrap" gap={5} align="center">
+          <ActionIcon
+          size="sm"
+          variant="subtle"
+          aria-label="Sort"
+          color="#9CA3AF"
           style={{
-            width: "1rem",
-            height: "1rem",
-            color: "var(--mantine-color-yellow-3)",
+            "--ai-hover-color": "white",
+            "--ai-hover": "#047857",
           }}
-        />
-      ) : (
-        <IconFolderFilled
-          style={{
-            width: "1rem",
-            height: "1rem",
-            color: "var(--mantine-color-yellow-3)",
+          onClick={(event) => {
+            event.stopPropagation();
+            newFolder(props.scope, props.folder._id);
+            // Add any additional logic for the ActionIcon click here
           }}
-        />
+        >
+          <IconFolderPlus size={"1rem"} />
+        </ActionIcon>
+          <ActionIcon
+            size="sm"
+            variant="subtle"
+            aria-label="Sort"
+            color="#9CA3AF"
+            style={{
+              "--ai-hover-color": "white",
+              "--ai-hover": "#047857",
+            }}
+            onClick={(event) => {
+              event.stopPropagation();
+              newChat(props.scope, props.folder._id);
+              // Add any additional logic for the ActionIcon click here
+            }}
+          >
+            <IconPlus size={"1rem"} />
+          </ActionIcon>
+          <ActionIcon
+            size="sm"
+            variant="subtle"
+            aria-label="Sort"
+            color="#9CA3AF"
+            style={{
+              "--ai-hover-color": "white",
+            }}
+            onClick={(event) => {
+              event.stopPropagation();
+              // Add any additional logic for the ActionIcon click here
+            }}
+          >
+            <PromptMenu />
+          </ActionIcon>
+        </Group>
       )}
-      <Text size="sm" style={{ marginLeft: "0.5rem" }}>
-        {props.title}
-      </Text>
-    </div>
+    </Group>
   );
 };
 
-const FolderItem = (props: { folder: IChatFolderDocument }) => {
-  const { folder } = props;
+const FolderItem = (props: {
+  folder: IChatFolderDocument;
+  scope: "public" | "private";
+}) => {
+  const { folder, scope } = props;
+  const [isOpened, setIsOpened] = useState(false);
+  const { ref, hovered } = useHover();
   return (
     <>
       <Accordion.Item value={folder._id}>
-        <Accordion.Control>
-          <FolderLabel title={folder.name} isOpened={false} />
-        </Accordion.Control>
+        <div ref={ref}>
+          <Accordion.Control onClick={() => setIsOpened(!isOpened)}>
+            <FolderLabel
+              folder={folder}
+              scope={scope}
+              isHovered={hovered}
+              isOpened={isOpened}
+            />
+          </Accordion.Control>
+        </div>
 
         <Accordion.Panel>
-          {folder.subFolders.map((subFolder, subIndex) => (
+          {folder.subFolders?.length > 0 && folder.subFolders.map((subFolder, subIndex) => (
             <div key={subIndex}>
               <Accordion
                 chevronPosition="left"
                 classNames={{ chevron: style.chevron }}
                 chevron={<IconCaretRightFilled className={style.icon} />}
               >
-                <div>{subFolder.toString()}</div>
-                <FolderItem folder={subFolder as IChatFolderDocument} />
+                <FolderItem
+                  folder={subFolder as IChatFolderDocument}
+                  scope={scope}
+                />
               </Accordion>
             </div>
           ))}
-          {folder.chats.map((chat, chatIndex) => (
+          { folder.chats?.length > 0 && folder.chats.map((chat, chatIndex) => (
             <div key={chatIndex}>
-              <div>{chat.toString()}</div>
               <ChatItem item={chat as IChatDocument} />
             </div>
           ))}
@@ -530,8 +611,8 @@ const ChatItem = (props: { item: IChatDocument }) => {
             height: "1rem",
           }}
         />
-        <Text size="sm" style={{ marginLeft: "0.5rem" }}>
-          {item.name}
+        <Text size="sm" w={150} truncate="end" ml={8}>
+          {item.name}{" "}{item._id.slice(-4)}
         </Text>
       </div>
     </>

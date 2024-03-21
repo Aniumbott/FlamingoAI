@@ -96,13 +96,13 @@ const createPrivateChat = async () => {
 
 const createPublicFolder = async () => {
   console.log("creating public folder");
-  const res = await createChatFolder("public");
+  const res = await createChatFolder("public",null);
   console.log("res", res);
 }
 
 const createPrivateFolder = async () => {
   console.log("creating private folder");
-  const res = await createChatFolder("private");
+  const res = await createChatFolder("private",null);
   console.log("res", res);
 }
 
