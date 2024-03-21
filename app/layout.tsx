@@ -12,7 +12,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { ClerkProvider } from "@clerk/nextjs";
-import StoreProvider from "./lib/StoreProvider";
+import StoreProvider from "./redux/StoreProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 

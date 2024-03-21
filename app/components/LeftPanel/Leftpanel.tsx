@@ -18,16 +18,26 @@ const LeftPanel = () => {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   return (
     <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
-      <SingleMenu />
+      <Group justify="space-around">
+        <OrganizationSwitcher
+          hidePersonal
+          appearance={{
+            baseTheme: colorScheme === "dark" ? dark : undefined,
+            elements: {
+              organizationSwitcherPopoverActionButtonText: {
+                content: "red",
+              },
+            },
+          }}
+        />
+        <SingleMenu />
+      </Group>
+
       {/* <ClerkLoading>
         <div>Loading</div>
       </ClerkLoading> */}
       {/* <ClerkLoaded> */}
-      <OrganizationSwitcher
-        appearance={{
-          baseTheme: colorScheme === "dark" ? dark : undefined,
-        }}
-      />
+
       {/* </ClerkLoaded> */}
       <Group
         justify="flex-start"

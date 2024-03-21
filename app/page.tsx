@@ -89,7 +89,7 @@
 
 // export default Home;
 
-import { ClerkLoaded, ClerkLoading, OrganizationList } from "@clerk/nextjs";
+import { ClerkLoading, OrganizationList } from "@clerk/nextjs";
 import { Stack } from "@mantine/core";
 import React from "react";
 

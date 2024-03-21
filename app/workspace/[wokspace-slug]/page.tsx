@@ -5,28 +5,40 @@ import { AppShell, Group, Title, ActionIcon, Button } from "@mantine/core";
 import { IconLayoutSidebarRightExpand } from "@tabler/icons-react";
 // import { MantineLogo } from '@mantinex/mantine-logo';
 import { useDisclosure } from "@mantine/hooks";
-import NavigationBar from "../../components/NavigationBar" ;
+import NavigationBar from "../../components/NavigationBar";
 import RightPanel from "../../components/RightPanel/RightPanel";
 import LeftPanel from "../../components/LeftPanel/Leftpanel";
-import { OrganizationList, OrganizationProfile, OrganizationSwitcher, UserButton } from "@clerk/nextjs";
+import {
+  OrganizationList,
+  OrganizationProfile,
+  OrganizationSwitcher,
+  UserButton,
+  useAuth,
+} from "@clerk/nextjs";
+import { getChats } from "@/app/controllers/chat";
 
 const Workspace = () => {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
   const [rightOpened, { toggle: toggleRight }] = useDisclosure(true);
+  const { orgId } = useAuth();
+
+  useEffect(() => {
+    console.log("orgId", orgId);
+  }, [orgId]);
 
   return (
     <AppShell
       // header={{ height: 60 }}
 
       navbar={{
-        width: 270,
+        width: 300,
         breakpoint: "sm",
-        collapsed: { desktop: !leftOpened },
+        collapsed: { desktop: !leftOpened, mobile: !leftOpened },
       }}
       aside={{
         width: 325,
         breakpoint: "md",
-        collapsed: { desktop: !rightOpened },
+        collapsed: { desktop: !rightOpened, mobile: !rightOpened },
       }}
       padding="md"
     >
@@ -53,33 +65,7 @@ const Workspace = () => {
       </AppShell.Aside>
       <AppShell.Main style={{ paddingTop: 0 }}>
         <NavigationBar leftOpened={leftOpened} toggleLeft={toggleLeft} />
-        <Button
-          onClick={() => {
-            fetch("/api/profile", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                clerk_user_id: "123",
-                name: "Poorvank Shah",
-                email: "poorvank@gmail.com",
-                photo_url: "https://www.google.com",
-              }),
-            })
-              .then((res) => res.json())
-              .then(
-                (data) => {
-                  console.log("data", data);
-                },
-                (err) => {
-                  console.log("err", err);
-                }
-              );
-          }}
-        >
-          PROFILE POST REQ!!!
-        </Button>
+        <Button>GET CHATS!!!</Button>
       </AppShell.Main>
     </AppShell>
   );
