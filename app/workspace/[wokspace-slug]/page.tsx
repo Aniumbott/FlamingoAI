@@ -16,11 +16,18 @@ import {
   useAuth,
 } from "@clerk/nextjs";
 import { getChats } from "@/app/controllers/chat";
+import { usePathname } from "next/navigation";
 
-const Workspace = () => {
+const Workspace = ({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) => {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
   const [rightOpened, { toggle: toggleRight }] = useDisclosure(true);
   const { orgId } = useAuth();
+
+  const pathname = usePathname();
 
   useEffect(() => {
     console.log("orgId", orgId);
@@ -65,7 +72,7 @@ const Workspace = () => {
       </AppShell.Aside>
       <AppShell.Main style={{ paddingTop: 0 }}>
         <NavigationBar leftOpened={leftOpened} toggleLeft={toggleLeft} />
-        <Button>GET CHATS!!!</Button>
+        {pathname.split("/")[2] ? children : <Button>GET CHATS!!!</Button>}
       </AppShell.Main>
     </AppShell>
   );

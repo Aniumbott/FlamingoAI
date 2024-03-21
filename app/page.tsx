@@ -90,10 +90,11 @@
 // export default Home;
 
 import { ClerkLoading, OrganizationList } from "@clerk/nextjs";
+import { dark } from "@clerk/themes";
 import { Stack } from "@mantine/core";
 import React from "react";
 
-const page = () => {
+export default function Page() {
   return (
     <Stack gap={20} justify="center" align="center" w="100%" h="100vh">
       <ClerkLoading>
@@ -109,6 +110,4 @@ const page = () => {
       {/* </ClerkLoaded> */}
     </Stack>
   );
-};
-
-export default page;
+}

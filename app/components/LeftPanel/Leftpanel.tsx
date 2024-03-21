@@ -7,7 +7,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import PersonalChats from "./Menu/PersonalChats";
+import PersonalChats from "./PersonalChats";
 import SingleMenu from "./Menu/WorkspaceMenu";
 import FilterMenuComponent from "./Menu/FilterMenu";
 import NewMenuComponent from "./Menu/NewMenu";
@@ -24,11 +24,6 @@ const LeftPanel = () => {
           hidePersonal
           appearance={{
             baseTheme: colorScheme === "dark" ? dark : undefined,
-            elements: {
-              organizationSwitcherPopoverActionButtonText: {
-                content: "red",
-              },
-            },
           }}
         />
         <SingleMenu />
