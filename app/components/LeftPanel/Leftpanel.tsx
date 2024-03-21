@@ -13,6 +13,7 @@ import FilterMenuComponent from "./Menu/FilterMenu";
 import NewMenuComponent from "./Menu/NewMenu";
 import { ClerkLoaded, ClerkLoading, OrganizationSwitcher } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
+import { createChat } from "../../controllers/chat";
 
 const LeftPanel = () => {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
@@ -54,7 +55,7 @@ const LeftPanel = () => {
           gap={1}
           w={"10%"}
         >
-          <Button color="#047857" px={"xs"}>
+          <Button color="#047857" px={"xs"} onClick={createPublicChat}>
             <IconPlus size={20} />
           </Button>
           <NewMenuComponent />
@@ -65,6 +66,12 @@ const LeftPanel = () => {
       <Divider orientation="horizontal" />
     </Stack>
   );
+};
+
+const createPublicChat = async () => {
+  console.log("creating a chat");
+  const res = await createChat("public", null);
+  console.log("res", res);
 };
 
 export default LeftPanel;

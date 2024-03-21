@@ -5,13 +5,13 @@ import ChatFolder from "@/app/models/ChatFolder";
 
 export async function POST(req: any, res: NextApiResponse) {
   try {
-    const body = await req.json();
     await dbConnect();
+    const body = await req.json();
     const chatFolder = await ChatFolder.create({
-      name: body.name,
-      user_id: body.user_id,
+      name: "New Folder",
+      createdBy: body.createdBy,
       scope: body.scope,
-      sub_folders: body.sub_folders,
+      subFolders: body.subFolders,
       chats: body.chats,
     });
     return NextResponse.json({ chatFolder }, { status: 200 });
@@ -24,7 +24,27 @@ export async function POST(req: any, res: NextApiResponse) {
 export async function GET(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
-    const chatFolder = await ChatFolder.find();
+
+    const reqParam = req.nextUrl.searchParams;
+    const scope = reqParam.get("scope");
+    const workspaceId = reqParam.get("workspaceId");
+    const createdBy = reqParam.get("createdBy");
+
+    // find by workspaceId and socpe
+    let chatFolder;
+    if (scope === "public") {
+      chatFolder = await ChatFolder.find({
+        workspaceId: workspaceId,
+        scope: scope,
+      });
+    } else if (scope === "private") {
+      chatFolder = await ChatFolder.find({
+        workspaceId: workspaceId,
+        scope: scope,
+        createdBy: createdBy,
+      });
+    }
+
     return NextResponse.json({ chatFolder }, { status: 200 });
   } catch (error: any) {
     console.log("error from route", error);
@@ -37,7 +57,9 @@ export async function PUT(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
-    const chatFolder = await ChatFolder.findByIdAndUpdate(body.id, body, { new: true });
+    const chatFolder = await ChatFolder.findByIdAndUpdate(body.id, body, {
+      new: true,
+    });
     return NextResponse.json({ chatFolder }, { status: 200 });
   } catch (error: any) {
     console.log("error from route", error);
@@ -60,4 +82,3 @@ export async function DELETE(req: any, res: NextApiResponse) {
     return NextResponse.json(error.message, { status: 500 });
   }
 }
-

@@ -4,8 +4,9 @@ import * as Mongoose from "mongoose";
 const ChatFolderSchema = new Mongoose.Schema(
   {
     name: { type: String, required: true },
-    createdBy: { type: Mongoose.Types.ObjectId, ref: "User", required: true },
+    createdBy: { type: String, ref: "User", required: true },
     scope: { type: String, enum: ["public", "private"], required: true },
+    workspaceId: { type: String, ref: "Workspace", required: true, },
     subFolders: [
       {
         type: Mongoose.Types.ObjectId,
@@ -15,8 +16,6 @@ const ChatFolderSchema = new Mongoose.Schema(
       },
     ],
     chats: [{ type: Mongoose.Types.ObjectId, ref: "Chat", default: [] }],
-
-    // workspace_id: { type: Mongoose.Types.ObjectId, ref: "Workspace", required: true },
   },
   {
     timestamps: true,
@@ -25,11 +24,11 @@ const ChatFolderSchema = new Mongoose.Schema(
 
 interface IChatFolder {
   name: string;
-  userId: Mongoose.Types.ObjectId;
+  createdBy: string;
+  workspaceId: string;
   scope: string;
-  subFolders: Mongoose.Types.ObjectId;
+  subFolders: Mongoose.Types.ObjectId[];
   chats: Mongoose.Types.ObjectId[];
-  // workspace_id: Mongoose.Types.ObjectId;
 }
 
 interface IChatFolderDocument extends IChatFolder, Document {}
@@ -40,3 +39,4 @@ const ChatFolder: IChatFolderModel =
   Mongoose.model<IChatFolderDocument>("chat_folders", ChatFolderSchema);
 
 export default ChatFolder;
+export type { IChatFolderDocument };

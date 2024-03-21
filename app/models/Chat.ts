@@ -4,10 +4,10 @@ import * as Mongoose from "mongoose";
 const ChatSchema = new Mongoose.Schema(
   {
     name: { type: String, required: true },
-    createdBy: { type: Mongoose.Types.ObjectId, ref: "User", required: true },
+    createdBy: { type: String, ref: "User", required: true },
     scope: { type: String, enum: ["public", "private"], required: true },
     parentFolder: {
-      type: Mongoose.Types.ObjectId,
+      type: Mongoose.Types.ObjectId || null,
       ref: "ChatFolder",
       required: false,
     },
@@ -15,11 +15,11 @@ const ChatSchema = new Mongoose.Schema(
 
     messages: [{ type: Mongoose.Types.ObjectId, ref: "Message", default: [] }],
     workspaceId: {
-      type: Mongoose.Types.ObjectId,
+      type: String,
       ref: "Workspace",
       required: true,
     },
-    participants: [{ type: Mongoose.Types.ObjectId, ref: "User", default: [] }],
+    participants: [{ type: String, ref: "User", default: [] }],
     // model
   },
   {
@@ -29,13 +29,13 @@ const ChatSchema = new Mongoose.Schema(
 
 interface IChat {
   name: string;
-  createdBy: Mongoose.Types.ObjectId;
+  createdBy: string;
+  workspaceId: string;
   scope: string;
-  parentFolder: Mongoose.Types.ObjectId;
+  parentFolder: Mongoose.Types.ObjectId | null;
   archived: boolean;
   messages: Mongoose.Types.ObjectId[];
-  workspaceId: Mongoose.Types.ObjectId;
-  participants: Mongoose.Types.ObjectId[];
+  participants: string[];
 }
 
 interface IChatDocument extends IChat, Document {}
