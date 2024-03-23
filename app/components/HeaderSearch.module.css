@@ -1,5 +1,6 @@
 .header {
   height: 3rem;
+  margin-left: -15px;
   margin-bottom: rem(120px);
   background-color: var(--mantine-color-body);
   border-bottom: rem(1px) solid

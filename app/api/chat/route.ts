@@ -44,22 +44,31 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
     const scope = reqParam.get("scope");
     const workspaceId = reqParam.get("workspaceId");
     const createdBy = reqParam.get("createdBy");
+    const id = reqParam.get("id");
 
     // find by workspaceId and socpe
     let chats;
-    if (scope === "public") {
+    if (id === "all") {
+      if (scope === "public") {
+        chats = await Chat.find({
+          workspaceId: workspaceId,
+          scope: scope,
+          parentFolder: null,
+        });
+      } else if (scope === "private") {
+        chats = await Chat.find({
+          workspaceId: workspaceId,
+          scope: scope,
+          createdBy: createdBy,
+          parentFolder: null,
+        });
+      }
+    } else {
       chats = await Chat.find({
         workspaceId: workspaceId,
-        scope: scope,
-        parentFolder: null,
+        _id: id,
       });
-    } else if (scope === "private") {
-      chats = await Chat.find({
-        workspaceId: workspaceId,
-        scope: scope,
-        createdBy: createdBy,
-        parentFolder: null,
-      });
+      console.log("chats", chats);
     }
     return NextResponse.json({ chats }, { status: 200 });
   } catch (error: any) {

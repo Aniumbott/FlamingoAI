@@ -13,6 +13,7 @@ export const newChat = async (
   console.log("creating new chat");
   const res = await createChat(scope, parentFolder);
   console.log("res", res);
+  return res;
 };
 
 export default function ChatItem(props: { item: IChatDocument }) {
