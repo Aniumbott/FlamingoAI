@@ -45,10 +45,13 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
     const workspaceId = reqParam.get("workspaceId");
     const createdBy = reqParam.get("createdBy");
     const id = reqParam.get("id");
-
+    const independent = reqParam.get("independent");
+    console.log(scope, workspaceId, createdBy, id, independent);
     // find by workspaceId and socpe
     let chats;
-    if (id === "all") {
+
+    // get independent chats based on scope
+    if (independent) {
       if (scope === "public") {
         chats = await Chat.find({
           workspaceId: workspaceId,
@@ -63,12 +66,21 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
           parentFolder: null,
         });
       }
-    } else {
+    }
+    //get all chats relevant to workspace and user
+    else if (id === "all") {
+      chats = await Chat.find({
+        workspaceId: workspaceId,
+        $or: [{ scope: "public" }, { scope: "private", createdBy: createdBy }],
+      });
+    }
+    // get specific chat by id
+    else if (id) {
       chats = await Chat.find({
         workspaceId: workspaceId,
         _id: id,
       });
-      console.log("chats", chats);
+      // console.log("chats", chats);
     }
     return NextResponse.json({ chats }, { status: 200 });
   } catch (error: any) {

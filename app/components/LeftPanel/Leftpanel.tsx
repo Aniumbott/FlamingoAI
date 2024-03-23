@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Button,
   Stack,
@@ -7,19 +7,27 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import PersonalChats from "./PersonalChats";
+import GeneralChats from "./GeneralChats";
 import SingleMenu from "./Menu/WorkspaceMenu";
 import FilterMenuComponent from "./Menu/FilterMenu";
 import NewMenuComponent from "./Menu/NewMenu";
 import { ClerkLoaded, ClerkLoading, OrganizationSwitcher } from "@clerk/nextjs";
 import { dark } from "@clerk/themes";
 import { createChat } from "../../controllers/chat";
+import PeopleChats from "./PeopleChats";
+import RecentChats from "./RecentChats";
 
 const LeftPanel = () => {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const [filterMenu, setFilterMenu] = useState(0);
   return (
     <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
-      <Group justify="space-between" align="center" grow preventGrowOverflow={false}>
+      <Group
+        justify="space-between"
+        align="center"
+        grow
+        preventGrowOverflow={false}
+      >
         <OrganizationSwitcher
           hidePersonal
           appearance={{
@@ -42,7 +50,10 @@ const LeftPanel = () => {
         preventGrowOverflow={false}
         gap={10}
       >
-        <FilterMenuComponent />
+        <FilterMenuComponent
+          filterMenu={filterMenu}
+          setFilterMenu={setFilterMenu}
+        />
         <Group
           color="#047857"
           wrap="nowrap"
@@ -57,7 +68,19 @@ const LeftPanel = () => {
         </Group>
       </Group>
 
-      <PersonalChats />
+      {(() => {
+        switch (filterMenu) {
+          case 0:
+            return <GeneralChats />;
+          case 1:
+            return <PeopleChats />;
+          case 2:
+            return <RecentChats />;
+          default:
+            return null;
+        }
+      })()}
+
       <Divider orientation="horizontal" />
     </Stack>
   );

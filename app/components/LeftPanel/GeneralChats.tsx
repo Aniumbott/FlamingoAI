@@ -14,7 +14,7 @@ import {
 } from "@tabler/icons-react";
 import React, { useEffect, useState } from "react";
 import style from "../RightPanel/RightPanel.module.css";
-import { getChats } from "@/app/controllers/chat";
+import { getIndependentChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
 import { getChatFolders } from "@/app/controllers/folders";
@@ -141,14 +141,13 @@ const PersonalChats = () => {
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        setPublicChats((await getChats("public")).chats);
-        setPrivateChats((await getChats("private")).chats);
+        setPublicChats((await getIndependentChats("public")).chats);
+        setPrivateChats((await getIndependentChats("private")).chats);
       } catch (error) {
         console.error("Failed to fetch chats:", error);
       }
     };
 
-    console.log("fetching chats");
     fetchChats();
   }, []);
 
@@ -161,7 +160,6 @@ const PersonalChats = () => {
         console.error("Failed to fetch folders:", error);
       }
     };
-    console.log("fetching folders");
     fetchFolders();
   }, []);
 

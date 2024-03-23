@@ -24,7 +24,6 @@ import {
   UserButton,
   useAuth,
 } from "@clerk/nextjs";
-import { getChats } from "@/app/controllers/chat";
 import { usePathname, useRouter } from "next/navigation";
 import { newChat } from "@/app/components/LeftPanel/ChatItem";
 
