@@ -3,11 +3,15 @@
 import React, { useEffect, useState } from "react";
 import Workspace from "../page";
 import { usePathname } from "next/navigation";
-import { Container, Divider, Text } from "@mantine/core";
-import { getChat, getChats } from "@/app/controllers/chat";
+import { Button, Container, Divider, Text } from "@mantine/core";
+import { getChat, getChats, updateChat } from "@/app/controllers/chat";
 import { auth, clerkClient, useOrganization } from "@clerk/nextjs";
 import { getAuth } from "@clerk/nextjs/server";
 import { Content } from "next/font/google";
+import dummies from "@/public/messages.json";
+import { sendMessage } from "@/app/controllers/message";
+
+import * as Mongoose from "mongoose";
 
 export default function ChatWindow() {
   const pathname = usePathname();
@@ -16,10 +20,13 @@ export default function ChatWindow() {
   );
   const { organization } = useOrganization();
   const [chat, setChat] = useState<any>(null);
+  const [messages, setMessages] = useState<any>([]);
 
   useEffect(() => {
+    console.log(Mongoose.models);
     const getCurrentChat = async () => {
       setChat((await getChat(currentChatId, organization?.id || "")).chats[0]);
+      setMessages(chat.messages);
     };
     getCurrentChat();
   }, [currentChatId, organization]);
@@ -45,6 +52,40 @@ export default function ChatWindow() {
           marginLeft: "-15px",
         }}
       />
+
+      {messages.map((message: any) => {
+        return (
+          <Container key={message._id}>
+            <Text>{message.content}</Text>
+          </Container>
+        );
+      })}
+
+      <Container>
+        <Button
+          color="red"
+          onClick={() => {
+            const message = dummies[1];
+            sendMessage(
+              message.createdBy,
+              message.content,
+              message.type,
+              message.chatId
+            ).then((res) => {
+              updateChat(currentChatId, {
+                ...chat,
+                messages: [...chat.messages, res.message._id],
+              }).then((res) => {
+                setChat(res.chat);
+                console.log(res.message);
+              });
+              setMessages([...messages, res.message]);
+            });
+          }}
+        >
+          Send Dummy
+        </Button>
+      </Container>
     </Workspace>
   );
 }

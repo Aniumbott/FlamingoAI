@@ -3,23 +3,24 @@ import * as Mongoose from "mongoose";
 
 const MessageSchema = new Mongoose.Schema(
   {
-    user_id: {
-      type: String,
-      required: true,
-    },
+    createdBy: { type: String, ref: "User", required: true },
     content: {
       type: String,
       required: true,
     },
-    participant: {
+    type: {
       type: String,
       enum: ["user", "assistant"],
       required: true,
     },
-    chat: {
-      type: Mongoose.Types.ObjectId,
-      ref: "Chat",
+    chatId: {
+      type: String,
+      ref: "chats",
       required: true,
+    },
+    updatedAt: {
+      type: Date,
+      required: false,
     },
 
     // comments
@@ -30,9 +31,11 @@ const MessageSchema = new Mongoose.Schema(
 );
 
 interface IMessage {
-  user_id: string;
-  content: string;
-  participant: string;
+  createdBy: String;
+  content: String;
+  type: String;
+  chatId: String;
+  updatedAt: Date;
 }
 
 interface IMessageDocument extends IMessage, Document {}
@@ -44,3 +47,4 @@ const Message: IMessageModel =
   Mongoose.model<IMessageDocument>("messages", MessageSchema);
 
 export default Message;
+export type { IMessageDocument };

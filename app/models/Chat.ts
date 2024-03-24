@@ -1,5 +1,6 @@
 import { Document, Model } from "mongoose";
 import * as Mongoose from "mongoose";
+require("./Message.ts");
 
 const ChatSchema = new Mongoose.Schema(
   {
@@ -12,7 +13,7 @@ const ChatSchema = new Mongoose.Schema(
     },
     archived: { type: Boolean, required: false, default: false },
 
-    messages: [{ type: Mongoose.Types.ObjectId, ref: "Message", default: [] }],
+    messages: [{ type: Mongoose.Types.ObjectId, ref: "messages", default: [] }],
     workspaceId: {
       type: String,
       ref: "Workspace",

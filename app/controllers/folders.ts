@@ -2,7 +2,7 @@ import * as Mongoose from "mongoose";
 import { IChatFolderDocument } from "../models/ChatFolder";
 
 const createdBy = "user_2dsZmTZTBij5xjWmPjvirpXKtsL";
-const workspaceId = "org_2dsZqn6iZka7bixMpUXGc9oa8at";
+const workspaceId = "org_2dz9SJPInQzTNl4R7qBx7DfFYby";
 
 type Scope = "public" | "private";
 

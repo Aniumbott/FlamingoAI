@@ -67,7 +67,7 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
       chats = await Chat.find({
         workspaceId: workspaceId,
         _id: id,
-      });
+      }).populate("messages");
       console.log("chats", chats);
     }
     return NextResponse.json({ chats }, { status: 200 });
