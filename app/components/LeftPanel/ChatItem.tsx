@@ -25,9 +25,9 @@ export default function ChatItem(props: { item: IChatDocument }) {
       <div
         className={style.prompt}
         onClick={() => {
-          router.push(
-            pathname.split("/").slice(0, 3).join("/") + "/" + item._id
-          );
+          const newUrl =
+            pathname.split("/").slice(0, 3).join("/") + "/" + item._id;
+          window.history.pushState({}, "", newUrl);
         }}
       >
         <IconAlignJustified

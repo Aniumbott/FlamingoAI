@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Workspace from "../page";
 import { usePathname } from "next/navigation";
 import { Button, Container, Divider, Text } from "@mantine/core";
-import { getChat, getChats, updateChat } from "@/app/controllers/chat";
+import { getChat, updateChat } from "@/app/controllers/chat";
 import { auth, clerkClient, useOrganization } from "@clerk/nextjs";
 import { getAuth } from "@clerk/nextjs/server";
 import { Content } from "next/font/google";

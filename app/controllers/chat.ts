@@ -33,9 +33,24 @@ async function getChat(id: String, workspaceId: String) {
   return response;
 }
 
-async function getChats(scope: Scope) {
+async function getIndependentChats(scope: Scope) {
   const data = await fetch(
-    `/api/chat/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}&id=all`,
+    `/api/chat/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}&independent=true`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+
+  const response = await data.json();
+  return response;
+}
+
+async function getAllChats() {
+  const data = await fetch(
+    `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&id=all`,
     {
       method: "GET",
       headers: {
@@ -73,4 +88,4 @@ async function deleteChat(chat: IChatDocument) {
   return response;
 }
 
-export { createChat, getChat, getChats, updateChat, deleteChat };
+export { createChat, getChat, getIndependentChats, getAllChats, updateChat, deleteChat };

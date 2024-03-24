@@ -25,9 +25,9 @@ type MenuButtonProps = {
   };
 };
 
-const FilterMenu = () => {
+const FilterMenu = (props: {filterMenu:number, setFilterMenu: (value: number) => void }) => {
   const { hovered, ref } = useHover();
-
+  const {filterMenu,setFilterMenu} = props;
   return (
     <Menu
       position="top-start"
@@ -66,23 +66,23 @@ const FilterMenu = () => {
           {...(hovered ? { color: "gray" } : { color: "#9CA3AF" })}
           variant="subtle"
         >
-          {FilterMenuData[0].title}
+          {FilterMenuData[filterMenu].title}
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item>
+        <Menu.Item onClick={()=>props.setFilterMenu(0)}>
           <MenuButton properties={FilterMenuData[0]} />
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item onClick={()=>props.setFilterMenu(1)}>
           <MenuButton properties={FilterMenuData[1]} />
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item onClick={()=>props.setFilterMenu(2)}>
           <MenuButton properties={FilterMenuData[2]} />
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item onClick={()=>props.setFilterMenu(3)}>
           <MenuButton properties={FilterMenuData[3]} />
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item onClick={()=>props.setFilterMenu(4)}>
           <MenuButton properties={FilterMenuData[4]} />
         </Menu.Item>
       </Menu.Dropdown>
