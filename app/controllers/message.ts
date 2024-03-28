@@ -2,10 +2,10 @@ import * as Mongoose from "mongoose";
 import { IMessageDocument } from "../models/Message";
 
 async function sendMessage(
-  createdBy: string,
-  content: string,
-  type: string,
-  chatId: string
+  createdBy: String,
+  content: String,
+  type: String,
+  chatId: String
 ) {
   const data = await fetch("/api/message", {
     method: "POST",

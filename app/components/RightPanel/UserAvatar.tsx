@@ -1,11 +1,5 @@
-import {
-  Avatar,
-  Menu,
-  Text,
-  rem,
-  Group,
-  useMantineColorScheme,
-} from "@mantine/core";
+// Modules
+import { Avatar, Menu, Text, rem, useMantineColorScheme } from "@mantine/core";
 import {
   IconSettings,
   IconUser,
@@ -14,10 +8,12 @@ import {
   IconLogout,
 } from "@tabler/icons-react";
 import { useState } from "react";
-import Profile from "./Modals/Profile/Profile";
-import Workspace from "./Modals/Workspace/Workspace";
 import { useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
+
+// Components
+// import Profile from "./Modals/Profile/Profile";
+import Workspace from "./Modals/Workspace/Workspace";
 
 export default function UserAvatar() {
   const [profileModalOpened, setProfileModalOpened] = useState(false);
@@ -27,7 +23,7 @@ export default function UserAvatar() {
   const router = useRouter();
   return (
     <>
-      <Profile opened={profileModalOpened} setOpened={setProfileModalOpened} />
+      {/* <Profile opened={profileModalOpened} setOpened={setProfileModalOpened} /> */}
       <Workspace
         opened={workspaceModalOpened}
         setOpened={setWorkspaceModalOpened}

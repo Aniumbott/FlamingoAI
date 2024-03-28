@@ -1,11 +1,14 @@
 import { Document, Model } from "mongoose";
 import * as Mongoose from "mongoose";
+require("./User.ts");
+require("./ChatFolder.ts");
 require("./Message.ts");
+require("./Workspace.ts");
 
 const ChatSchema = new Mongoose.Schema(
   {
     name: { type: String, required: true },
-    createdBy: { type: String, ref: "User", required: true },
+    createdBy: { type: String, ref: "users", required: true },
     scope: { type: String, enum: ["public", "private"], required: true },
     parentFolder: {
       type: Mongoose.Types.ObjectId || null,
@@ -16,10 +19,10 @@ const ChatSchema = new Mongoose.Schema(
     messages: [{ type: Mongoose.Types.ObjectId, ref: "messages", default: [] }],
     workspaceId: {
       type: String,
-      ref: "Workspace",
+      ref: "workspaces",
       required: true,
     },
-    participants: [{ type: String, ref: "User", default: [] }],
+    participants: [{ type: String, ref: "users", default: [] }],
     // model
   },
   {

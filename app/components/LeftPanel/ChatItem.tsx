@@ -1,9 +1,12 @@
-import { IChatDocument } from "@/app/models/Chat";
+// Modules
 import { useRouter, usePathname } from "next/navigation";
-import { IconAlignJustified } from "@tabler/icons-react";
-import { Text } from "@mantine/core";
-import style from "../RightPanel/RightPanel.module.css";
 import Mongoose from "mongoose";
+import { Text } from "@mantine/core";
+import { IconAlignJustified } from "@tabler/icons-react";
+
+// Compoonents
+import style from "../RightPanel/RightPanel.module.css";
+import { IChatDocument } from "@/app/models/Chat";
 import { createChat } from "@/app/controllers/chat";
 
 export const newChat = async (

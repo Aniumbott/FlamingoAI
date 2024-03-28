@@ -1,28 +1,24 @@
-import { getAllChats } from "@/app/controllers/chat";
-import React, { useEffect, useState } from "react";
-import ChatItem from "./ChatItem";
-import { IChatDocument } from "@/app/models/Chat";
+// Modules
+import { useEffect, useState } from "react";
 import { useOrganization } from "@clerk/nextjs";
 import {
   Accordion,
-  AccordionControl,
   AccordionPanel,
   ActionIcon,
   Avatar,
-  Divider,
   Group,
   ScrollArea,
   Text,
   ThemeIcon,
 } from "@mantine/core";
+import { IconCaretRightFilled } from "@tabler/icons-react";
+
+// Compontets
+import ChatItem from "./ChatItem";
+import { getAllChats } from "@/app/controllers/chat";
+import { IChatDocument } from "@/app/models/Chat";
 import style from "../RightPanel/RightPanel.module.css";
-import {
-  IconCaretRightFilled,
-  IconFolderPlus,
-  IconPlus,
-} from "@tabler/icons-react";
 import PromptMenu from "./Menu/PromptMenu";
-import { useHover } from "@mantine/hooks";
 
 const PeopleChats = () => {
   useEffect(() => {
@@ -81,9 +77,10 @@ const PeopleChats = () => {
     </ScrollArea>
   );
 };
+
 const AccordianLabel = (props: { user: any; chatCount: number }) => {
   const { user, chatCount } = props;
-  console.log(user)
+  console.log(user);
   return (
     <Group wrap="nowrap" gap={"xs"} justify="space-between">
       {user.hasImage ? (

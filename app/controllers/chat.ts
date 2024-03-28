@@ -23,6 +23,7 @@ async function createChat(
 }
 
 async function getChat(id: String, workspaceId: String) {
+  console.log("collecting all chats");
   const data = await fetch(`/api/chat/?&workspaceId=${workspaceId}&id=${id}`, {
     method: "GET",
     headers: {
@@ -88,4 +89,11 @@ async function deleteChat(chat: IChatDocument) {
   return response;
 }
 
-export { createChat, getChat, getIndependentChats, getAllChats, updateChat, deleteChat };
+export {
+  createChat,
+  getChat,
+  getIndependentChats,
+  getAllChats,
+  updateChat,
+  deleteChat,
+};

@@ -94,7 +94,9 @@ export async function PUT(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
-    const chat = await Chat.findByIdAndUpdate(body.id, body, { new: true });
+    const chat = await Chat.findByIdAndUpdate(body.id, body, {
+      new: true,
+    }).populate("messages");
     return NextResponse.json({ chat }, { status: 200 });
   } catch (error: any) {
     console.log("error at PUT in Chat route", error);

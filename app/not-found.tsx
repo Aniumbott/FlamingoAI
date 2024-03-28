@@ -1,8 +1,12 @@
 "use client";
-import { Container, Title, Text, Button, Group } from "@mantine/core";
-import { Illustration } from "./components/Illustration";
-import classes from "./NothingFoundBackground.module.css";
+
+// Modules
 import { useRouter } from "next/navigation";
+import { Container, Title, Text, Button, Group } from "@mantine/core";
+
+// Components
+import classes from "./NothingFoundBackground.module.css";
+import { Illustration } from "./components/Illustration";
 
 export default function NothingFoundBackground() {
   const router = useRouter();

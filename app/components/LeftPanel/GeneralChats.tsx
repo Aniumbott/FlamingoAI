@@ -1,3 +1,5 @@
+// Modules
+import { useEffect, useState } from "react";
 import {
   Accordion,
   AccordionControl,
@@ -12,17 +14,16 @@ import {
   IconFolderPlus,
   IconPlus,
 } from "@tabler/icons-react";
-import React, { useEffect, useState } from "react";
-import style from "../RightPanel/RightPanel.module.css";
+
+// Components
+import ChatItem, { newChat } from "./ChatItem";
+import FolderItem, { newFolder } from "./FolderItem";
 import { getIndependentChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
 import { getChatFolders } from "@/app/controllers/folders";
-import ChatItem from "./ChatItem";
-import FolderItem from "./FolderItem";
 import PromptMenu from "./Menu/PromptMenu";
-import { newChat } from "./ChatItem";
-import { newFolder } from "./FolderItem";
+import style from "../RightPanel/RightPanel.module.css";
 
 const chats: Chats = {
   title: "Chats",

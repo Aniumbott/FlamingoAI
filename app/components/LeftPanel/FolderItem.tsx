@@ -1,3 +1,7 @@
+// Modules
+import { useState } from "react";
+import { useHover } from "@mantine/hooks";
+import Mongoose from "mongoose";
 import { Accordion, Text, Group, ActionIcon } from "@mantine/core";
 import {
   IconCaretRightFilled,
@@ -8,14 +12,12 @@ import {
 } from "@tabler/icons-react";
 import { IChatDocument } from "@/app/models/Chat";
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
-import ChatItem from "./ChatItem";
-import style from "../RightPanel/RightPanel.module.css";
-import { useState } from "react";
-import { useHover } from "@mantine/hooks";
-import { createChatFolder } from "@/app/controllers/folders";
+
+// Components
 import PromptMenu from "./Menu/PromptMenu";
-import Mongoose from "mongoose";
-import { newChat } from "./ChatItem";
+import ChatItem, { newChat } from "./ChatItem";
+import { createChatFolder } from "@/app/controllers/folders";
+import style from "../RightPanel/RightPanel.module.css";
 
 export const newFolder = async (
   scope: "public" | "private",
@@ -69,26 +71,6 @@ export default function FolderItem(props: {
                 <ChatItem item={chat as IChatDocument} />
               </div>
             ))}
-
-          {/* {Array.isArray(folder.content) &&
-            item.content.map((subItem, subIndex) => {
-              if (subItem.type == "folder")
-                return (
-                  <div key={subIndex}>
-                    <Accordion
-                      chevronPosition="left"
-                      classNames={{ chevron: style.chevron }}
-                      chevron={<IconCaretRightFilled className={style.icon} />}
-                    >
-                      <FolderItem item={subItem} />
-                    </Accordion>
-                  </div>
-                );
-              else
-                return (
-                  <div key={subIndex}> <ChatItem item={subItem} /> </div>
-                );
-            })} */}
         </Accordion.Panel>
       </Accordion.Item>
     </>

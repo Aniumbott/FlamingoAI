@@ -1,5 +1,5 @@
+// Modules
 import { Accordion, Text, ActionIcon, Center, Menu, rem } from "@mantine/core";
-import style from "../RightPanel/RightPanel.module.css";
 import {
   IconCaretRightFilled,
   IconDots,
@@ -12,6 +12,9 @@ import {
   IconSortDescending,
   IconAlignJustified,
 } from "@tabler/icons-react";
+
+// Components
+import style from "../RightPanel/RightPanel.module.css";
 
 type Props = {
   item: {

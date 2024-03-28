@@ -13,10 +13,7 @@ import {
   IconRocket,
 } from "@tabler/icons-react";
 import classes from "./HeaderSearch.module.css";
-import WorkspaceBranding from "./LeftPanel/Modals/WorkspaceBranding";
 import { useState } from "react";
-import { OrganizationProfile } from "@clerk/nextjs";
-import InvitePeople from "./LeftPanel/Modals/InvitePeople";
 
 export default function NavigationBar(props: {
   leftOpened: boolean;
@@ -90,7 +87,7 @@ export default function NavigationBar(props: {
           </Button>
         </Group>
       </div>
-      <InvitePeople opened={open} setOpened={setOpen} />
+      {/* <InvitePeople opened={open} setOpened={setOpen} /> */}
     </header>
   );
 }

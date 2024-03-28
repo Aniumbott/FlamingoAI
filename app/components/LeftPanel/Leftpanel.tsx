@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+// Modules
+import { useState } from "react";
 import {
   Button,
   Stack,
@@ -7,18 +8,20 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import GeneralChats from "./GeneralChats";
+import { OrganizationSwitcher } from "@clerk/nextjs";
+
+// Components
 import SingleMenu from "./Menu/WorkspaceMenu";
+import ChatMenu from "./Menu/ChatMenu";
 import FilterMenuComponent from "./Menu/FilterMenu";
-import NewMenuComponent from "./Menu/NewMenu";
-import { ClerkLoaded, ClerkLoading, OrganizationSwitcher } from "@clerk/nextjs";
+import GeneralChats from "./GeneralChats";
 import { dark } from "@clerk/themes";
 import { createChat } from "../../controllers/chat";
 import PeopleChats from "./PeopleChats";
 import RecentChats from "./RecentChats";
 
 const LeftPanel = () => {
-  const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const { colorScheme } = useMantineColorScheme();
   const [filterMenu, setFilterMenu] = useState(0);
   return (
     <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
@@ -37,12 +40,6 @@ const LeftPanel = () => {
         <SingleMenu />
       </Group>
 
-      {/* <ClerkLoading>
-        <div>Loading</div>
-      </ClerkLoading> */}
-      {/* <ClerkLoaded> */}
-
-      {/* </ClerkLoaded> */}
       <Group
         justify="flex-start"
         wrap="nowrap"
@@ -64,7 +61,7 @@ const LeftPanel = () => {
           <Button color="#047857" px={"xs"} onClick={createPublicChat}>
             <IconPlus size={20} />
           </Button>
-          <NewMenuComponent />
+          <ChatMenu />
         </Group>
       </Group>
 

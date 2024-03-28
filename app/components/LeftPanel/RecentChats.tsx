@@ -1,6 +1,9 @@
+// Modules
+import { useEffect, useState } from "react";
+
+// Components
 import { getAllChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
-import React, { useEffect, useState } from "react";
 import ChatItem from "./ChatItem";
 
 const RecentChats = () => {
@@ -19,11 +22,13 @@ const RecentChats = () => {
 
   const [recentChats, setRecentChats] = useState<IChatDocument[]>([]);
 
-  return <div>
-    {recentChats.map((chat,key) => {
-      return <ChatItem item={chat} key={key} />
-    })}
-  </div>;
+  return (
+    <div>
+      {recentChats.map((chat, key) => {
+        return <ChatItem item={chat} key={key} />;
+      })}
+    </div>
+  );
 };
 
 export default RecentChats;

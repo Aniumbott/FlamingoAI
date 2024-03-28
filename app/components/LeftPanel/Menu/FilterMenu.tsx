@@ -1,4 +1,4 @@
-import React from "react";
+// Modules
 import { Menu, Button, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import {
@@ -25,9 +25,12 @@ type MenuButtonProps = {
   };
 };
 
-const FilterMenu = (props: {filterMenu:number, setFilterMenu: (value: number) => void }) => {
+const FilterMenu = (props: {
+  filterMenu: number;
+  setFilterMenu: (value: number) => void;
+}) => {
   const { hovered, ref } = useHover();
-  const {filterMenu,setFilterMenu} = props;
+  const { filterMenu, setFilterMenu } = props;
   return (
     <Menu
       position="top-start"
@@ -70,19 +73,19 @@ const FilterMenu = (props: {filterMenu:number, setFilterMenu: (value: number) =>
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item onClick={()=>props.setFilterMenu(0)}>
+        <Menu.Item onClick={() => props.setFilterMenu(0)}>
           <MenuButton properties={FilterMenuData[0]} />
         </Menu.Item>
-        <Menu.Item onClick={()=>props.setFilterMenu(1)}>
+        <Menu.Item onClick={() => props.setFilterMenu(1)}>
           <MenuButton properties={FilterMenuData[1]} />
         </Menu.Item>
-        <Menu.Item onClick={()=>props.setFilterMenu(2)}>
+        <Menu.Item onClick={() => props.setFilterMenu(2)}>
           <MenuButton properties={FilterMenuData[2]} />
         </Menu.Item>
-        <Menu.Item onClick={()=>props.setFilterMenu(3)}>
+        <Menu.Item onClick={() => props.setFilterMenu(3)}>
           <MenuButton properties={FilterMenuData[3]} />
         </Menu.Item>
-        <Menu.Item onClick={()=>props.setFilterMenu(4)}>
+        <Menu.Item onClick={() => props.setFilterMenu(4)}>
           <MenuButton properties={FilterMenuData[4]} />
         </Menu.Item>
       </Menu.Dropdown>

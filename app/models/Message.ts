@@ -1,9 +1,10 @@
 import { Document, Model } from "mongoose";
 import * as Mongoose from "mongoose";
+require("./User.ts");
 
 const MessageSchema = new Mongoose.Schema(
   {
-    createdBy: { type: String, ref: "User", required: true },
+    createdBy: { type: String, ref: "users", required: true },
     content: {
       type: String,
       required: true,

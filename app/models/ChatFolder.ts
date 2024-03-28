@@ -1,13 +1,16 @@
 import { Document, Model } from "mongoose";
 import * as Mongoose from "mongoose";
 import { IChatDocument } from "./Chat";
+require("./User.ts");
+require("./Workspace.ts");
+require("./ChatFolder.ts");
 
 const ChatFolderSchema = new Mongoose.Schema(
   {
     name: { type: String, required: true },
-    createdBy: { type: String, ref: "User", required: true },
+    createdBy: { type: String, ref: "users", required: true },
     scope: { type: String, enum: ["public", "private"], required: true },
-    workspaceId: { type: String, ref: "Workspace", required: true },
+    workspaceId: { type: String, ref: "workspaces", required: true },
     parentFolder: {
       type: Mongoose.Types.ObjectId || null,
       ref: "chat_folders",

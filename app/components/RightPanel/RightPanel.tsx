@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+// Modules
+import { useState } from "react";
 import {
-  Card,
-  Avatar,
   ActionIcon,
   CloseButton,
   Text,
@@ -24,6 +23,8 @@ import {
   IconSearch,
   IconCaretRightFilled,
 } from "@tabler/icons-react";
+
+// Components
 import style from "./RightPanel.module.css";
 import UserAvatar from "./UserAvatar";
 import LibraryAccordianItem from "./LibraryAccordianItem";

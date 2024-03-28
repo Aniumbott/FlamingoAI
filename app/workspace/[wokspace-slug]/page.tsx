@@ -1,9 +1,8 @@
 "use client";
-
-import React, { useEffect, useState } from "react";
+// Modules
+import { useEffect } from "react";
 import {
   AppShell,
-  Group,
   Title,
   ActionIcon,
   Button,
@@ -11,27 +10,19 @@ import {
   Container,
   Text,
 } from "@mantine/core";
-import { IconLayoutSidebarRightExpand, IconPlus } from "@tabler/icons-react";
-// import { MantineLogo } from '@mantinex/mantine-logo';
 import { useDisclosure } from "@mantine/hooks";
+import { IconLayoutSidebarRightExpand, IconPlus } from "@tabler/icons-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
+
+// Compontets
+import { newChat } from "@/app/components/LeftPanel/ChatItem";
 import NavigationBar from "../../components/NavigationBar";
 import RightPanel from "../../components/RightPanel/RightPanel";
 import LeftPanel from "../../components/LeftPanel/Leftpanel";
-import {
-  OrganizationList,
-  OrganizationProfile,
-  OrganizationSwitcher,
-  UserButton,
-  useAuth,
-} from "@clerk/nextjs";
-import { usePathname, useRouter } from "next/navigation";
-import { newChat } from "@/app/components/LeftPanel/ChatItem";
+import ChatWindow from "./ChatWindow";
 
-const Workspace = ({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) => {
+const Workspace = () => {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
   const [rightOpened, { toggle: toggleRight }] = useDisclosure(true);
   const { orgId } = useAuth();
@@ -80,37 +71,50 @@ const Workspace = ({
         <RightPanel rightOpened={rightOpened} toggleRight={toggleRight} />
       </AppShell.Aside>
       <AppShell.Main
-        style={{ paddingTop: 0, position: "relative", paddingBottom: "0rem" }}
+        style={{
+          paddingTop: 0,
+          position: "relative",
+          paddingBottom: "0rem",
+          overflowY: "hidden",
+        }}
       >
-        <NavigationBar leftOpened={leftOpened} toggleLeft={toggleLeft} />
-        {pathname.split("/")[3] ? (
-          children
-        ) : (
-          <Stack>
-            <Container mt={150}>
-              <Text>What do you want to do ?</Text>
-              <Button
-                radius="md"
-                mt={20}
-                size="lg"
-                color="teal"
-                onClick={() => {
-                  const req = newChat("public", null);
-                  req.then((res) => {
-                    router.push(
-                      pathname.split("/").slice(0, 3).join("/") +
-                        "/" +
-                        res.chat._id
-                    );
-                  });
-                }}
-                leftSection={<IconPlus />}
-              >
-                Share a Chat
-              </Button>
-            </Container>
-          </Stack>
-        )}
+        <div
+          className="h-dvh w-full"
+          style={{
+            position: "relative",
+            marginLeft: "-15px",
+          }}
+        >
+          <NavigationBar leftOpened={leftOpened} toggleLeft={toggleLeft} />
+          {pathname.split("/")[3] ? (
+            <ChatWindow currentChatId={pathname.split("/")[3]} />
+          ) : (
+            <Stack>
+              <Container mt={150}>
+                <Text>What do you want to do ?</Text>
+                <Button
+                  radius="md"
+                  mt={20}
+                  size="lg"
+                  color="teal"
+                  onClick={() => {
+                    const req = newChat("public", null);
+                    req.then((res) => {
+                      router.push(
+                        pathname.split("/").slice(0, 3).join("/") +
+                          "/" +
+                          res.chat._id
+                      );
+                    });
+                  }}
+                  leftSection={<IconPlus />}
+                >
+                  Share a Chat
+                </Button>
+              </Container>
+            </Stack>
+          )}
+        </div>
       </AppShell.Main>
     </AppShell>
   );

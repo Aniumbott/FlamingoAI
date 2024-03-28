@@ -1,18 +1,13 @@
+// Modules
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
-
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
-// import "@mantine/spotlight/styles.css";
-// import "@mantine/modals/styles.css";
-
-import {
-  ColorSchemeScript,
-  MantineProvider,
-  useMantineColorScheme,
-} from "@mantine/core";
 import { ClerkProvider } from "@clerk/nextjs";
 import StoreProvider from "./redux/StoreProvider";
+
+// Componets
+import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 

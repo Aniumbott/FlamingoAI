@@ -1,20 +1,16 @@
-import React from "react";
+// Modules
 import { Menu, Button, Stack, Text } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import {
-  IconArchive,
-  IconCalendarClock,
   IconChevronDown,
   IconFolderPlus,
   IconFolderRoot,
-  IconListDetails,
   IconLock,
   IconMessages,
   IconNews,
-  IconSelector,
-  IconStar,
-  IconUsers,
 } from "@tabler/icons-react";
+
+// Components
 import { createChat } from "@/app/controllers/chat";
 import { createChatFolder } from "@/app/controllers/folders";
 
@@ -33,7 +29,7 @@ type MenuButtonProps = {
   };
 };
 
-const NewMenu = () => {
+const ChatMenu = () => {
   return (
     <Menu
       position="top-start"
@@ -63,19 +59,19 @@ const NewMenu = () => {
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Item onClick={createPublicChat}>
-          <MenuButton properties={NewMenuData[0]} />
+          <MenuButton properties={MenuData[0]} />
         </Menu.Item>
         <Menu.Item onClick={createPrivateChat}>
-          <MenuButton properties={NewMenuData[1]} />
+          <MenuButton properties={MenuData[1]} />
         </Menu.Item>
         <Menu.Item onClick={createPublicFolder}>
-          <MenuButton properties={NewMenuData[2]} />
+          <MenuButton properties={MenuData[2]} />
         </Menu.Item>
         <Menu.Item onClick={createPrivateFolder}>
-          <MenuButton properties={NewMenuData[3]} />
+          <MenuButton properties={MenuData[3]} />
         </Menu.Item>
         <Menu.Item>
-          <MenuButton properties={NewMenuData[4]} />
+          <MenuButton properties={MenuData[4]} />
         </Menu.Item>
       </Menu.Dropdown>
     </Menu>
@@ -96,15 +92,15 @@ const createPrivateChat = async () => {
 
 const createPublicFolder = async () => {
   console.log("creating public folder");
-  const res = await createChatFolder("public",null);
+  const res = await createChatFolder("public", null);
   console.log("res", res);
-}
+};
 
 const createPrivateFolder = async () => {
   console.log("creating private folder");
-  const res = await createChatFolder("private",null);
+  const res = await createChatFolder("private", null);
   console.log("res", res);
-}
+};
 
 const MenuButton = (props: MenuButtonProps) => {
   const { hovered, ref } = useHover();
@@ -140,7 +136,7 @@ const MenuButton = (props: MenuButtonProps) => {
   );
 };
 
-const NewMenuData: MenuData[] = [
+const MenuData: MenuData[] = [
   {
     title: "New Shared Chat",
     description: "Chat with AI and collaborate with the team",
@@ -168,4 +164,4 @@ const NewMenuData: MenuData[] = [
   },
 ];
 
-export default NewMenu;
+export default ChatMenu;

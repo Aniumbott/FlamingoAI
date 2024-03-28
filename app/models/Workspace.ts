@@ -1,5 +1,6 @@
 import { Document, Model } from "mongoose";
 import * as Mongoose from "mongoose";
+require("./User.ts");
 
 const workspaceSchema = new Mongoose.Schema(
   {
@@ -8,7 +9,7 @@ const workspaceSchema = new Mongoose.Schema(
     imageUrl: { type: String, required: false },
     allowPersonal: { type: Boolean, required: true },
     allowPublic: { type: Boolean, required: true },
-    createdBy: { type: Mongoose.Types.ObjectId, ref: "User", required: true },
+    createdBy: { type: Mongoose.Types.ObjectId, ref: "users", required: true },
   },
   {
     timestamps: true,
