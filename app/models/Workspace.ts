@@ -4,6 +4,7 @@ require("./User.ts");
 
 const workspaceSchema = new Mongoose.Schema(
   {
+    _id: { type: String, required: true },
     name: { type: String, required: true },
     slug: { type: String, required: true },
     imageUrl: { type: String, required: false },
@@ -17,6 +18,7 @@ const workspaceSchema = new Mongoose.Schema(
 );
 
 interface IWorkspace {
+  _id: string;
   name: string;
   slug: string;
   imageUrl: string;
@@ -25,7 +27,9 @@ interface IWorkspace {
   createdBy: Mongoose.Types.ObjectId;
 }
 
-interface IWorkspaceDocument extends IWorkspace, Document {}
+interface IWorkspaceDocument extends IWorkspace, Mongoose.Document {
+  _id: string;
+}
 interface IWorkspaceModel extends Model<IWorkspaceDocument> {}
 
 const Workspace: IWorkspaceModel =

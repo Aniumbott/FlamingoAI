@@ -196,8 +196,8 @@ const PersonalChats = () => {
     setSharedChats({ ...sharedChats, content: sharedChatItems });
   }, []);
   useEffect(() => {
-    console.log("privateChats", privateChats);
-    console.log("publicChats", publicChats);
+    // console.log("privateChats", privateChats);
+    // console.log("publicChats", publicChats);
   }, [privateChats, publicChats]);
 
   return (
@@ -276,6 +276,7 @@ const AccordianLabel = (props: {
           color="#9CA3AF"
           style={{
             "--ai-hover-color": "white",
+            "--ai-hover": "#047857",
           }}
           onClick={(event) => {
             event.stopPropagation();

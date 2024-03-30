@@ -17,7 +17,7 @@ const RecentChats = () => {
       setRecentChats(allChats);
     };
     fetchAllChats();
-    console.log("recentChats", recentChats);
+    // console.log("recentChats", recentChats);
   }, []);
 
   const [recentChats, setRecentChats] = useState<IChatDocument[]>([]);

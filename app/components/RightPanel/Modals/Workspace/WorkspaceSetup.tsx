@@ -1,23 +1,36 @@
-import {
-  Badge,
-  Group,
-  Paper,
-  Select,
-  Text,
-  Button,
-  TextInput,
-  Accordion,
-  List,
-  Card,
-  Switch,
-} from "@mantine/core";
-import { useState } from "react";
+import { getWorkspace, updateWorkspace } from "@/app/controllers/Workspace";
+import { useOrganization } from "@clerk/nextjs";
+import { Group, Paper, Text, Switch } from "@mantine/core";
+import { useEffect, useState } from "react";
 
 export default function WorkspaceSetup(props: {
   activeTab: string;
   setActiveTab: (value: string) => void;
 }) {
+  const [workspace, setWorkspace] = useState<any>(null);
+  const { organization } = useOrganization();
   const { activeTab, setActiveTab } = props;
+
+  useEffect(() => {
+    if (organization?.id) {
+      const fetchWorkspace = async () => {
+        const res = await getWorkspace(organization.id);
+        // console.log(res);
+        setWorkspace(res.workspace);
+      };
+      fetchWorkspace();
+    }
+  }, [organization?.id]);
+
+  useEffect(() => {
+    if (workspace?._id) {
+      const update = async () => {
+        await updateWorkspace(workspace._id, workspace);
+        // console.log(res);
+      };
+      update();
+    }
+  }, [workspace]);
 
   return (
     <Paper
@@ -37,7 +50,17 @@ export default function WorkspaceSetup(props: {
               Allow team members to creat personal chat
             </Text>
           </div>
-          <Switch color="teal" size="md" />
+          <Switch
+            color="teal"
+            size="md"
+            defaultChecked={workspace?.allowPersonal || true}
+            onChange={(e) => {
+              setWorkspace({
+                ...workspace,
+                allowPersonal: e.currentTarget.checked,
+              });
+            }}
+          />
         </Group>
         <Group mt={20} justify="space-between">
           <div>
@@ -48,7 +71,17 @@ export default function WorkspaceSetup(props: {
               Allow team members to share chats publicaly.
             </Text>
           </div>
-          <Switch color="teal" size="md" />
+          <Switch
+            color="teal"
+            size="md"
+            defaultChecked={workspace?.allowPublic || true}
+            onChange={(e) => {
+              setWorkspace({
+                ...workspace,
+                allowPublic: e.currentTarget.checked,
+              });
+            }}
+          />
         </Group>
       </div>
     </Paper>

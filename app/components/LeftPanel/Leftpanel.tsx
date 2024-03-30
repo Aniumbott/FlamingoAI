@@ -8,10 +8,10 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { OrganizationSwitcher } from "@clerk/nextjs";
+import { OrganizationSwitcher, Protect } from "@clerk/nextjs";
 
 // Components
-import SingleMenu from "./Menu/WorkspaceMenu";
+import WorkspaceMenu from "./Menu/WorkspaceMenu";
 import ChatMenu from "./Menu/ChatMenu";
 import FilterMenuComponent from "./Menu/FilterMenu";
 import GeneralChats from "./GeneralChats";
@@ -23,6 +23,7 @@ import RecentChats from "./RecentChats";
 const LeftPanel = () => {
   const { colorScheme } = useMantineColorScheme();
   const [filterMenu, setFilterMenu] = useState(0);
+
   return (
     <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
       <Group
@@ -37,7 +38,10 @@ const LeftPanel = () => {
             baseTheme: colorScheme === "dark" ? dark : undefined,
           }}
         />
-        <SingleMenu />
+
+        <Protect role="org:admin">
+          <WorkspaceMenu />
+        </Protect>
       </Group>
 
       <Group
@@ -58,8 +62,16 @@ const LeftPanel = () => {
           gap={1}
           w={"10%"}
         >
-          <Button color="#047857" px={"xs"} onClick={createPublicChat}>
-            <IconPlus size={20} />
+          <Button
+            color="#047857"
+            radius="0"
+            px={12}
+            style={{
+              borderRadius: "5px 0 0 5px ",
+            }}
+            onClick={createPublicChat}
+          >
+            <IconPlus size={15} />
           </Button>
           <ChatMenu />
         </Group>
@@ -84,9 +96,9 @@ const LeftPanel = () => {
 };
 
 const createPublicChat = async () => {
-  console.log("creating a chat");
+  // console.log("creating a chat");
   const res = await createChat("public", null);
-  console.log("res", res);
+  // console.log("res", res);
 };
 
 export default LeftPanel;

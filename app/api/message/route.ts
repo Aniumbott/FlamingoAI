@@ -16,25 +16,25 @@ export async function POST(req: any, res: NextApiResponse) {
     });
     return NextResponse.json({ message }, { status: 200 });
   } catch (error: any) {
-    console.log("error from route", error);
+    // console.log("error from route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
 export async function GET(req: any, res: NextApiResponse) {
-  console.log("hit get chat");
+  // console.log("hit get chat");
   try {
     await dbConnect();
     const messages = await Message.find();
     return NextResponse.json({ messages }, { status: 200 });
   } catch (error: any) {
-    console.log("error from route", error);
+    // console.log("error from route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
 export async function PUT(req: any, res: NextApiResponse) {
-  console.log("hit put message");
+  // console.log("hit put message");
   try {
     await dbConnect();
     const body = await req.json();
@@ -43,13 +43,13 @@ export async function PUT(req: any, res: NextApiResponse) {
     });
     return NextResponse.json({ message }, { status: 200 });
   } catch (error: any) {
-    console.log("error from route", error);
+    // console.log("error from route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
 export async function DELETE(req: any, res: NextApiResponse) {
-  console.log("hit delete message");
+  // console.log("hit delete message");
   try {
     await dbConnect();
     const body = await req.json();
@@ -59,7 +59,7 @@ export async function DELETE(req: any, res: NextApiResponse) {
       { status: 200 }
     );
   } catch (error: any) {
-    console.log("error from route", error);
+    // console.log("error from route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }

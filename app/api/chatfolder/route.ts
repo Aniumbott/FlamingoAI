@@ -20,16 +20,16 @@ export async function POST(req: any, res: NextApiResponse) {
       await ChatFolder.findByIdAndUpdate(body.parentFolder, {
         $push: { subFolders: chatFolder._id },
       });
-      console.log(
-        "pushed ",
-        chatFolder._id,
-        "to parent folder ",
-        body.parentFolder
-      );
+      // console.log(
+      //   "pushed ",
+      //   chatFolder._id,
+      //   "to parent folder ",
+      //   body.parentFolder
+      // );
     }
     return NextResponse.json({ chatFolder }, { status: 200 });
   } catch (error: any) {
-    console.log("error in POST at chatfolder route");
+    // console.log("error in POST at chatfolder route");
     return NextResponse.json(error.message, { status: 500 });
   }
 }
@@ -73,13 +73,13 @@ export async function GET(req: any, res: NextApiResponse) {
 
     return NextResponse.json({ chatFolder }, { status: 200 });
   } catch (error: any) {
-    console.log("error at GET in Chatfolder route", error);
+    // console.log("error at GET in Chatfolder route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
 export async function PUT(req: any, res: NextApiResponse) {
-  console.log("hit put chatfolder");
+  // console.log("hit put chatfolder");
   try {
     await dbConnect();
     const body = await req.json();
@@ -88,13 +88,13 @@ export async function PUT(req: any, res: NextApiResponse) {
     });
     return NextResponse.json({ chatFolder }, { status: 200 });
   } catch (error: any) {
-    console.log("error at PUT in Chatfolder route", error);
+    // console.log("error at PUT in Chatfolder route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
 export async function DELETE(req: any, res: NextApiResponse) {
-  console.log("hit delete chatfolder");
+  // console.log("hit delete chatfolder");
   try {
     await dbConnect();
     const body = await req.json();
@@ -104,7 +104,7 @@ export async function DELETE(req: any, res: NextApiResponse) {
       { status: 200 }
     );
   } catch (error: any) {
-    console.log("error at DELETE in Chatfolder route", error);
+    // console.log("error at DELETE in Chatfolder route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }

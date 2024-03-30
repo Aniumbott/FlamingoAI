@@ -33,7 +33,7 @@ async function getChatFolders(scope: Scope) {
     }
   );
   const response = await data.json();
-  console.log("response", response);
+  // console.log("response", response);
   return response;
 }
 

@@ -23,9 +23,9 @@ export const newFolder = async (
   scope: "public" | "private",
   parentFolder: Mongoose.Types.ObjectId | null
 ) => {
-  console.log("creating new folder");
+  // console.log("creating new folder");
   const res = await createChatFolder(scope, parentFolder);
-  console.log("res", res);
+  // console.log("res", res);
 };
 
 export default function FolderItem(props: {

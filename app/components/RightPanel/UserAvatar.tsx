@@ -12,7 +12,6 @@ import { useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
 // Components
-// import Profile from "./Modals/Profile/Profile";
 import Workspace from "./Modals/Workspace/Workspace";
 
 export default function UserAvatar() {
@@ -23,7 +22,6 @@ export default function UserAvatar() {
   const router = useRouter();
   return (
     <>
-      {/* <Profile opened={profileModalOpened} setOpened={setProfileModalOpened} /> */}
       <Workspace
         opened={workspaceModalOpened}
         setOpened={setWorkspaceModalOpened}

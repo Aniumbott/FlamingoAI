@@ -14,7 +14,7 @@ global.mongoose = {
 export async function dbConnect() {
   try {
     if (global.mongoose && global.mongoose.conn) {
-      console.log("Connected from previous");
+      // console.log("Connected from previous");
       return global.mongoose.conn;
     } else {
       const conString = process.env.MONGODB_URI || "";
@@ -28,7 +28,7 @@ export async function dbConnect() {
         promise,
       };
 
-      console.log("Newly connected");
+      // console.log("Newly connected");
       return await promise;
     }
   } catch (error) {

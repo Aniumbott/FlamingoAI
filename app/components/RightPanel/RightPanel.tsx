@@ -10,6 +10,9 @@ import {
   ScrollArea,
   useMantineColorScheme,
   Paper,
+  Avatar,
+  Container,
+  Box,
 } from "@mantine/core";
 import {
   IconCategory,
@@ -28,6 +31,7 @@ import {
 import style from "./RightPanel.module.css";
 import UserAvatar from "./UserAvatar";
 import LibraryAccordianItem from "./LibraryAccordianItem";
+import { UserButton } from "@clerk/nextjs";
 
 export default function RightPanel(props: {
   rightOpened: boolean;
@@ -65,8 +69,8 @@ export default function RightPanel(props: {
         }}
       >
         <div>
-          <div>
-            <UserAvatar />
+          <div className="w-full flex justify-center items-center mt-3">
+            <UserButton />
           </div>
           <div style={{ marginTop: "8rem" }}>
             <ActionIcon

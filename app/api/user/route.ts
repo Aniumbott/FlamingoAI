@@ -5,10 +5,10 @@ import { NextResponse } from "next/server";
 import mongoose from "mongoose";
 
 export async function POST(req: any, res: NextApiResponse) {
-  console.log("hit post", new Date().getSeconds());
+  // console.log("hit post", new Date().getSeconds());
   try {
     const body = await req.json();
-    console.log("req", body);
+    // console.log("req", body);
     await dbConnect();
     const post = await User.create({
       name: body.name,
@@ -23,13 +23,13 @@ export async function POST(req: any, res: NextApiResponse) {
 }
 
 export async function GET(req: any, res: NextApiResponse) {
-  console.log("hit get", new Date().getSeconds());
+  // console.log("hit get", new Date().getSeconds());
   try {
     await dbConnect();
     const Users = await User.find();
     return NextResponse.json(Users, { status: 200 });
   } catch (error) {
-    console.log("error from route", error);
-    return NextResponse.json("Internal Server Error", {status: 500});
+    // console.log("error from route", error);
+    return NextResponse.json("Internal Server Error", { status: 500 });
   }
 }

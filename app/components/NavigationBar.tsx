@@ -1,3 +1,4 @@
+// Modules
 import {
   Autocomplete,
   Group,
@@ -12,8 +13,10 @@ import {
   IconUsersPlus,
   IconRocket,
 } from "@tabler/icons-react";
-import classes from "./HeaderSearch.module.css";
 import { useState } from "react";
+import classes from "./HeaderSearch.module.css";
+
+// Compoenents
 
 export default function NavigationBar(props: {
   leftOpened: boolean;

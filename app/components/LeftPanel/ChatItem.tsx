@@ -13,9 +13,9 @@ export const newChat = async (
   scope: "private" | "public",
   parentFolder: Mongoose.Types.ObjectId | null
 ) => {
-  console.log("creating new chat");
+  // console.log("creating new chat");
   const res = await createChat(scope, parentFolder);
-  console.log("res", res);
+  // console.log("res", res);
   return res;
 };
 

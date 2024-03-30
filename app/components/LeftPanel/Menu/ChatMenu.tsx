@@ -53,8 +53,15 @@ const ChatMenu = () => {
       }}
     >
       <Menu.Target>
-        <Button color="#047857" py={0} px={1}>
-          <IconChevronDown size={20} />
+        <Button
+          color="#047857"
+          px={6}
+          radius="0"
+          style={{
+            borderRadius: " 0 5px 5px 0",
+          }}
+        >
+          <IconChevronDown size={15} />
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
@@ -79,27 +86,27 @@ const ChatMenu = () => {
 };
 
 const createPublicChat = async () => {
-  console.log("creating public chat");
+  // console.log("creating public chat");
   const res = await createChat("public", null);
-  console.log("res", res);
+  // console.log("res", res);
 };
 
 const createPrivateChat = async () => {
-  console.log("creating private chat");
+  // console.log("creating private chat");
   const res = await createChat("private", null);
-  console.log("res", res);
+  // console.log("res", res);
 };
 
 const createPublicFolder = async () => {
-  console.log("creating public folder");
+  // console.log("creating public folder");
   const res = await createChatFolder("public", null);
-  console.log("res", res);
+  // console.log("res", res);
 };
 
 const createPrivateFolder = async () => {
-  console.log("creating private folder");
+  // console.log("creating private folder");
   const res = await createChatFolder("private", null);
-  console.log("res", res);
+  // console.log("res", res);
 };
 
 const MenuButton = (props: MenuButtonProps) => {
@@ -140,27 +147,27 @@ const MenuData: MenuData[] = [
   {
     title: "New Shared Chat",
     description: "Chat with AI and collaborate with the team",
-    icon: <IconMessages />,
+    icon: <IconMessages size={20} />,
   },
   {
     title: "New Personal Chat",
     description: "Individual chats with AI",
-    icon: <IconLock />,
+    icon: <IconLock size={20} />,
   },
   {
     title: "New Shared Folder",
     description: "Organize shared chats in folders",
-    icon: <IconFolderPlus />,
+    icon: <IconFolderPlus size={20} />,
   },
   {
     title: "New Personal Folder",
     description: "Organize personal chats in folders",
-    icon: <IconFolderRoot />,
+    icon: <IconFolderRoot size={20} />,
   },
   {
     title: "New Prompt",
     description: "Prompt template to start chats with",
-    icon: <IconNews />,
+    icon: <IconNews size={20} />,
   },
 ];
 

@@ -80,7 +80,7 @@ const PeopleChats = () => {
 
 const AccordianLabel = (props: { user: any; chatCount: number }) => {
   const { user, chatCount } = props;
-  console.log(user);
+  // console.log(user);
   return (
     <Group wrap="nowrap" gap={"xs"} justify="space-between">
       {user.hasImage ? (

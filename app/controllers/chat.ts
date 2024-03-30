@@ -23,7 +23,7 @@ async function createChat(
 }
 
 async function getChat(id: String, workspaceId: String) {
-  console.log("collecting all chats");
+  // console.log("collecting all chats");
   const data = await fetch(`/api/chat/?&workspaceId=${workspaceId}&id=${id}`, {
     method: "GET",
     headers: {

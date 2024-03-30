@@ -30,7 +30,7 @@ const Workspace = () => {
   const pathname = usePathname();
 
   useEffect(() => {
-    console.log("orgId", orgId);
+    // console.log("orgId", orgId);
   }, [orgId]);
 
   return (

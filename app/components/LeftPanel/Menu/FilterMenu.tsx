@@ -131,27 +131,27 @@ const FilterMenuData: MenuData[] = [
   {
     title: "General",
     description: "All chats and folders",
-    icon: <IconListDetails />,
+    icon: <IconListDetails size={20} />,
   },
   {
     title: "By People",
     description: "Chats by their participants",
-    icon: <IconUsers />,
+    icon: <IconUsers size={20} />,
   },
   {
     title: "Recent",
     description: "Most recent chats of any kind",
-    icon: <IconCalendarClock />,
+    icon: <IconCalendarClock size={20} />,
   },
   {
     title: "Favorites",
     description: "Saved chats for later",
-    icon: <IconStar />,
+    icon: <IconStar size={20} />,
   },
   {
     title: "Archive",
     description: "Archived chats",
-    icon: <IconArchive />,
+    icon: <IconArchive size={20} />,
   },
 ];
 
