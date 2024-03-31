@@ -20,25 +20,20 @@ import { IChatDocument } from "@/app/models/Chat";
 import style from "../RightPanel/RightPanel.module.css";
 import PromptMenu from "./Menu/PromptMenu";
 
-const PeopleChats = () => {
+const PeopleChats = (props: { members: any[] }) => {
+  const { members } = props;
+  const [allChats, setAllChats] = useState<IChatDocument[]>([]);
+
   useEffect(() => {
     const fetchAllChats = async () => {
-      const userList =
-        (await organization?.getMemberships())?.map(
-          (member: any) => member.publicUserData
-        ) ?? [];
-      setUserList(userList);
       setAllChats((await getAllChats()).chats);
     };
     fetchAllChats();
   }, []);
 
-  let { organization } = useOrganization();
-  const [userList, setUserList] = useState<any>([]);
-  const [allChats, setAllChats] = useState<IChatDocument[]>([]);
   return (
     <ScrollArea scrollbarSize={3} pb={"10"}>
-      {userList.length > 0 && (
+      {members.length > 0 && (
         <Accordion
           chevronPosition="left"
           className={style.parent}
@@ -46,7 +41,7 @@ const PeopleChats = () => {
           chevron={<IconCaretRightFilled className={style.icon} />}
           variant="default"
         >
-          {userList.map((user: any) => {
+          {members.map((user: any) => {
             const filteredChats = allChats.filter((chat) =>
               chat.participants.includes(user.userId)
             );
@@ -66,7 +61,7 @@ const PeopleChats = () => {
                 </Accordion.Control>
                 <AccordionPanel>
                   {filteredChats.map((chat, key) => (
-                    <ChatItem item={chat} key={key} />
+                    <ChatItem item={chat} key={key} members={members} />
                   ))}
                 </AccordionPanel>
               </Accordion.Item>

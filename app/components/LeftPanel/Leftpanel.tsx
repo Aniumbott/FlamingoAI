@@ -1,5 +1,5 @@
 // Modules
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Button,
   Stack,
@@ -8,7 +8,7 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { OrganizationSwitcher, Protect } from "@clerk/nextjs";
+import { OrganizationSwitcher, Protect, useOrganization } from "@clerk/nextjs";
 
 // Components
 import WorkspaceMenu from "./Menu/WorkspaceMenu";
@@ -23,6 +23,23 @@ import RecentChats from "./RecentChats";
 const LeftPanel = () => {
   const { colorScheme } = useMantineColorScheme();
   const [filterMenu, setFilterMenu] = useState(0);
+  const [members, setMembers] = useState<any>([]);
+  const { organization } = useOrganization();
+
+  useEffect(() => {
+    const getmembers = async () => {
+      const userList =
+        (await organization?.getMemberships())?.map(
+          (member: any) => member.publicUserData
+        ) ?? [];
+      setMembers(userList);
+    };
+    getmembers();
+  }, [organization?.id]);
+
+  useEffect(() => {
+    console.log(members);
+  }, [members]);
 
   return (
     <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
@@ -80,9 +97,9 @@ const LeftPanel = () => {
       {(() => {
         switch (filterMenu) {
           case 0:
-            return <GeneralChats />;
+            return <GeneralChats members={members} />;
           case 1:
-            return <PeopleChats />;
+            return <PeopleChats members={members || []} />;
           case 2:
             return <RecentChats />;
           default:

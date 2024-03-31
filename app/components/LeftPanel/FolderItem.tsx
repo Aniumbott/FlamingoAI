@@ -31,8 +31,9 @@ export const newFolder = async (
 export default function FolderItem(props: {
   folder: IChatFolderDocument;
   scope: "public" | "private";
+  members: any[];
 }) {
-  const { folder, scope } = props;
+  const { folder, scope, members } = props;
   const [isOpened, setIsOpened] = useState(false);
   const { ref, hovered } = useHover();
   return (
@@ -61,6 +62,7 @@ export default function FolderItem(props: {
                   <FolderItem
                     folder={subFolder as IChatFolderDocument}
                     scope={scope}
+                    members={members}
                   />
                 </Accordion>
               </div>
@@ -68,7 +70,7 @@ export default function FolderItem(props: {
           {folder.chats?.length > 0 &&
             folder.chats.map((chat, chatIndex) => (
               <div key={chatIndex}>
-                <ChatItem item={chat as IChatDocument} />
+                <ChatItem item={chat as IChatDocument} members={members} />
               </div>
             ))}
         </Accordion.Panel>

@@ -131,7 +131,8 @@ interface ChatItem {
   content: string | ChatItem[];
 }
 
-const PersonalChats = () => {
+const PersonalChats = (props: { members: any[] }) => {
+  const { members } = props;
   const [publicChats, setPublicChats] = useState<IChatDocument[]>([]);
   const [privateChats, setPrivateChats] = useState<IChatDocument[]>([]);
   const [publicFolders, setPublicFolders] = useState<IChatFolderDocument[]>([]);
@@ -220,11 +221,15 @@ const PersonalChats = () => {
                 chevron={<IconCaretRightFilled className={style.icon} />}
                 key={key}
               >
-                <FolderItem folder={folder} scope={"public"} />
+                <FolderItem
+                  folder={folder}
+                  scope={"public"}
+                  members={members}
+                />
               </Accordion>
             ))}
             {publicChats.map((chat, key) => (
-              <ChatItem item={chat} key={key} />
+              <ChatItem item={chat} key={key} members={members} />
             ))}
           </AccordionPanel>
         </Accordion.Item>
@@ -241,11 +246,15 @@ const PersonalChats = () => {
                 chevron={<IconCaretRightFilled className={style.icon} />}
                 key={key}
               >
-                <FolderItem folder={folder} scope={"private"} />
+                <FolderItem
+                  folder={folder}
+                  scope={"private"}
+                  members={members}
+                />
               </Accordion>
             ))}
             {privateChats.map((chat, key) => (
-              <ChatItem item={chat} key={key} />
+              <ChatItem item={chat} key={key} members={members} />
             ))}
           </AccordionPanel>
         </Accordion.Item>

@@ -84,7 +84,7 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
     }
     return NextResponse.json({ chats }, { status: 200 });
   } catch (error: any) {
-    // console.log("error at GET in Chat route", error);
+    console.log("error at GET in Chat route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
@@ -99,7 +99,7 @@ export async function PUT(req: any, res: NextApiResponse) {
     }).populate("messages");
     return NextResponse.json({ chat }, { status: 200 });
   } catch (error: any) {
-    // console.log("error at PUT in Chat route", error);
+    console.log("error at PUT in Chat route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }

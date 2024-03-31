@@ -27,6 +27,10 @@ export default function ChatWindow(props: { currentChatId: String }) {
   const { colorScheme } = useMantineColorScheme();
   const [participants, setParticipants] = useState<any>([]);
   const [messageInput, setMessageInput] = useState("");
+  const updateParticipants = () => {
+    if (chat.participants.includes(user?.id)) return chat.participants;
+    return [...chat.participants, user?.id];
+  };
 
   useEffect(() => {
     const fetchParticipants = async () => {
@@ -49,6 +53,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
   }, [currentChatId]);
 
   useEffect(() => {
+    console.log(chat);
     setMessages(chat?.messages);
   }, [chat]);
 
@@ -143,6 +148,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
               updateChat(currentChatId, {
                 ...chat,
                 messages: [...chat.messages, res.message._id],
+                participants: updateParticipants(),
               }).then((res) => {
                 setChat(res.chat);
               });

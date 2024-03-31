@@ -1,7 +1,7 @@
 // Modules
 import { useRouter, usePathname } from "next/navigation";
 import Mongoose from "mongoose";
-import { Text } from "@mantine/core";
+import { Avatar, Group, Text } from "@mantine/core";
 import { IconAlignJustified } from "@tabler/icons-react";
 
 // Compoonents
@@ -19,10 +19,13 @@ export const newChat = async (
   return res;
 };
 
-export default function ChatItem(props: { item: IChatDocument }) {
+export default function ChatItem(props: {
+  item: IChatDocument;
+  members: any[];
+}) {
   const router = useRouter();
   const pathname = usePathname();
-  const { item } = props;
+  const { item, members } = props;
   return (
     <>
       <div
@@ -33,16 +36,27 @@ export default function ChatItem(props: { item: IChatDocument }) {
           window.history.pushState({}, "", newUrl);
         }}
       >
-        <IconAlignJustified
-          color="gray"
-          style={{
-            width: "1rem",
-            height: "1rem",
-          }}
-        />
-        <Text size="sm" style={{ marginLeft: "0.5rem" }}>
-          {item.name}
-        </Text>
+        <div className="flex flex-row justify-between w-full">
+          <Group>
+            <IconAlignJustified
+              color="gray"
+              style={{
+                width: "1rem",
+                height: "1rem",
+              }}
+            />
+            <Text size="sm" style={{ marginLeft: "0.1rem" }}>
+              {item.name}
+            </Text>
+          </Group>
+          <Avatar.Group>
+            {members.map((member, key) =>
+              item.participants.includes(member.userId) ? (
+                <Avatar key={key} size="25px" src={member.imageUrl} />
+              ) : null
+            )}
+          </Avatar.Group>
+        </div>
       </div>
     </>
   );
