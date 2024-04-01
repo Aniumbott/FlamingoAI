@@ -228,7 +228,7 @@ const PersonalChats = (props: { members: any[] }) => {
                 />
               </Accordion>
             ))}
-            {publicChats.map((chat, key) => (
+            {publicChats?.map((chat, key) => (
               <ChatItem item={chat} key={key} members={members} />
             ))}
           </AccordionPanel>
@@ -239,7 +239,7 @@ const PersonalChats = (props: { members: any[] }) => {
             <AccordianLabel title={"PERSONAL"} scope="private" />
           </AccordionControl>
           <AccordionPanel>
-            {privateFolders.map((folder, key) => (
+            {privateFolders?.map((folder, key) => (
               <Accordion
                 chevronPosition="left"
                 classNames={{ chevron: style.chevron }}
@@ -253,7 +253,7 @@ const PersonalChats = (props: { members: any[] }) => {
                 />
               </Accordion>
             ))}
-            {privateChats.map((chat, key) => (
+            {privateChats?.map((chat, key) => (
               <ChatItem item={chat} key={key} members={members} />
             ))}
           </AccordionPanel>

@@ -17,6 +17,7 @@ import { useOrganization, useUser } from "@clerk/nextjs";
 import MessageItem from "./MessageItem";
 import { sendMessage } from "@/app/controllers/message";
 import { getChat, updateChat } from "@/app/controllers/chat";
+import { socket } from "@/socket";
 
 export default function ChatWindow(props: { currentChatId: String }) {
   const { currentChatId } = props;
@@ -42,6 +43,10 @@ export default function ChatWindow(props: { currentChatId: String }) {
     };
     fetchParticipants();
   }, [organization]);
+
+  socket.on("chat message", (msg: any) => {
+    console.log(msg);
+  });
 
   useEffect(() => {
     const getCurrentChat = async () => {
@@ -147,9 +152,11 @@ export default function ChatWindow(props: { currentChatId: String }) {
             ).then((res) => {
               updateChat(currentChatId, {
                 ...chat,
-                messages: [...chat.messages, res.message._id],
+                messages: [...chat?.messages, res.message._id],
                 participants: updateParticipants(),
               }).then((res) => {
+                console.log('sendcomplete')
+                socket.emit("chat message", res.chat);
                 setChat(res.chat);
               });
             });

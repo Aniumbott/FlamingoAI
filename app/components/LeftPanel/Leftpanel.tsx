@@ -19,6 +19,7 @@ import { dark } from "@clerk/themes";
 import { createChat } from "../../controllers/chat";
 import PeopleChats from "./PeopleChats";
 import RecentChats from "./RecentChats";
+import { socket } from "@/socket";
 
 const LeftPanel = () => {
   const { colorScheme } = useMantineColorScheme();
@@ -114,6 +115,8 @@ const LeftPanel = () => {
 
 const createPublicChat = async () => {
   // console.log("creating a chat");
+  socket.emit("hello", "world");
+  console.log("emmiting");
   const res = await createChat("public", null);
   // console.log("res", res);
 };
