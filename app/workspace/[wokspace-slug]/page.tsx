@@ -22,49 +22,51 @@ import NavigationBar from "../../components/NavigationBar";
 import RightPanel from "../../components/RightPanel/RightPanel";
 import LeftPanel from "../../components/LeftPanel/Leftpanel";
 import ChatWindow from "./ChatWindow";
+import { io } from "socket.io-client";
 
 const Workspace = () => {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
   const [rightOpened, { toggle: toggleRight }] = useDisclosure(true);
-  const { orgId } = useAuth();
+  const { orgId, userId } = useAuth();
+
   const router = useRouter();
   const pathname = usePathname();
 
-  const [isConnected, setIsConnected] = useState(false);
-  const [transport, setTransport] = useState("N/A");
+  // const [isConnected, setIsConnected] = useState(false);
+  // const [transport, setTransport] = useState("N/A");
 
-  useEffect(() => {
-    console.log("isConnected", isConnected);
-  }, [isConnected]);
+  // useEffect(() => {
+  //   console.log("isConnected", isConnected);
+  // }, [isConnected]);
 
-  useEffect(() => {
-    if (socket.connected) {
-      onConnect();
-    }
+  // useEffect(() => {
+  //   if (socket.connected) {
+  //     onConnect();
+  //   }
 
-    function onConnect() {
-      setIsConnected(true);
-      setTransport(socket.io.engine.transport.name);
-      socket.io.engine.on("upgrade", (transport) => {
-        setTransport(transport.name);
-      });
-    }
+  //   function onConnect() {
+  //     setIsConnected(true);
+  //     setTransport(socket.io.engine.transport.name);
+  //     socket.io.engine.on("upgrade", (transport) => {
+  //       setTransport(transport.name);
+  //     });
+  //   }
 
-    function onDisconnect() {
-      setIsConnected(false);
-      setTransport("N/A");
-    }
-    socket.on("hello", (value) => {
-     console.log(value,"socket listeners")
-    });
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
+  //   function onDisconnect() {
+  //     setIsConnected(false);
+  //     setTransport("N/A");
+  //   }
+  //   socket.on("hello", (value) => {
+  //    console.log(value,"socket listeners")
+  //   });
+  //   socket.on("connect", onConnect);
+  //   socket.on("disconnect", onDisconnect);
 
-    return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-    };
-  }, []);
+  //   return () => {
+  //     socket.off("connect", onConnect);
+  //     socket.off("disconnect", onDisconnect);
+  //   };
+  // }, []);
 
   useEffect(() => {
     // console.log("orgId", orgId);
@@ -135,7 +137,12 @@ const Workspace = () => {
                   size="lg"
                   color="teal"
                   onClick={() => {
-                    const req = newChat("public", null);
+                    const req = newChat(
+                      "public",
+                      null,
+                      userId || "",
+                      orgId || ""
+                    );
                     req.then((res) => {
                       router.push(
                         pathname?.split("/").slice(0, 3).join("/") +
@@ -148,9 +155,13 @@ const Workspace = () => {
                 >
                   Share a Chat
                 </Button>
-                <Button onClick={()=>{
-                  socket.emit("hello","world")
-                }}>Socket</Button>
+                <Button
+                  onClick={() => {
+                    socket.emit("hello", "world");
+                  }}
+                >
+                  Socket
+                </Button>
               </Container>
             </Stack>
           )}

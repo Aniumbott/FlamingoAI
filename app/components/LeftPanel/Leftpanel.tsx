@@ -8,7 +8,12 @@ import {
   useMantineColorScheme,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
-import { OrganizationSwitcher, Protect, useOrganization } from "@clerk/nextjs";
+import {
+  OrganizationSwitcher,
+  Protect,
+  useAuth,
+  useOrganization,
+} from "@clerk/nextjs";
 
 // Components
 import WorkspaceMenu from "./Menu/WorkspaceMenu";
@@ -26,6 +31,7 @@ const LeftPanel = () => {
   const [filterMenu, setFilterMenu] = useState(0);
   const [members, setMembers] = useState<any>([]);
   const { organization } = useOrganization();
+  const { userId, orgId } = useAuth();
 
   useEffect(() => {
     const getmembers = async () => {
@@ -87,7 +93,7 @@ const LeftPanel = () => {
             style={{
               borderRadius: "5px 0 0 5px ",
             }}
-            onClick={createPublicChat}
+            onClick={() => createPublicChat(userId || "", orgId || "")}
           >
             <IconPlus size={15} />
           </Button>
@@ -100,9 +106,9 @@ const LeftPanel = () => {
           case 0:
             return <GeneralChats members={members} />;
           case 1:
-            return <PeopleChats members={members || []} />;
+            return <PeopleChats members={members} />;
           case 2:
-            return <RecentChats />;
+            return <RecentChats members={members} />;
           default:
             return null;
         }
@@ -113,11 +119,11 @@ const LeftPanel = () => {
   );
 };
 
-const createPublicChat = async () => {
+const createPublicChat = async (userId: string, workspaceId: string) => {
   // console.log("creating a chat");
   socket.emit("hello", "world");
   console.log("emmiting");
-  const res = await createChat("public", null);
+  const res = await createChat("public", null, userId, workspaceId);
   // console.log("res", res);
 };
 

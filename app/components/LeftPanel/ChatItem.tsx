@@ -11,10 +11,12 @@ import { createChat } from "@/app/controllers/chat";
 
 export const newChat = async (
   scope: "private" | "public",
-  parentFolder: Mongoose.Types.ObjectId | null
+  parentFolder: Mongoose.Types.ObjectId | null,
+  userId: string,
+  workspaceId: string
 ) => {
   // console.log("creating new chat");
-  const res = await createChat(scope, parentFolder);
+  const res = await createChat(scope, parentFolder, userId, workspaceId);
   // console.log("res", res);
   return res;
 };
@@ -32,7 +34,7 @@ export default function ChatItem(props: {
         className={style.prompt}
         onClick={() => {
           const newUrl =
-            pathname.split("/").slice(0, 3).join("/") + "/" + item._id;
+            pathname?.split("/").slice(0, 3).join("/") + "/" + item._id;
           window.history.pushState({}, "", newUrl);
         }}
       >

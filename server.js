@@ -1,6 +1,6 @@
-const { createServer } = require('node:http')
-const next = require('next')
-const { Server } = require('socket.io')
+const { createServer } = require("node:http");
+const next = require("next");
+const { Server } = require("socket.io");
 
 const dev = process.env.NODE_ENV !== "production";
 const hostname = "localhost";
@@ -15,22 +15,30 @@ app.prepare().then(() => {
   const io = new Server(httpServer);
 
   io.on("connection", (socket) => {
+    
     console.log("a user connected");
+    
+    // Event listeners
+    // Basic
+    socket.on("joinRoom", (roomId) => {
+      socket.join(roomId);
+      console.log(`User with ID: ${socket.id} joined room: ${roomId}`);
+    });
+
+    socket.on("leaveRoom", (roomId) => {
+      socket.leave(roomId);
+      console.log(`User with ID: ${socket.id} left room: ${roomId}`);
+    });
 
     socket.on("disconnect", () => {
       console.log("user disconnected");
     });
 
-    socket.on("chat message", (msg) => {
-      console.log("message: " + msg);
-      io.emit("chat message", msg);
-    });
 
-    socket.on("hello", (msg) => {
-      console.log(msg);
-      io.emit("hello", msg+"from server");
+    // Custom
+    socket.on("createMessage", (roomId, message) => {
+      io.to(roomId).emit("newMessage", message);
     });
-
   });
 
   httpServer

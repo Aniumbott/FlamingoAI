@@ -1,14 +1,13 @@
 import * as Mongoose from "mongoose";
 import { IChatDocument } from "../models/Chat";
 
-const createdBy = "user_2dsZmTZTBij5xjWmPjvirpXKtsL";
-const workspaceId = "org_2dz9SJPInQzTNl4R7qBx7DfFYby";
-
 type Scope = "public" | "private";
 
 async function createChat(
   scope: Scope,
-  parentFolder: Mongoose.Types.ObjectId | null
+  parentFolder: Mongoose.Types.ObjectId | null,
+  createdBy: string,
+  workspaceId: string
 ) {
   const data = await fetch("/api/chat", {
     method: "POST",
@@ -34,7 +33,11 @@ async function getChat(id: String, workspaceId: String) {
   return response;
 }
 
-async function getIndependentChats(scope: Scope) {
+async function getIndependentChats(
+  scope: Scope,
+  createdBy: string,
+  workspaceId: string
+) {
   const data = await fetch(
     `/api/chat/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}&independent=true`,
     {
@@ -49,7 +52,7 @@ async function getIndependentChats(scope: Scope) {
   return response;
 }
 
-async function getAllChats() {
+async function getAllChats(createdBy: string, workspaceId: string) {
   const data = await fetch(
     `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&id=all`,
     {

@@ -24,6 +24,7 @@ import { IChatFolderDocument } from "@/app/models/ChatFolder";
 import { getChatFolders } from "@/app/controllers/folders";
 import PromptMenu from "./Menu/PromptMenu";
 import style from "../RightPanel/RightPanel.module.css";
+import { useAuth } from "@clerk/nextjs";
 
 const chats: Chats = {
   title: "Chats",
@@ -139,12 +140,18 @@ const PersonalChats = (props: { members: any[] }) => {
   const [privateFolders, setPrivateFolders] = useState<IChatFolderDocument[]>(
     []
   );
+  const { userId, orgId } = useAuth();
 
   useEffect(() => {
     const fetchChats = async () => {
       try {
-        setPublicChats((await getIndependentChats("public")).chats);
-        setPrivateChats((await getIndependentChats("private")).chats);
+        setPublicChats(
+          (await getIndependentChats("public", userId || "", orgId || "")).chats
+        );
+        setPrivateChats(
+          (await getIndependentChats("private", userId || "", orgId || ""))
+            .chats
+        );
       } catch (error) {
         console.error("Failed to fetch chats:", error);
       }
@@ -211,10 +218,15 @@ const PersonalChats = (props: { members: any[] }) => {
       >
         <Accordion.Item value={sharedChats.title} key={sharedChats.title}>
           <Accordion.Control>
-            <AccordianLabel title={"SHARED"} scope="public" />
+            <AccordianLabel
+              title={"SHARED"}
+              scope="public"
+              userId={userId || ""}
+              workspaceId={orgId || ""}
+            />
           </Accordion.Control>
           <AccordionPanel>
-            {publicFolders.map((folder, key) => (
+            {publicFolders?.map((folder, key) => (
               <Accordion
                 chevronPosition="left"
                 classNames={{ chevron: style.chevron }}
@@ -236,7 +248,12 @@ const PersonalChats = (props: { members: any[] }) => {
 
         <Accordion.Item value={"PERSONAL"} key={"PERSONAL"}>
           <AccordionControl>
-            <AccordianLabel title={"PERSONAL"} scope="private" />
+            <AccordianLabel
+              title={"PERSONAL"}
+              scope="private"
+              userId={userId || ""}
+              workspaceId={orgId || ""}
+            />
           </AccordionControl>
           <AccordionPanel>
             {privateFolders?.map((folder, key) => (
@@ -266,6 +283,8 @@ const PersonalChats = (props: { members: any[] }) => {
 const AccordianLabel = (props: {
   title: string;
   scope: "private" | "public";
+  userId: string;
+  workspaceId: string;
 }) => {
   return (
     <Group
@@ -322,7 +341,7 @@ const AccordianLabel = (props: {
           }}
           onClick={(event) => {
             event.stopPropagation();
-            newChat(props.scope, null);
+            newChat(props.scope, null, props.userId, props.workspaceId);
             // Add any additional logic for the ActionIcon click here
           }}
         >

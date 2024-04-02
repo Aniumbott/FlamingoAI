@@ -1,6 +1,6 @@
 // Modules
 import { useEffect, useState } from "react";
-import { useOrganization } from "@clerk/nextjs";
+import { useAuth, useOrganization } from "@clerk/nextjs";
 import {
   Accordion,
   AccordionPanel,
@@ -23,10 +23,10 @@ import PromptMenu from "./Menu/PromptMenu";
 const PeopleChats = (props: { members: any[] }) => {
   const { members } = props;
   const [allChats, setAllChats] = useState<IChatDocument[]>([]);
-
+  const { userId, orgId } = useAuth();
   useEffect(() => {
     const fetchAllChats = async () => {
-      setAllChats((await getAllChats()).chats);
+      setAllChats((await getAllChats(userId || "", orgId || "")).chats);
     };
     fetchAllChats();
   }, []);

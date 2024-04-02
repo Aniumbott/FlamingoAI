@@ -5,11 +5,14 @@ import { useEffect, useState } from "react";
 import { getAllChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import ChatItem from "./ChatItem";
+import { useAuth } from "@clerk/nextjs";
 
-const RecentChats = () => {
+const RecentChats = (props: { members: any[] }) => {
+  const { members } = props;
+  const { userId, orgId } = useAuth();
   useEffect(() => {
     const fetchAllChats = async () => {
-      const allChats = (await getAllChats()).chats;
+      const allChats = (await getAllChats(userId || "", orgId || "")).chats;
       allChats.sort(
         (a: any, b: any) =>
           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
@@ -25,7 +28,7 @@ const RecentChats = () => {
   return (
     <div>
       {recentChats.map((chat, key) => {
-        return <ChatItem item={chat} key={key} />;
+        return <ChatItem item={chat} key={key} members={members} />;
       })}
     </div>
   );

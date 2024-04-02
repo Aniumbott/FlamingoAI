@@ -33,6 +33,45 @@ export default function ChatWindow(props: { currentChatId: String }) {
     return [...chat.participants, user?.id];
   };
 
+  // Functions
+  async function sendMessageHandler() {
+    sendMessage(user?.id || "", messageInput, "user", currentChatId).then(
+      (res) => {
+        updateChat(currentChatId, {
+          ...chat,
+          messages: [
+            ...chat?.messages.slice(
+              Math.max(chat?.messages.length - 19, 0),
+              chat?.messages.length
+            ),
+            res.message._id,
+          ],
+          participants: updateParticipants(),
+        }).then((res) => {
+          console.log("sendcomplete");
+          socket.to(currentChatId).emit("createMessage", res.chat); // Changed this line
+          setChat(res.chat);
+        });
+      }
+    );
+  }
+
+  // socket.on("createMessage", (msg: any) => {
+  //   updateChat(currentChatId, {
+  //     ...chat,
+  //     messages: [
+  //       ...chat?.messages.slice(
+  //         Math.max(chat?.messages.length() - 19, 0),
+  //         chat?.messages.length()
+  //       ),
+  //       msg._id,
+  //     ],
+  //     participants: updateParticipants(),
+  //   }).then((res) => {
+  //     setChat(res.chat);
+  //   });
+  // });
+
   useEffect(() => {
     const fetchParticipants = async () => {
       const res =
@@ -43,10 +82,6 @@ export default function ChatWindow(props: { currentChatId: String }) {
     };
     fetchParticipants();
   }, [organization]);
-
-  socket.on("chat message", (msg: any) => {
-    console.log(msg);
-  });
 
   useEffect(() => {
     const getCurrentChat = async () => {
@@ -143,24 +178,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
           size="50"
           radius="0"
           color="teal"
-          onClick={() => {
-            sendMessage(
-              user?.id || "",
-              messageInput,
-              "user",
-              currentChatId
-            ).then((res) => {
-              updateChat(currentChatId, {
-                ...chat,
-                messages: [...chat?.messages, res.message._id],
-                participants: updateParticipants(),
-              }).then((res) => {
-                console.log('sendcomplete')
-                socket.emit("chat message", res.chat);
-                setChat(res.chat);
-              });
-            });
-          }}
+          onClick={() => sendMessageHandler()}
         >
           <IconSend size="24" />
         </ActionIcon>
