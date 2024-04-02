@@ -1,14 +1,17 @@
 import * as Mongoose from "mongoose";
 import { IChatFolderDocument } from "../models/ChatFolder";
+import { socket } from "@/socket";
 
-const createdBy = "user_2dsZmTZTBij5xjWmPjvirpXKtsL";
-const workspaceId = "org_2dz9SJPInQzTNl4R7qBx7DfFYby";
+// const createdBy = "user_2dsZmTZTBij5xjWmPjvirpXKtsL";
+// const workspaceId = "org_2dz9SJPInQzTNl4R7qBx7DfFYby";
 
 type Scope = "public" | "private";
 
 async function createChatFolder(
   scope: Scope,
-  parentFolder: Mongoose.Types.ObjectId | null
+  parentFolder: Mongoose.Types.ObjectId | null,
+  createdBy: string,
+  workspaceId: string
 ) {
   const data = await fetch("/api/chatfolder", {
     method: "POST",
@@ -19,10 +22,17 @@ async function createChatFolder(
   });
 
   const response = await data.json();
+  if (scope === "public")
+    socket.emit("createChatFolder", workspaceId, response.chatFolder);
+  else socket.emit("createPersonalChatFolder", response.chatFolder);
   return response;
 }
 
-async function getChatFolders(scope: Scope) {
+async function getChatFolders(
+  scope: Scope,
+  createdBy: string,
+  workspaceId: string
+) {
   const data = await fetch(
     `/api/chatfolder/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}`,
     {

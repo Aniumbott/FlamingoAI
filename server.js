@@ -15,29 +15,69 @@ app.prepare().then(() => {
   const io = new Server(httpServer);
 
   io.on("connection", (socket) => {
-    
     console.log("a user connected");
-    
+
     // Event listeners
     // Basic
-    socket.on("joinRoom", (roomId) => {
+    socket.on("joinChatRoom", (roomId) => {
       socket.join(roomId);
-      console.log(`User with ID: ${socket.id} joined room: ${roomId}`);
+      console.log(`User with ID: ${socket.id} joined Chat: ${roomId}`);
     });
 
-    socket.on("leaveRoom", (roomId) => {
+    socket.on("leaveChatRoom", (roomId) => {
       socket.leave(roomId);
-      console.log(`User with ID: ${socket.id} left room: ${roomId}`);
+      console.log(`User with ID: ${socket.id} left Chat: ${roomId}`);
+    });
+
+    socket.on("joinWorkspaceRoom", (roomId) => {
+      socket.join(roomId);
+      console.log(`User with ID: ${socket.id} joined Workspace: ${roomId}`);
+    });
+
+    socket.on("leaveWorkspaceRoom", (roomId) => {
+      socket.leave(roomId);
+      console.log(`User with ID: ${socket.id} left Workspace: ${roomId}`);
     });
 
     socket.on("disconnect", () => {
       console.log("user disconnected");
     });
 
-
-    // Custom
+    // Message
     socket.on("createMessage", (roomId, message) => {
+      console.log(
+        `User with ID: ${socket.id} sent message: ${message} in room: ${roomId}`
+      );
       io.to(roomId).emit("newMessage", message);
+    });
+
+    // FOLDER
+    socket.on("createChatFolder", (roomId, folder) => {
+      console.log(
+        `User with ID: ${socket.id} created folder: ${folder} in room: ${roomId}`
+      );
+      io.to(roomId).emit("newChatFolder", folder);
+    });
+
+    socket.on("createPersonalChatFolder", (folder) => {
+      console.log(
+        `User with ID: ${socket.id} created private folder: ${folder} to user: ${socket.id}`
+      );
+      io.to(socket.id).emit("newChatFolder", folder);
+    });
+
+    // Chat
+    socket.on("createChat", (roomId, chat) => {
+      console.log(
+        `User with ID: ${socket.id} created chat: ${chat} in room: ${roomId}`
+      );
+      io.to(roomId).emit("newChat", chat);
+    });
+    socket.on("createPersonalChat", (chat) => {
+      console.log(
+        `User with ID: ${socket.id} created private chat: ${chat} to user: ${socket.id}`
+      );
+      io.to(socket.id).emit("newChat", chat);
     });
   });
 

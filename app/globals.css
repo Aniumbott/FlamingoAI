@@ -40,6 +40,19 @@ body {
   display: none;
 }
 
+.cl-organizationSwitcherTrigger {
+  width: 100%;
+  justify-content: space-between;
+}
+
 ::-webkit-scrollbar {
   width: 0;
+}
+
+.HeaderSearch_header__1FzqK {
+  margin: 0;
+}
+
+header {
+  margin: 0;
 }

@@ -1,9 +1,7 @@
 import { Button, Modal, rem, Paper } from "@mantine/core";
-import { IconUser, IconShieldCheckFilled, IconPlus } from "@tabler/icons-react";
 import style from ".././Modals.module.css";
 
 import { useState } from "react";
-import { useScrollIntoView } from "@mantine/hooks";
 import ChatAuth from "./ChatAuth";
 import WorkspaceSetup from "./WorkspaceSetup";
 import AdvancedSetup from "./AdvancedSetup";

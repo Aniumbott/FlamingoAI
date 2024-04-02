@@ -1,6 +1,6 @@
 import * as Mongoose from "mongoose";
 import { IChatDocument } from "../models/Chat";
-
+import { socket } from "@/socket";
 type Scope = "public" | "private";
 
 async function createChat(
@@ -18,6 +18,9 @@ async function createChat(
   });
 
   const response = await data.json();
+  console.log(socket);
+  if (scope === "public") socket.emit("createChat", workspaceId, response.chat);
+  else socket.emit("createPersonalChat", response.chat);
   return response;
 }
 

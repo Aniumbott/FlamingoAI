@@ -9,18 +9,6 @@ import style from "../RightPanel/RightPanel.module.css";
 import { IChatDocument } from "@/app/models/Chat";
 import { createChat } from "@/app/controllers/chat";
 
-export const newChat = async (
-  scope: "private" | "public",
-  parentFolder: Mongoose.Types.ObjectId | null,
-  userId: string,
-  workspaceId: string
-) => {
-  // console.log("creating new chat");
-  const res = await createChat(scope, parentFolder, userId, workspaceId);
-  // console.log("res", res);
-  return res;
-};
-
 export default function ChatItem(props: {
   item: IChatDocument;
   members: any[];

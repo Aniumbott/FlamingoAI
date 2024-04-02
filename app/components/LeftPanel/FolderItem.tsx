@@ -15,16 +15,24 @@ import { IChatFolderDocument } from "@/app/models/ChatFolder";
 
 // Components
 import PromptMenu from "./Menu/PromptMenu";
-import ChatItem, { newChat } from "./ChatItem";
+import ChatItem from "./ChatItem";
 import { createChatFolder } from "@/app/controllers/folders";
+import { createChat } from "@/app/controllers/chat";
 import style from "../RightPanel/RightPanel.module.css";
 
 export const newFolder = async (
   scope: "public" | "private",
-  parentFolder: Mongoose.Types.ObjectId | null
+  parentFolder: Mongoose.Types.ObjectId | null,
+  createdBy: string,
+  workspaceId: string
 ) => {
   // console.log("creating new folder");
-  const res = await createChatFolder(scope, parentFolder);
+  const res = await createChatFolder(
+    scope,
+    parentFolder,
+    createdBy,
+    workspaceId
+  );
   // console.log("res", res);
 };
 
@@ -32,8 +40,10 @@ export default function FolderItem(props: {
   folder: IChatFolderDocument;
   scope: "public" | "private";
   members: any[];
+  userId: string;
+  workspaceId: string;
 }) {
-  const { folder, scope, members } = props;
+  const { folder, scope, members, userId, workspaceId } = props;
   const [isOpened, setIsOpened] = useState(false);
   const { ref, hovered } = useHover();
   return (
@@ -46,6 +56,8 @@ export default function FolderItem(props: {
               scope={scope}
               isHovered={hovered}
               isOpened={isOpened}
+              userId={userId}
+              workspaceId={workspaceId}
             />
           </Accordion.Control>
         </div>
@@ -63,6 +75,8 @@ export default function FolderItem(props: {
                     folder={subFolder as IChatFolderDocument}
                     scope={scope}
                     members={members}
+                    userId={props.userId}
+                    workspaceId={props.workspaceId}
                   />
                 </Accordion>
               </div>
@@ -84,6 +98,8 @@ const FolderLabel = (props: {
   scope: "public" | "private";
   isOpened: boolean;
   isHovered: boolean;
+  userId: string;
+  workspaceId: string;
 }) => {
   return (
     // <div className="flex justify-start items-center">
@@ -107,7 +123,7 @@ const FolderLabel = (props: {
           />
         )}
         <Text size="sm" w={100} ml={8} truncate="end">
-          {props.folder.name} {props.folder._id.slice(-2)}
+          {props.folder.name}
         </Text>
       </Group>
       {props.isHovered && (
@@ -123,7 +139,12 @@ const FolderLabel = (props: {
             }}
             onClick={(event) => {
               event.stopPropagation();
-              newFolder(props.scope, props.folder._id);
+              newFolder(
+                props.scope,
+                props.folder._id,
+                props.userId,
+                props.workspaceId
+              );
               // Add any additional logic for the ActionIcon click here
             }}
           >
@@ -140,7 +161,13 @@ const FolderLabel = (props: {
             }}
             onClick={(event) => {
               event.stopPropagation();
-              newChat(props.scope, props.folder._id);
+              createChat(
+                props.scope,
+                props.folder._id,
+                props.userId,
+                props.workspaceId
+              );
+
               // Add any additional logic for the ActionIcon click here
             }}
           >

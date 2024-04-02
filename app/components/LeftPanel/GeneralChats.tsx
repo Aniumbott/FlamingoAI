@@ -16,109 +16,16 @@ import {
 } from "@tabler/icons-react";
 
 // Components
-import ChatItem, { newChat } from "./ChatItem";
+import ChatItem from "./ChatItem";
 import FolderItem, { newFolder } from "./FolderItem";
-import { getIndependentChats } from "@/app/controllers/chat";
+import { getIndependentChats, createChat } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
 import { getChatFolders } from "@/app/controllers/folders";
 import PromptMenu from "./Menu/PromptMenu";
 import style from "../RightPanel/RightPanel.module.css";
 import { useAuth } from "@clerk/nextjs";
-
-const chats: Chats = {
-  title: "Chats",
-  content: [
-    {
-      id: "1jkjhhhjkh",
-      type: "folder",
-      title: "Folder 1",
-      scope: "shared",
-      content: [
-        {
-          id: "1u89jij",
-          type: "chat",
-          title: "Prompt 1",
-          scope: "shared",
-          content: "This is the content of prompt 1",
-        },
-        {
-          id: "2jjginou9",
-          type: "folder",
-          title: "Folder 2",
-          scope: "shared",
-          content: [
-            {
-              id: "1jbuiujoij",
-              type: "prompt",
-              title: "Prompt 2",
-              scope: "shared",
-              content: "This is the content of prompt 2",
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "1jkjhhhjkh",
-      type: "folder",
-      title: "Folder 2",
-      scope: "personal",
-      content: [
-        {
-          id: "1u89jij",
-          type: "prompt",
-          scope: "personal",
-
-          title: "Prompt 1",
-          content: "This is the content of prompt 1",
-        },
-        {
-          id: "2jjginou9",
-          type: "folder",
-          scope: "personal",
-
-          title: "Folder 2",
-          content: [
-            {
-              id: "1jbuiujoij",
-              type: "prompt",
-              title: "Prompt 2",
-              scope: "personal",
-
-              content: "This is the content of prompt 2",
-            },
-          ],
-        },
-      ],
-    },
-    {
-      id: "1u89jij",
-      type: "prompt",
-      scope: "personal",
-
-      title: "Prompt 1",
-      content: "This is the content of prompt 1",
-    },
-    {
-      id: "2jjginou9",
-      type: "folder",
-      scope: "personal",
-
-      title: "Folder 2",
-      content: [
-        {
-          id: "1jbuiujoij",
-          type: "prompt",
-          title: "Prompt 2",
-          scope: "personal",
-
-          content: "This is the content of prompt 2",
-        },
-      ],
-    },
-  ],
-};
+import { socket } from "@/socket";
 
 interface Chats {
   title: string;
@@ -132,7 +39,7 @@ interface ChatItem {
   content: string | ChatItem[];
 }
 
-const PersonalChats = (props: { members: any[] }) => {
+const GeneralChats = (props: { members: any[] }) => {
   const { members } = props;
   const [publicChats, setPublicChats] = useState<IChatDocument[]>([]);
   const [privateChats, setPrivateChats] = useState<IChatDocument[]>([]);
@@ -157,56 +64,31 @@ const PersonalChats = (props: { members: any[] }) => {
       }
     };
 
-    fetchChats();
-  }, []);
-
-  useEffect(() => {
     const fetchFolders = async () => {
       try {
-        setPublicFolders((await getChatFolders("public")).chatFolder);
-        setPrivateFolders((await getChatFolders("private")).chatFolder);
+        setPublicFolders(
+          (await getChatFolders("public", userId || "", orgId || "")).chatFolder
+        );
+        setPrivateFolders(
+          (await getChatFolders("private", userId || "", orgId || ""))
+            .chatFolder
+        );
       } catch (error) {
         console.error("Failed to fetch folders:", error);
       }
     };
-    fetchFolders();
+
+    fetchChats().then(() => fetchFolders());
+    socket.on("newChat", (chat) => {
+      console.log("newChat", chat);
+      fetchChats().then(() => fetchFolders());
+    });
+
+    socket.on("newChatFolder", (folder) => {
+      console.log("newChatFolder", folder);
+      fetchChats().then(() => fetchFolders());
+    });
   }, []);
-
-  const [personalChats, setPersonalChats] = useState<Chats>({
-    title: "PERSONAL",
-    content: [],
-  });
-  const [sharedChats, setSharedChats] = useState<Chats>({
-    title: "SHARED",
-    content: [],
-  });
-
-  useEffect(() => {
-    const filterChats = (
-      chats: ChatItem[],
-      scope: "personal" | "shared"
-    ): ChatItem[] => {
-      return chats
-        .filter((chat) => chat.scope === scope)
-        .map((chat) => ({
-          ...chat,
-          content:
-            chat.type === "folder"
-              ? filterChats(chat.content as ChatItem[], scope)
-              : chat.content,
-        }));
-    };
-
-    const personalChatItems = filterChats(chats.content, "personal");
-    const sharedChatItems = filterChats(chats.content, "shared");
-
-    setPersonalChats({ ...personalChats, content: personalChatItems });
-    setSharedChats({ ...sharedChats, content: sharedChatItems });
-  }, []);
-  useEffect(() => {
-    // console.log("privateChats", privateChats);
-    // console.log("publicChats", publicChats);
-  }, [privateChats, publicChats]);
 
   return (
     <ScrollArea scrollbarSize={3} pb={"10"}>
@@ -216,7 +98,7 @@ const PersonalChats = (props: { members: any[] }) => {
         classNames={{ chevron: style.chevron }}
         chevron={<IconCaretRightFilled className={style.icon} />}
       >
-        <Accordion.Item value={sharedChats.title} key={sharedChats.title}>
+        <Accordion.Item value={"SHARED"} key={"SHARED"}>
           <Accordion.Control>
             <AccordianLabel
               title={"SHARED"}
@@ -237,6 +119,8 @@ const PersonalChats = (props: { members: any[] }) => {
                   folder={folder}
                   scope={"public"}
                   members={members}
+                  userId={userId || ""}
+                  workspaceId={orgId || ""}
                 />
               </Accordion>
             ))}
@@ -267,6 +151,8 @@ const PersonalChats = (props: { members: any[] }) => {
                   folder={folder}
                   scope={"private"}
                   members={members}
+                  userId={userId || ""}
+                  workspaceId={orgId || ""}
                 />
               </Accordion>
             ))}
@@ -324,7 +210,7 @@ const AccordianLabel = (props: {
           }}
           onClick={(event) => {
             event.stopPropagation();
-            newFolder(props.scope, null);
+            newFolder(props.scope, null, props.userId, props.workspaceId);
             // Add any additional logic for the ActionIcon click here
           }}
         >
@@ -341,7 +227,7 @@ const AccordianLabel = (props: {
           }}
           onClick={(event) => {
             event.stopPropagation();
-            newChat(props.scope, null, props.userId, props.workspaceId);
+            createChat(props.scope, null, props.userId, props.workspaceId);
             // Add any additional logic for the ActionIcon click here
           }}
         >
@@ -352,4 +238,4 @@ const AccordianLabel = (props: {
   );
 };
 
-export default PersonalChats;
+export default GeneralChats;
