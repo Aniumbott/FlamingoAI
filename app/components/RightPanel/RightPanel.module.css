@@ -1,0 +1,46 @@
+.activeTitle {
+  width: 90%;
+  margin: 0 auto;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.activeTitle p {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+}
+
+.parent .chevron {
+  &[data-rotate] {
+    transform: rotate(90deg);
+  }
+  &[data-active]{
+    background-color: aqua;
+  }
+  margin: 0.5rem 0.2rem;
+}
+
+.accordionControl[data-active] {
+  background-color: #404040;
+}
+
+.parent {
+  border: 0;
+}
+
+.parent * {
+  border: 0;
+}
+
+.prompt {
+  padding: 0.5rem;
+  display: flex;
+  &:hover {
+    cursor: pointer;
+    background: #ffffff0a;
+  }
+}

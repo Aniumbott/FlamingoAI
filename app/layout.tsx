@@ -1,5 +1,12 @@
+// Modules
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
+import "@mantine/core/styles.css";
+import { ClerkProvider } from "@clerk/nextjs";
+import StoreProvider from "./redux/StoreProvider";
+
+// Componets
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -15,8 +22,26 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={inter.className}>{children}</body>
-    </html>
+    <ClerkProvider
+      appearance={{
+        variables: {
+          colorPrimary: "#4f976b",
+        },
+      }}
+    >
+      <StoreProvider>
+        <html lang="en">
+          <head>
+            <ColorSchemeScript />
+            <title>Team GPT PRO !!!</title>
+          </head>
+          <body className={inter.className}>
+            <MantineProvider defaultColorScheme="dark">
+              {children}
+            </MantineProvider>
+          </body>
+        </html>
+      </StoreProvider>
+    </ClerkProvider>
   );
 }
