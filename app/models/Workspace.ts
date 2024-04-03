@@ -10,6 +10,7 @@ const workspaceSchema = new Mongoose.Schema(
     imageUrl: { type: String, required: false },
     allowPersonal: { type: Boolean, required: true },
     allowPublic: { type: Boolean, required: true },
+    apiKey: { type: String, required: false },
     createdBy: { type: Mongoose.Types.ObjectId, ref: "users", required: true },
   },
   {
@@ -24,6 +25,7 @@ interface IWorkspace {
   imageUrl: string;
   allowPersonal: boolean;
   allowPublic: boolean;
+  apiKey: string;
   createdBy: Mongoose.Types.ObjectId;
 }
 

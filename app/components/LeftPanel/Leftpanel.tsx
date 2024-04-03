@@ -44,10 +44,6 @@ const LeftPanel = () => {
     getmembers();
   }, [organization?.id]);
 
-  useEffect(() => {
-    console.log(members);
-  }, [members]);
-
   return (
     <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
       <Group
@@ -122,7 +118,7 @@ const LeftPanel = () => {
 const createPublicChat = async (userId: string, workspaceId: string) => {
   // console.log("creating a chat");
   socket.emit("hello", "world");
-  console.log("emmiting");
+  // console.log("emmiting");
   const res = await createChat("public", null, userId, workspaceId);
   // console.log("res", res);
 };

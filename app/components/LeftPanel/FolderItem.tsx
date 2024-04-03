@@ -1,5 +1,5 @@
 // Modules
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useHover } from "@mantine/hooks";
 import Mongoose from "mongoose";
 import { Accordion, Text, Group, ActionIcon } from "@mantine/core";
@@ -15,6 +15,7 @@ import { IChatFolderDocument } from "@/app/models/ChatFolder";
 
 // Components
 import PromptMenu from "./Menu/PromptMenu";
+import FolderFeatureMenu from "./Menu/FolderFeatureMenu";
 import ChatItem from "./ChatItem";
 import { createChatFolder } from "@/app/controllers/folders";
 import { createChat } from "@/app/controllers/chat";
@@ -46,6 +47,7 @@ export default function FolderItem(props: {
   const { folder, scope, members, userId, workspaceId } = props;
   const [isOpened, setIsOpened] = useState(false);
   const { ref, hovered } = useHover();
+
   return (
     <>
       <Accordion.Item value={folder._id}>
@@ -101,6 +103,12 @@ const FolderLabel = (props: {
   userId: string;
   workspaceId: string;
 }) => {
+  const [menuOpen, setMenuOpen] = useState(false);
+  let actionIconVisible = props.isHovered || menuOpen;
+
+  useEffect(() => {
+    actionIconVisible = props.isHovered || menuOpen;
+  }, [props.isHovered, menuOpen]);
   return (
     // <div className="flex justify-start items-center">
     <Group wrap="nowrap" justify="space-between" preventGrowOverflow={false}>
@@ -126,7 +134,7 @@ const FolderLabel = (props: {
           {props.folder.name}
         </Text>
       </Group>
-      {props.isHovered && (
+      {actionIconVisible && (
         <Group wrap="nowrap" gap={5} align="center">
           <ActionIcon
             size="sm"
@@ -186,7 +194,14 @@ const FolderLabel = (props: {
               // Add any additional logic for the ActionIcon click here
             }}
           >
-            <PromptMenu />
+            <FolderFeatureMenu
+              folder={props.folder}
+              scope={props.scope}
+              workspaceId={props.workspaceId}
+              userId={props.userId}
+              open={menuOpen}
+              setOpen={setMenuOpen}
+            />
           </ActionIcon>
         </Group>
       )}

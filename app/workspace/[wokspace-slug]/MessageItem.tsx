@@ -1,5 +1,6 @@
 // Modules
 import { Avatar, Text, useMantineColorScheme } from "@mantine/core";
+import { IconRobotFace } from "@tabler/icons-react";
 
 function getDate(date: string) {
   return new Date(date).toLocaleDateString();
@@ -33,22 +34,48 @@ function MessageItem(props: {
         }}
       >
         <div className="w-2/3 h-full min-w-96 flex flex-row ">
-          {message.createdBy.hasImage ? (
+          {/* {message.createdBy.hasImage ? (
             <Avatar
               size="md"
               radius="sm"
               src={message.createdBy.avatar}
               mt={5}
             />
-          ) : (
+          ) : message.type == "user" ? (
             <Avatar size="md" radius="sm" mt={5}>
               {message.createdBy.name[0]}
+            </Avatar>
+          ) : (
+            <Avatar size="md" radius="sm" mt={5}>
+              <IconRobotFace
+                size="24px"
+                color="var(--mantine-color-yellow-3)"
+              />
+            </Avatar>
+          )} */}
+
+          {message.type === "user" ? (
+            message.createdBy.hasImage ? (
+              <Avatar
+                size="md"
+                radius="sm"
+                src={message.createdBy.avatar}
+                mt={5}
+              />
+            ) : (
+              <Avatar size="md" radius="sm" mt={5}>
+                {message.createdBy.name[0]}
+              </Avatar>
+            )
+          ) : (
+            <Avatar size="md" radius="sm" mt={5}>
+              <IconRobotFace size="24px" color="var(--mantine-color-teal-3)" />
             </Avatar>
           )}
           <div className="w-full ml-10 flex flex-col   ">
             <div className="flex flex-row items-center ">
               <Text size="md" fw={700}>
-                {message.createdBy.name}
+                {message.type == "user" ? message.createdBy.name : "TeamGPT"}
               </Text>
               <Text pl={10} size="xs">
                 {getDate(message.updatedAt.toString())}

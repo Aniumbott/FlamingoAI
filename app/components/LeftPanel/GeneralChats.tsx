@@ -80,34 +80,35 @@ const GeneralChats = (props: { members: any[] }) => {
 
     fetchChats().then(() => fetchFolders());
     socket.on("newChat", (chat) => {
-      console.log("newChat", chat);
+      // console.log("newChat", chat);
       fetchChats().then(() => fetchFolders());
     });
 
     socket.on("newChatFolder", (folder) => {
-      console.log("newChatFolder", folder);
+      // console.log("newChatFolder", folder);
       fetchChats().then(() => fetchFolders());
     });
   }, []);
 
   return (
-    <ScrollArea scrollbarSize={3} pb={"10"}>
-      <Accordion
-        chevronPosition="left"
-        className={style.parent}
-        classNames={{ chevron: style.chevron }}
-        chevron={<IconCaretRightFilled className={style.icon} />}
-      >
-        <Accordion.Item value={"SHARED"} key={"SHARED"}>
-          <Accordion.Control>
-            <AccordianLabel
-              title={"SHARED"}
-              scope="public"
-              userId={userId || ""}
-              workspaceId={orgId || ""}
-            />
-          </Accordion.Control>
-          <AccordionPanel>
+    // <ScrollArea scrollbarSize={3} pb={"10"}>
+    <Accordion
+      chevronPosition="left"
+      className={style.parent}
+      classNames={{ chevron: style.chevron }}
+      chevron={<IconCaretRightFilled className={style.icon} />}
+    >
+      <Accordion.Item value={"SHARED"} key={"SHARED"}>
+        <Accordion.Control>
+          <AccordianLabel
+            title={"SHARED"}
+            scope="public"
+            userId={userId || ""}
+            workspaceId={orgId || ""}
+          />
+        </Accordion.Control>
+        <AccordionPanel>
+          <ScrollArea h="30vh" scrollbarSize={10} offsetScrollbars>
             {publicFolders?.map((folder, key) => (
               <Accordion
                 chevronPosition="left"
@@ -127,19 +128,21 @@ const GeneralChats = (props: { members: any[] }) => {
             {publicChats?.map((chat, key) => (
               <ChatItem item={chat} key={key} members={members} />
             ))}
-          </AccordionPanel>
-        </Accordion.Item>
+          </ScrollArea>
+        </AccordionPanel>
+      </Accordion.Item>
 
-        <Accordion.Item value={"PERSONAL"} key={"PERSONAL"}>
-          <AccordionControl>
-            <AccordianLabel
-              title={"PERSONAL"}
-              scope="private"
-              userId={userId || ""}
-              workspaceId={orgId || ""}
-            />
-          </AccordionControl>
-          <AccordionPanel>
+      <Accordion.Item value={"PERSONAL"} key={"PERSONAL"}>
+        <AccordionControl>
+          <AccordianLabel
+            title={"PERSONAL"}
+            scope="private"
+            userId={userId || ""}
+            workspaceId={orgId || ""}
+          />
+        </AccordionControl>
+        <AccordionPanel>
+          <ScrollArea h="30vh" scrollbarSize={10} offsetScrollbars>
             {privateFolders?.map((folder, key) => (
               <Accordion
                 chevronPosition="left"
@@ -159,10 +162,11 @@ const GeneralChats = (props: { members: any[] }) => {
             {privateChats?.map((chat, key) => (
               <ChatItem item={chat} key={key} members={members} />
             ))}
-          </AccordionPanel>
-        </Accordion.Item>
-      </Accordion>
-    </ScrollArea>
+          </ScrollArea>
+        </AccordionPanel>
+      </Accordion.Item>
+    </Accordion>
+    // </ScrollArea>
   );
 };
 

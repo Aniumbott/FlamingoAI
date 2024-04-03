@@ -56,3 +56,12 @@ body {
 header {
   margin: 0;
 }
+
+.mantine-Accordion-content {
+  padding: 0 !important;
+  padding-left: 0.5rem !important;
+}
+
+.mantine-Accordion-control {
+  padding-right: 8px !important;
+}

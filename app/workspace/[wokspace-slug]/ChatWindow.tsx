@@ -24,6 +24,8 @@ import { sendMessage } from "@/app/controllers/message";
 import { getChat, updateChat } from "@/app/controllers/chat";
 import { socket } from "@/socket";
 import { useScrollIntoView } from "@mantine/hooks";
+import { getAssistantResponse } from "@/app/controllers/assistant";
+import { getWorkspace } from "@/app/controllers/Workspace";
 
 export default function ChatWindow(props: { currentChatId: String }) {
   const { currentChatId } = props;
@@ -48,7 +50,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
     setMessages(chat?.messages);
 
     if (socket.connected) {
-      console.log("socket already connected");
+      // console.log("socket already connected");
     }
     socket.on("newMessage", (msg) => {
       // console.log("newMessage", msg);
@@ -58,7 +60,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
         messages: [...(chat?.messages || []), msg._id],
         participants: updateParticipants(),
       }).then((res) => {
-        console.log("response at chat", res);
+        // console.log("response at chat", res);
         setChat(res.chat);
       });
     });
@@ -69,45 +71,33 @@ export default function ChatWindow(props: { currentChatId: String }) {
 
   useEffect(() => {
     scrollIntoView();
+    if (
+      messages?.length > 0 &&
+      messages[messages.length - 1].type == "user" &&
+      messages[messages.length - 1].createdBy == user?.id
+    ) {
+      // collectAssitantResponse.then((res) => sendMessageHandler("Hello, I am a bot", "assistant"));
+      getAssistantResponse(
+        messages.map((msg: any) => {
+          return {
+            role: msg.type,
+            content: msg.content,
+          };
+        }),
+        chat?.scope,
+        organization?.id || "",
+        "gpt-3.5-turbo"
+      ).then((res) => {
+        sendMessageHandler(res.gptRes.choices[0].message.content, "assistant");
+      });
+    }
   }, [messages]);
 
-  // useEffect(() => {
-  //   console.log(chat);
-  // }, [chat]);
-
-  // Functions
-  // async function sendMessageHandler() {
-  //   sendMessage(user?.id || "", messageInput, "user", currentChatId).then(
-  //     (res) => {
-  //       updateChat(currentChatId, {
-  //         ...chat,
-  //         messages: [
-  //           ...chat?.messages.slice(
-  //             Math.max(chat?.messages.length - 19, 0),
-  //             chat?.messages.length
-  //           ),
-  //           res.message._id,
-  //         ],
-  //         participants: updateParticipants(),
-  //       }).then((res) => {
-  //         console.log("sendcomplete");
-  //         setChat(res.chat);
-  //       });
-  //     }
-  //   );
-  // }
-
-  async function sendMessageHandler() {
-    sendMessage(user?.id || "", messageInput, "user", currentChatId).then(
-      (res) => {
-        socket.emit("createMessage", currentChatId, res.message);
-        setMessageInput("");
-      }
-    );
-  }
-
-  async function updateChatHandler(msg: any, chat: any) {
-    console.log("chat", chat);
+  async function sendMessageHandler(msg: any, role: String) {
+    sendMessage(user?.id || "", msg, role, currentChatId).then((res) => {
+      socket.emit("createMessage", currentChatId, res.message);
+      setMessageInput("");
+    });
   }
 
   useEffect(() => {
@@ -133,7 +123,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
         return await getChat(currentChatId, organization?.id || "");
       };
       getCurrentChat().then((res) => {
-        console.log("currentChat", res);
+        // console.log("currentChat", res);
         setChat(res.chats[0]);
       });
     }
@@ -216,7 +206,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
           onChange={(e) => setMessageInput(e.currentTarget.value)}
           onKeyPress={(e) => {
             if (e.key === "Enter") {
-              sendMessageHandler();
+              sendMessageHandler(messageInput, "user");
             }
           }}
         />
@@ -225,7 +215,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
           size="50"
           radius="0"
           color="teal"
-          onClick={() => sendMessageHandler()}
+          onClick={() => sendMessageHandler(messageInput, "user")}
         >
           <IconSend size="24" />
         </ActionIcon>
