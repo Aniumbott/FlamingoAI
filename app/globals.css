@@ -18,16 +18,50 @@
 
 body {
   color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* .modal-body {
+  background-color: transparent !important;
+} */
+
+.cl-internal-rx251b,
+.cl-internal-1ee916m {
+  margin: 0;
+}
+
+.cl-internal-b3fm6y,
+.cl-internal-8nk38b {
+  display: none;
+}
+
+.cl-organizationSwitcherTrigger {
+  width: 100%;
+  justify-content: space-between;
+}
+
+::-webkit-scrollbar {
+  width: 0;
+}
+
+.HeaderSearch_header__1FzqK {
+  margin: 0;
+}
+
+header {
+  margin: 0;
+}
+
+.mantine-Accordion-content {
+  padding: 0 !important;
+  padding-left: 0.5rem !important;
+}
+
+.mantine-Accordion-control {
+  padding-right: 8px !important;
 }
