@@ -2,7 +2,7 @@ import type { NextApiResponse } from "next";
 import { dbConnect } from "@/app/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 // import get from workspace route
-import { getWorkspace } from "../workspace/route";
+import Workspace from "@/app/models/Workspace";
 
 export async function GET(req: NextRequest, res: NextApiResponse) {
   try {
@@ -35,4 +35,10 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
     console.log("error at GET in Assistant route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
+}
+
+async function getWorkspace(workspaceId: string) {
+  await dbConnect();
+  const workspace = await Workspace.findById(workspaceId);
+  return workspace;
 }

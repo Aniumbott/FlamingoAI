@@ -9,7 +9,7 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
     await dbConnect();
     const reqParam = req.nextUrl.searchParams;
     const id = reqParam.get("id");
-    const workspace = getWorkspace(id || "");
+    const workspace = await Workspace.findById(id);
     // console.log("workspace", workspace);
     return NextResponse.json({ workspace }, { status: 200 });
   } catch (error: any) {
@@ -30,10 +30,4 @@ export async function PUT(req: any, res: NextApiResponse) {
     // console.log("error at PUT in Workspace route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
-}
-
-export async function getWorkspace(workspaceId: string) {
-  await dbConnect();
-  const workspace = await Workspace.findById(workspaceId);
-  return workspace;
 }
