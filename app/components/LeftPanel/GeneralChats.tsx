@@ -79,6 +79,7 @@ const GeneralChats = (props: { members: any[] }) => {
     };
 
     fetchChats().then(() => fetchFolders());
+    
     socket.on("newChat", (chat) => {
       // console.log("newChat", chat);
       fetchChats().then(() => fetchFolders());

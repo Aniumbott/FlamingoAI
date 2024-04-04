@@ -3,13 +3,13 @@ import { useHover } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Mongoose from "mongoose";
-import { Avatar, Group, Text, ActionIcon } from "@mantine/core";
+import { Avatar, Group, Text, ActionIcon, TextInput } from "@mantine/core";
 import { IconAlignJustified } from "@tabler/icons-react";
 
 // Compoonents
 import style from "../RightPanel/RightPanel.module.css";
 import { IChatDocument } from "@/app/models/Chat";
-import { createChat } from "@/app/controllers/chat";
+import { createChat, updateChat } from "@/app/controllers/chat";
 import ChatFeatureMenu from "./Menu/ChatFeatureMenu";
 
 export default function ChatItem(props: {
@@ -21,6 +21,7 @@ export default function ChatItem(props: {
   const { item, members } = props;
   const { hovered, ref } = useHover();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [rename, setRename] = useState(false);
   let actionIconVisible = hovered || menuOpen;
 
   useEffect(() => {
@@ -46,42 +47,69 @@ export default function ChatItem(props: {
                 height: "1rem",
               }}
             />
-            <Text size="sm" style={{ marginLeft: "0.1rem" }}>
-              {item.name}
-            </Text>
-          </Group>
-          {actionIconVisible ? (
-            <ActionIcon
-              size="25px"
-              variant="subtle"
-              aria-label=""
-              color="#9CA3AF"
-              // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
-              style={{
-                "--ai-hover-color": "white",
-              }}
-              onClick={(e) => {
-                e.stopPropagation();
-              }}
-            >
-              <ChatFeatureMenu
-                chat={item}
-                members={members}
-                open={menuOpen}
-                setOpen={setMenuOpen}
+
+            {rename ? (
+              <TextInput
+
+                autoFocus
+                variant="filled"
+                placeholder="Rename"
+                onClick={(event) => {
+                  event.stopPropagation();
+                }}
+                onBlur={() => setRename(false)}
+                onKeyDown={(event) => {
+                  event.stopPropagation();
+                  if (event.key === "Enter") {
+                    updateChat(item._id, {
+                      name: event.currentTarget.value,
+                    }).then((res) => {
+                      setRename(false);
+                    });
+                  }
+                }}
               />
-            </ActionIcon>
-          ) : (
-            <Avatar.Group
-            // {...(hovered ? { opacity: "0" } : { opacity: "1" })}
-            >
-              {members.map((member, key) =>
-                item.participants.includes(member.userId) ? (
-                  <Avatar key={key} size="25px" src={member.imageUrl} />
-                ) : null
-              )}
-            </Avatar.Group>
-          )}
+            ) : (
+              <Text size="sm" style={{ marginLeft: "0.1rem" }}>
+                {item.name}
+              </Text>
+            )}
+          </Group>
+          {!rename ? (
+            actionIconVisible ? (
+              <ActionIcon
+                size="25px"
+                variant="subtle"
+                aria-label=""
+                color="#9CA3AF"
+                // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
+                style={{
+                  "--ai-hover-color": "white",
+                }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                }}
+              >
+                <ChatFeatureMenu
+                  chat={item}
+                  members={members}
+                  open={menuOpen}
+                  setOpen={setMenuOpen}
+                  setRename={setRename}
+                />
+              </ActionIcon>
+            ) : (
+              <Avatar.Group
+              // {...(hovered ? { opacity: "0" } : { opacity: "1" })}
+              >
+                {members.map((member, key) =>
+                  item.participants.includes(member.userId) ? (
+                    <Avatar key={key} size="25px" src={member.imageUrl} />
+                  ) : null
+                )}
+              </Avatar.Group>
+            )
+          ) : null}
         </div>
       </div>
     </>

@@ -19,6 +19,7 @@ export default function ChatFeatureMenu(props: {
   members: any[];
   open: boolean;
   setOpen: (value: boolean) => void;
+  setRename: (value: boolean) => void;
 }) {
   return (
     <Menu
@@ -53,7 +54,7 @@ export default function ChatFeatureMenu(props: {
             {props.chat.name}
           </Text>
         </Menu.Label>
-        <Menu.Item>
+        <Menu.Item onClick={() => props.setRename(true)}>
           <MenuButton properties={MenuData[0]} />
         </Menu.Item>
 

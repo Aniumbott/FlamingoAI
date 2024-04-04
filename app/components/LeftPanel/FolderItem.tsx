@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useHover } from "@mantine/hooks";
 import Mongoose from "mongoose";
-import { Accordion, Text, Group, ActionIcon } from "@mantine/core";
+import { Accordion, Text, Group, ActionIcon, TextInput } from "@mantine/core";
 import {
   IconCaretRightFilled,
   IconFolderOpen,
@@ -17,7 +17,7 @@ import { IChatFolderDocument } from "@/app/models/ChatFolder";
 import PromptMenu from "./Menu/PromptMenu";
 import FolderFeatureMenu from "./Menu/FolderFeatureMenu";
 import ChatItem from "./ChatItem";
-import { createChatFolder } from "@/app/controllers/folders";
+import { createChatFolder, updateChatFolders } from "@/app/controllers/folders";
 import { createChat } from "@/app/controllers/chat";
 import style from "../RightPanel/RightPanel.module.css";
 
@@ -105,6 +105,7 @@ const FolderLabel = (props: {
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   let actionIconVisible = props.isHovered || menuOpen;
+  const [rename, setRename] = useState(false);
 
   useEffect(() => {
     actionIconVisible = props.isHovered || menuOpen;
@@ -130,11 +131,36 @@ const FolderLabel = (props: {
             }}
           />
         )}
-        <Text size="sm" w={100} ml={8} truncate="end">
-          {props.folder.name}
-        </Text>
+        {rename ? (
+          <TextInput
+            autoFocus
+            variant="filled"
+            placeholder="Rename"
+            onClick={(event) => {
+              event.stopPropagation();
+            }}
+            onBlur={() => setRename(false)}
+            onKeyDown={(event) => {
+              event.stopPropagation();
+              if (event.key === "Enter") {
+                updateChatFolders(props.folder._id, {
+                  name: event.currentTarget.value,
+                }).then((res) => {
+                  setRename(false);
+                });
+              } else if (event.key === " ") {
+                event.preventDefault();
+                event.currentTarget.value += " ";
+              }
+            }}
+          />
+        ) : (
+          <Text size="sm" style={{ marginLeft: "0.1rem" }}>
+            {props.folder.name}
+          </Text>
+        )}
       </Group>
-      {actionIconVisible && (
+      {!rename && actionIconVisible && (
         <Group wrap="nowrap" gap={5} align="center">
           <ActionIcon
             size="sm"
@@ -201,6 +227,7 @@ const FolderLabel = (props: {
               userId={props.userId}
               open={menuOpen}
               setOpen={setMenuOpen}
+              setRename={setRename}
             />
           </ActionIcon>
         </Group>

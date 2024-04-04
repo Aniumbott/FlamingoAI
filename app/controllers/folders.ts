@@ -48,7 +48,7 @@ async function getChatFolders(
 }
 
 async function updateChatFolders(id: String, body: any) {
-  const data = await fetch("/api/chat", {
+  const data = await fetch("/api/chatfolder", {
     method: "PUT",
     body: JSON.stringify({ id, ...body }),
     headers: {
@@ -56,13 +56,20 @@ async function updateChatFolders(id: String, body: any) {
     },
   });
   const response = await data.json();
+  if (response.chatFolder.scope === "public")
+    socket.emit(
+      "createChatFolder",
+      response.chatFolder.workspaceId,
+      response.chatFolder
+    );
+  else socket.emit("createPersonalChatFolder", response.chatFolder);
   return response;
 }
 
 async function deleteChatFolders(chat: IChatFolderDocument) {
   // call controller to delete messages message ref array
 
-  const data = await fetch("/api/chat", {
+  const data = await fetch("/api/chatfolder", {
     method: "DELETE",
     body: JSON.stringify(chat._id),
     headers: {

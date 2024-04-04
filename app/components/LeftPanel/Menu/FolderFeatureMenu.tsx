@@ -20,6 +20,7 @@ export default function FolderFeatureMenu(props: {
   userId: string;
   open: boolean;
   setOpen: (value: boolean) => void;
+  setRename: (value: boolean) => void;
 }) {
   return (
     <Menu
@@ -54,7 +55,7 @@ export default function FolderFeatureMenu(props: {
             {props.folder.name}
           </Text>
         </Menu.Label>
-        <Menu.Item>
+        <Menu.Item onClick={() => props.setRename(true)}>
           <MenuButton properties={MenuData[0]} />
         </Menu.Item>
 
