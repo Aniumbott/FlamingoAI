@@ -23,7 +23,10 @@ const MessageSchema = new Mongoose.Schema(
       type: Date,
       required: false,
     },
-
+    createdAt: {
+      type: Date,
+      required: false,
+    },
     // comments
   },
   {
@@ -37,6 +40,7 @@ interface IMessage {
   type: String;
   chatId: String;
   updatedAt: Date;
+  createdAt: Date;
 }
 
 interface IMessageDocument extends IMessage, Document {}

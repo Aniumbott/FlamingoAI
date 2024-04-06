@@ -36,6 +36,7 @@ function MessageItem(props: {
       name: String;
       avatar: string;
     };
+    chatId: string;
     content: String;
     type: String;
     updatedAt: Date;
@@ -145,8 +146,7 @@ function MessageItem(props: {
                           "All messages sent after the one you are about to edit will be deleted!"
                         ).valueOf()
                       ) {
-                        const newMessage = { ...message, content: messageText };
-                        console.log(newMessage);
+                        // console.log(updateMessage(message));
                       }
 
                       // const update = async () =>

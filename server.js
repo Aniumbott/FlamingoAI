@@ -51,6 +51,13 @@ app.prepare().then(() => {
       io.to(roomId).emit("newMessage", message);
     });
 
+    socket.on("updateMessage", (roomId, message) => {
+      console.log(
+        `User with ID: ${socket.id} updated message: ${message} in room: ${roomId}`
+      );
+      io.to(roomId).emit("updateMessage", message);
+    });
+
     // FOLDER
     socket.on("createChatFolder", (roomId, folder) => {
       console.log(

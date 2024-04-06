@@ -26,6 +26,7 @@ import { socket } from "@/socket";
 import { useScrollIntoView } from "@mantine/hooks";
 import { getAssistantResponse } from "@/app/controllers/assistant";
 import { getWorkspace } from "@/app/controllers/Workspace";
+import { Ms_Madi } from "next/font/google";
 
 export default function ChatWindow(props: { currentChatId: String }) {
   const { currentChatId } = props;
@@ -64,6 +65,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
         setChat(res.chat);
       });
     });
+
     return () => {
       socket.off("newMessage");
     };
@@ -165,6 +167,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
                       name: `${user.firstName} ${user.lastName}`,
                       avatar: user.imageUrl,
                     },
+                    chatId: message.chatId,
                     content: message.content,
                     type: message.type,
                     updatedAt: message.updatedAt,
