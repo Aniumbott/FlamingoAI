@@ -78,7 +78,6 @@ async function updateChat(id: String, body: any) {
     },
   });
   const response = await data.json();
-  console.log("chatController", response);
   if (response.chat.scope === "public")
     socket.emit("createChat", response.chat.workspaceId, response.chat);
   else socket.emit("createPersonalChat", response.chat);

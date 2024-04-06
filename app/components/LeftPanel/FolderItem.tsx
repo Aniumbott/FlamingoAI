@@ -20,6 +20,7 @@ import ChatItem from "./ChatItem";
 import { createChatFolder, updateChatFolders } from "@/app/controllers/folders";
 import { createChat } from "@/app/controllers/chat";
 import style from "../RightPanel/RightPanel.module.css";
+import MoveChats from "./Modals/MoveItems";
 
 export const newFolder = async (
   scope: "public" | "private",
@@ -47,6 +48,7 @@ export default function FolderItem(props: {
   const { folder, scope, members, userId, workspaceId } = props;
   const [isOpened, setIsOpened] = useState(false);
   const { ref, hovered } = useHover();
+  const [openMoveModal, setOpenMoveModal] = useState(false);
 
   return (
     <>
@@ -60,6 +62,7 @@ export default function FolderItem(props: {
               isOpened={isOpened}
               userId={userId}
               workspaceId={workspaceId}
+              setMoveModal={setOpenMoveModal}
             />
           </Accordion.Control>
         </div>
@@ -91,6 +94,13 @@ export default function FolderItem(props: {
             ))}
         </Accordion.Panel>
       </Accordion.Item>
+      {openMoveModal && (
+        <MoveChats
+          opened={openMoveModal}
+          setOpened={setOpenMoveModal}
+          item={folder}
+        />
+      )}
     </>
   );
 }
@@ -102,6 +112,7 @@ const FolderLabel = (props: {
   isHovered: boolean;
   userId: string;
   workspaceId: string;
+  setMoveModal: (value: boolean) => void;
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   let actionIconVisible = props.isHovered || menuOpen;
@@ -228,6 +239,7 @@ const FolderLabel = (props: {
               open={menuOpen}
               setOpen={setMenuOpen}
               setRename={setRename}
+              setMoveModal={props.setMoveModal}
             />
           </ActionIcon>
         </Group>
