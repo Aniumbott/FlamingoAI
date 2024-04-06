@@ -2,24 +2,21 @@
 import { useEffect, useState } from "react";
 
 // Components
-import { getAllChats } from "@/app/controllers/chat";
+import { getArchivedChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import ChatItem from "./ChatItem";
 import { useAuth } from "@clerk/nextjs";
 import { ScrollArea } from "@mantine/core";
 import { socket } from "@/socket";
 
-const RecentChats = (props: { members: any[] }) => {
+const ArchivedChats = (props: { members: any[] }) => {
   const { members } = props;
   const { userId, orgId } = useAuth();
   useEffect(() => {
     const fetchAllChats = async () => {
-      const allChats = (await getAllChats(userId || "", orgId || "")).chats;
-      allChats.sort(
-        (a: any, b: any) =>
-          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-      );
-      setRecentChats(allChats);
+      const chats = (await getArchivedChats(userId || "", orgId || "")).chats;
+      console.log("archied", chats);
+      setArchivedChats(chats);
     };
     fetchAllChats();
     socket.on("newChat", (chat) => {
@@ -27,12 +24,12 @@ const RecentChats = (props: { members: any[] }) => {
     });
   }, []);
 
-  const [recentChats, setRecentChats] = useState<IChatDocument[]>([]);
+  const [archivedChats, setArchivedChats] = useState<IChatDocument[]>([]);
 
   return (
     <div>
       <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
-        {recentChats.map((chat, key) => {
+        {archivedChats.map((chat, key) => {
           return <ChatItem item={chat} key={key} members={members} />;
         })}
       </ScrollArea>
@@ -40,4 +37,4 @@ const RecentChats = (props: { members: any[] }) => {
   );
 };
 
-export default RecentChats;
+export default ArchivedChats;

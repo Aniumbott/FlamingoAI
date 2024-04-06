@@ -1,14 +1,23 @@
 // Modules
-import { Menu, Button, Stack, Text, rem } from "@mantine/core";
+import {
+  Menu,
+  Button,
+  Stack,
+  Text,
+  rem,
+  ColorPicker,
+  Paper,
+} from "@mantine/core";
 import {
   IconDots,
   IconFolderUp,
   IconFolderPlus,
   IconPlus,
   IconPencilMinus,
+  IconTrash,
 } from "@tabler/icons-react";
 import { useHover } from "@mantine/hooks";
-import { createChatFolder } from "@/app/controllers/folders";
+import { createChatFolder, deleteChatFolders } from "@/app/controllers/folders";
 import { createChat } from "@/app/controllers/chat";
 
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
@@ -23,6 +32,15 @@ export default function FolderFeatureMenu(props: {
   setRename: (value: boolean) => void;
   setMoveModal: (value: boolean) => void;
 }) {
+  const colors = [
+    "#2596FF",
+    "#AF75F8",
+    "#1CAB83",
+    "#F8D775",
+    "#FF5656",
+    "#F875B4",
+  ]; // Add more colors if needed
+
   return (
     <Menu
       width={200}
@@ -87,6 +105,37 @@ export default function FolderFeatureMenu(props: {
         <Menu.Item onClick={() => props.setMoveModal(true)}>
           <MenuButton properties={MenuData[3]} />
         </Menu.Item>
+        <Menu.Item>
+          <div className="flex gap-2 justify-evenly m-1">
+            {colors.map((color, index) => (
+              <Paper
+                key={index}
+                style={{
+                  backgroundColor: color,
+                  height: "15px",
+                  width: "15px",
+                  borderRadius: "100%",
+                  transition: "transform 0.3s ease",
+                }}
+                onMouseEnter={(e) =>
+                  (e.currentTarget.style.transform = "scale(1.1)")
+                }
+                onMouseLeave={(e) =>
+                  (e.currentTarget.style.transform = "scale(1)")
+                }
+              />
+            ))}
+          </div>
+        </Menu.Item>
+        <Menu.Item
+          onClick={() => {
+            deleteChatFolders(props.folder).then((res) => {
+              console.log(res);
+            });
+          }}
+        >
+          <MenuButton properties={MenuData[4]} />
+        </Menu.Item>
       </Menu.Dropdown>
     </Menu>
   );
@@ -139,5 +188,9 @@ const MenuData: { title: string; icon: React.ReactNode }[] = [
   {
     title: "Move",
     icon: <IconFolderUp size={20} />,
+  },
+  {
+    title: "Delete",
+    icon: <IconTrash size={20} />,
   },
 ];

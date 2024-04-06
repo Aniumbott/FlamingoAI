@@ -19,6 +19,7 @@ import { getAllChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import style from "../RightPanel/RightPanel.module.css";
 import PromptMenu from "./Menu/PromptMenu";
+import { socket } from "@/socket";
 
 const PeopleChats = (props: { members: any[] }) => {
   const { members } = props;
@@ -26,13 +27,20 @@ const PeopleChats = (props: { members: any[] }) => {
   const { userId, orgId } = useAuth();
   useEffect(() => {
     const fetchAllChats = async () => {
-      setAllChats((await getAllChats(userId || "", orgId || "")).chats);
+      const chats = (await getAllChats(userId || "", orgId || "")).chats;
+      setAllChats(
+        chats
+        // chats.filter((chat: IChatDocument) => chat.archived === false)
+      );
     };
     fetchAllChats();
+    socket.on("newChat", (chat) => {
+      fetchAllChats();
+    });
   }, []);
 
   return (
-    <ScrollArea scrollbarSize={3} pb={"10"}>
+    <ScrollArea h="50vh" scrollbarSize={3} pb={"10"}>
       {members.length > 0 && (
         <Accordion
           chevronPosition="left"

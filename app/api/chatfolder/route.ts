@@ -2,6 +2,8 @@ import type { NextApiResponse } from "next";
 import { dbConnect } from "@/app/lib/db";
 import { NextResponse } from "next/server";
 import ChatFolder from "@/app/models/ChatFolder";
+import Chat from "@/app/models/Chat";
+import Message from "@/app/models/Message";
 
 export async function POST(req: any, res: NextApiResponse) {
   try {
@@ -98,7 +100,8 @@ export async function DELETE(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
-    const chatFolder = await ChatFolder.findByIdAndDelete(body.id);
+    // const chatFolder = await ChatFolder.findByIdAndDelete(body.id);
+    await deleteFolderAndContents(body.id);
     return NextResponse.json(
       { message: "Chat Folder deleted successfully" },
       { status: 200 }
@@ -106,6 +109,33 @@ export async function DELETE(req: any, res: NextApiResponse) {
   } catch (error: any) {
     // console.log("error at DELETE in Chatfolder route", error);
     return NextResponse.json(error.message, { status: 500 });
+  }
+}
+
+async function deleteFolderAndContents(folderId: string) {
+  const folder = await ChatFolder.findById(folderId);
+
+  if (folder) {
+    // Delete all chats in folder.chats
+    for (const chatId of folder.chats) {
+      const chat = await Chat.findById(chatId);
+      if (chat) {
+        // Delete all messages in chat.messages
+        for (const messageId of chat.messages) {
+          await Message.findByIdAndDelete(messageId);
+        }
+        // Delete the chat
+        await Chat.findByIdAndDelete(chatId);
+      }
+    }
+
+    // Recursively delete all subfolders
+    for (const subFolderId of folder.subFolders) {
+      await deleteFolderAndContents(subFolderId._id);
+    }
+
+    // Delete the folder
+    await ChatFolder.findByIdAndDelete(folderId);
   }
 }
 

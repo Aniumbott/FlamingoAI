@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Mongoose from "mongoose";
 import { Avatar, Group, Text, ActionIcon, TextInput } from "@mantine/core";
-import { IconAlignJustified } from "@tabler/icons-react";
+import { IconAlignJustified, IconStarFilled } from "@tabler/icons-react";
 
 // Compoonents
 import style from "../RightPanel/RightPanel.module.css";
@@ -42,13 +42,23 @@ export default function ChatItem(props: {
       >
         <div ref={ref} className="flex flex-row justify-between w-full">
           <Group>
-            <IconAlignJustified
-              color="gray"
-              style={{
-                width: "1rem",
-                height: "1rem",
-              }}
-            />
+            {item.favourite ? (
+              <IconStarFilled
+                style={{
+                  color: "#FFD700",
+                  width: "1rem",
+                  height: "1rem",
+                }}
+              />
+            ) : (
+              <IconAlignJustified
+                color="gray"
+                style={{
+                  width: "1rem",
+                  height: "1rem",
+                }}
+              />
+            )}
 
             {rename ? (
               <TextInput

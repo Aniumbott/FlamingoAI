@@ -69,6 +69,20 @@ async function getAllChats(createdBy: string, workspaceId: string) {
   return response;
 }
 
+async function getArchivedChats(createdBy: string, workspaceId: string) {
+  const data = await fetch(
+    `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&id=archived`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const response = await data.json();
+  return response;
+}
+
 async function updateChat(id: String, body: any) {
   const data = await fetch("/api/chat", {
     method: "PUT",
@@ -88,15 +102,19 @@ async function updateChat(id: String, body: any) {
 
 async function deleteChat(chat: IChatDocument) {
   // call controller to delete messages message ref array
-
+  const id = chat._id;
   const data = await fetch("/api/chat", {
     method: "DELETE",
-    body: JSON.stringify(chat._id),
+    body: JSON.stringify({ id }),
     headers: {
       "Content-Type": "application/json",
     },
   });
+
   const response = await data.json();
+  if (chat.scope === "public")
+    socket.emit("createChat", chat.workspaceId, chat);
+  else socket.emit("createPersonalChat", chat);
   return response;
 }
 
@@ -105,6 +123,7 @@ export {
   getChat,
   getIndependentChats,
   getAllChats,
+  getArchivedChats,
   updateChat,
   deleteChat,
 };

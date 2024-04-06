@@ -26,6 +26,8 @@ import PeopleChats from "./PeopleChats";
 import RecentChats from "./RecentChats";
 import { socket } from "@/socket";
 import MoveChats from "./Modals/MoveItems";
+import FavouriteChats from "./FavouriteChats";
+import ArchivedChats from "./ArchivedChats";
 
 const LeftPanel = () => {
   const { colorScheme } = useMantineColorScheme();
@@ -106,6 +108,10 @@ const LeftPanel = () => {
             return <PeopleChats members={members} />;
           case 2:
             return <RecentChats members={members} />;
+          case 3:
+            return <FavouriteChats members={members} />;
+          case 4:
+            return <ArchivedChats members={members} />;
           default:
             return null;
         }

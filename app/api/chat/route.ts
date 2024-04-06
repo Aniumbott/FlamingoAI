@@ -3,6 +3,7 @@ import { dbConnect } from "@/app/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import Chat from "@/app/models/Chat";
 import ChatFolder from "@/app/models/ChatFolder";
+import Message from "@/app/models/Message";
 
 export async function POST(req: any, res: NextApiResponse) {
   try {
@@ -57,6 +58,7 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
           workspaceId: workspaceId,
           scope: scope,
           parentFolder: null,
+          archived: false,
         });
       } else if (scope === "private") {
         chats = await Chat.find({
@@ -64,6 +66,7 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
           scope: scope,
           createdBy: createdBy,
           parentFolder: null,
+          archived: false,
         });
       }
     }
@@ -72,6 +75,15 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
       chats = await Chat.find({
         workspaceId: workspaceId,
         $or: [{ scope: "public" }, { scope: "private", createdBy: createdBy }],
+        archived: false,
+      });
+    }
+    // get archived chats
+    else if (id === "archived") {
+      chats = await Chat.find({
+        workspaceId: workspaceId,
+        $or: [{ scope: "public" }, { scope: "private", createdBy: createdBy }],
+        archived: true,
       });
     }
     // get specific chat by id
@@ -105,11 +117,22 @@ export async function PUT(req: any, res: NextApiResponse) {
 }
 
 export async function DELETE(req: any, res: NextApiResponse) {
-  // console.log("hit delete chat");
+  console.log("hit delete chat");
   try {
     await dbConnect();
     const body = await req.json();
-    const chat = await Chat.findByIdAndDelete(body.id);
+    const chat = await Chat.findById(body.id);
+
+    if (chat) {
+      // Delete all messages in chat.messages
+      for (const messageId of chat.messages) {
+        await Message.findByIdAndDelete(messageId);
+      }
+
+      // Delete the chat
+      await Chat.findByIdAndDelete(body.id);
+    }
+
     return NextResponse.json(
       { message: "Chat deleted successfully" },
       { status: 200 }

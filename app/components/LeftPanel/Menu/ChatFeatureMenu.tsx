@@ -1,5 +1,5 @@
 // Modules
-import { Menu, Button, Stack, Text, rem } from "@mantine/core";
+import { Menu, Button, Stack, Text, rem, Avatar, Divider } from "@mantine/core";
 import {
   IconDots,
   IconFolderUp,
@@ -7,10 +7,13 @@ import {
   IconTrash,
   IconCopy,
   IconPencilMinus,
+  IconStarFilled,
+  IconStarOff,
+  IconArchive,
 } from "@tabler/icons-react";
 import { useHover } from "@mantine/hooks";
 import { createChatFolder } from "@/app/controllers/folders";
-import { createChat } from "@/app/controllers/chat";
+import { createChat, deleteChat, updateChat } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import { setRequestMeta } from "next/dist/server/request-meta";
 import MoveChats from "../Modals/MoveItems";
@@ -54,26 +57,101 @@ export default function ChatFeatureMenu(props: {
 
         <Menu.Dropdown>
           <Menu.Label>
-            <Text fw={"500"} fz={"sm"} c={"#000000"}>
-              {props.chat.name}
-            </Text>
+            <Stack gap={5}>
+              <Text fw={"500"} fz={"sm"} c={"#000000"}>
+                {props.chat.name}
+              </Text>
+              <Avatar.Group>
+                {props.members.map((member, key) =>
+                  props.chat.participants.includes(member.userId) ? (
+                    <Avatar
+                      radius={"md"}
+                      key={key}
+                      style={{
+                        border: "none",
+                      }}
+                      size="25px"
+                      src={member.imageUrl}
+                    />
+                  ) : null
+                )}
+              </Avatar.Group>
+            </Stack>
           </Menu.Label>
-          <Menu.Item onClick={() => props.setRename(true)}>
-            <MenuButton properties={MenuData[0]} />
-          </Menu.Item>
-
-          <Menu.Item>
-            <MenuButton properties={MenuData[1]} />
-          </Menu.Item>
-          <Menu.Item>
-            <MenuButton properties={MenuData[2]} />
-          </Menu.Item>
-          <Menu.Item onClick={() => props.setMoveModal(true)}>
-            <MenuButton properties={MenuData[3]} />
-          </Menu.Item>
-          <Menu.Item>
-            <MenuButton properties={MenuData[4]} />
-          </Menu.Item>
+          <Divider color={"#d8dce0"} my={2} />
+          {props.chat.archived ? (
+            <>
+              <Menu.Item
+                onClick={() => {
+                  updateChat(props.chat._id, {
+                    archived: false,
+                  }).then((res) => {
+                    console.log(res);
+                  });
+                }}
+              >
+                <MenuButton properties={MenuData[6]} />
+              </Menu.Item>
+              <Menu.Item
+                onClick={() => {
+                  deleteChat(props.chat).then((res) => {
+                    console.log(res);
+                  });
+                }}
+              >
+                <MenuButton properties={MenuData[7]} />
+              </Menu.Item>
+            </>
+          ) : (
+            <>
+              <Menu.Item onClick={() => props.setRename(true)}>
+                <MenuButton properties={MenuData[0]} />
+              </Menu.Item>
+              <Menu.Item>
+                <MenuButton properties={MenuData[1]} />
+              </Menu.Item>
+              {props.chat.favourite ? (
+                <Menu.Item
+                  onClick={() => {
+                    updateChat(props.chat._id, {
+                      favourite: false,
+                    }).then((res) => {
+                      console.log(res);
+                    });
+                  }}
+                >
+                  <MenuButton properties={MenuData[5]} />
+                </Menu.Item>
+              ) : (
+                <Menu.Item
+                  onClick={() => {
+                    updateChat(props.chat._id, {
+                      favourite: true,
+                    }).then((res) => {
+                      console.log(res);
+                    });
+                  }}
+                >
+                  <MenuButton properties={MenuData[2]} />
+                </Menu.Item>
+              )}
+              <Menu.Item onClick={() => props.setMoveModal(true)}>
+                <MenuButton properties={MenuData[3]} />
+              </Menu.Item>
+              <Menu.Item
+                onClick={() => {
+                  console.log("archiving chat");
+                  updateChat(props.chat._id, {
+                    archived: true,
+                  }).then((res) => {
+                    console.log(res);
+                  });
+                }}
+              >
+                <MenuButton properties={MenuData[4]} />
+              </Menu.Item>
+            </>
+          )}
         </Menu.Dropdown>
       </Menu>
     </>
@@ -130,6 +208,18 @@ const MenuData: { title: string; icon: React.ReactNode }[] = [
   },
   {
     title: "Archive",
+    icon: <IconTrash size={20} />,
+  },
+  {
+    title: "Remove from favourite",
+    icon: <IconStarOff size={20} />,
+  },
+  {
+    title: "Restore",
+    icon: <IconArchive size={20} />,
+  },
+  {
+    title: "Delete",
     icon: <IconTrash size={20} />,
   },
 ];
