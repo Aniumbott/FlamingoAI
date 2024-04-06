@@ -109,7 +109,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
       setParticipants(res);
     };
     fetchParticipants();
-  }, [organization]);
+  }, [organization?.membersCount]);
 
   useEffect(() => {
     if (currentChatId != "") {
@@ -159,6 +159,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
               <div key={message._id} className="mb-1">
                 <MessageItem
                   message={{
+                    _id: message._id,
                     createdBy: {
                       hasImage: user.hasImage,
                       name: `${user.firstName} ${user.lastName}`,

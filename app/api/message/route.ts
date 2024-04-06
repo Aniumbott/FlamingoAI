@@ -38,9 +38,13 @@ export async function PUT(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
-    const message = await Message.findByIdAndUpdate(body.id, body, {
-      new: true,
-    });
+    const message = await Message.findByIdAndUpdate(
+      body.id,
+      { ...body, updatedAt: new Date() },
+      {
+        new: true,
+      }
+    );
     return NextResponse.json({ message }, { status: 200 });
   } catch (error: any) {
     // console.log("error from route", error);

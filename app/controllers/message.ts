@@ -19,4 +19,26 @@ async function sendMessage(
   return response;
 }
 
-export { sendMessage };
+async function updateMessage(id: String, body: any) {
+  const data = await fetch("/api/message", {
+    method: "PUT",
+    body: JSON.stringify({ id, ...body }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const response = await data.json();
+  return response;
+}
+async function deleteMessage() {
+  const data = await fetch("/api/message", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const response = await data.json();
+  return response;
+}
+
+export { sendMessage, updateMessage, deleteMessage };

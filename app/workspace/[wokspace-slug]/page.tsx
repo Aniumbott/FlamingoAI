@@ -13,8 +13,13 @@ import {
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconLayoutSidebarRightExpand, IconPlus } from "@tabler/icons-react";
-import { usePathname, useRouter } from "next/navigation";
-import { ClerkLoaded, ClerkLoading, useAuth } from "@clerk/nextjs";
+import { notFound, usePathname, useRouter } from "next/navigation";
+import {
+  ClerkLoaded,
+  ClerkLoading,
+  useAuth,
+  useOrganization,
+} from "@clerk/nextjs";
 import { socket } from "@/socket";
 
 // Compontets
@@ -29,10 +34,17 @@ const Workspace = () => {
   const [rightOpened, { toggle: toggleRight }] = useDisclosure(true);
   const [currentChatId, setCurrentChatId] = useState("");
   const { orgId, userId } = useAuth();
-
+  const { organization } = useOrganization();
   const router = useRouter();
   const pathname = usePathname();
 
+  // useEffect(() => {
+  //   const members = await organization?.getMemberships();
+  //   // check if the userId is in the members list
+  //   if (!members?.find((member) => member.id === userId)) {
+  //     notFound();
+  //   }
+  // }, [organization?.id]);
   useEffect(() => {
     console.log("organization ID", orgId);
     socket.emit("joinWorkspaceRoom", orgId);
