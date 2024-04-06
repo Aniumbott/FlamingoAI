@@ -21,6 +21,7 @@ export default function FolderFeatureMenu(props: {
   open: boolean;
   setOpen: (value: boolean) => void;
   setRename: (value: boolean) => void;
+  setMoveModal: (value: boolean) => void;
 }) {
   return (
     <Menu
@@ -83,7 +84,7 @@ export default function FolderFeatureMenu(props: {
         >
           <MenuButton properties={MenuData[2]} />
         </Menu.Item>
-        <Menu.Item>
+        <Menu.Item onClick={() => props.setMoveModal(true)}>
           <MenuButton properties={MenuData[3]} />
         </Menu.Item>
       </Menu.Dropdown>

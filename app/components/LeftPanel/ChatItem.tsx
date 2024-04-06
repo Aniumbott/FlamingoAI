@@ -11,6 +11,7 @@ import style from "../RightPanel/RightPanel.module.css";
 import { IChatDocument } from "@/app/models/Chat";
 import { createChat, updateChat } from "@/app/controllers/chat";
 import ChatFeatureMenu from "./Menu/ChatFeatureMenu";
+import MoveChats from "./Modals/MoveItems";
 
 export default function ChatItem(props: {
   item: IChatDocument;
@@ -23,6 +24,7 @@ export default function ChatItem(props: {
   const [menuOpen, setMenuOpen] = useState(false);
   const [rename, setRename] = useState(false);
   let actionIconVisible = hovered || menuOpen;
+  const [openMoveModal, setOpenMoveModal] = useState(false);
 
   useEffect(() => {
     actionIconVisible = hovered || menuOpen;
@@ -50,7 +52,6 @@ export default function ChatItem(props: {
 
             {rename ? (
               <TextInput
-
                 autoFocus
                 variant="filled"
                 placeholder="Rename"
@@ -96,6 +97,7 @@ export default function ChatItem(props: {
                   open={menuOpen}
                   setOpen={setMenuOpen}
                   setRename={setRename}
+                  setMoveModal={setOpenMoveModal}
                 />
               </ActionIcon>
             ) : (
@@ -112,6 +114,13 @@ export default function ChatItem(props: {
           ) : null}
         </div>
       </div>
+      {openMoveModal && (
+        <MoveChats
+          opened={openMoveModal}
+          setOpened={setOpenMoveModal}
+          item={item}
+        />
+      )}
     </>
   );
 }

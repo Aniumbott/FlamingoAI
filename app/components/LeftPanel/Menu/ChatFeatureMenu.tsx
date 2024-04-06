@@ -13,6 +13,8 @@ import { createChatFolder } from "@/app/controllers/folders";
 import { createChat } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import { setRequestMeta } from "next/dist/server/request-meta";
+import MoveChats from "../Modals/MoveItems";
+import { useEffect, useState } from "react";
 
 export default function ChatFeatureMenu(props: {
   chat: IChatDocument;
@@ -20,58 +22,61 @@ export default function ChatFeatureMenu(props: {
   open: boolean;
   setOpen: (value: boolean) => void;
   setRename: (value: boolean) => void;
+  setMoveModal: (value: boolean) => void;
 }) {
   return (
-    <Menu
-      width={200}
-      styles={{
-        dropdown: {
-          backgroundColor: "#ffffff",
-        },
-        item: {
-          backgroundColor: "#ffffff",
-          color: "#000000",
-          hover: {
-            backgroundColor: "#000000",
+    <>
+      <Menu
+        width={200}
+        styles={{
+          dropdown: {
+            backgroundColor: "#ffffff",
           },
-          height: "auto",
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "flex-start",
-          padding: "0px",
-        },
-      }}
-      opened={props.open}
-      onChange={props.setOpen}
-    >
-      <Menu.Target>
-        <IconDots size={15} stroke={1.5} />
-      </Menu.Target>
+          item: {
+            backgroundColor: "#ffffff",
+            color: "#000000",
+            hover: {
+              backgroundColor: "#000000",
+            },
+            height: "auto",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            padding: "0px",
+          },
+        }}
+        opened={props.open}
+        onChange={props.setOpen}
+      >
+        <Menu.Target>
+          <IconDots size={15} stroke={1.5} />
+        </Menu.Target>
 
-      <Menu.Dropdown>
-        <Menu.Label>
-          <Text fw={"500"} fz={"sm"} c={"#000000"}>
-            {props.chat.name}
-          </Text>
-        </Menu.Label>
-        <Menu.Item onClick={() => props.setRename(true)}>
-          <MenuButton properties={MenuData[0]} />
-        </Menu.Item>
+        <Menu.Dropdown>
+          <Menu.Label>
+            <Text fw={"500"} fz={"sm"} c={"#000000"}>
+              {props.chat.name}
+            </Text>
+          </Menu.Label>
+          <Menu.Item onClick={() => props.setRename(true)}>
+            <MenuButton properties={MenuData[0]} />
+          </Menu.Item>
 
-        <Menu.Item>
-          <MenuButton properties={MenuData[1]} />
-        </Menu.Item>
-        <Menu.Item>
-          <MenuButton properties={MenuData[2]} />
-        </Menu.Item>
-        <Menu.Item>
-          <MenuButton properties={MenuData[3]} />
-        </Menu.Item>
-        <Menu.Item>
-          <MenuButton properties={MenuData[4]} />
-        </Menu.Item>
-      </Menu.Dropdown>
-    </Menu>
+          <Menu.Item>
+            <MenuButton properties={MenuData[1]} />
+          </Menu.Item>
+          <Menu.Item>
+            <MenuButton properties={MenuData[2]} />
+          </Menu.Item>
+          <Menu.Item onClick={() => props.setMoveModal(true)}>
+            <MenuButton properties={MenuData[3]} />
+          </Menu.Item>
+          <Menu.Item>
+            <MenuButton properties={MenuData[4]} />
+          </Menu.Item>
+        </Menu.Dropdown>
+      </Menu>
+    </>
   );
 }
 

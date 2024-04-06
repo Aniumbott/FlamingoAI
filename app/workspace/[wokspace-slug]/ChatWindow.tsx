@@ -109,7 +109,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
       setParticipants(res);
     };
     fetchParticipants();
-  }, [organization]);
+  }, [organization?.membersCount]);
 
   useEffect(() => {
     if (currentChatId != "") {

@@ -50,6 +50,10 @@ const GeneralChats = (props: { members: any[] }) => {
   const { userId, orgId } = useAuth();
 
   useEffect(() => {
+    console.log(privateFolders)
+  }, [privateFolders])
+
+  useEffect(() => {
     const fetchChats = async () => {
       try {
         setPublicChats(
