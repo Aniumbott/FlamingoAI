@@ -5,6 +5,7 @@ import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import StoreProvider from "./redux/StoreProvider";
+import "@mantine/charts/styles.css";
 
 // Componets
 import "./globals.css";

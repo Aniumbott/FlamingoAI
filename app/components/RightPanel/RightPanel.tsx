@@ -40,7 +40,6 @@ export default function RightPanel(props: {
   const { rightOpened, toggleRight } = props;
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const [active, setActive] = useState(0);
-  const [darkMode, setDarkMode] = useState(true);
   const buttonStyle = (ind: Number) => {
     return {
       width: "100%",

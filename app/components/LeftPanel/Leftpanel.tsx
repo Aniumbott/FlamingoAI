@@ -68,7 +68,7 @@ const LeftPanel = () => {
       </Group>
 
       <Group
-        justify="flex-start"
+        justify="space-between"
         wrap="nowrap"
         grow
         preventGrowOverflow={false}
@@ -81,7 +81,7 @@ const LeftPanel = () => {
         <Group
           color="#047857"
           wrap="nowrap"
-          justify="flex-start"
+          justify="flex-end"
           gap={1}
           w={"10%"}
         >

@@ -1,5 +1,5 @@
 // Modules
-import { Menu, rem } from "@mantine/core";
+import { ActionIcon, Menu, rem } from "@mantine/core";
 import {
   IconDots,
   IconSortAscending,
@@ -12,7 +12,22 @@ export default function PromptMenu() {
   return (
     <Menu>
       <Menu.Target>
-        <IconDots style={{ width: "70%", height: "70%" }} stroke={1.5} />
+        <ActionIcon
+          size="sm"
+          variant="subtle"
+          aria-label="Sort"
+          color="#9CA3AF"
+          style={{
+            "--ai-hover-color": "white",
+            "--ai-hover": "#047857",
+          }}
+          onClick={(event) => {
+            event.stopPropagation();
+            // Add any additional logic for the ActionIcon click here
+          }}
+        >
+          <IconDots style={{ width: "70%", height: "70%" }} stroke={1.5} />
+        </ActionIcon>
       </Menu.Target>
 
       <Menu.Dropdown>
