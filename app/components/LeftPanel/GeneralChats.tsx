@@ -50,10 +50,6 @@ const GeneralChats = (props: { members: any[] }) => {
   const { userId, orgId } = useAuth();
 
   useEffect(() => {
-    console.log(privateFolders)
-  }, [privateFolders])
-
-  useEffect(() => {
     const fetchChats = async () => {
       try {
         setPublicChats(
@@ -83,7 +79,7 @@ const GeneralChats = (props: { members: any[] }) => {
     };
 
     fetchChats().then(() => fetchFolders());
-    
+
     socket.on("newChat", (chat) => {
       // console.log("newChat", chat);
       fetchChats().then(() => fetchFolders());
@@ -192,22 +188,7 @@ const AccordianLabel = (props: {
         {props.title}
       </Text>
       <Group wrap="nowrap" grow gap={2} align="center">
-        <ActionIcon
-          size="sm"
-          variant="subtle"
-          aria-label="Sort"
-          color="#9CA3AF"
-          style={{
-            "--ai-hover-color": "white",
-            "--ai-hover": "#047857",
-          }}
-          onClick={(event) => {
-            event.stopPropagation();
-            // Add any additional logic for the ActionIcon click here
-          }}
-        >
-          <PromptMenu />
-        </ActionIcon>
+        <PromptMenu />
         <ActionIcon
           size="sm"
           variant="subtle"
