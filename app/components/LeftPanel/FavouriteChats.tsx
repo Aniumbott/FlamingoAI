@@ -15,10 +15,12 @@ const FavouriteChats = (props: { members: any[] }) => {
   useEffect(() => {
     const fetchAllChats = async () => {
       const allChats = (await getAllChats(userId || "", orgId || "")).chats;
-      const favourites = allChats.filter(
-        (chat: IChatDocument) => chat.favourite === true
-      );
-      setFavouriteChats(favourites);
+      if (userId) {
+        const favourites = allChats.filter((chat: IChatDocument) =>
+          chat.favourites.includes(userId)
+        );
+        setFavouriteChats(favourites);
+      }
     };
     fetchAllChats();
     socket.on("newChat", (chat) => {

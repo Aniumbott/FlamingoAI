@@ -12,6 +12,7 @@ import { IChatDocument } from "@/app/models/Chat";
 import { createChat, updateChat } from "@/app/controllers/chat";
 import ChatFeatureMenu from "./Menu/ChatFeatureMenu";
 import MoveChats from "./Modals/MoveItems";
+import { useAuth } from "@clerk/nextjs";
 
 export default function ChatItem(props: {
   item: IChatDocument;
@@ -25,7 +26,7 @@ export default function ChatItem(props: {
   const [rename, setRename] = useState(false);
   let actionIconVisible = hovered || menuOpen;
   const [openMoveModal, setOpenMoveModal] = useState(false);
-
+  const {userId , orgId} = useAuth();
   useEffect(() => {
     actionIconVisible = hovered || menuOpen;
   }, [hovered, menuOpen]);
@@ -42,7 +43,7 @@ export default function ChatItem(props: {
       >
         <div ref={ref} className="flex flex-row justify-between w-full">
           <Group>
-            {item.favourite ? (
+            {item.favourites.includes(userId || "") ? (
               <IconStarFilled
                 style={{
                   color: "#FFD700",

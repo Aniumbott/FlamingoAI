@@ -18,6 +18,7 @@ import { IChatDocument } from "@/app/models/Chat";
 import { setRequestMeta } from "next/dist/server/request-meta";
 import MoveChats from "../Modals/MoveItems";
 import { useEffect, useState } from "react";
+import { useAuth } from "@clerk/nextjs";
 
 export default function ChatFeatureMenu(props: {
   chat: IChatDocument;
@@ -27,6 +28,7 @@ export default function ChatFeatureMenu(props: {
   setRename: (value: boolean) => void;
   setMoveModal: (value: boolean) => void;
 }) {
+  const { userId, orgId } = useAuth();
   return (
     <>
       <Menu
@@ -110,11 +112,11 @@ export default function ChatFeatureMenu(props: {
               <Menu.Item>
                 <MenuButton properties={MenuData[1]} />
               </Menu.Item>
-              {props.chat.favourite ? (
+              {userId && props.chat.favourites?.includes(userId) ? (
                 <Menu.Item
                   onClick={() => {
                     updateChat(props.chat._id, {
-                      favourite: false,
+                      $pull: { favourites: userId || "" },
                     }).then((res) => {
                       console.log(res);
                     });
@@ -126,7 +128,7 @@ export default function ChatFeatureMenu(props: {
                 <Menu.Item
                   onClick={() => {
                     updateChat(props.chat._id, {
-                      favourite: true,
+                      $push: { favourites: userId || "" },
                     }).then((res) => {
                       console.log(res);
                     });
