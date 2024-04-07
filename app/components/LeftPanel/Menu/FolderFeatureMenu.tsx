@@ -17,7 +17,11 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useHover } from "@mantine/hooks";
-import { createChatFolder, deleteChatFolders } from "@/app/controllers/folders";
+import {
+  createChatFolder,
+  deleteChatFolders,
+  updateChatFolders,
+} from "@/app/controllers/folders";
 import { createChat } from "@/app/controllers/chat";
 
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
@@ -36,7 +40,7 @@ export default function FolderFeatureMenu(props: {
     "#2596FF",
     "#AF75F8",
     "#1CAB83",
-    "#F8D775",
+    "#FFE066",
     "#FF5656",
     "#F875B4",
   ]; // Add more colors if needed
@@ -123,6 +127,13 @@ export default function FolderFeatureMenu(props: {
                 onMouseLeave={(e) =>
                   (e.currentTarget.style.transform = "scale(1)")
                 }
+                onClick={() => {
+                  updateChatFolders(props.folder._id, {
+                    folderColor: color,
+                  }).then((res) => {
+                    console.log(res);
+                  });
+                }}
               />
             ))}
           </div>

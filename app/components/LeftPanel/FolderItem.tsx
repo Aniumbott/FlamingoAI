@@ -130,7 +130,7 @@ const FolderLabel = (props: {
             style={{
               width: "1rem",
               height: "1rem",
-              color: "var(--mantine-color-yellow-3)",
+              color: props.folder.folderColor || "#FFE066",
             }}
           />
         ) : (
@@ -138,7 +138,7 @@ const FolderLabel = (props: {
             style={{
               width: "1rem",
               height: "1rem",
-              color: "var(--mantine-color-yellow-3)",
+              color: props.folder.folderColor || "#FFE066",
             }}
           />
         )}
