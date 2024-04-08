@@ -72,7 +72,6 @@ app.prepare().then(() => {
       io.to(socket.id).emit("newChat", chat);
     });
 
-
     // Message
     socket.on("createMessage", (roomId, message) => {
       console.log(
@@ -93,6 +92,12 @@ app.prepare().then(() => {
         `User with ID: ${socket.id} deleted message: ${message} in room: ${roomId}`
       );
       io.to(roomId).emit("deleteMessage", message);
+    });
+    socket.on("deleteMessages", (roomId, messages) => {
+      console.log(
+        `User with ID: ${socket.id} deleted messages: ${messages} in room: ${roomId}`
+      );
+      io.to(roomId).emit("deleteMessages", messages);
     });
 
     // Comments
@@ -123,7 +128,6 @@ app.prepare().then(() => {
       );
       io.to(roomId).emit("deleteReply", reply);
     });
-
   });
 
   httpServer

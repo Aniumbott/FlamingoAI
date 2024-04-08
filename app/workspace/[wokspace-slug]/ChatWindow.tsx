@@ -56,6 +56,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
     setMessages(chat?.messages);
 
     socket.on("newMessage", (msg) => {
+      console.log("msg", msg);
       updateChat(currentChatId, {
         ...chat,
         messages: [...(chat?.messages || []), msg._id],
@@ -77,6 +78,20 @@ export default function ChatWindow(props: { currentChatId: String }) {
         setChat(res.chat);
       });
     });
+
+    socket.on("deleteMessages", (messages)=>{
+      console.log("messages", messages);
+      updateChat(currentChatId, {
+        ...chat,
+        messages: chat?.messages
+          .map((m: any) => m._id)
+          .filter((m: any) => !messages.includes(m)),
+      }).then((res) => {
+        console.log("res", res);
+        setChat(res.chat);
+      });
+    
+    })
 
     return () => {
       socket.off("newMessage");

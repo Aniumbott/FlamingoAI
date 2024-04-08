@@ -58,29 +58,21 @@ async function updateMessageContent(
   createdAt: Date
 ) {
   // get all messages from chat
-  const getMessages = await fetch(`/api/message/?chatId=${chatId}`, {
-    method: "GET",
+  const data = await fetch("/api/message", {
+    method: "PUT",
+    body: JSON.stringify({ chatId, createdAt, action: "deleteMany" }),
     headers: {
       "Content-Type": "application/json",
     },
   });
 
-  const messages = (await getMessages.json()).messages;
+  const response = await data.json();
+  console.log("deleted messages",response.messages)
+  socket.emit("deletedMessages", chatId, response.messages);
 
-  const toBeDeleted = messages.filter((msg: any) => {
-    return msg.createdAt >= createdAt;
-  });
+  const newdata = sendMessage(createdBy, content, "user", chatId);
 
-  console.log("toBeDeleted", toBeDeleted);
-
-  for (const msg of toBeDeleted) {
-    await deleteMessage(msg);
-  }
-
-  const data = sendMessage(createdBy, content, "user", chatId);
-
-  const response = data;
-  return response;
+  return newdata;
 }
 
 async function sendAssistantMessage(

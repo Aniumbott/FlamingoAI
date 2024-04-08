@@ -132,7 +132,7 @@ const GeneralChats = (props: { members: any[] }) => {
           />
         </Accordion.Control>
         <AccordionPanel>
-          <ScrollArea h="30vh" scrollbarSize={10} offsetScrollbars>
+          <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
             {publicFolders?.map((folder, key) => (
               <Accordion
                 chevronPosition="left"
@@ -168,7 +168,7 @@ const GeneralChats = (props: { members: any[] }) => {
           />
         </AccordionControl>
         <AccordionPanel>
-          <ScrollArea h="30vh" scrollbarSize={10} offsetScrollbars>
+          <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
             {privateFolders?.map((folder, key) => (
               <Accordion
                 chevronPosition="left"
