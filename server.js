@@ -43,21 +43,6 @@ app.prepare().then(() => {
       console.log("user disconnected");
     });
 
-    // Message
-    socket.on("createMessage", (roomId, message) => {
-      console.log(
-        `User with ID: ${socket.id} sent message: ${message} in room: ${roomId}`
-      );
-      io.to(roomId).emit("newMessage", message);
-    });
-
-    socket.on("updateMessage", (roomId, message) => {
-      console.log(
-        `User with ID: ${socket.id} updated message: ${message} in room: ${roomId}`
-      );
-      io.to(roomId).emit("updateMessage", message);
-    });
-
     // FOLDER
     socket.on("createChatFolder", (roomId, folder) => {
       console.log(
@@ -86,6 +71,59 @@ app.prepare().then(() => {
       );
       io.to(socket.id).emit("newChat", chat);
     });
+
+
+    // Message
+    socket.on("createMessage", (roomId, message) => {
+      console.log(
+        `User with ID: ${socket.id} sent message: ${message} in room: ${roomId}`
+      );
+      io.to(roomId).emit("newMessage", message);
+    });
+
+    socket.on("updateMessage", (roomId, message) => {
+      console.log(
+        `User with ID: ${socket.id} updated message: ${message} in room: ${roomId}`
+      );
+      io.to(roomId).emit("updateMessage", message);
+    });
+
+    socket.on("deleteMessage", (roomId, message) => {
+      console.log(
+        `User with ID: ${socket.id} deleted message: ${message} in room: ${roomId}`
+      );
+      io.to(roomId).emit("deleteMessage", message);
+    });
+
+    // Comments
+    socket.on("createComment", (roomId, comment) => {
+      console.log(
+        `User with ID: ${socket.id} created comment: ${comment} in room: ${roomId}`
+      );
+      io.to(roomId).emit("newComment", comment);
+    });
+
+    socket.on("updateComment", (roomId, comment) => {
+      console.log(
+        `User with ID: ${socket.id} updated comment: ${comment._id} in room: ${roomId}`
+      );
+      io.to(roomId).emit("updateComment", comment);
+    });
+
+    socket.on("deleteComment", (roomId, comment) => {
+      console.log(
+        `User with ID: ${socket.id} deleted comment: ${comment} in room: ${roomId}`
+      );
+      io.to(roomId).emit("deleteComment", comment);
+    });
+
+    socket.on("deleteReply", (roomId, reply) => {
+      console.log(
+        `User with ID: ${socket.id} deleted reply: ${reply} in room: ${roomId}`
+      );
+      io.to(roomId).emit("deleteReply", reply);
+    });
+
   });
 
   httpServer

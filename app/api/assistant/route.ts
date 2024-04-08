@@ -10,7 +10,6 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
     // console.log("req ------->", req);
     const reqParam = req.nextUrl.searchParams;
     const messages = reqParam.get("messages") || "";
-    const scope = reqParam.get("scope");
     const workspaceId = reqParam.get("workspaceId") || "";
     const model = reqParam.get("model");
     const workspace = await getWorkspace(workspaceId);

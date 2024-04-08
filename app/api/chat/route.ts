@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Chat from "@/app/models/Chat";
 import ChatFolder from "@/app/models/ChatFolder";
 import Message from "@/app/models/Message";
+import Comment from "@/app/models/Comment";
 
 export async function POST(req: any, res: NextApiResponse) {
   try {
@@ -34,12 +35,8 @@ export async function POST(req: any, res: NextApiResponse) {
   }
 }
 
-export async function GET(req: NextRequest, res: NextApiResponse) {
+export async function GET(req: NextRequest, res: NextResponse) {
   try {
-    // export const GET = async (request, { params }) => {
-    //   try{
-    //        Path Params are received from {params} variable
-
     await dbConnect();
     const reqParam = req.nextUrl.searchParams;
     const scope = reqParam.get("scope");
@@ -47,8 +44,6 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
     const createdBy = reqParam.get("createdBy");
     const id = reqParam.get("id");
     const independent = reqParam.get("independent");
-    // console.log(scope, workspaceId, createdBy, id, independent);
-    // find by workspaceId and socpe
     let chats;
 
     // get independent chats based on scope
@@ -91,8 +86,15 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
       chats = await Chat.find({
         workspaceId: workspaceId,
         _id: id,
-      }).populate("messages");
-      // console.log("chats", chats);
+      }).populate({
+        path: "messages",
+        populate: {
+          path: "comments",
+          populate: {
+            path: "replies",
+          },
+        },
+      });
     }
     return NextResponse.json({ chats }, { status: 200 });
   } catch (error: any) {
@@ -108,7 +110,16 @@ export async function PUT(req: any, res: NextApiResponse) {
     const body = await req.json();
     const chat = await Chat.findByIdAndUpdate(body.id, body, {
       new: true,
-    }).populate("messages");
+    }).populate({
+      path: "messages",
+      populate: {
+        path: "comments",
+        populate: {
+          path: "replies",
+        },
+      },
+    });
+
     return NextResponse.json({ chat }, { status: 200 });
   } catch (error: any) {
     console.log("error at PUT in Chat route", error);
@@ -121,24 +132,33 @@ export async function DELETE(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
-    const chat = await Chat.findById(body.id);
+    const chat = await Chat.findById(body.id).populate({
+      path: "messages",
+      populate: {
+        path: "comments",
+        populate: {
+          path: "replies",
+        },
+      },
+    });
 
-    if (chat) {
-      // Delete all messages in chat.messages
-      for (const messageId of chat.messages) {
-        await Message.findByIdAndDelete(messageId);
-      }
+    chat?.messages.forEach(async (message: any) => {
+      message.comments.forEach(async (comment: any) => {
+        comment.replies.forEach(async (reply: any) => {
+          await Comment.findByIdAndDelete(reply._id);
+        });
+        await Comment.findByIdAndDelete(comment._id);
+      });
+      await Message.findByIdAndDelete(message._id);
+    });
 
-      // Delete the chat
-      await Chat.findByIdAndDelete(body.id);
-    }
+    await Chat.findByIdAndDelete(body.id);
 
     return NextResponse.json(
       { message: "Chat deleted successfully" },
       { status: 200 }
     );
   } catch (error: any) {
-    // console.log("error at DELETE in Chat route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
