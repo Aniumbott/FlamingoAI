@@ -118,6 +118,62 @@ async function deleteChat(chat: IChatDocument) {
   return response;
 }
 
+// const sortItems = (items: any, sortType: string): any => {
+//   switch (sortType) {
+//     case "A-Z":
+//       return [...items].sort((a, b) => a.name.localeCompare(b.name));
+//     case "Z-A":
+//       return [...items].sort((a, b) => b.name.localeCompare(a.name));
+//     case "New":
+//       return [...items].sort(
+//         (a, b) =>
+//           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+//       );
+//     case "Old":
+//       return [...items].sort(
+//         (a, b) =>
+//           new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+//       );
+//     default:
+//       return items;
+//   }
+// };
+
+const sortItems = (items: any, sortType: string): any => {
+  let sortedItems;
+  switch (sortType) {
+    case "A-Z":
+      sortedItems = [...items].sort((a, b) => a.name.localeCompare(b.name));
+      break;
+    case "Z-A":
+      sortedItems = [...items].sort((a, b) => b.name.localeCompare(a.name));
+      break;
+    case "New":
+      sortedItems = [...items].sort(
+        (a, b) =>
+          new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
+      break;
+    case "Old":
+      sortedItems = [...items].sort(
+        (a, b) =>
+          new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
+      );
+      break;
+    default:
+      sortedItems = items;
+  }
+
+  // Sort the subfolders of each item
+  sortedItems.forEach((item: any) => {
+    if (item.subFolders?.length > 0) {
+      item.subFolders = sortItems(item.subFolders, sortType);
+    }
+  });
+
+  return sortedItems;
+};
+
 export {
   createChat,
   getChat,
@@ -126,4 +182,5 @@ export {
   getArchivedChats,
   updateChat,
   deleteChat,
+  sortItems,
 };

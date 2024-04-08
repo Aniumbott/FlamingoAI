@@ -52,14 +52,14 @@ export async function GET(req: any, res: NextApiResponse) {
         workspaceId: workspaceId,
         scope: scope,
         parentFolder: null,
-      });
+      }).sort({ updatedAt: -1 });
     } else if (scope === "private") {
       chatFolder = await ChatFolder.find({
         workspaceId: workspaceId,
         scope: scope,
         createdBy: createdBy,
         parentFolder: null,
-      });
+      }).sort({ updatedAt: -1 });
     }
 
     let populatedFolders = [];
@@ -141,14 +141,20 @@ async function deleteFolderAndContents(folderId: string) {
 
 async function populateSubFolders(folder: any) {
   if (folder.subFolders && folder.subFolders.length > 0) {
-    folder = await ChatFolder.populate(folder, { path: "subFolders" });
+    folder = await ChatFolder.populate(folder, {
+      path: "subFolders",
+      options: { sort: { updatedAt: -1 } },
+    });
     for (let i = 0; i < folder.subFolders.length; i++) {
       folder.subFolders[i] = await populateSubFolders(folder.subFolders[i]);
     }
   }
 
   if (folder.chats && folder.chats.length > 0) {
-    folder = await ChatFolder.populate(folder, { path: "chats" });
+    folder = await ChatFolder.populate(folder, {
+      path: "chats",
+      options: { sort: { updatedAt: -1 } },
+    });
   }
   return folder;
 }

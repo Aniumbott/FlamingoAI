@@ -1,5 +1,14 @@
 // Modules
-import { Menu, Button, Stack, Text, rem, Avatar, Divider } from "@mantine/core";
+import {
+  Menu,
+  Button,
+  Stack,
+  Text,
+  rem,
+  Avatar,
+  Divider,
+  ActionIcon,
+} from "@mantine/core";
 import {
   IconDots,
   IconFolderUp,
@@ -33,6 +42,7 @@ export default function ChatFeatureMenu(props: {
     <>
       <Menu
         width={200}
+        position="bottom-end"
         styles={{
           dropdown: {
             backgroundColor: "#ffffff",
@@ -54,7 +64,19 @@ export default function ChatFeatureMenu(props: {
         onChange={props.setOpen}
       >
         <Menu.Target>
-          <IconDots size={15} stroke={1.5} />
+          <ActionIcon
+            size="25px"
+            variant="subtle"
+            aria-label=""
+            color="#9CA3AF"
+            // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
+            style={{
+              "--ai-hover-color": "white",
+            }}
+           
+          >
+            <IconDots size={15} stroke={1.5} />
+          </ActionIcon>
         </Menu.Target>
 
         <Menu.Dropdown>

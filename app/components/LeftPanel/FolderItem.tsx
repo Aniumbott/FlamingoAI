@@ -14,7 +14,7 @@ import { IChatDocument } from "@/app/models/Chat";
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
 
 // Components
-import PromptMenu from "./Menu/PromptMenu";
+import PromptMenu from "./Menu/SortMenu";
 import FolderFeatureMenu from "./Menu/FolderFeatureMenu";
 import ChatItem from "./ChatItem";
 import { createChatFolder, updateChatFolders } from "@/app/controllers/folders";

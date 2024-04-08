@@ -18,13 +18,15 @@ import ChatItem from "./ChatItem";
 import { getAllChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import style from "../RightPanel/RightPanel.module.css";
-import PromptMenu from "./Menu/PromptMenu";
+import SortMenu from "./Menu/SortMenu";
 import { socket } from "@/socket";
+import { sortItems } from "@/app/controllers/chat";
 
 const PeopleChats = (props: { members: any[] }) => {
   const { members } = props;
   const [allChats, setAllChats] = useState<IChatDocument[]>([]);
   const { userId, orgId } = useAuth();
+
   useEffect(() => {
     const fetchAllChats = async () => {
       const chats = (await getAllChats(userId || "", orgId || "")).chats;
@@ -49,10 +51,22 @@ const PeopleChats = (props: { members: any[] }) => {
           chevron={<IconCaretRightFilled className={style.icon} />}
           variant="default"
         >
-          {members.map((user: any) => {
-            const filteredChats = allChats.filter((chat) =>
+          {allChats.length > 0 &&
+            members.map((user: any) => (
+              <UserAccordionItem
+                user={user}
+                allChats={allChats}
+                members={members}
+                key={user.userId}
+              />
+            ))}
+          {/* {members.map((user: any) => {
+            const [sort, setSort] = useState<string>("New");
+
+            const filteredChats = allChats?.filter((chat) =>
               chat.participants.includes(user.userId)
             );
+            const sortedChats = sortItems(filteredChats, sort);
             return (
               <Accordion.Item
                 value={user.userId}
@@ -64,24 +78,73 @@ const PeopleChats = (props: { members: any[] }) => {
                 <Accordion.Control className={style.accordionControl}>
                   <AccordianLabel
                     user={user}
-                    chatCount={filteredChats.length}
+                    chatCount={sortedChats.length}
+                    sort={sort}
+                    setSort={setSort}
                   />
                 </Accordion.Control>
                 <AccordionPanel>
-                  {filteredChats.map((chat, key) => (
+                  {sortedChats.map((chat: IChatDocument, key: any) => (
                     <ChatItem item={chat} key={key} members={members} />
                   ))}
                 </AccordionPanel>
               </Accordion.Item>
             );
-          })}
+          })} */}
         </Accordion>
       )}
     </ScrollArea>
   );
 };
 
-const AccordianLabel = (props: { user: any; chatCount: number }) => {
+const UserAccordionItem = (props: {
+  user: any;
+  allChats: IChatDocument[];
+  members: any[];
+}) => {
+  const { user, allChats, members } = props;
+  const [sort, setSort] = useState<string>("New");
+
+  const [sortedChats, setSortedChats] = useState<IChatDocument[]>([]);
+
+  useEffect(() => {
+    console.log("useeffect at people");
+    const filteredChats = allChats?.filter((chat) =>
+      chat.participants.includes(user.userId)
+    );
+    console.log("filteredChats", filteredChats);
+    setSortedChats(filteredChats);
+  }, [allChats, user]);
+
+  useEffect(() => {
+    if (sortedChats.length) setSortedChats(sortItems(sortedChats, sort));
+  }, [sort]);
+
+  return (
+    <Accordion.Item value={user.userId} key={user.userId}>
+      <Accordion.Control className={style.accordionControl}>
+        <AccordianLabel
+          user={user}
+          chatCount={sortedChats.length}
+          sort={sort}
+          setSort={setSort}
+        />
+      </Accordion.Control>
+      <AccordionPanel>
+        {sortedChats.map((chat: IChatDocument, key: any) => (
+          <ChatItem item={chat} key={key} members={members} />
+        ))}
+      </AccordionPanel>
+    </Accordion.Item>
+  );
+};
+
+const AccordianLabel = (props: {
+  user: any;
+  chatCount: number;
+  sort: string;
+  setSort: (value: string) => void;
+}) => {
   const { user, chatCount } = props;
   // console.log(user);
   return (
@@ -116,7 +179,7 @@ const AccordianLabel = (props: { user: any; chatCount: number }) => {
             // Add any additional logic for the ActionIcon click here
           }}
         >
-          <PromptMenu />
+          <SortMenu sort={props.sort} setSort={props.setSort} />
         </ActionIcon>
         <ThemeIcon size="sm" color="gray" variant="filled" radius="sm">
           <Text size="xs">{chatCount}</Text>

@@ -7,6 +7,7 @@ import {
   rem,
   ColorPicker,
   Paper,
+  ActionIcon,
 } from "@mantine/core";
 import {
   IconDots,
@@ -48,6 +49,7 @@ export default function FolderFeatureMenu(props: {
   return (
     <Menu
       width={200}
+      position="bottom-end"
       styles={{
         dropdown: {
           backgroundColor: "#ffffff",
@@ -69,7 +71,18 @@ export default function FolderFeatureMenu(props: {
       onChange={props.setOpen}
     >
       <Menu.Target>
-        <IconDots style={{ width: "70%", height: "70%" }} stroke={1.5} />
+        <ActionIcon
+          size="25px"
+          variant="subtle"
+          aria-label=""
+          color="#9CA3AF"
+          // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
+          style={{
+            "--ai-hover-color": "white",
+          }}
+        >
+          <IconDots size={15} stroke={1.5} />
+        </ActionIcon>
       </Menu.Target>
 
       <Menu.Dropdown>

@@ -1,5 +1,5 @@
 // Modules
-import { useEffect, useState } from "react";
+import { use, useEffect, useState } from "react";
 import {
   Accordion,
   AccordionControl,
@@ -18,11 +18,15 @@ import {
 // Components
 import ChatItem from "./ChatItem";
 import FolderItem, { newFolder } from "./FolderItem";
-import { getIndependentChats, createChat } from "@/app/controllers/chat";
+import {
+  getIndependentChats,
+  createChat,
+  sortItems,
+} from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
 import { getChatFolders } from "@/app/controllers/folders";
-import PromptMenu from "./Menu/PromptMenu";
+import SortMenu from "./Menu/SortMenu";
 import style from "../RightPanel/RightPanel.module.css";
 import { useAuth } from "@clerk/nextjs";
 import { socket } from "@/socket";
@@ -48,6 +52,7 @@ const GeneralChats = (props: { members: any[] }) => {
     []
   );
   const { userId, orgId } = useAuth();
+  const [sort, setSort] = useState<string>("New");
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -91,6 +96,22 @@ const GeneralChats = (props: { members: any[] }) => {
     });
   }, []);
 
+  const handleSort = () => {
+    console.log("sorting items", sort);
+    if (publicChats.length > 0) setPublicChats(sortItems(publicChats, sort));
+    if (privateChats.length > 0) setPrivateChats(sortItems(privateChats, sort));
+    if (publicFolders.length > 0)
+      setPublicFolders(sortItems(publicFolders, sort));
+    if (privateFolders.length > 0)
+      setPrivateFolders(sortItems(privateFolders, sort));
+    console.log("items sorted");
+  };
+
+  useEffect(() => {
+    console.log("useeffect");
+    handleSort();
+  }, [sort]);
+
   return (
     // <ScrollArea scrollbarSize={3} pb={"10"}>
     <Accordion
@@ -106,6 +127,8 @@ const GeneralChats = (props: { members: any[] }) => {
             scope="public"
             userId={userId || ""}
             workspaceId={orgId || ""}
+            sort={sort}
+            setSort={setSort}
           />
         </Accordion.Control>
         <AccordionPanel>
@@ -140,6 +163,8 @@ const GeneralChats = (props: { members: any[] }) => {
             scope="private"
             userId={userId || ""}
             workspaceId={orgId || ""}
+            sort={sort}
+            setSort={setSort}
           />
         </AccordionControl>
         <AccordionPanel>
@@ -176,6 +201,8 @@ const AccordianLabel = (props: {
   scope: "private" | "public";
   userId: string;
   workspaceId: string;
+  sort: string;
+  setSort: (sort: string) => void;
 }) => {
   return (
     <Group
@@ -187,8 +214,14 @@ const AccordianLabel = (props: {
       <Text size="sm" fw={600}>
         {props.title}
       </Text>
-      <Group wrap="nowrap" grow gap={2} align="center">
-        <PromptMenu />
+      <Group
+        wrap="nowrap"
+        grow
+        gap={2}
+        align="center"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <SortMenu sort={props.sort} setSort={props.setSort} />
         <ActionIcon
           size="sm"
           variant="subtle"

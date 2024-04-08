@@ -59,7 +59,7 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
           scope: scope,
           parentFolder: null,
           archived: false,
-        });
+        }).sort({ updatedAt: -1 });;
       } else if (scope === "private") {
         chats = await Chat.find({
           workspaceId: workspaceId,
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
           createdBy: createdBy,
           parentFolder: null,
           archived: false,
-        });
+        }).sort({ updatedAt: -1 });;
       }
     }
     //get all chats relevant to workspace and user
@@ -76,7 +76,7 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
         workspaceId: workspaceId,
         $or: [{ scope: "public" }, { scope: "private", createdBy: createdBy }],
         archived: false,
-      });
+      }).sort({ updatedAt: -1 });;
     }
     // get archived chats
     else if (id === "archived") {
@@ -84,7 +84,7 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
         workspaceId: workspaceId,
         $or: [{ scope: "public" }, { scope: "private", createdBy: createdBy }],
         archived: true,
-      });
+      }).sort({ updatedAt: -1 });;
     }
     // get specific chat by id
     else if (id) {
