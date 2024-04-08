@@ -8,6 +8,12 @@ require("./ChatFolder.ts");
 const ChatFolderSchema = new Mongoose.Schema(
   {
     name: { type: String, required: true },
+    folderColor: {
+      type: String,
+      enum: ["#2596FF", "#AF75F8", "#1CAB83", "#FFE066", "#FF5656", "#F875B4"],
+      required: false,
+      default: "#FFE066",
+    },
     createdBy: { type: String, ref: "users", required: true },
     scope: { type: String, enum: ["public", "private"], required: true },
     workspaceId: { type: String, ref: "workspaces", required: true },
@@ -32,6 +38,7 @@ const ChatFolderSchema = new Mongoose.Schema(
 
 interface IChatFolder {
   name: string;
+  folderColor: string;
   createdBy: string;
   workspaceId: string;
   parentFolder: Mongoose.Types.ObjectId | null;

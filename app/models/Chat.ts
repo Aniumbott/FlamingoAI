@@ -15,8 +15,6 @@ const ChatSchema = new Mongoose.Schema(
       ref: "chat_folders",
     },
     archived: { type: Boolean, required: false, default: false },
-    favourite: { type: Boolean, required: false, default: false },
-
     messages: [{ type: Mongoose.Types.ObjectId, ref: "messages", default: [] }],
     workspaceId: {
       type: String,
@@ -24,6 +22,7 @@ const ChatSchema = new Mongoose.Schema(
       required: true,
     },
     participants: [{ type: String, ref: "users", default: [] }],
+    favourites: [{ type: String, ref: "users", default: [] }],
     // model
   },
   {
@@ -38,7 +37,7 @@ interface IChat {
   scope: string;
   parentFolder: Mongoose.Types.ObjectId | null;
   archived: boolean;
-  favourite: boolean;
+  favourites: string[];
   messages: Mongoose.Types.ObjectId[];
   participants: string[];
 }
