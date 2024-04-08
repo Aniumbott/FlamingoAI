@@ -1,27 +1,26 @@
 import { Document, Model } from "mongoose";
 import * as Mongoose from "mongoose";
 require("./User.ts");
-require("./Comment.ts");
-require("./Chat.ts");
+require("./Message.ts");
 
-const MessageSchema = new Mongoose.Schema(
+const CommentsSchema = new Mongoose.Schema(
   {
     createdBy: { type: String, ref: "users", required: true },
     content: {
       type: String,
       required: true,
     },
-    type: {
+    status: {
       type: String,
-      enum: ["user", "assistant"],
+      enum: ["resolved", "unresolved"],
       required: true,
     },
-    chatId: {
+    messageId: {
       type: String,
-      ref: "chats",
+      ref: "messages",
       required: true,
     },
-    comments: {
+    replies: {
       type: [{ type: Mongoose.Types.ObjectId, ref: "comments", default: [] }],
     },
     updatedAt: {
@@ -39,23 +38,23 @@ const MessageSchema = new Mongoose.Schema(
   }
 );
 
-interface IMessage {
+interface IComment {
   createdBy: String;
   content: String;
-  type: String;
-  chatId: String;
-  comments: Mongoose.Types.ObjectId[];
+  status: String;
+  messageId: String;
+  replies: Mongoose.Types.ObjectId[];
   updatedAt: Date;
   createdAt: Date;
 }
 
-interface IMessageDocument extends IMessage, Document {}
+interface ICommentDocument extends IComment, Document {}
 
-interface IMessageModel extends Model<IMessageDocument> {}
+interface ICommentModel extends Model<ICommentDocument> {}
 
-const Message: IMessageModel =
-  Mongoose.models.messages ||
-  Mongoose.model<IMessageDocument>("messages", MessageSchema);
+const Comment: ICommentModel =
+  Mongoose.models.comments ||
+  Mongoose.model<ICommentDocument>("comments", CommentsSchema);
 
-export default Message;
-export type { IMessageDocument };
+export default Comment;
+export type { ICommentDocument };

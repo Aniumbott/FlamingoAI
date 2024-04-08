@@ -20,13 +20,18 @@ import { useOrganization, useUser } from "@clerk/nextjs";
 
 // Components
 import MessageItem from "./MessageItem";
-import { sendMessage } from "@/app/controllers/message";
+import {
+  sendAssistantMessage,
+  sendMessage,
+  updateMessage,
+} from "@/app/controllers/message";
 import { getChat, updateChat } from "@/app/controllers/chat";
 import { socket } from "@/socket";
 import { useScrollIntoView } from "@mantine/hooks";
 import { getAssistantResponse } from "@/app/controllers/assistant";
 import { getWorkspace } from "@/app/controllers/Workspace";
-import { Ms_Madi } from "next/font/google";
+import { ICommentDocument } from "@/app/models/Comment";
+import { updateComment } from "@/app/controllers/comment";
 
 export default function ChatWindow(props: { currentChatId: String }) {
   const { currentChatId } = props;
@@ -50,57 +55,141 @@ export default function ChatWindow(props: { currentChatId: String }) {
   useEffect(() => {
     setMessages(chat?.messages);
 
-    if (socket.connected) {
-      // console.log("socket already connected");
-    }
     socket.on("newMessage", (msg) => {
-      // console.log("newMessage", msg);
-      // console.log("insocketlistner", chat);
       updateChat(currentChatId, {
         ...chat,
         messages: [...(chat?.messages || []), msg._id],
         participants: updateParticipants(),
       }).then((res) => {
-        // console.log("response at chat", res);
+        setChat(res.chat);
+      });
+    });
+
+    socket.on("deleteMessage", (msg) => {
+      console.log("msg", msg);
+      updateChat(currentChatId, {
+        ...chat,
+        messages: chat?.messages
+          .map((m: any) => m._id)
+          .filter((m: any) => m != msg._id),
+      }).then((res) => {
+        console.log("res", res);
         setChat(res.chat);
       });
     });
 
     return () => {
       socket.off("newMessage");
+      socket.off("deleteMessage");
     };
   }, [chat]);
 
+  // useEffect(() => {
+  //   console.log("chat", chat);
+  // }, [chat]);
+
   useEffect(() => {
-    scrollIntoView();
-    if (
-      messages?.length > 0 &&
-      messages[messages.length - 1].type == "user" &&
-      messages[messages.length - 1].createdBy == user?.id
-    ) {
-      // collectAssitantResponse.then((res) => sendMessageHandler("Hello, I am a bot", "assistant"));
-      getAssistantResponse(
-        messages.map((msg: any) => {
-          return {
-            role: msg.type,
-            content: msg.content,
-          };
-        }),
-        chat?.scope,
-        organization?.id || "",
-        "gpt-3.5-turbo"
-      ).then((res) => {
-        sendMessageHandler(res.gptRes.choices[0].message.content, "assistant");
+    socket.on("newComment", (comment: ICommentDocument) => {
+      const message = messages.find((msg: any) => msg._id == comment.messageId);
+      // console.log("message", message);
+      updateMessage(message._id, {
+        comments: [...message.comments.map((c: any) => c._id), comment._id],
+      })
+        .then((res) => {
+          updateChat(currentChatId, {
+            ...chat,
+            participants: updateParticipants(),
+          }).then((res) => {
+            setChat(res.chat);
+          });
+
+          return res;
+        })
+        .then((res) => {
+          console.log("res", res.message);
+
+          console.log("messages");
+          setMessages(
+            messages.map((msg: any) => {
+              if (msg._id == res.message._id) return res.message;
+              return msg;
+            })
+          );
+        });
+    });
+
+    socket.on("updateComment", (comment: ICommentDocument) => {
+      // console.log("comment", comment);
+      let message = messages.find((msg: any) => msg._id == comment.messageId);
+      message.comments = message.comments.map((c: any) => {
+        if (c._id == comment._id) return comment;
+        return c;
       });
-    }
+      setMessages(
+        messages.map((msg: any) => {
+          if (msg._id == message._id) return message;
+          return msg;
+        })
+      );
+    });
+
+    socket.on("deleteComment", (comment: ICommentDocument) => {
+      let message = messages.find((msg: any) => msg._id == comment.messageId);
+
+      updateMessage(message._id, {
+        comments: message.comments
+          .filter((c: any) => c._id != comment._id)
+          .map((c: any) => c._id),
+      }).then((res) => {
+        setMessages(
+          messages.map((msg: any) => {
+            if (msg._id == res.message._id) return res.message;
+            return msg;
+          })
+        );
+      });
+    });
+
+    socket.on("deleteReply", (reply: ICommentDocument) => {
+      console.log("reply", reply);
+      let message = messages.find((msg: any) => msg._id == reply.messageId);
+      console.log("message", message);
+      let comment = message.comments.find((c: any) =>
+        c.replies.map((r: any) => r._id).includes(reply._id)
+      );
+
+      updateComment(comment._id, {
+        replies: comment.replies
+          .filter((r: any) => r._id != reply._id)
+          .map((r: any) => r._id),
+      });
+
+      comment.replies = comment.replies.filter((r: any) => r._id != reply._id);
+
+      message.comments = message.comments.map((c: any) => {
+        if (c._id == comment._id) return comment;
+        return c;
+      });
+
+      setMessages(
+        messages.map((msg: any) => {
+          if (msg._id == message._id) return message;
+          return msg;
+        })
+      );
+    });
+
+    return () => {
+      socket.off("newComment");
+      socket.off("updateComment");
+      socket.off("deleteComment");
+      socket.off("deleteReply");
+    };
   }, [messages]);
 
-  async function sendMessageHandler(msg: any, role: String) {
-    sendMessage(user?.id || "", msg, role, currentChatId).then((res) => {
-      socket.emit("createMessage", currentChatId, res.message);
-      setMessageInput("");
-    });
-  }
+  useEffect(() => {
+    scrollIntoView();
+  }, [messages?.length]);
 
   useEffect(() => {
     const fetchParticipants = async () => {
@@ -159,21 +248,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
             };
             return (
               <div key={message._id} className="mb-1">
-                <MessageItem
-                  message={{
-                    _id: message._id,
-                    createdBy: {
-                      hasImage: user.hasImage,
-                      name: `${user.firstName} ${user.lastName}`,
-                      avatar: user.imageUrl,
-                    },
-                    chatId: message.chatId,
-                    content: message.content,
-                    type: message.type,
-                    updatedAt: message.updatedAt,
-                    createdAt: message.createdAt,
-                  }}
-                />
+                <MessageItem message={message} participants={participants} />
               </div>
             );
           })
@@ -210,7 +285,19 @@ export default function ChatWindow(props: { currentChatId: String }) {
           onChange={(e) => setMessageInput(e.currentTarget.value)}
           onKeyPress={(e) => {
             if (e.key === "Enter") {
-              sendMessageHandler(messageInput, "user");
+              sendMessage(
+                user?.id || "",
+                messageInput,
+                "user",
+                currentChatId
+              ).then((res) => {
+                sendAssistantMessage(
+                  res.message,
+                  chat.workspaceId,
+                  "gpt-3.5-turbo"
+                );
+                setMessageInput("");
+              });
             }
           }}
         />
@@ -219,7 +306,21 @@ export default function ChatWindow(props: { currentChatId: String }) {
           size="50"
           radius="0"
           color="teal"
-          onClick={() => sendMessageHandler(messageInput, "user")}
+          onClick={() => {
+            sendMessage(
+              user?.id || "",
+              messageInput,
+              "user",
+              currentChatId
+            ).then((res) => {
+              sendAssistantMessage(
+                res.message,
+                chat.workspaceId,
+                "gpt-3.5-turbo"
+              );
+              setMessageInput("");
+            });
+          }}
         >
           <IconSend size="24" />
         </ActionIcon>

@@ -3,6 +3,7 @@ import { dbConnect } from "@/app/lib/db";
 import { NextResponse } from "next/server";
 import Message, { IMessageDocument } from "@/app/models/Message";
 import Chat from "@/app/models/Chat";
+import Comment from "@/app/models/Comment";
 
 export async function POST(req: any, res: NextApiResponse) {
   try {
@@ -14,6 +15,7 @@ export async function POST(req: any, res: NextApiResponse) {
       type: body.type,
       chatId: body.chatId,
       updatedAt: new Date(),
+      comments: [],
     });
     return NextResponse.json({ message }, { status: 200 });
   } catch (error: any) {
@@ -26,7 +28,14 @@ export async function GET(req: any, res: NextApiResponse) {
   // console.log("hit get chat");
   try {
     await dbConnect();
-    const messages = await Message.find();
+    const reqParam = req.nextUrl.searchParams;
+    const chatId = reqParam.get("chatId");
+
+    console.log("chatId", chatId);
+
+    const messages = await Message.find({
+      chatId: chatId,
+    });
     return NextResponse.json({ messages }, { status: 200 });
   } catch (error: any) {
     // console.log("error from route", error);
@@ -40,39 +49,18 @@ export async function PUT(req: any, res: NextApiResponse) {
     await dbConnect();
     const body = await req.json();
 
-    console.log("body", body);
-    const chatObj = await Chat.findById(body.chatId);
-    console.log("chatObj", chatObj?.populate("messages"));
-
-    const toBeDeleted = chatObj?.messages.filter((msg: any) => {
-      msg.createdAt > body.createdAt;
-    });
-    console.log("toBeDeleted", toBeDeleted);
-    await Chat.findByIdAndUpdate(
-      body.chatId,
-      {
-        ...chatObj,
-        messages: chatObj?.messages.filter((msg: any) => {
-          return msg.createdAt < body.createdAt;
-        }),
+    const message = await Message.findByIdAndUpdate(body.id, body, {
+      new: true,
+    }).populate({
+      path: "comments",
+      populate: {
+        path: "replies",
       },
-      {
-        new: true,
-      }
-    ).then((res) => {
-      console.log("res", res);
     });
-
-    toBeDeleted?.forEach(async (e: any) => {
-      await Message.findByIdAndDelete(e._id);
-    });
-    console.log("All done");
-
-    const data = await Message.findByIdAndUpdate(body._id, body);
-
-    return NextResponse.json({ data }, { status: 200 });
+    console.log("updatedMessage", message);
+    return NextResponse.json({ message }, { status: 200 });
   } catch (error: any) {
-    // console.log("error from route", error);
+    console.log("error from PUT at Message", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
@@ -82,7 +70,18 @@ export async function DELETE(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
-    const message = await Message.findByIdAndDelete(body.id);
+
+    const message = await Message.findById(body.id).populate("comments");
+
+    message?.comments.forEach(async (comment: any) => {
+      comment.replies.forEach(async (reply: any) => {
+        await Comment.findByIdAndDelete(reply._id);
+      });
+      await Comment.findByIdAndDelete(comment._id);
+    });
+
+    await Message.findByIdAndDelete(body.id);
+
     return NextResponse.json(
       { message: "Message deleted successfully" },
       { status: 200 }
