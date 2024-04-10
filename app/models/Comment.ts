@@ -23,6 +23,11 @@ const CommentsSchema = new Mongoose.Schema(
     replies: {
       type: [{ type: Mongoose.Types.ObjectId, ref: "comments", default: [] }],
     },
+    parent: {
+      type: String || null,
+      ref: "comments",
+      required: false,
+    },
     updatedAt: {
       type: Date,
       required: false,
@@ -44,6 +49,7 @@ interface IComment {
   status: String;
   messageId: String;
   replies: Mongoose.Types.ObjectId[];
+  parent: String | null;
   updatedAt: Date;
   createdAt: Date;
 }

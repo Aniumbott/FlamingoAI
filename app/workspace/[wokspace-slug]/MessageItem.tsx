@@ -31,6 +31,7 @@ import {
 import { useEffect, useState } from "react";
 import CommentItem from "./CommentItem";
 import { useOrganization, useUser } from "@clerk/nextjs";
+import MentionInput from "./MentionInput";
 
 function getDate(date: string) {
   return new Date(date).toLocaleDateString();
@@ -104,25 +105,26 @@ function MessageItem(props: { message: any; participants: any[] }) {
                     : "TeamGPT"}
                 </Text>
                 <Text pl={10} size="xs">
-                  {/* {getDate(message.updatedAt.toString())} */}
+                  {getDate(message.updatedAt.toString())}
                 </Text>
-                {message.createdAt !== message.updatedAt ? (
+                {/* {message.createdAt !== message.updatedAt ? (
                   <Text pl={10} size="xs">
                     (edited)
                   </Text>
-                ) : null}
+                ) : null} */}
               </div>
 
               <div className="flex flex-row">
                 {hovered && !isEdit ? (
                   message.type === "user" ? (
                     <>
-                      <ActionIcon color="grey" variant="subtle">
-                        <IconEdit
-                          display={isEdit ? "none" : "block"}
-                          style={{ width: rem(16) }}
-                          onClick={() => setIsEdit(!isEdit)}
-                        />
+                      <ActionIcon
+                        color="grey"
+                        variant="subtle"
+                        display={isEdit ? "none" : "block"}
+                        onClick={() => setIsEdit(!isEdit)}
+                      >
+                        <IconEdit style={{ width: rem(16) }} />
                       </ActionIcon>
                       <ActionIcon color="grey" variant="subtle">
                         <IconBookmarkPlus style={{ width: rem(16) }} />
@@ -169,18 +171,21 @@ function MessageItem(props: { message: any; participants: any[] }) {
                         "All messages sent after the one you are about to edit will be deleted!"
                       ).valueOf()
                     ) {
-                      updateMessageContent(
-                        createdBy?.userId,
-                        messageText,
-                        message.chatId,
-                        message.createdAt
-                      ).then((res) => {
-                        sendAssistantMessage(
-                          res.message,
-                          organization?.id || "",
-                          "gpt-3.5-turbo"
-                        );
-                      });
+                      updateMessageContent({
+                        ...message,
+                        creaatedBy: createdBy?.userId,
+                        content: messageText,
+                      })
+                        .then((res) => {
+                          sendAssistantMessage(
+                            res.message,
+                            organization?.id || "",
+                            "gpt-3.5-turbo"
+                          );
+                        })
+                        .then(() => {
+                          setIsEdit(!isEdit);
+                        });
                     }
                   }}
                 >
@@ -237,7 +242,7 @@ function MessageItem(props: { message: any; participants: any[] }) {
                       />
                     );
                   })}
-                  <Textarea
+                  {/* <Textarea
                     mt="md"
                     onChange={(e) => setCommentInput(e.currentTarget.value)}
                     placeholder="Add a comment."
@@ -258,7 +263,36 @@ function MessageItem(props: { message: any; participants: any[] }) {
                         <IconSend style={{ width: rem(16) }} />
                       </ActionIcon>
                     }
-                  ></Textarea>
+                  ></Textarea> */}
+
+                  <div className="relative mt-4">
+                    <MentionInput
+                      commentText={commentInput}
+                      setCommentText={setCommentInput}
+                      participants={participants}
+                    />
+                    <ActionIcon
+                      color="grey"
+                      mr="1rem"
+                      onClick={() => {
+                        createComment(
+                          String(user?.id),
+                          commentInput,
+                          message._id,
+                          message.chatId,
+                          null
+                        );
+                        setCommentInput("");
+                      }}
+                      style={{
+                        position: "absolute",
+                        right: "0",
+                        bottom: "1rem",
+                      }}
+                    >
+                      <IconSend style={{ width: rem(16) }} />
+                    </ActionIcon>
+                  </div>
                 </div>
               ) : null}
             </div>

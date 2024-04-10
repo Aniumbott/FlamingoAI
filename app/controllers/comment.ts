@@ -4,11 +4,12 @@ async function createComment(
   createdBy: String,
   content: String,
   messageId: String,
-  chatId: String
+  chatId: String,
+  parent: String | null
 ) {
   const data = await fetch("/api/comment", {
     method: "POST",
-    body: JSON.stringify({ createdBy, content, messageId }),
+    body: JSON.stringify({ createdBy, content, messageId, parent }),
     headers: {
       "Content-Type": "application/json",
     },
@@ -28,7 +29,6 @@ async function getComments(messageId: String) {
     },
   });
   const response = await data.json();
-  // console.log("response", response);
   return response;
 }
 
@@ -62,38 +62,4 @@ async function deleteComment(chatId: String, body: any) {
   return response;
 }
 
-async function addReply(createdBy: String, content: String, messageId: String) {
-  const data = await fetch("/api/comment", {
-    method: "POST",
-    body: JSON.stringify({ createdBy, content, messageId }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const response = await data.json();
-
-  return response;
-}
-
-async function deleteReply(chatId: String, body: any) {
-  const data = await fetch("/api/comment", {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  const response = await data.json();
-  socket.emit("deleteReply", chatId, body);
-  return response;
-}
-
-export {
-  createComment,
-  getComments,
-  updateComment,
-  deleteComment,
-  addReply,
-  deleteReply,
-};
+export { createComment, getComments, updateComment, deleteComment };

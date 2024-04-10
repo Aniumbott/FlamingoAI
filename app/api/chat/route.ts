@@ -40,8 +40,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
     await dbConnect();
     const reqParam = req.nextUrl.searchParams;
     const scope = reqParam.get("scope");
-    const workspaceId = reqParam.get("workspaceId");
-    const createdBy = reqParam.get("createdBy");
+    const workspaceId = reqParam.get("workspaceId") || "";
+    const createdBy = reqParam.get("createdBy") || "";
     const id = reqParam.get("id");
     const independent = reqParam.get("independent");
     let chats;
@@ -108,6 +108,7 @@ export async function PUT(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
+    console.log("body", body);
 
     const chat = await Chat.findByIdAndUpdate(body.id, body, {
       new: true,

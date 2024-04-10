@@ -94,7 +94,7 @@ const MoveItems = (props: {
       withCloseButton={false}
     >
       <Stack gap={"sm"} p={"sm"}>
-        <Title order={3}>Move &qout;{item.name}&quot;</Title>
+        <Title order={3}>{`Move "${item.name}"`}</Title>
         <Stack gap={"md"} p={"sm"}>
           <div className="flex gap-2">
             Current Location:
