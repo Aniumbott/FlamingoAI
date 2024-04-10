@@ -17,7 +17,14 @@ export async function POST(req: any, res: NextApiResponse) {
       updatedAt: new Date(),
       comments: [],
     });
-    return NextResponse.json({ message }, { status: 200 });
+
+    const chat = await Chat.findByIdAndUpdate(body.chatId, {
+      $push: { messages: message._id },
+    });
+
+    // console.log("newMessage", message, chat);
+
+    return NextResponse.json({ message, chat }, { status: 200 });
   } catch (error: any) {
     // console.log("error from route", error);
     return NextResponse.json(error.message, { status: 500 });
@@ -29,15 +36,29 @@ export async function GET(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const reqParam = req.nextUrl.searchParams;
+    const id = reqParam.get("id");
     const chatId = reqParam.get("chatId");
 
-    console.log("chatId", chatId);
+    let messages;
+    let message;
 
-    const messages = await Message.find({
-      chatId: chatId,
-    });
+    if (chatId) {
+      messages = await Message.find({ chatId: chatId }).populate({
+        path: "comments",
+        populate: {
+          path: "replies",
+        },
+      });
+    } else if (id) {
+      message = await Message.findById(id).populate({
+        path: "comments",
+        populate: {
+          path: "replies",
+        },
+      });
+    } // console.log("chatId", chatId);
 
-    return NextResponse.json({ messages }, { status: 200 });
+    return NextResponse.json({ message, messages }, { status: 200 });
   } catch (error: any) {
     // console.log("error from route", error);
     return NextResponse.json(error.message, { status: 500 });
@@ -48,22 +69,29 @@ export async function PUT(req: any, res: NextApiResponse) {
   // console.log("hit put message");
   try {
     await dbConnect();
-    const body = await req.json();
+    const { body, action } = await req.json();
 
-    if (body.action && body.action === "deleteMany") {
+    if (action && action === "deleteMany") {
       // Fetch the current message
       // const currentMessage = await Message.findById(body.id);
 
       // Delete all messages from the chat that were created after the current message
       const messages = await Message.deleteMany({
         chatId: body.chatId,
-        createdAt: { $gte: body.createdAt },
+        createdAt: { $gt: body.createdAt },
+      });
+
+      const message = await Message.findByIdAndUpdate(body._id, body).populate({
+        path: "comments",
+        populate: {
+          path: "replies",
+        },
       });
 
       // Delete the current message
       // await Message.findByIdAndDelete(body.id);
 
-      return NextResponse.json({ messages }, { status: 200 });
+      return NextResponse.json({ message }, { status: 200 });
     } else {
       const message = await Message.findByIdAndUpdate(body.id, body, {
         new: true,
@@ -88,7 +116,7 @@ export async function DELETE(req: any, res: NextApiResponse) {
     await dbConnect();
     const body = await req.json();
 
-    const message = await Message.findById(body.id).populate("comments");
+    const message = await Message.findById(body._id).populate("comments");
 
     message?.comments.forEach(async (comment: any) => {
       comment.replies.forEach(async (reply: any) => {
@@ -97,8 +125,15 @@ export async function DELETE(req: any, res: NextApiResponse) {
       await Comment.findByIdAndDelete(comment._id);
     });
 
-    await Message.findByIdAndDelete(body.id);
+    const deleteMessage = await Message.findByIdAndDelete(body._id);
 
+    console.log("deleteMessage", body);
+
+    const updateChat = await Chat.findByIdAndUpdate(body.chatId, {
+      $pull: { messages: body._id },
+    });
+
+    console.log(updateChat);
     return NextResponse.json(
       { message: "Message deleted successfully" },
       { status: 200 }

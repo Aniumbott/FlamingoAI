@@ -1,8 +1,9 @@
-import { deleteReply } from "@/app/controllers/comment";
+import { deleteComment } from "@/app/controllers/comment";
 import { Avatar, Card, Title, Text, ActionIcon, rem } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { MentionParser } from "./MentionInput";
 
 export default function ReplyItem(props: { reply: any; participants: any[] }) {
   const { reply, participants } = props;
@@ -40,11 +41,11 @@ export default function ReplyItem(props: { reply: any; participants: any[] }) {
         <div className="w-full flex flex-col">
           <div className="w-full flex flex-row justify-between items-center">
             <div className="w-fill flex flex-rwo">
-              <Title order={5} mr="sm">
+              <Text size="sm" fw={700} mr="sm">
                 {createdBy?.firstName + " " + createdBy?.lastName ||
                   "Unknown User"}
-              </Title>
-              <Text size="sm">
+              </Text>
+              <Text size="xs">
                 {new Date(reply.createdAt).toLocaleDateString() || "now"}
               </Text>
             </div>
@@ -52,13 +53,13 @@ export default function ReplyItem(props: { reply: any; participants: any[] }) {
               color="grey"
               variant="subtle"
               onClick={() => {
-                deleteReply(chatId, reply);
+                deleteComment(chatId, reply);
               }}
             >
               <IconTrash style={{ width: rem(16) }} />
             </ActionIcon>
           </div>
-          <Text size="sm">{reply.content}</Text>
+          {MentionParser(reply.content)}
         </div>
       </div>
     </Card>

@@ -32,6 +32,7 @@ import style from "./RightPanel.module.css";
 import UserAvatar from "./UserAvatar";
 import LibraryAccordianItem from "./LibraryAccordianItem";
 import { UserButton } from "@clerk/nextjs";
+import Comments from "./Comments";
 
 export default function RightPanel(props: {
   rightOpened: boolean;
@@ -202,7 +203,7 @@ export default function RightPanel(props: {
       {/* Ralaven Content */}
       {active == 0 ? <SavedPrompts toggleRight={toggleRight} /> : <></>}
       {active == 1 ? reports(toggleRight) : <></>}
-      {active == 2 ? comments(toggleRight) : <></>}
+      {active == 2 ? <Comments toggleRight={toggleRight} /> : <></>}
       {active == 3 ? help(toggleRight) : <></>}
     </>
   );
@@ -417,18 +418,6 @@ const reports = (toggleRight: () => void) => {
     <>
       <div className={style.activeTitle}>
         <Text>REPORTS</Text>
-        <CloseButton onClick={toggleRight} />
-      </div>
-      <Divider my="md" />
-    </>
-  );
-};
-
-const comments = (toggleRight: () => void) => {
-  return (
-    <>
-      <div className={style.activeTitle}>
-        <Text>COMMENTS</Text>
         <CloseButton onClick={toggleRight} />
       </div>
       <Divider my="md" />

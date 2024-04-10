@@ -1,6 +1,7 @@
 import {
   ActionIcon,
   Avatar,
+  Group,
   Menu,
   Paper,
   Text,
@@ -23,22 +24,25 @@ import { useEffect, useState } from "react";
 import ReplyItem from "./ReplyItem";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import {
-  addReply,
+  createComment,
   deleteComment,
   updateComment,
 } from "@/app/controllers/comment";
 import { usePathname } from "next/navigation";
+
+import { MentionsInput, Mention } from "react-mentions";
+import { set } from "mongoose";
+import MentionInput, { MentionParser } from "./MentionInput";
 
 function CommentItem(props: { comment: any; participants: any[] }) {
   const { comment, participants } = props;
   const [isOpen, setIsOpen] = useState(false);
   // const [participants, setParticipants] = useState<any>([]);
   const { user } = useUser();
-  const { organization } = useOrganization();
   const [chatId, setChatId] = useState("");
   const [replyContent, setReplyContent] = useState("");
+  const [commentText, setCommentText] = useState(comment.content.toString());
   const [isEdit, setIsEdit] = useState(false);
-  const [commentText, setCommentText] = useState(comment.content || "");
   const [createdBy, setCreatedBy] = useState<any>(null);
   const pathname = usePathname();
 
@@ -72,11 +76,11 @@ function CommentItem(props: { comment: any; participants: any[] }) {
         <div className="flex flex-col w-full">
           <div className="flex flex-row justify-between items-center">
             <div className="flex items-center">
-              <Title order={5} mr="sm">
+              <Text size="sm" fw={700} mr="sm">
                 {createdBy?.firstName + " " + createdBy?.lastName ||
                   "Unknown User"}
-              </Title>
-              <Text size="sm">
+              </Text>
+              <Text size="xs">
                 {new Date(comment.createdAt).toLocaleDateString() || "now"}
               </Text>
             </div>
@@ -141,22 +145,24 @@ function CommentItem(props: { comment: any; participants: any[] }) {
 
           {isOpen && (
             <>
-              <div className="flex flex-col w-full">
+              <div className="flex flex-col w-full mt-1">
                 {isEdit ? (
-                  <div className="w-full flex flex-row items-center justify-center mt-3">
-                    <TextInput
+                  <div className="w-full flex flex-row items-center mt-3">
+                    {/* <TextInput
                       w="100%"
                       defaultValue={comment.content}
                       onChange={(e) => setCommentText(e.currentTarget.value)}
+                    /> */}
+                    <MentionInput
+                      commentText={commentText}
+                      setCommentText={setCommentText}
+                      participants={participants}
                     />
-                    <ActionIcon
-                      color="teal"
-                      ml="1rem"
-                      size="lg"
-                      variant="light"
-                    >
-                      <IconCheck
-                        size="18px"
+                    <div className="h-full flex flex-col ml-2 items-center justify-center">
+                      <ActionIcon
+                        color="teal"
+                        size="lg"
+                        variant="light"
                         onClick={() => {
                           updateComment(chatId, {
                             id: comment._id,
@@ -164,20 +170,22 @@ function CommentItem(props: { comment: any; participants: any[] }) {
                           });
                           setIsEdit(!isEdit);
                         }}
-                      />
-                    </ActionIcon>
-                    <ActionIcon
-                      color="red"
-                      ml="0.5rem"
-                      size="lg"
-                      variant="light"
-                      onClick={() => setIsEdit(!isEdit)}
-                    >
-                      <IconX size="18px" />
-                    </ActionIcon>
+                      >
+                        <IconCheck size="18px" />
+                      </ActionIcon>
+                      <ActionIcon
+                        color="red"
+                        mt={5}
+                        size="lg"
+                        variant="light"
+                        onClick={() => setIsEdit(!isEdit)}
+                      >
+                        <IconX size="18px" />
+                      </ActionIcon>
+                    </div>
                   </div>
                 ) : (
-                  <Text size="md">{comment.content}</Text>
+                  MentionParser(comment.content)
                 )}
               </div>
               <Text size="xs" mt="lg">
@@ -193,8 +201,7 @@ function CommentItem(props: { comment: any; participants: any[] }) {
                     />
                   ))}
               </div>
-              <div className="flex flex-col ">
-                <Textarea
+              {/* <Textarea
                   mt="md"
                   placeholder="Reply to comment"
                   value={replyContent}
@@ -220,7 +227,35 @@ function CommentItem(props: { comment: any; participants: any[] }) {
                       <IconSend style={{ width: rem(16) }} />
                     </ActionIcon>
                   }
-                ></Textarea>
+                ></Textarea> */}
+              <div className="relative mt-4">
+                <MentionInput
+                  commentText={replyContent}
+                  setCommentText={setReplyContent}
+                  participants={participants}
+                />
+                <ActionIcon
+                  color="grey"
+                  mr="1rem"
+                  onClick={(e) =>
+                    createComment(
+                      user?.id || "",
+                      replyContent,
+                      comment.messageId,
+                      chatId,
+                      comment._id
+                    ).then(() => {
+                      setReplyContent("");
+                    })
+                  }
+                  style={{
+                    position: "absolute",
+                    right: "0",
+                    bottom: "1rem",
+                  }}
+                >
+                  <IconSend style={{ width: rem(16) }} />
+                </ActionIcon>
               </div>
             </>
           )}

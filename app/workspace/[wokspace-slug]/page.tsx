@@ -107,7 +107,7 @@ const Workspace = () => {
             collapsed: { desktop: !leftOpened, mobile: !leftOpened },
           }}
           aside={{
-            width: 325,
+            width: 330,
             breakpoint: "md",
             collapsed: { desktop: !rightOpened, mobile: !rightOpened },
           }}

@@ -40,8 +40,8 @@ export async function GET(req: NextRequest, res: NextResponse) {
     await dbConnect();
     const reqParam = req.nextUrl.searchParams;
     const scope = reqParam.get("scope");
-    const workspaceId = reqParam.get("workspaceId");
-    const createdBy = reqParam.get("createdBy");
+    const workspaceId = reqParam.get("workspaceId") || "";
+    const createdBy = reqParam.get("createdBy") || "";
     const id = reqParam.get("id");
     const independent = reqParam.get("independent");
     let chats;
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
           scope: scope,
           parentFolder: null,
           archived: false,
-        }).sort({ updatedAt: -1 });;
+        }).sort({ updatedAt: -1 });
       } else if (scope === "private") {
         chats = await Chat.find({
           workspaceId: workspaceId,
@@ -62,7 +62,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
           createdBy: createdBy,
           parentFolder: null,
           archived: false,
-        }).sort({ updatedAt: -1 });;
+        }).sort({ updatedAt: -1 });
       }
     }
     //get all chats relevant to workspace and user
@@ -71,7 +71,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         workspaceId: workspaceId,
         $or: [{ scope: "public" }, { scope: "private", createdBy: createdBy }],
         archived: false,
-      }).sort({ updatedAt: -1 });;
+      }).sort({ updatedAt: -1 });
     }
     // get archived chats
     else if (id === "archived") {
@@ -79,7 +79,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         workspaceId: workspaceId,
         $or: [{ scope: "public" }, { scope: "private", createdBy: createdBy }],
         archived: true,
-      }).sort({ updatedAt: -1 });;
+      }).sort({ updatedAt: -1 });
     }
     // get specific chat by id
     else if (id) {
@@ -108,6 +108,7 @@ export async function PUT(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
+    console.log("body", body);
     const chat = await Chat.findByIdAndUpdate(body.id, body, {
       new: true,
     }).populate({

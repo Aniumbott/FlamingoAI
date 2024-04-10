@@ -3,6 +3,7 @@ import { dbConnect } from "@/app/lib/db";
 import { NextResponse } from "next/server";
 import Comment, { ICommentDocument } from "@/app/models/Comment";
 import Chat from "@/app/models/Chat";
+import Message from "@/app/models/Message";
 
 export async function POST(req: any, res: NextApiResponse) {
   try {
@@ -13,9 +14,31 @@ export async function POST(req: any, res: NextApiResponse) {
       content: body.content,
       status: "unresolved",
       messageId: body.messageId,
+      parent: body.parent,
       replies: [],
     });
-    return NextResponse.json({ comment }, { status: 200 });
+
+    let parentComment;
+    let message;
+
+    console.log("body", body);
+
+    if (body.parent != null) {
+      parentComment = await Comment.findByIdAndUpdate(body.parent, {
+        $push: { replies: comment._id },
+      });
+    } else {
+      message = await Message.findByIdAndUpdate(body.messageId, {
+        $push: { comments: comment._id },
+      });
+    }
+
+    console.log("newComment", comment, message, parentComment);
+
+    return NextResponse.json(
+      { comment, message, parentComment },
+      { status: 200 }
+    );
   } catch (error: any) {
     console.log("error from comment route", error);
     return NextResponse.json(error.Comment, { status: 500 });
@@ -74,7 +97,17 @@ export async function DELETE(req: any, res: NextApiResponse) {
       }
     }
 
-    const comment = await Comment.findByIdAndDelete(body.id);
+    await Comment.findByIdAndDelete(body._id);
+
+    if (body.parent) {
+      await Comment.findByIdAndUpdate(body.parent, {
+        $pull: { replies: body._id },
+      });
+    } else {
+      await Message.findByIdAndUpdate(body.messageId, {
+        $pull: { comments: body._id },
+      });
+    }
 
     return NextResponse.json(
       { Comment: "Comment deleted successfully" },

@@ -93,12 +93,6 @@ app.prepare().then(() => {
       );
       io.to(roomId).emit("deleteMessage", message);
     });
-    socket.on("deleteMessages", (roomId, messages) => {
-      console.log(
-        `User with ID: ${socket.id} deleted messages: ${messages} in room: ${roomId}`
-      );
-      io.to(roomId).emit("deleteMessages", messages);
-    });
 
     // Comments
     socket.on("createComment", (roomId, comment) => {
@@ -106,6 +100,7 @@ app.prepare().then(() => {
         `User with ID: ${socket.id} created comment: ${comment} in room: ${roomId}`
       );
       io.to(roomId).emit("newComment", comment);
+      io.to(roomId).emit("newCommentInSection", comment);
     });
 
     socket.on("updateComment", (roomId, comment) => {
@@ -113,6 +108,7 @@ app.prepare().then(() => {
         `User with ID: ${socket.id} updated comment: ${comment._id} in room: ${roomId}`
       );
       io.to(roomId).emit("updateComment", comment);
+      io.to(roomId).emit("updateCommentInSection", comment);
     });
 
     socket.on("deleteComment", (roomId, comment) => {
@@ -120,13 +116,7 @@ app.prepare().then(() => {
         `User with ID: ${socket.id} deleted comment: ${comment} in room: ${roomId}`
       );
       io.to(roomId).emit("deleteComment", comment);
-    });
-
-    socket.on("deleteReply", (roomId, reply) => {
-      console.log(
-        `User with ID: ${socket.id} deleted reply: ${reply} in room: ${roomId}`
-      );
-      io.to(roomId).emit("deleteReply", reply);
+      io.to(roomId).emit("deleteCommentInSection", comment);
     });
   });
 

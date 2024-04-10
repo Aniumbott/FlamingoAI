@@ -1,10 +1,7 @@
-import * as Mongoose from "mongoose";
-import { IMessageDocument } from "../models/Message";
-import { getChat } from "./chat";
 import { socket } from "@/socket";
 import { getAssistantResponse } from "./assistant";
 
-async function sendMessage(
+async function createMessage(
   createdBy: String,
   content: String,
   type: String,
@@ -20,6 +17,18 @@ async function sendMessage(
 
   const response = await data.json();
   socket.emit("createMessage", chatId, response.message);
+  return response;
+}
+
+async function getMessage(id: String) {
+  const data = await fetch(`/api/message/?id=${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const response = await data.json();
   return response;
 }
 
@@ -51,28 +60,20 @@ async function deleteMessage(body: any) {
   return response;
 }
 
-async function updateMessageContent(
-  createdBy: String,
-  content: String,
-  chatId: String,
-  createdAt: Date
-) {
+async function updateMessageContent(body: any) {
   // get all messages from chat
   const data = await fetch("/api/message", {
     method: "PUT",
-    body: JSON.stringify({ chatId, createdAt, action: "deleteMany" }),
+    body: JSON.stringify({ body, action: "deleteMany" }),
     headers: {
       "Content-Type": "application/json",
     },
   });
 
   const response = await data.json();
-  console.log("deleted messages",response.messages)
-  socket.emit("deletedMessages", chatId, response.messages);
+  socket.emit("updateMessage", body.chatId, response.message);
 
-  const newdata = sendMessage(createdBy, content, "user", chatId);
-
-  return newdata;
+  return response;
 }
 
 async function sendAssistantMessage(
@@ -103,7 +104,7 @@ async function sendAssistantMessage(
     workspaceId,
     model
   ).then((res) => {
-    sendMessage(
+    createMessage(
       message.createdBy,
       res.gptRes.choices[0].message.content,
       "assistant",
@@ -113,7 +114,8 @@ async function sendAssistantMessage(
 }
 
 export {
-  sendMessage,
+  createMessage,
+  getMessage,
   updateMessage,
   deleteMessage,
   updateMessageContent,
