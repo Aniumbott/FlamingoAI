@@ -47,14 +47,14 @@ export async function GET(req: NextRequest, res: NextResponse) {
     let chats;
 
     // get independent chats based on scope
-    if (independent) {
+    if (independent && workspaceId && createdBy) {
       if (scope === "public") {
         chats = await Chat.find({
           workspaceId: workspaceId,
           scope: scope,
           parentFolder: null,
           archived: false,
-        }).sort({ updatedAt: -1 });;
+        }).sort({ updatedAt: -1 });
       } else if (scope === "private") {
         chats = await Chat.find({
           workspaceId: workspaceId,
@@ -62,27 +62,27 @@ export async function GET(req: NextRequest, res: NextResponse) {
           createdBy: createdBy,
           parentFolder: null,
           archived: false,
-        }).sort({ updatedAt: -1 });;
+        }).sort({ updatedAt: -1 });
       }
     }
     //get all chats relevant to workspace and user
-    else if (id === "all") {
+    else if (id === "all" && workspaceId && createdBy) {
       chats = await Chat.find({
         workspaceId: workspaceId,
         $or: [{ scope: "public" }, { scope: "private", createdBy: createdBy }],
         archived: false,
-      }).sort({ updatedAt: -1 });;
+      }).sort({ updatedAt: -1 });
     }
     // get archived chats
-    else if (id === "archived") {
+    else if (id === "archived" && workspaceId && createdBy) {
       chats = await Chat.find({
         workspaceId: workspaceId,
         $or: [{ scope: "public" }, { scope: "private", createdBy: createdBy }],
         archived: true,
-      }).sort({ updatedAt: -1 });;
+      }).sort({ updatedAt: -1 });
     }
     // get specific chat by id
-    else if (id) {
+    else if (id && workspaceId) {
       chats = await Chat.find({
         workspaceId: workspaceId,
         _id: id,
@@ -108,6 +108,7 @@ export async function PUT(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
+
     const chat = await Chat.findByIdAndUpdate(body.id, body, {
       new: true,
     }).populate({
