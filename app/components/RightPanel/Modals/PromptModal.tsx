@@ -93,7 +93,7 @@ const PromptModal = (props: {
           />
           {modalItem && (
             <Alert variant="default" c={"teal"} icon={<IconInfoCircle />}>
-              To use this prompt in chat, type &quote; /{name} &quote;
+              {`To use this prompt in chat, type "/${name}"`}
             </Alert>
           )}
           {modalItem === null ? (
