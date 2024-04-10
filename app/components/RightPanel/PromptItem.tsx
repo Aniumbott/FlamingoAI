@@ -20,6 +20,7 @@ import { useAuth } from "@clerk/nextjs";
 import { IPromptDocument } from "@/app/models/Prompt";
 import PromptFeatureMenu from "./Menu/PromptFeatureMenu";
 import { ModalControls } from "./PromptPanel";
+import MovePromptItems from "./Modals/MovePromptItems";
 
 export default function PromptItem(props: {
   item: IPromptDocument;
@@ -116,13 +117,13 @@ export default function PromptItem(props: {
           ) : null}
         </div>
       </div>
-      {/* {openMoveModal && (
-        <MoveChats
+      {openMoveModal && (
+        <MovePromptItems
           opened={openMoveModal}
           setOpened={setOpenMoveModal}
           item={item}
         />
-      )} */}
+      )}
     </>
   );
 }

@@ -25,13 +25,19 @@ import * as Mongoose from "mongoose";
 import { socket } from "@/socket";
 import { updateChat } from "@/app/controllers/chat";
 import { IPromptFolderDocument } from "@/app/models/PromptFolder";
-import { getPromptFolders } from "@/app/controllers/promptFolder";
+import {
+  createPromptFolder,
+  getPromptFolders,
+  updatePromptFolder,
+} from "@/app/controllers/promptFolder";
 import MoveFolderAccordian from "./MoveFolderAccordian";
+import { updatePrompt } from "@/app/controllers/prompt";
+import { IPromptDocument } from "@/app/models/Prompt";
 
-const MovePromptFolders = (props: {
+const MovePromptItems = (props: {
   opened: boolean;
   setOpened: (value: boolean) => void;
-  item: IPromptFolderDocument;
+  item: IPromptFolderDocument | IPromptDocument;
 }) => {
   const { opened, setOpened, item } = props;
   const [publicFolders, setPublicFolders] = useState<IPromptFolderDocument[]>(
@@ -45,20 +51,33 @@ const MovePromptFolders = (props: {
     "public"
   );
 
-  const [breadcrumb, setBreadcrumb] = useState([{ id: "null", name: "Root" }]);
+  const [breadcrumb, setBreadcrumb] = useState([
+    { id: "null", name: "public" },
+  ]);
 
   const fetchFolders = async () => {
     try {
       setPublicFolders(
-        (await getPromptFolders(userId || "", "public", orgId || "")).chatFolder
+        (await getPromptFolders(orgId || "", "public", userId || ""))
+          .promptFolders
       );
       setPrivateFolders(
-        (await getPromptFolders( userId || "","private", orgId || "")).chatFolder
+        (await getPromptFolders(orgId || "", "private", userId || ""))
+          .promptFolders
       );
     } catch (error) {
       console.error("Failed to fetch folders:", error);
     }
   };
+
+  // useEffect(() => {
+  //   console.log(
+  //     "publicFolder ",
+  //     publicFolders,
+  //     "privateFolder ",
+  //     privateFolders
+  //   );
+  // }, [publicFolders, privateFolders]);
 
   const handleBreadcrumb = (value: string | null) => {
     if (value === null) {
@@ -75,15 +94,33 @@ const MovePromptFolders = (props: {
   };
 
   const searchFolder = (id: string) => {
-    console.log("searching folder", id);
-    const folder = publicFolders.find((folder) => folder._id === id);
-    if (folder) return folder;
-    return privateFolders.find((folder) => folder._id === id);
-  };
+    const search = (
+      folders: IPromptFolderDocument[]
+    ): IPromptFolderDocument | undefined => {
+      for (let folder of folders) {
+        if (folder._id === id) {
+          return folder;
+        }
 
+        if (folder.subFolders && folder.subFolders.length > 0) {
+          const foundFolder = search(
+            folder.subFolders as IPromptFolderDocument[]
+          );
+          if (foundFolder) {
+            return foundFolder;
+          }
+        }
+      }
+    };
+
+    let folder = search(publicFolders);
+    if (folder) return folder;
+
+    return search(privateFolders);
+  };
   useEffect(() => {
     fetchFolders();
-    console.log(opened, item);
+    // console.log(opened, item);
     // socket.on("newChatFolder", (folder) => {
     //   console.log("new folder created");
     //   fetchFolders();
@@ -116,7 +153,7 @@ const MovePromptFolders = (props: {
               c={"white"}
               onClick={() => {
                 setSelectedTab("public");
-                setBreadcrumb([{ id: "null", name: "Root" }]);
+                setBreadcrumb([{ id: "null", name: "public" }]);
               }}
               {...(selectedTab === "public"
                 ? { variant: "outline" }
@@ -129,7 +166,7 @@ const MovePromptFolders = (props: {
               c={"white"}
               onClick={() => {
                 setSelectedTab("private");
-                setBreadcrumb([{ id: "null", name: "Root" }]);
+                setBreadcrumb([{ id: "null", name: "private" }]);
               }}
               {...(selectedTab === "private"
                 ? { variant: "outline" }
@@ -189,7 +226,7 @@ const MovePromptFolders = (props: {
                   selectedTab,
                   userId || "",
                   orgId || ""
-                )
+                ).then(() => fetchFolders())
               }
             >
               Create New Folder
@@ -205,7 +242,11 @@ const MovePromptFolders = (props: {
               <Button
                 variant="filled"
                 color="teal"
-                // onClick={() => moveItem(item, breadcrumb, searchFolder)}
+                onClick={() =>
+                  moveItem(item, breadcrumb, searchFolder).then(() =>
+                    setOpened(false)
+                  )
+                }
               >
                 Move
               </Button>
@@ -217,7 +258,7 @@ const MovePromptFolders = (props: {
   );
 };
 
-const createNewFolder = (
+const createNewFolder = async (
   breadcrumb: any,
   selectedTab: any,
   userId: string,
@@ -225,7 +266,7 @@ const createNewFolder = (
 ) => {
   const id = breadcrumb[breadcrumb.length - 1].id;
   if (id !== "null") {
-    createChatFolder(
+    await createPromptFolder(
       selectedTab,
       breadcrumb[breadcrumb.length - 1]
         .id as unknown as Mongoose.Types.ObjectId,
@@ -233,81 +274,61 @@ const createNewFolder = (
       orgId || ""
     );
   } else {
-    createChatFolder(selectedTab, null, userId || "", orgId || "");
+    await createPromptFolder(selectedTab, null, userId || "", orgId || "");
   }
 };
 
 const moveItem = async (
   currentItem: any,
   breadcrumb: any,
-  searchFolder: (id: string) => IChatFolderDocument | undefined
+  searchFolder: (id: string) => IPromptFolderDocument | undefined
 ) => {
-  const id = breadcrumb[breadcrumb.length - 1].id;
-  console.log(currentItem, id);
+  const targetFolderId =
+    breadcrumb[breadcrumb.length - 1].id === "null"
+      ? breadcrumb[breadcrumb.length - 1].name
+      : breadcrumb[breadcrumb.length - 1].id;
 
-  if (currentItem.messages) {
-    if (currentItem.parentFolder) {
-      const previousParentFolder = searchFolder(currentItem.parentFolder);
-      console.log(previousParentFolder);
+  let parentFolderId = "null";
+  if (currentItem.parentFolder) {
+    const previousParentFolder = searchFolder(currentItem.parentFolder);
+    parentFolderId = previousParentFolder?._id || "null";
+  }
 
-      const res = await updateChatFolders(previousParentFolder?._id, {
-        chats: previousParentFolder?.chats.filter(
-          (chat) => chat._id !== currentItem._id
-        ),
-      });
-      console.log("chat removed from previous parent", res);
-    }
-
-    if (id === "null") {
-      const res = await updateChat(currentItem._id, {
-        parentFolder: null,
-      });
-      console.log("chat updated", res);
-    } else {
-      const res = await updateChat(currentItem._id, {
-        parentFolder: id,
-      });
-      console.log("chat updated", res);
-      const newParentFolder = searchFolder(id);
-      const newChats = newParentFolder?.chats || [];
-      updateChatFolders(newParentFolder?._id, {
-        chats: [...newChats, currentItem._id],
-      }).then((res) => {
-        console.log("new parent's chats[] updated", res);
-      });
-    }
+  let newScope = null;
+  let targetScope = null;
+  // Fetch the current and target folders
+  if (targetFolderId === "public" || targetFolderId === "private") {
+    targetScope = targetFolderId;
   } else {
-    if (currentItem.parentFolder) {
-      const previousParentFolder = searchFolder(currentItem.parentFolder);
-      console.log(previousParentFolder);
+    const targetFolder = searchFolder(targetFolderId);
+    targetScope = targetFolder?.scope;
+  }
 
-      const res = await updateChatFolders(previousParentFolder?._id, {
-        subFolders: previousParentFolder?.subFolders.filter(
-          (subFolder) => subFolder._id !== currentItem._id
-        ),
-      });
-      console.log("folder removed from previous parents folder[]", res);
+  // Check if the scopes of the current and target folders are different
+  if (currentItem?.scope !== targetScope) {
+    // If they are, show a confirmation dialog
+    newScope = targetScope;
+    const proceed = confirm(
+      "The target folder has a different scope. Do you want to proceed?"
+    );
+    // If the user clicks Cancel, return
+    if (!proceed) {
+      return;
     }
-
-    if (id === "null") {
-      const res = await updateChatFolders(currentItem._id, {
-        parentFolder: null,
-      });
-      console.log("folder updated", res);
-    } else {
-      const res = await updateChatFolders(currentItem._id, {
-        parentFolder: id,
-      });
-      console.log("folder updated", res);
-      const newParentFolder = searchFolder(id);
-      const newsubFolders = newParentFolder?.subFolders || [];
-      updateChatFolders(newParentFolder?._id, {
-        subFolders: [...newsubFolders, currentItem._id],
-      }).then((res) => {
-        console.log("new parent's subfolders[] updated", res);
-      });
-    }
+  }
+  if (currentItem.prompts) {
+    await updatePromptFolder(currentItem._id, {
+      targetFolderId: targetFolderId,
+      parentFolderId: parentFolderId,
+      newScope: newScope,
+    });
+  } else {
+    await updatePrompt(currentItem._id, {
+      targetFolderId: targetFolderId,
+      parentFolderId: parentFolderId,
+      newScope: newScope,
+    });
   }
 };
 
-export default MovePromptFolders;
+export default MovePromptItems;

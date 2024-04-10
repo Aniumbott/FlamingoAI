@@ -115,6 +115,7 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
       }
     };
 
+
     const fetchPromptsAndFolders = () => {
       fetchPrompts().then(() => fetchPromptFolders());
     };

@@ -20,7 +20,7 @@ import PromptItem from "./PromptItem";
 import { IPromptDocument } from "@/app/models/Prompt";
 import PromptFolderFeatureMenu from "./Menu/PromptFolderFeatureMenu";
 import { updatePromptFolder } from "@/app/controllers/promptFolder";
-import MovePromptFolders from "./Modals/MovePromptFolders";
+import MovePromptItems from "./Modals/MovePromptItems";
 
 export default function PromptFolderItem(props: {
   folder: IPromptFolderDocument;
@@ -80,7 +80,7 @@ export default function PromptFolderItem(props: {
         </Accordion.Panel>
       </Accordion.Item>
       {openMoveModal && (
-        <MovePromptFolders
+        <MovePromptItems
           opened={openMoveModal}
           setOpened={setOpenMoveModal}
           item={folder}
