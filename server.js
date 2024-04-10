@@ -118,6 +118,34 @@ app.prepare().then(() => {
       io.to(roomId).emit("deleteComment", comment);
       io.to(roomId).emit("deleteCommentInSection", comment);
     });
+
+    socket.on("changeInPrompt", (roomId, prompt) => {
+      console.log(
+        `User with ID: ${socket.id} changed prompt: ${prompt} in room: ${roomId}`
+      );
+      io.to(roomId).emit("fetchPrompts", prompt);
+    });
+
+    socket.on("changeInPersonalPrompt", (prompt) => {
+      console.log(
+        `User with ID: ${socket.id} changed prompt: ${prompt} in room: ${socket.id}`
+      );
+      io.to(socket.id).emit("fetchPrompts", prompt);
+    });
+
+    socket.on("changeInPromptFolder", (roomId, promptFolder) => {
+      console.log(
+        `User with ID: ${socket.id} changed prompt folder: ${promptFolder} in room: ${roomId}`
+      );
+      io.to(roomId).emit("fetchPromptFolders", promptFolder);
+    });
+
+    socket.on("changeInPersonalPromptFolder", (promptFolder) => {
+      console.log(
+        `User with ID: ${socket.id} changed prompt folder: ${promptFolder} in room: ${socket.id}`
+      );
+      io.to(socket.id).emit("fetchPromptFolders", promptFolder);
+    });
   });
 
   httpServer

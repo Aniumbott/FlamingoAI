@@ -83,17 +83,26 @@ const GeneralChats = (props: { members: any[] }) => {
       }
     };
 
-    fetchChats().then(() => fetchFolders());
+    const fetchChatsAndFolders = () => {
+      fetchChats().then(() => fetchFolders());
+    };
+
+    fetchChatsAndFolders();
 
     socket.on("newChat", (chat) => {
       // console.log("newChat", chat);
-      fetchChats().then(() => fetchFolders());
+      fetchChatsAndFolders();
     });
 
     socket.on("newChatFolder", (folder) => {
       // console.log("newChatFolder", folder);
-      fetchChats().then(() => fetchFolders());
+      fetchChatsAndFolders();
     });
+
+    return () => {
+      socket.off("newChat", fetchChatsAndFolders);
+      socket.off("newChatFolder", fetchChatsAndFolders);
+    };
   }, []);
 
   const handleSort = () => {
@@ -205,19 +214,13 @@ const AccordianLabel = (props: {
   setSort: (sort: string) => void;
 }) => {
   return (
-    <Group
-      wrap="nowrap"
-      justify="space-between"
-      grow
-      preventGrowOverflow={false}
-    >
+    <Group wrap="nowrap" justify="space-between">
       <Text size="sm" fw={600}>
         {props.title}
       </Text>
       <Group
         wrap="nowrap"
-        grow
-        gap={2}
+        gap={5}
         align="center"
         onClick={(event) => event.stopPropagation()}
       >
