@@ -36,6 +36,7 @@ import PromptFolderItem from "./PromptFolderItem";
 import PromptModal from "./Modals/PromptModal";
 import * as Mongoose from "mongoose";
 import { socket } from "@/socket";
+import { sortItems } from "@/app/controllers/chat";
 
 export type ModalControls = {
   setModalItem: (value: IPromptDocument | null) => void;
@@ -56,7 +57,9 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
     []
   );
   const { userId, orgId } = useAuth();
-  const [sort, setSort] = useState<string>("New");
+  const [systemSort, setSystemSort] = useState<string>("New");
+  const [publicSort, setPublicSort] = useState<string>("New");
+  const [privateSort, setPrivateSort] = useState<string>("New");
   const [openModal, setOpenModal] = useState(false);
   const [modalItem, setModalItem] = useState<IPromptDocument | null>(null);
   const [modalScope, setModalScope] = useState<"public" | "private" | "">("");
@@ -128,6 +131,27 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (systemPrompt.length > 0)
+      setSystemPrompt(sortItems(systemPrompt, systemSort));
+    if (systemFolder.length > 0)
+      setSystemFolder(sortItems(systemFolder, systemSort));
+  }, [systemSort]);
+
+  useEffect(() => {
+    if (publicPrompt.length > 0)
+      setPublicPrompt(sortItems(publicPrompt, publicSort));
+    if (publicFolder.length > 0)
+      setPublicFolder(sortItems(publicFolder, publicSort));
+  }, [publicSort]);
+
+  useEffect(() => {
+    if (personalPrompt.length > 0)
+      setPersonalPrompt(sortItems(personalPrompt, privateSort));
+    if (personalFolder.length > 0)
+      setPersonalFolder(sortItems(personalFolder, privateSort));
+  }, [privateSort]);
+
   return (
     <>
       <div className={style.activeTitle}>
@@ -155,8 +179,8 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
                 scope="system"
                 userId={userId || ""}
                 workspaceId={orgId || ""}
-                sort={sort}
-                setSort={setSort}
+                sort={systemSort}
+                setSort={setSystemSort}
               />
             </Accordion.Control>
             <AccordionPanel>
@@ -195,8 +219,8 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
                 scope="public"
                 userId={userId || ""}
                 workspaceId={orgId || ""}
-                sort={sort}
-                setSort={setSort}
+                sort={publicSort}
+                setSort={setPublicSort}
                 modalControls={modalControls}
               />
             </Accordion.Control>
@@ -255,8 +279,8 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
                 scope="private"
                 userId={userId || ""}
                 workspaceId={orgId || ""}
-                sort={sort}
-                setSort={setSort}
+                sort={privateSort}
+                setSort={setPrivateSort}
                 modalControls={modalControls}
               />
             </Accordion.Control>

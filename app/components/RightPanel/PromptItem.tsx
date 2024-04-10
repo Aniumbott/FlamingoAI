@@ -109,6 +109,7 @@ export default function PromptItem(props: {
                   setOpen={setMenuOpen}
                   setRename={setRename}
                   setMoveModal={setOpenMoveModal}
+                  modalControls={props.modalControls}
                 />
               </ActionIcon>
             ) : null

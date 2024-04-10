@@ -25,7 +25,6 @@ import { createChat } from "../../controllers/chat";
 import PeopleChats from "./PeopleChats";
 import RecentChats from "./RecentChats";
 import { socket } from "@/socket";
-import MoveChats from "./Modals/MoveItems";
 import FavouriteChats from "./FavouriteChats";
 import ArchivedChats from "./ArchivedChats";
 

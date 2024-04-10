@@ -54,7 +54,7 @@ const updatePromptFolder = async (id: string, body: any) => {
   if (response.promptFolder.scope === "public")
     socket.emit(
       "changeInPromptFolder",
-      response.promptFolderworkspaceId,
+      response.promptFolder.workspaceId,
       response.promptFolder
     );
   else socket.emit("changeInPersonalPromptFolder", response.promptFolder);
