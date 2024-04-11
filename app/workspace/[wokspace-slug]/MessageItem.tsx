@@ -100,8 +100,10 @@ function MessageItem(props: { message: any; participants: any[] }) {
             <div className="flex flex-row justify-between ">
               <div className="flex flex-row items-center ">
                 <Text size="md" fw={700}>
-                  {message.type == "user"
-                    ? createdBy?.firstName + createdBy?.lastName
+                  {message.type === "user"
+                    ? `${createdBy?.firstName || ""} ${
+                        createdBy?.lastName || ""
+                      }`
                     : "TeamGPT"}
                 </Text>
                 <Text pl={10} size="xs">

@@ -12,6 +12,11 @@ import {
   Group,
   Stack,
   Button,
+  Paper,
+  Title,
+  Combobox,
+  TextInput,
+  useCombobox,
 } from "@mantine/core";
 import {
   IconSearch,
@@ -66,6 +71,65 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
   const [modalParentFolder, setModalParentFolder] =
     useState<Mongoose.Types.ObjectId | null>(null);
 
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const combobox = useCombobox({
+    onDropdownClose: () => combobox.resetSelectedOption(),
+  });
+
+  const searchPromptsInFolders = (folders: any, searchTerm: string) => {
+    let results: any = [];
+    for (let folder of folders) {
+      if (folder.prompts) {
+        const matchedPrompts = folder.prompts.filter((prompt: any) =>
+          prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        results = results.concat(matchedPrompts);
+      }
+      if (folder.subfolders) {
+        results = results.concat(
+          searchPromptsInFolders(folder.subfolders, searchTerm)
+        );
+      }
+    }
+    return results;
+  };
+
+  const filteredSystemPrompt = systemPrompt.filter((prompt) =>
+    prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const filteredSystemFolderPrompts = searchPromptsInFolders(
+    systemFolder,
+    searchTerm
+  );
+  const combinedSystemPrompts = [
+    ...filteredSystemPrompt,
+    ...filteredSystemFolderPrompts,
+  ];
+
+  const filteredPublicPrompt = publicPrompt.filter((prompt) =>
+    prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const filterPublicFolderPrompts = searchPromptsInFolders(
+    publicFolder,
+    searchTerm
+  );
+  const combinedPublicPrompts = [
+    ...filteredPublicPrompt,
+    ...filterPublicFolderPrompts,
+  ];
+
+  const filteredPersonalPrompt = personalPrompt.filter((prompt) =>
+    prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const filterPersonalFolderPrompts = searchPromptsInFolders(
+    personalFolder,
+    searchTerm
+  );
+  const combinedPersonalPrompts = [
+    ...filteredPersonalPrompt,
+    ...filterPersonalFolderPrompts,
+  ];
+
   const modalControls: ModalControls = {
     setModalItem,
     setModalScope,
@@ -115,7 +179,6 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
       }
     };
 
-
     const fetchPromptsAndFolders = () => {
       fetchPrompts().then(() => fetchPromptFolders());
     };
@@ -161,11 +224,68 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
       </div>
       <Divider my="md" />
       <Stack gap={"sm"} p={"8px"}>
-        <Input
-          placeholder="Search Prompts..."
-          leftSection={<IconSearch size={16} />}
-          style={{ margin: "0 1rem" }}
-        />
+        <Combobox store={combobox}>
+          <Combobox.Target>
+            <TextInput
+              placeholder="Search Prompts..."
+              leftSection={<IconSearch size={16} />}
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onClick={() => combobox.openDropdown()}
+              onFocus={() => combobox.openDropdown()}
+              onBlur={() => combobox.closeDropdown()}
+            />
+          </Combobox.Target>
+          {searchTerm.length > 0 && (
+            <Combobox.Dropdown>
+              <Combobox.Options>
+                <ScrollArea.Autosize mah={200} type="scroll">
+                  {combinedSystemPrompts.length === 0 &&
+                    combinedPublicPrompts.length === 0 &&
+                    combinedPersonalPrompts.length === 0 && (
+                      <Combobox.Empty>Nothing found</Combobox.Empty>
+                    )}
+                  {combinedSystemPrompts.length > 0 && (
+                    <>
+                      <Text>System Prompts</Text>
+                      {combinedSystemPrompts.map((prompt, key) => (
+                        <PromptItem
+                          item={prompt}
+                          key={key}
+                          modalControls={modalControls}
+                        />
+                      ))}
+                    </>
+                  )}
+                  {combinedPublicPrompts.length > 0 && (
+                    <>
+                      <Text mt={5}>Workspace Prompts</Text>
+                      {combinedPublicPrompts.map((prompt, key) => (
+                        <PromptItem
+                          item={prompt}
+                          key={key}
+                          modalControls={modalControls}
+                        />
+                      ))}
+                    </>
+                  )}
+                  {combinedPersonalPrompts.length > 0 && (
+                    <>
+                      <Text mt={5}>Personal Prompts</Text>
+                      {combinedPersonalPrompts.map((prompt, key) => (
+                        <PromptItem
+                          item={prompt}
+                          key={key}
+                          modalControls={modalControls}
+                        />
+                      ))}
+                    </>
+                  )}
+                </ScrollArea.Autosize>
+              </Combobox.Options>
+            </Combobox.Dropdown>
+          )}
+        </Combobox>
 
         <Accordion
           chevronPosition="left"
@@ -185,7 +305,11 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
               />
             </Accordion.Control>
             <AccordionPanel>
-              <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
+              <ScrollArea.Autosize
+                mah="50vh"
+                scrollbarSize={10}
+                offsetScrollbars
+              >
                 {systemFolder?.map((folder, key) => (
                   <Accordion
                     chevronPosition="left"
@@ -209,7 +333,7 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
                     modalControls={modalControls}
                   />
                 ))}
-              </ScrollArea>
+              </ScrollArea.Autosize>
             </AccordionPanel>
           </Accordion.Item>
 
@@ -226,7 +350,11 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
               />
             </Accordion.Control>
             <AccordionPanel>
-              <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
+              <ScrollArea.Autosize
+                mah="50vh"
+                scrollbarSize={10}
+                offsetScrollbars
+              >
                 <Button
                   variant="default"
                   style={{
@@ -269,7 +397,7 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
                     modalControls={modalControls}
                   />
                 ))}
-              </ScrollArea>
+              </ScrollArea.Autosize>
             </AccordionPanel>
           </Accordion.Item>
 
@@ -286,7 +414,11 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
               />
             </Accordion.Control>
             <AccordionPanel>
-              <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
+              <ScrollArea.Autosize
+                mah="50vh"
+                scrollbarSize={10}
+                offsetScrollbars
+              >
                 <Button
                   variant="default"
                   style={{
@@ -329,7 +461,7 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
                     modalControls={modalControls}
                   />
                 ))}
-              </ScrollArea>
+              </ScrollArea.Autosize>
             </AccordionPanel>
           </Accordion.Item>
         </Accordion>
