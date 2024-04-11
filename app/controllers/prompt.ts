@@ -55,6 +55,23 @@ const getPrompts = async (
   return response;
 };
 
+const getAllPrompts = async (
+  workspaceId: string,
+  createdBy: string
+) => {
+  const data = await fetch(
+    `/api/prompt/?workspaceId=${workspaceId}&createdBy=${createdBy}&id=all`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const response = await data.json();
+  return response;
+};
+
 const updatePrompt = async (id: string, body: any) => {
   const data = await fetch(`/api/prompt`, {
     method: "PUT",
@@ -90,4 +107,4 @@ const deletePrompt = async (prompt: IPromptDocument) => {
   return response;
 };
 
-export { createPrompt, getPrompts, updatePrompt, deletePrompt };
+export { createPrompt, getPrompts, getAllPrompts, updatePrompt, deletePrompt };

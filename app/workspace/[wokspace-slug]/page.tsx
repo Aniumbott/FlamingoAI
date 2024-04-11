@@ -148,12 +148,12 @@ const Workspace = () => {
                 marginLeft: "-15px",
               }}
             >
-              <div className="max-h-[50px]">
+              {/* <div className="max-h-[50px]">
                 <NavigationBar
                   leftOpened={leftOpened}
                   toggleLeft={toggleLeft}
                 />
-              </div>
+              </div> */}
               <div className="grow">
                 {pathname?.split("/")[3] ? (
                   <ChatWindow currentChatId={currentChatId} />

@@ -39,6 +39,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const scope = reqParam.get("scope");
     const workspaceId = reqParam.get("workspaceId");
     const createdBy = reqParam.get("createdBy");
+    const id = reqParam.get("id");
     let prompts;
 
     if (scope === "public" && workspaceId) {
@@ -58,6 +59,14 @@ export async function GET(req: NextRequest, res: NextResponse) {
       prompts = await Prompt.find({
         scope: scope,
         parentFolder: null,
+      }).sort({ updatedAt: -1 });
+    } else if (id === "all" && workspaceId && createdBy) {
+      prompts = await Prompt.find({
+        $or: [
+          { scope: "system" },
+          { scope: "public", workspaceId: workspaceId },
+          { scope: "private", createdBy: createdBy , workspaceId: workspaceId },
+        ],
       }).sort({ updatedAt: -1 });
     }
 
