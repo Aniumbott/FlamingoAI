@@ -6,6 +6,7 @@ import {
   ScrollArea,
   Text,
   Title,
+  Select,
 } from "@mantine/core";
 import style from "./RightPanel.module.css";
 import { useEffect, useState } from "react";
@@ -22,7 +23,7 @@ import { socket } from "@/socket";
 
 export default function Comments(props: { toggleRight: () => void }) {
   const { toggleRight } = props;
-  const [filter, toggle] = useToggle(["all", "resolved", "unresolved"]);
+  const [filter, setFilter] = useState("all");
   const [isMentions, setIsMentions] = useState(false);
   const [comments, setComments] = useState<any[]>([]);
   const { organization } = useOrganization();
@@ -131,31 +132,19 @@ export default function Comments(props: { toggleRight: () => void }) {
       </div>
       <Divider my="md" />
       <div className="flex flex-row justify-between">
-        <Button
-          leftSection={
-            filter === "unresolved" ? (
-              <IconCircleDot size="16px" />
-            ) : (
-              <IconCircleCheck size="16px" />
-            )
-          }
-          size="sm"
-          radius="md"
+        <Select
+          variant="filled"
+          color="teal"
           w="48%"
-          variant={filter === "all" ? "light" : "filled"}
-          color={
-            filter === "all" ? "white" : filter == "resolved" ? "teal" : "red"
-          }
-          onClick={() => toggle()}
-        >
-          {
-            {
-              all: "Resolved",
-              resolved: "Resolved",
-              unresolved: "Unresolved",
-            }[filter]
-          }
-        </Button>
+          radius="md"
+          value={filter}
+          onChange={(value) => setFilter(value || "all")}
+          data={[
+            { value: "all", label: "All" },
+            { value: "resolved", label: "Resolved" },
+            { value: "unresolved", label: "Unresolved" },
+          ]}
+        ></Select>
 
         <Button
           leftSection={<IconAt size="16px" />}

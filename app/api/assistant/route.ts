@@ -4,14 +4,13 @@ import { NextRequest, NextResponse } from "next/server";
 // import get from workspace route
 import Workspace from "@/app/models/Workspace";
 
-export async function GET(req: NextRequest, res: NextApiResponse) {
+export async function POST(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
-    // console.log("req ------->", req);
-    const reqParam = req.nextUrl.searchParams;
-    const messages = reqParam.get("messages") || "";
-    const workspaceId = reqParam.get("workspaceId") || "";
-    const model = reqParam.get("model");
+    // console.log("req ------->", req);s
+    const body = await req.json();
+    const { messages, workspaceId, model } = body;
+    // console.log("ASSISTANT-------->", messages);
     const workspace = await getWorkspace(workspaceId);
     const apiKey = workspace?.toJSON().apiKey;
 
@@ -22,16 +21,18 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
           "Content-Type": "application/json",
           Authorization: `Bearer ${apiKey}`,
         },
-
         body: JSON.stringify({
           model: model,
-          messages: JSON.parse(messages),
+          messages: messages,
         }),
       })
     ).json();
+
+    // console.log("gptRes", gptRes);
+
     return NextResponse.json({ gptRes }, { status: 200 });
   } catch (error: any) {
-    console.log("error at GET in Assistant route", error);
+    console.log("error at POST in Assistant route", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }

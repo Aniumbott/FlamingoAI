@@ -25,6 +25,7 @@ import { getChat } from "@/app/controllers/chat";
 import { socket } from "@/socket";
 import { useScrollIntoView } from "@mantine/hooks";
 import { ICommentDocument } from "@/app/models/Comment";
+import ForkChatModal from "./ForkChatModal";
 
 export default function ChatWindow(props: { currentChatId: String }) {
   const { currentChatId } = props;
@@ -51,6 +52,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
   };
 
   useEffect(() => {
+    console.log("chat", chat);
     socket.on("newMessage", (msg) => {
       console.log("new message", msg);
       setChat({

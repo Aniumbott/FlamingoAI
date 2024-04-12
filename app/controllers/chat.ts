@@ -24,6 +24,38 @@ async function createChat(
   return response;
 }
 
+async function createChatFork(
+  messageId: String,
+  id: String,
+  workspaceId: String,
+  name: String,
+  scope: String,
+  createdBy: String,
+  isComments: Boolean
+) {
+  const data = await fetch("/api/chat", {
+    method: "POST",
+    body: JSON.stringify({
+      messageId,
+      id,
+      workspaceId,
+      name,
+      scope,
+      createdBy,
+      isComments,
+      action: "fork",
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const response = await data.json();
+
+  if (scope === "public") socket.emit("createChat", workspaceId, response.chat);
+  else socket.emit("createPersonalChat", response.chat);
+  return response;
+}
+
 async function getChat(id: String, workspaceId: String) {
   // console.log("collecting all chats");
   const data = await fetch(`/api/chat/?&workspaceId=${workspaceId}&id=${id}`, {
@@ -118,27 +150,6 @@ async function deleteChat(chat: IChatDocument) {
   return response;
 }
 
-// const sortItems = (items: any, sortType: string): any => {
-//   switch (sortType) {
-//     case "A-Z":
-//       return [...items].sort((a, b) => a.name.localeCompare(b.name));
-//     case "Z-A":
-//       return [...items].sort((a, b) => b.name.localeCompare(a.name));
-//     case "New":
-//       return [...items].sort(
-//         (a, b) =>
-//           new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-//       );
-//     case "Old":
-//       return [...items].sort(
-//         (a, b) =>
-//           new Date(a.updatedAt).getTime() - new Date(b.updatedAt).getTime()
-//       );
-//     default:
-//       return items;
-//   }
-// };
-
 const sortItems = (items: any, sortType: string): any => {
   let sortedItems;
   switch (sortType) {
@@ -176,6 +187,7 @@ const sortItems = (items: any, sortType: string): any => {
 
 export {
   createChat,
+  createChatFork,
   getChat,
   getIndependentChats,
   getAllChats,

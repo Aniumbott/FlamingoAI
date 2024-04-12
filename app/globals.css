@@ -16,19 +16,11 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
 }
-
-/* .modal-body {
-  background-color: transparent !important;
-} */
 
 .cl-internal-rx251b,
 .cl-internal-1ee916m {
