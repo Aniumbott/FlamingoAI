@@ -28,7 +28,8 @@ import { setRequestMeta } from "next/dist/server/request-meta";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { IPromptDocument } from "@/app/models/Prompt";
-import { deletePrompt } from "@/app/controllers/prompt";
+import { createPrompt, deletePrompt } from "@/app/controllers/prompt";
+import { ModalControls } from "../PromptPanel";
 
 export default function PromptFeatureMenu(props: {
   prompt: IPromptDocument;
@@ -36,6 +37,7 @@ export default function PromptFeatureMenu(props: {
   setOpen: (value: boolean) => void;
   setRename: (value: boolean) => void;
   setMoveModal: (value: boolean) => void;
+  modalControls: ModalControls;
 }) {
   const { userId, orgId } = useAuth();
   return (
@@ -86,10 +88,27 @@ export default function PromptFeatureMenu(props: {
           </Menu.Label>
           <Divider color={"#d8dce0"} my={2} />
 
-          <Menu.Item onClick={() => {}}>
+          <Menu.Item
+            onClick={() => {
+              props.modalControls.setModalItem(props.prompt);
+              props.modalControls.setOpenModal(true);
+            }}
+          >
             <MenuButton properties={MenuData[0]} />
           </Menu.Item>
-          <Menu.Item>
+          <Menu.Item
+            onClick={() => {
+              createPrompt(
+                "Copy of " + props.prompt.name,
+                props.prompt.content,
+                props.prompt.description,
+                props.prompt.scope,
+                props.prompt.parentFolder,
+                userId || "",
+                orgId || ""
+              );
+            }}
+          >
             <MenuButton properties={MenuData[1]} />
           </Menu.Item>
           <Menu.Item onClick={() => props.setMoveModal(true)}>

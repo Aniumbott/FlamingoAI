@@ -5,14 +5,19 @@ import {
   AccordionControl,
   AccordionPanel,
   ActionIcon,
+  Combobox,
   Group,
   ScrollArea,
+  Stack,
   Text,
+  TextInput,
+  useCombobox,
 } from "@mantine/core";
 import {
   IconCaretRightFilled,
   IconFolderPlus,
   IconPlus,
+  IconSearch,
 } from "@tabler/icons-react";
 
 // Components
@@ -53,6 +58,53 @@ const GeneralChats = (props: { members: any[] }) => {
   );
   const { userId, orgId } = useAuth();
   const [sort, setSort] = useState<string>("New");
+
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const combobox = useCombobox({
+    onDropdownClose: () => combobox.resetSelectedOption(),
+  });
+
+  const searchChatsInFolders = (folders: any, searchTerm: string) => {
+    let results: any = [];
+    for (let folder of folders) {
+      if (folder.chats) {
+        const matchedChats = folder.chats.filter((chat: any) =>
+          chat.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+        results = results.concat(matchedChats);
+      }
+      if (folder.subfolders) {
+        results = results.concat(
+          searchChatsInFolders(folder.subfolders, searchTerm)
+        );
+      }
+    }
+    return results;
+  };
+
+  const filteredPublicChat = publicChats.filter((chat) =>
+    chat.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const filteredPublicFolderChats = searchChatsInFolders(
+    publicFolders,
+    searchTerm
+  );
+  const combinedFilteredPublicChats = [
+    ...filteredPublicChat,
+    ...filteredPublicFolderChats,
+  ];
+
+  const filteredPrivateChat = privateChats.filter((chat) =>
+    chat.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+  const filteredPrivateFolderChats = searchChatsInFolders(
+    privateFolders,
+    searchTerm
+  );
+  const combinedFilteredPrivateChats = [
+    ...filteredPrivateChat,
+    ...filteredPrivateFolderChats,
+  ];
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -122,86 +174,135 @@ const GeneralChats = (props: { members: any[] }) => {
   }, [sort]);
 
   return (
-    // <ScrollArea scrollbarSize={3} pb={"10"}>
-    <Accordion
-      chevronPosition="left"
-      className={style.parent}
-      classNames={{ chevron: style.chevron }}
-      chevron={<IconCaretRightFilled className={style.icon} />}
-    >
-      <Accordion.Item value={"SHARED"} key={"SHARED"}>
-        <Accordion.Control>
-          <AccordianLabel
-            title={"SHARED"}
-            scope="public"
-            userId={userId || ""}
-            workspaceId={orgId || ""}
-            sort={sort}
-            setSort={setSort}
+    <Stack gap={"sm"}>
+      <Combobox store={combobox} onOptionSubmit={(val)=>{
+        combobox.closeDropdown();
+        setSearchTerm("");
+      }}>
+        <Combobox.Target>
+          <TextInput
+            placeholder="Search Chats..."
+            leftSection={<IconSearch size={16} />}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onClick={() => combobox.openDropdown()}
+            onFocus={() => combobox.openDropdown()}
+            onBlur={() => combobox.closeDropdown()}
           />
-        </Accordion.Control>
-        <AccordionPanel>
-          <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
-            {publicFolders?.map((folder, key) => (
-              <Accordion
-                chevronPosition="left"
-                classNames={{ chevron: style.chevron }}
-                chevron={<IconCaretRightFilled className={style.icon} />}
-                key={key}
-              >
-                <FolderItem
-                  folder={folder}
-                  scope={"public"}
-                  members={members}
-                  userId={userId || ""}
-                  workspaceId={orgId || ""}
-                />
-              </Accordion>
-            ))}
-            {publicChats?.map((chat, key) => (
-              <ChatItem item={chat} key={key} members={members} />
-            ))}
-          </ScrollArea>
-        </AccordionPanel>
-      </Accordion.Item>
+        </Combobox.Target>
+        {searchTerm.length > 0 && (
+          <Combobox.Dropdown>
+            <Combobox.Options>
+              <ScrollArea.Autosize mah={200} type="scroll">
+                {combinedFilteredPublicChats.length === 0 &&
+                  combinedFilteredPrivateChats.length === 0 && (
+                    <Combobox.Empty>Nothing found</Combobox.Empty>
+                  )}
+                {combinedFilteredPublicChats.length > 0 && (
+                  <>
+                    <Text fw={500}>Shared Chats</Text>
+                    {combinedFilteredPublicChats.map((chat, key) => (
+                      <Combobox.Option key={key} value={chat._id}>
+                      <ChatItem item={chat} members={members} />
+                      </Combobox.Option>
+                    ))}
+                  </>
+                )}
+                {combinedFilteredPrivateChats.length > 0 && (
+                  <>
+                    <Text mt={5}>Personal Chats</Text>
+                    {combinedFilteredPrivateChats.map((chat, key) => (
+                      <Combobox.Option key={key} value={chat._id}>
+                      <ChatItem item={chat} members={members} />
+                      </Combobox.Option>
+                    ))}
+                  </>
+                )}
+              </ScrollArea.Autosize>
+            </Combobox.Options>
+          </Combobox.Dropdown>
+        )}
+      </Combobox>
 
-      <Accordion.Item value={"PERSONAL"} key={"PERSONAL"}>
-        <AccordionControl>
-          <AccordianLabel
-            title={"PERSONAL"}
-            scope="private"
-            userId={userId || ""}
-            workspaceId={orgId || ""}
-            sort={sort}
-            setSort={setSort}
-          />
-        </AccordionControl>
-        <AccordionPanel>
-          <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
-            {privateFolders?.map((folder, key) => (
-              <Accordion
-                chevronPosition="left"
-                classNames={{ chevron: style.chevron }}
-                chevron={<IconCaretRightFilled className={style.icon} />}
-                key={key}
-              >
-                <FolderItem
-                  folder={folder}
-                  scope={"private"}
-                  members={members}
-                  userId={userId || ""}
-                  workspaceId={orgId || ""}
-                />
-              </Accordion>
-            ))}
-            {privateChats?.map((chat, key) => (
-              <ChatItem item={chat} key={key} members={members} />
-            ))}
-          </ScrollArea>
-        </AccordionPanel>
-      </Accordion.Item>
-    </Accordion>
-    // </ScrollArea>
+      <Accordion
+        chevronPosition="left"
+        className={style.parent}
+        classNames={{ chevron: style.chevron }}
+        chevron={<IconCaretRightFilled className={style.icon} />}
+      >
+        <Accordion.Item value={"SHARED"} key={"SHARED"}>
+          <Accordion.Control>
+            <AccordianLabel
+              title={"SHARED"}
+              scope="public"
+              userId={userId || ""}
+              workspaceId={orgId || ""}
+              sort={sort}
+              setSort={setSort}
+            />
+          </Accordion.Control>
+          <AccordionPanel>
+            <ScrollArea.Autosize mah="50vh" scrollbarSize={10} offsetScrollbars>
+              {publicFolders?.map((folder, key) => (
+                <Accordion
+                  chevronPosition="left"
+                  classNames={{ chevron: style.chevron }}
+                  chevron={<IconCaretRightFilled className={style.icon} />}
+                  key={key}
+                >
+                  <FolderItem
+                    folder={folder}
+                    scope={"public"}
+                    members={members}
+                    userId={userId || ""}
+                    workspaceId={orgId || ""}
+                  />
+                </Accordion>
+              ))}
+              {publicChats?.map((chat, key) => (
+                <ChatItem item={chat} key={key} members={members} />
+              ))}
+            </ScrollArea.Autosize>
+          </AccordionPanel>
+        </Accordion.Item>
+
+        <Accordion.Item value={"PERSONAL"} key={"PERSONAL"}>
+          <AccordionControl>
+            <AccordianLabel
+              title={"PERSONAL"}
+              scope="private"
+              userId={userId || ""}
+              workspaceId={orgId || ""}
+              sort={sort}
+              setSort={setSort}
+            />
+          </AccordionControl>
+          <AccordionPanel>
+            <ScrollArea.Autosize mah="50vh" scrollbarSize={10} offsetScrollbars>
+              {privateFolders?.map((folder, key) => (
+                <Accordion
+                  chevronPosition="left"
+                  classNames={{ chevron: style.chevron }}
+                  chevron={<IconCaretRightFilled className={style.icon} />}
+                  key={key}
+                >
+                  <FolderItem
+                    folder={folder}
+                    scope={"private"}
+                    members={members}
+                    userId={userId || ""}
+                    workspaceId={orgId || ""}
+                  />
+                </Accordion>
+              ))}
+              {privateChats?.map((chat, key) => (
+                <ChatItem item={chat} key={key} members={members} />
+              ))}
+            </ScrollArea.Autosize>
+          </AccordionPanel>
+        </Accordion.Item>
+      </Accordion>
+    </Stack>
   );
 };
 

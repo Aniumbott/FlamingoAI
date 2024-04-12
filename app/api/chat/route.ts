@@ -195,19 +195,67 @@ export async function PUT(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
-    console.log("body", body);
+    let chat;
+    const { id, targetFolderId, parentFolderId, newScope } = body;
 
-    const chat = await Chat.findByIdAndUpdate(body.id, body, {
-      new: true,
-    }).populate({
-      path: "messages",
-      populate: {
-        path: "comments",
-        populate: {
-          path: "replies",
+    if (id && targetFolderId && parentFolderId) {
+      // If the chat currently has a parent folder, remove it from the parent folder's chats
+      if (parentFolderId !== "null") {
+        await ChatFolder.findByIdAndUpdate(parentFolderId, {
+          $pull: { chats: id },
+        });
+      }
+
+      // If the target folder id is not "null", add the chat to the target folder's chats
+      if (targetFolderId !== "public" && targetFolderId !== "private") {
+        await ChatFolder.findByIdAndUpdate(targetFolderId, {
+          $push: { chats: id },
+        });
+      }
+
+      // Update the chat's parentFolder
+      chat = await Chat.findByIdAndUpdate(
+        id,
+        {
+          parentFolder:
+            targetFolderId === "public" || targetFolderId === "private"
+              ? null
+              : targetFolderId,
         },
-      },
-    });
+        {
+          new: true,
+        }
+      );
+
+      if (newScope) {
+        // If newScope is not null, update the scope of all messages in the chat
+        await Chat.findByIdAndUpdate(id, { scope: newScope });
+        await Message.updateMany({ chat: id }, { scope: newScope });
+      }
+
+      chat = await chat?.populate({
+        path: "messages",
+        populate: {
+          path: "comments",
+          populate: {
+            path: "replies",
+          },
+        },
+      });
+      
+    } else {
+      chat = await Chat.findByIdAndUpdate(body.id, body, {
+        new: true,
+      }).populate({
+        path: "messages",
+        populate: {
+          path: "comments",
+          populate: {
+            path: "replies",
+          },
+        },
+      });
+    }
 
     return NextResponse.json({ chat }, { status: 200 });
   } catch (error: any) {

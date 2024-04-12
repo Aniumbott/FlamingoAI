@@ -21,12 +21,8 @@ import {
   IconArchive,
 } from "@tabler/icons-react";
 import { useHover } from "@mantine/hooks";
-import { createChatFolder } from "@/app/controllers/folders";
 import { createChat, deleteChat, updateChat } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
-import { setRequestMeta } from "next/dist/server/request-meta";
-import MoveChats from "../Modals/MoveItems";
-import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 
 export default function ChatFeatureMenu(props: {

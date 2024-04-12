@@ -17,22 +17,33 @@ import {
 } from "@/app/controllers/folders";
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
 import { useAuth } from "@clerk/nextjs";
-import FolderAccordian from "./FolderAccordian";
+import FolderAccordian from "../../LeftPanel/Modals/FolderAccordian";
 import style from "../../RightPanel/RightPanel.module.css";
 import { IconCaretRightFilled } from "@tabler/icons-react";
 import { IChatDocument } from "@/app/models/Chat";
 import * as Mongoose from "mongoose";
 import { socket } from "@/socket";
 import { updateChat } from "@/app/controllers/chat";
+import { IPromptFolderDocument } from "@/app/models/PromptFolder";
+import {
+  createPromptFolder,
+  getPromptFolders,
+  updatePromptFolder,
+} from "@/app/controllers/promptFolder";
+import MoveFolderAccordian from "./MoveFolderAccordian";
+import { updatePrompt } from "@/app/controllers/prompt";
+import { IPromptDocument } from "@/app/models/Prompt";
 
-const MoveItems = (props: {
+const MovePromptItems = (props: {
   opened: boolean;
   setOpened: (value: boolean) => void;
-  item: IChatDocument | IChatFolderDocument;
+  item: IPromptFolderDocument | IPromptDocument;
 }) => {
   const { opened, setOpened, item } = props;
-  const [publicFolders, setPublicFolders] = useState<IChatFolderDocument[]>([]);
-  const [privateFolders, setPrivateFolders] = useState<IChatFolderDocument[]>(
+  const [publicFolders, setPublicFolders] = useState<IPromptFolderDocument[]>(
+    []
+  );
+  const [privateFolders, setPrivateFolders] = useState<IPromptFolderDocument[]>(
     []
   );
   const { userId, orgId } = useAuth();
@@ -47,15 +58,26 @@ const MoveItems = (props: {
   const fetchFolders = async () => {
     try {
       setPublicFolders(
-        (await getChatFolders("public", userId || "", orgId || "")).chatFolder
+        (await getPromptFolders(orgId || "", "public", userId || ""))
+          .promptFolders
       );
       setPrivateFolders(
-        (await getChatFolders("private", userId || "", orgId || "")).chatFolder
+        (await getPromptFolders(orgId || "", "private", userId || ""))
+          .promptFolders
       );
     } catch (error) {
       console.error("Failed to fetch folders:", error);
     }
   };
+
+  // useEffect(() => {
+  //   console.log(
+  //     "publicFolder ",
+  //     publicFolders,
+  //     "privateFolder ",
+  //     privateFolders
+  //   );
+  // }, [publicFolders, privateFolders]);
 
   const handleBreadcrumb = (value: string | null) => {
     if (value === null) {
@@ -73,8 +95,8 @@ const MoveItems = (props: {
 
   const searchFolder = (id: string) => {
     const search = (
-      folders: IChatFolderDocument[]
-    ): IChatFolderDocument | undefined => {
+      folders: IPromptFolderDocument[]
+    ): IPromptFolderDocument | undefined => {
       for (let folder of folders) {
         if (folder._id === id) {
           return folder;
@@ -82,7 +104,7 @@ const MoveItems = (props: {
 
         if (folder.subFolders && folder.subFolders.length > 0) {
           const foundFolder = search(
-            folder.subFolders as IChatFolderDocument[]
+            folder.subFolders as IPromptFolderDocument[]
           );
           if (foundFolder) {
             return foundFolder;
@@ -96,9 +118,9 @@ const MoveItems = (props: {
 
     return search(privateFolders);
   };
-
   useEffect(() => {
     fetchFolders();
+    // console.log(opened, item);
     // socket.on("newChatFolder", (folder) => {
     //   console.log("new folder created");
     //   fetchFolders();
@@ -114,7 +136,7 @@ const MoveItems = (props: {
       withCloseButton={false}
     >
       <Stack gap={"sm"} p={"sm"}>
-        <Title order={3}>{`Move "${item.name}"`}</Title>
+        <Title order={3}>Move &qout;{item.name}&quot;</Title>
         <Stack gap={"md"} p={"sm"}>
           <div className="flex gap-2">
             Current Location:
@@ -137,7 +159,7 @@ const MoveItems = (props: {
                 ? { variant: "outline" }
                 : { variant: "subtle" })}
             >
-              SHARED
+              WORKSPACE
             </Button>
             <Button
               color={"teal"}
@@ -163,8 +185,8 @@ const MoveItems = (props: {
                 chevron={<IconCaretRightFilled className={style.icon} />}
                 onChange={(value) => handleBreadcrumb(value)}
               >
-                {publicFolders.map((folder, subIndex) => (
-                  <FolderAccordian
+                {publicFolders?.map((folder, subIndex) => (
+                  <MoveFolderAccordian
                     folder={folder}
                     breadcrumb={breadcrumb}
                     setBreadcrumb={setBreadcrumb}
@@ -181,8 +203,8 @@ const MoveItems = (props: {
                 chevron={<IconCaretRightFilled className={style.icon} />}
                 onChange={(value) => handleBreadcrumb(value)}
               >
-                {privateFolders.map((folder, subIndex) => (
-                  <FolderAccordian
+                {privateFolders?.map((folder, subIndex) => (
+                  <MoveFolderAccordian
                     folder={folder}
                     breadcrumb={breadcrumb}
                     setBreadcrumb={setBreadcrumb}
@@ -244,7 +266,7 @@ const createNewFolder = async (
 ) => {
   const id = breadcrumb[breadcrumb.length - 1].id;
   if (id !== "null") {
-    await createChatFolder(
+    await createPromptFolder(
       selectedTab,
       breadcrumb[breadcrumb.length - 1]
         .id as unknown as Mongoose.Types.ObjectId,
@@ -252,14 +274,14 @@ const createNewFolder = async (
       orgId || ""
     );
   } else {
-    await createChatFolder(selectedTab, null, userId || "", orgId || "");
+    await createPromptFolder(selectedTab, null, userId || "", orgId || "");
   }
 };
 
 const moveItem = async (
   currentItem: any,
   breadcrumb: any,
-  searchFolder: (id: string) => IChatFolderDocument | undefined
+  searchFolder: (id: string) => IPromptFolderDocument | undefined
 ) => {
   const targetFolderId =
     breadcrumb[breadcrumb.length - 1].id === "null"
@@ -281,6 +303,7 @@ const moveItem = async (
     const targetFolder = searchFolder(targetFolderId);
     targetScope = targetFolder?.scope;
   }
+
   // Check if the scopes of the current and target folders are different
   if (currentItem?.scope !== targetScope) {
     // If they are, show a confirmation dialog
@@ -293,15 +316,14 @@ const moveItem = async (
       return;
     }
   }
-
-  if (currentItem.messages) {
-    await updateChat(currentItem._id, {
+  if (currentItem.prompts) {
+    await updatePromptFolder(currentItem._id, {
       targetFolderId: targetFolderId,
       parentFolderId: parentFolderId,
       newScope: newScope,
     });
   } else {
-    await updateChatFolders(currentItem._id, {
+    await updatePrompt(currentItem._id, {
       targetFolderId: targetFolderId,
       parentFolderId: parentFolderId,
       newScope: newScope,
@@ -309,4 +331,4 @@ const moveItem = async (
   }
 };
 
-export default MoveItems;
+export default MovePromptItems;

@@ -85,9 +85,47 @@ export async function PUT(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
-    const chatFolder = await ChatFolder.findByIdAndUpdate(body.id, body, {
-      new: true,
-    });
+    let chatFolder;
+    const { id, targetFolderId, parentFolderId, newScope } = body;
+
+    if (id && targetFolderId && parentFolderId) {
+      // If the chat folder currently has a parent folder, remove it from the parent folder's subFolders
+      if (parentFolderId !== "null") {
+        await ChatFolder.findByIdAndUpdate(parentFolderId, {
+          $pull: { subFolders: id },
+        });
+      }
+
+      // If the target folder id is not "null", add the chat folder to the target folder's subFolders
+      if (targetFolderId !== "public" && targetFolderId !== "private") {
+        await ChatFolder.findByIdAndUpdate(targetFolderId, {
+          $push: { subFolders: id },
+        });
+      }
+
+      // Update the chat folder's parentFolder
+      chatFolder = await ChatFolder.findByIdAndUpdate(
+        id,
+        {
+          parentFolder:
+            targetFolderId === "public" || targetFolderId === "private"
+              ? null
+              : targetFolderId,
+        },
+        {
+          new: true,
+        }
+      );
+
+      // Update the scope of all sub-folders and chats of the chat folder
+      if (newScope) {
+        await updateScope(id, newScope);
+      }
+    } else {
+      chatFolder = await ChatFolder.findByIdAndUpdate(body.id, body, {
+        new: true,
+      });
+    }
     return NextResponse.json({ chatFolder }, { status: 200 });
   } catch (error: any) {
     // console.log("error at PUT in Chatfolder route", error);
@@ -157,4 +195,26 @@ async function populateSubFolders(folder: any) {
     });
   }
   return folder;
+}
+
+async function updateScope(folderId: any, newScope: any) {
+  // Fetch the folder from the database
+  const folder = await ChatFolder.findById(folderId);
+
+  // Update the scope of the folder
+  await ChatFolder.findByIdAndUpdate(folderId, { scope: newScope });
+
+  // Update the scope of each chat in the folder
+  if (folder?.chats && folder.chats.length > 0) {
+    for (let chatId of folder.chats) {
+      await Chat.findByIdAndUpdate(chatId, { scope: newScope });
+    }
+  }
+
+  // Recursively update the scope of each subfolder
+  if (folder?.subFolders && folder.subFolders.length > 0) {
+    for (let subfolderId of folder.subFolders) {
+      await updateScope(subfolderId, newScope);
+    }
+  }
 }

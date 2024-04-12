@@ -8,10 +8,12 @@ import {
   Avatar,
   Group,
   ScrollArea,
+  Stack,
   Text,
+  TextInput,
   ThemeIcon,
 } from "@mantine/core";
-import { IconCaretRightFilled } from "@tabler/icons-react";
+import { IconCaretRightFilled, IconSearch } from "@tabler/icons-react";
 
 // Compontets
 import ChatItem from "./ChatItem";
@@ -26,6 +28,14 @@ const PeopleChats = (props: { members: any[] }) => {
   const { members } = props;
   const [allChats, setAllChats] = useState<IChatDocument[]>([]);
   const { userId, orgId } = useAuth();
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const filteredMembers = members.filter((member) => {
+    return (
+      member.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      member.lastName.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  });
 
   useEffect(() => {
     const fetchAllChats = async () => {
@@ -42,58 +52,35 @@ const PeopleChats = (props: { members: any[] }) => {
   }, []);
 
   return (
-    <ScrollArea h="50vh" scrollbarSize={3} pb={"10"}>
-      {members.length > 0 && (
-        <Accordion
-          chevronPosition="left"
-          className={style.parent}
-          classNames={{ chevron: style.chevron }}
-          chevron={<IconCaretRightFilled className={style.icon} />}
-          variant="default"
-        >
-          {allChats.length > 0 &&
-            members.map((user: any) => (
-              <UserAccordionItem
-                user={user}
-                allChats={allChats}
-                members={members}
-                key={user.userId}
-              />
-            ))}
-          {/* {members.map((user: any) => {
-            const [sort, setSort] = useState<string>("New");
-
-            const filteredChats = allChats?.filter((chat) =>
-              chat.participants.includes(user.userId)
-            );
-            const sortedChats = sortItems(filteredChats, sort);
-            return (
-              <Accordion.Item
-                value={user.userId}
-                key={user.userId}
-                style={{
-                  borderBottom: "2px solid yello",
-                }}
-              >
-                <Accordion.Control className={style.accordionControl}>
-                  <AccordianLabel
-                    user={user}
-                    chatCount={sortedChats.length}
-                    sort={sort}
-                    setSort={setSort}
-                  />
-                </Accordion.Control>
-                <AccordionPanel>
-                  {sortedChats.map((chat: IChatDocument, key: any) => (
-                    <ChatItem item={chat} key={key} members={members} />
-                  ))}
-                </AccordionPanel>
-              </Accordion.Item>
-            );
-          })} */}
-        </Accordion>
-      )}
-    </ScrollArea>
+    <Stack gap={"sm"}>
+      <TextInput
+        placeholder="Search Members..."
+        leftSection={<IconSearch size={16} />}
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
+      <ScrollArea h="50vh" scrollbarSize={3} pb={"10"}>
+        {filteredMembers.length > 0 && (
+          <Accordion
+            chevronPosition="left"
+            className={style.parent}
+            classNames={{ chevron: style.chevron }}
+            chevron={<IconCaretRightFilled className={style.icon} />}
+            variant="default"
+          >
+            {allChats.length > 0 &&
+              filteredMembers.map((user: any) => (
+                <UserAccordionItem
+                  user={user}
+                  allChats={allChats}
+                  members={members}
+                  key={user.userId}
+                />
+              ))}
+          </Accordion>
+        )}
+      </ScrollArea>
+    </Stack>
   );
 };
 
@@ -108,11 +95,9 @@ const UserAccordionItem = (props: {
   const [sortedChats, setSortedChats] = useState<IChatDocument[]>([]);
 
   useEffect(() => {
-    console.log("useeffect at people");
     const filteredChats = allChats?.filter((chat) =>
       chat.participants.includes(user.userId)
     );
-    console.log("filteredChats", filteredChats);
     setSortedChats(filteredChats);
   }, [allChats, user]);
 

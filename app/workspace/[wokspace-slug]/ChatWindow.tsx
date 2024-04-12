@@ -14,6 +14,8 @@ import {
   useMantineColorScheme,
   Stack,
   Box,
+  Combobox,
+  useCombobox,
 } from "@mantine/core";
 import { IconSend } from "@tabler/icons-react";
 import { useOrganization, useUser } from "@clerk/nextjs";
@@ -26,6 +28,9 @@ import { socket } from "@/socket";
 import { useScrollIntoView } from "@mantine/hooks";
 import { ICommentDocument } from "@/app/models/Comment";
 import ForkChatModal from "./ForkChatModal";
+import { getAllPrompts } from "@/app/controllers/prompt";
+import { IPromptDocument } from "@/app/models/Prompt";
+import PromptItem from "@/app/components/RightPanel/PromptItem";
 
 export default function ChatWindow(props: { currentChatId: String }) {
   const { currentChatId } = props;
@@ -45,6 +50,18 @@ export default function ChatWindow(props: { currentChatId: String }) {
     HTMLDivElement,
     HTMLDivElement
   >();
+  const [prompts, setPrompts] = useState<IPromptDocument[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const combobox = useCombobox({
+    onDropdownClose: () => combobox.resetSelectedOption(),
+  });
+  const filteredPrompts = prompts?.filter((prompt) => {
+    return prompt.name.toLowerCase().includes(searchTerm.toLowerCase());
+  });
+
+  useEffect(() => {
+    console.log("filteredPrompts", filteredPrompts);
+  }, [filteredPrompts]);
 
   const updateParticipants = () => {
     if (chat.participants.includes(user?.id)) return chat.participants;
@@ -181,6 +198,10 @@ export default function ChatWindow(props: { currentChatId: String }) {
       getCurrentChat().then((res) => {
         setChat(res.chats[0]);
       });
+      getAllPrompts(organization?.id || "", user?.id || "").then((res) => {
+        console.log("prompts", res.prompts);
+        setPrompts(res.prompts);
+      });
     }
   }, [currentChatId]);
 
@@ -230,25 +251,65 @@ export default function ChatWindow(props: { currentChatId: String }) {
         <div ref={targetRef}></div>
       </Paper>
 
-      <div
-        className="w-full h-fit py-2 pb-4 flex justify-center items-center"
-        style={{
-          background:
-            colorScheme == "dark"
-              ? "var(--mantine-color-dark-8)"
-              : "var(--mantine-color-gray-0)",
+      <Combobox
+        store={combobox}
+        onOptionSubmit={(val) => {
+          combobox.closeDropdown();
+          setSearchTerm("");
         }}
+        position="top"
       >
-        <TextInput
-          variant="filled"
-          placeholder="Type a message"
-          w="75%"
-          size="lg"
-          radius="0"
-          value={messageInput}
-          onChange={(e) => setMessageInput(e.currentTarget.value)}
-          onKeyPress={(e) => {
-            if (e.key === "Enter") {
+        <div
+          className="w-full h-fit py-2 pb-4 flex justify-center items-center"
+          style={{
+            background:
+              colorScheme == "dark"
+                ? "var(--mantine-color-dark-8)"
+                : "var(--mantine-color-gray-0)",
+          }}
+        >
+          <Combobox.Target>
+            <TextInput
+              variant="filled"
+              placeholder="Type a message"
+              w="75%"
+              size="lg"
+              radius="0"
+              value={messageInput}
+              onChange={(e) => {
+                setMessageInput(e.currentTarget.value);
+                if (e.currentTarget.value.includes("/")) {
+                  // Set searchTerm with the value after "/"
+                  setSearchTerm(e.currentTarget.value.split("/").pop() ?? "");
+                  combobox.openDropdown();
+                } else {
+                  combobox.closeDropdown();
+                }
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !messageInput.includes("/")) {
+                  createMessage(
+                    user?.id || "",
+                    messageInput,
+                    "user",
+                    currentChatId
+                  ).then((res) => {
+                    sendAssistantMessage(
+                      res.message,
+                      chat.workspaceId,
+                      "gpt-3.5-turbo"
+                    );
+                    setMessageInput("");
+                  });
+                }
+              }}
+            />
+          </Combobox.Target>
+          <ActionIcon
+            size="50"
+            radius="0"
+            color="teal"
+            onClick={() => {
               createMessage(
                 user?.id || "",
                 messageInput,
@@ -262,33 +323,44 @@ export default function ChatWindow(props: { currentChatId: String }) {
                 );
                 setMessageInput("");
               });
-            }
-          }}
-        />
+            }}
+          >
+            <IconSend size="24" />
+          </ActionIcon>
+        </div>
 
-        <ActionIcon
-          size="50"
-          radius="0"
-          color="teal"
-          onClick={() => {
-            createMessage(
-              user?.id || "",
-              messageInput,
-              "user",
-              currentChatId
-            ).then((res) => {
-              sendAssistantMessage(
-                res.message,
-                chat.workspaceId,
-                "gpt-3.5-turbo"
-              );
-              setMessageInput("");
-            });
-          }}
-        >
-          <IconSend size="24" />
-        </ActionIcon>
-      </div>
+        <Combobox.Dropdown>
+          <Combobox.Options>
+            {/* <Text>Select Prompts</Text>
+            <Divider /> */}
+            <ScrollArea.Autosize mah={200} type="scroll">
+              {filteredPrompts.length > 0 ? (
+                filteredPrompts.map((prompt) => (
+                  <Combobox.Option
+                    key={prompt._id}
+                    value={prompt._id}
+                    onClick={() => {
+                      let newMessageInput = messageInput;
+                      if (newMessageInput.includes("/")) {
+                        newMessageInput = newMessageInput.substring(
+                          0,
+                          newMessageInput.lastIndexOf("/")
+                        );
+                      }
+                      setMessageInput(newMessageInput + prompt.content);
+                      setSearchTerm("");
+                    }}
+                  >
+                    <Text c={"white"}>{prompt.name}</Text>
+                  </Combobox.Option>
+                ))
+              ) : (
+                <Combobox.Empty>No prompts found</Combobox.Empty>
+              )}
+            </ScrollArea.Autosize>
+          </Combobox.Options>
+        </Combobox.Dropdown>
+      </Combobox>
     </Stack>
   );
 }
