@@ -41,6 +41,38 @@ async function createChat(
   }
 }
 
+async function createChatFork(
+  messageId: String,
+  id: String,
+  workspaceId: String,
+  name: String,
+  scope: String,
+  createdBy: String,
+  isComments: Boolean
+) {
+  const data = await fetch("/api/chat", {
+    method: "POST",
+    body: JSON.stringify({
+      messageId,
+      id,
+      workspaceId,
+      name,
+      scope,
+      createdBy,
+      isComments,
+      action: "fork",
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const response = await data.json();
+
+  if (scope === "public") socket.emit("createChat", workspaceId, response.chat);
+  else socket.emit("createPersonalChat", response.chat);
+  return response;
+}
+
 async function getChat(id: String, workspaceId: String) {
   try {
     const data = await fetch(
@@ -210,6 +242,7 @@ const sortItems = (items: any, sortType: string): any => {
 
 export {
   createChat,
+  createChatFork,
   getChat,
   getIndependentChats,
   getAllChats,

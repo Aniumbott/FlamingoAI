@@ -3,17 +3,21 @@ async function getAssistantResponse(
   workspaceId: string,
   model: string
 ) {
-  const data = await fetch(
-    `/api/assistant/?messages=${JSON.stringify(
-      messages
-    )}&workspaceId=${workspaceId}&model=${model}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const data = await fetch("/api/assistant", {
+    method: "POST",
+    body: JSON.stringify({
+      messages,
+      workspaceId,
+      model,
+    }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  console.log(messages);
+
+  console.log("data at getAssistantResponse", data);
 
   const response = await data.json();
   return response;

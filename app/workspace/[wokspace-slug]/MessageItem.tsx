@@ -32,6 +32,8 @@ import { useEffect, useState } from "react";
 import CommentItem from "./CommentItem";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import MentionInput from "./MentionInput";
+import ForkChatModal from "./ForkChatModal";
+import { MessageRender } from "./MessageRenderer";
 
 function getDate(date: string) {
   return new Date(date).toLocaleDateString();
@@ -45,6 +47,7 @@ function MessageItem(props: { message: any; participants: any[] }) {
   const [isEdit, setIsEdit] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentInput, setCommentInput] = useState("");
+  const [isForkModalOpen, setIsForkModalOpen] = useState(false);
   const { user } = useUser();
   const [createdBy, setCreatedBy] = useState<any>(null);
   const { organization } = useOrganization();
@@ -58,6 +61,11 @@ function MessageItem(props: { message: any; participants: any[] }) {
 
   return (
     <Box ref={ref}>
+      <ForkChatModal
+        isOpen={isForkModalOpen}
+        setIsOpen={setIsForkModalOpen}
+        message={message}
+      />
       <div
         className="w-full  py-10 flex justify-center items-start"
         style={{
@@ -90,11 +98,16 @@ function MessageItem(props: { message: any; participants: any[] }) {
                 />
               </Avatar>
             )}
-            {hovered && !isEdit && (
-              <ActionIcon color="grey" variant="subtle" mt="1rem">
+            {(hovered && !isEdit) || isForkModalOpen ? (
+              <ActionIcon
+                color="grey"
+                variant="subtle"
+                mt="1rem"
+                onClick={() => setIsForkModalOpen(true)}
+              >
                 <IconArrowFork style={{ width: rem(24), rotate: "180deg" }} />
               </ActionIcon>
-            )}
+            ) : null}
           </div>
           <div className="w-full ml-10 flex flex-col   ">
             <div className="flex flex-row justify-between ">
@@ -204,7 +217,8 @@ function MessageItem(props: { message: any; participants: any[] }) {
                 </ActionIcon>
               </div>
             ) : (
-              <Text size="md">{messageText}</Text>
+              // <Text size="md">{message.content}</Text>
+              <MessageRender>{message.content}</MessageRender>
             )}
             <div className="flex flex-row mt-2">
               <CopyButton value={String(message.content)} timeout={2000}>
