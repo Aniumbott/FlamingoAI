@@ -94,7 +94,7 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
     return results;
   };
 
-  const filteredSystemPrompt = systemPrompt.filter((prompt) =>
+  const filteredSystemPrompt = systemPrompt?.filter((prompt) =>
     prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const filteredSystemFolderPrompts = searchPromptsInFolders(
@@ -106,7 +106,7 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
     ...filteredSystemFolderPrompts,
   ];
 
-  const filteredPublicPrompt = publicPrompt.filter((prompt) =>
+  const filteredPublicPrompt = publicPrompt?.filter((prompt) =>
     prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const filterPublicFolderPrompts = searchPromptsInFolders(
@@ -118,7 +118,7 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
     ...filterPublicFolderPrompts,
   ];
 
-  const filteredPersonalPrompt = personalPrompt.filter((prompt) =>
+  const filteredPersonalPrompt = personalPrompt?.filter((prompt) =>
     prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const filterPersonalFolderPrompts = searchPromptsInFolders(
@@ -186,12 +186,10 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
     fetchPromptsAndFolders();
     fetchSystem();
 
-    socket.on("fetchPrompts", fetchPromptsAndFolders);
-    socket.on("fetchPromptFolders", fetchPromptsAndFolders);
+    socket.on("refreshPrompts", fetchPromptsAndFolders);
 
     return () => {
-      socket.off("fetchPrompts", fetchPrompts);
-      socket.off("fetchPromptFolders", fetchPromptFolders);
+      socket.off("refreshPrompts");
     };
   }, []);
 

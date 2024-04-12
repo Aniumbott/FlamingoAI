@@ -23,9 +23,13 @@ const FavouriteChats = (props: { members: any[] }) => {
       }
     };
     fetchAllChats();
-    socket.on("newChat", (chat) => {
+    socket.on("refreshChats", () => {
       fetchAllChats();
     });
+
+    return () => {
+      socket.off("refreshChats");
+    };
   }, []);
 
   const [favouriteChats, setFavouriteChats] = useState<IChatDocument[]>([]);

@@ -160,7 +160,6 @@ export default function ChatFeatureMenu(props: {
               </Menu.Item>
               <Menu.Item
                 onClick={() => {
-                  console.log("archiving chat");
                   updateChat(props.chat._id, {
                     archived: true,
                   }).then((res) => {

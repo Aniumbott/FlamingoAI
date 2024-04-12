@@ -44,33 +44,35 @@ app.prepare().then(() => {
     });
 
     // FOLDER
-    socket.on("createChatFolder", (roomId, folder) => {
+    // socket.on("updateChatFolder", (roomId, folder) => {
+    //   console.log(
+    //     `User with ID: ${socket.id} created folder: ${folder} in room: ${roomId}`
+    //   );
+    //   io.to(roomId).emit("refreshChats", folder);
+    // });
+
+    // socket.on("updatePersonalChatFolder", (folder) => {
+    //   console.log(
+    //     `User with ID: ${socket.id} created private folder: ${folder} to user: ${socket.id}`
+    //   );
+    //   io.to(socket.id).emit("refreshChats", folder);
+    // });
+
+    // Chat and ChatFolders
+    socket.on("updateChat", (roomId, item) => {
       console.log(
-        `User with ID: ${socket.id} created folder: ${folder} in room: ${roomId}`
+        `User with ID: ${socket.id} created chat: ${item} in room: ${roomId}`
       );
-      io.to(roomId).emit("newChatFolder", folder);
+      io.to(roomId).emit("refreshChats");
+    });
+    socket.on("updatePersonalChat", (item) => {
+      console.log(
+        `User with ID: ${socket.id} created private chat: ${item} to user: ${socket.id}`
+      );
+      io.to(socket.id).emit("refreshChats");
     });
 
-    socket.on("createPersonalChatFolder", (folder) => {
-      console.log(
-        `User with ID: ${socket.id} created private folder: ${folder} to user: ${socket.id}`
-      );
-      io.to(socket.id).emit("newChatFolder", folder);
-    });
-
-    // Chat
-    socket.on("createChat", (roomId, chat) => {
-      console.log(
-        `User with ID: ${socket.id} created chat: ${chat} in room: ${roomId}`
-      );
-      io.to(roomId).emit("newChat", chat);
-    });
-    socket.on("createPersonalChat", (chat) => {
-      console.log(
-        `User with ID: ${socket.id} created private chat: ${chat} to user: ${socket.id}`
-      );
-      io.to(socket.id).emit("newChat", chat);
-    });
+    
 
     // Message
     socket.on("createMessage", (roomId, message) => {
@@ -119,32 +121,19 @@ app.prepare().then(() => {
       io.to(roomId).emit("deleteCommentInSection", comment);
     });
 
-    socket.on("changeInPrompt", (roomId, prompt) => {
+    // Prompts and PromptFolders
+    socket.on("updatePrompt", (roomId, prompt) => {
       console.log(
         `User with ID: ${socket.id} changed prompt: ${prompt} in room: ${roomId}`
       );
-      io.to(roomId).emit("fetchPrompts", prompt);
+      io.to(roomId).emit("refreshPrompts", prompt);
     });
 
-    socket.on("changeInPersonalPrompt", (prompt) => {
+    socket.on("updatePersonalPrompt", (prompt) => {
       console.log(
         `User with ID: ${socket.id} changed prompt: ${prompt} in room: ${socket.id}`
       );
-      io.to(socket.id).emit("fetchPrompts", prompt);
-    });
-
-    socket.on("changeInPromptFolder", (roomId, promptFolder) => {
-      console.log(
-        `User with ID: ${socket.id} changed prompt folder: ${promptFolder} in room: ${roomId}`
-      );
-      io.to(roomId).emit("fetchPromptFolders", promptFolder);
-    });
-
-    socket.on("changeInPersonalPromptFolder", (promptFolder) => {
-      console.log(
-        `User with ID: ${socket.id} changed prompt folder: ${promptFolder} in room: ${socket.id}`
-      );
-      io.to(socket.id).emit("fetchPromptFolders", promptFolder);
+      io.to(socket.id).emit("refreshPrompts", prompt);
     });
   });
 

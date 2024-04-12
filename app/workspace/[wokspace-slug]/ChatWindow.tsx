@@ -58,9 +58,6 @@ export default function ChatWindow(props: { currentChatId: String }) {
     return prompt.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
-  useEffect(() => {
-    console.log("filteredPrompts", filteredPrompts);
-  }, [filteredPrompts]);
 
   const updateParticipants = () => {
     if (chat.participants.includes(user?.id)) return chat.participants;
@@ -174,7 +171,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
 
   useEffect(() => {
     scrollIntoView();
-  }, [chat.messages?.length]);
+  }, [chat?.messages?.length]);
 
   useEffect(() => {
     const fetchParticipants = async () => {
@@ -194,14 +191,19 @@ export default function ChatWindow(props: { currentChatId: String }) {
         return await getChat(currentChatId, organization?.id || "");
       };
       getCurrentChat().then((res) => {
-        setChat(res.chats[0]);
+        setChat(res.chats?.[0]);
       });
       getAllPrompts(organization?.id || "", user?.id || "").then((res) => {
-        console.log("prompts", res.prompts);
         setPrompts(res.prompts);
       });
     }
   }, [currentChatId]);
+
+  useEffect(() => {
+    if (chat?.messages) {
+      scrollIntoView();
+    }
+  }, [chat?.messages?.length]);
 
   return (
     <Stack gap={0} h={"100%"} justify="space-between" w="100%" mr={20}>
@@ -219,8 +221,8 @@ export default function ChatWindow(props: { currentChatId: String }) {
         }}
         ref={scrollableRef}
       >
-        {chat.messages ? (
-          chat.messages.map((message: any, index: Number) => {
+        {chat?.messages ? (
+          chat?.messages?.map((message: any, index: Number) => {
             const user = participants.find(
               (participant: any) => participant.userId == message.createdBy
             ) || {
@@ -332,7 +334,7 @@ export default function ChatWindow(props: { currentChatId: String }) {
             {/* <Text>Select Prompts</Text>
             <Divider /> */}
             <ScrollArea.Autosize mah={200} type="scroll">
-              {filteredPrompts.length > 0 ? (
+              {filteredPrompts?.length > 0 ? (
                 filteredPrompts.map((prompt) => (
                   <Combobox.Option
                     key={prompt._id}

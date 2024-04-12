@@ -120,11 +120,6 @@ const MovePromptItems = (props: {
   };
   useEffect(() => {
     fetchFolders();
-    // console.log(opened, item);
-    // socket.on("newChatFolder", (folder) => {
-    //   console.log("new folder created");
-    //   fetchFolders();
-    // });
   }, []);
 
   return (

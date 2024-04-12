@@ -141,19 +141,12 @@ const GeneralChats = (props: { members: any[] }) => {
 
     fetchChatsAndFolders();
 
-    socket.on("newChat", (chat) => {
-      // console.log("newChat", chat);
-      fetchChatsAndFolders();
-    });
-
-    socket.on("newChatFolder", (folder) => {
-      // console.log("newChatFolder", folder);
+    socket.on("refreshChats", () => {
       fetchChatsAndFolders();
     });
 
     return () => {
-      socket.off("newChat", fetchChatsAndFolders);
-      socket.off("newChatFolder", fetchChatsAndFolders);
+      socket.off("refreshChats");
     };
   }, []);
 

@@ -22,9 +22,13 @@ const RecentChats = (props: { members: any[] }) => {
       setRecentChats(allChats);
     };
     fetchAllChats();
-    socket.on("newChat", (chat) => {
+    socket.on("refreshChats", () => {
       fetchAllChats();
     });
+
+    return () => {
+      socket.off("refreshChats");
+    };
   }, []);
 
   const [recentChats, setRecentChats] = useState<IChatDocument[]>([]);

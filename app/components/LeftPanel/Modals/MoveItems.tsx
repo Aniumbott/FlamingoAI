@@ -99,10 +99,6 @@ const MoveItems = (props: {
 
   useEffect(() => {
     fetchFolders();
-    // socket.on("newChatFolder", (folder) => {
-    //   console.log("new folder created");
-    //   fetchFolders();
-    // });
   }, []);
 
   return (

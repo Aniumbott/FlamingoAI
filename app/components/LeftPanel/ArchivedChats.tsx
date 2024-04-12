@@ -27,16 +27,14 @@ const ArchivedChats = (props: { members: any[] }) => {
   useEffect(() => {
     const fetchAllChats = async () => {
       const chats = (await getArchivedChats(userId || "", orgId || "")).chats;
-      console.log("archied", chats);
       setArchivedChats(chats);
     };
     fetchAllChats();
-    socket.on("newChat", (chat) => {
-      console.log('sokcet listened at archived')
+    socket.on("refreshChats", () => {
       fetchAllChats();
     });
     return () => {
-      socket.off("newChat");
+      socket.off("refreshChats");
     };
   }, []);
 
