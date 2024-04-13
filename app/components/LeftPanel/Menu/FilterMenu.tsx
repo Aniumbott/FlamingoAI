@@ -55,6 +55,7 @@ const FilterMenu = (props: {
     >
       <Menu.Target ref={ref}>
         <Button
+          w="100%"
           justify="space-between "
           style={{
             padding: "6px",
@@ -66,7 +67,7 @@ const FilterMenu = (props: {
           }}
           leftSection={FilterMenuData[0].icon}
           rightSection={<IconSelector color="gray" size={20} />}
-          {...(hovered ? { color: "gray" } : { color: "#9CA3AF" })}
+          color="grey"
           variant="subtle"
         >
           {FilterMenuData[filterMenu].title}

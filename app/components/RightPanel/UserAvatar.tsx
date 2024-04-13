@@ -12,7 +12,7 @@ import { useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 
 // Components
-import Workspace from "./Modals/Workspace/Workspace";
+import Workspace from "../LeftPanel/Modals/Workspace/Workspace";
 
 export default function UserAvatar() {
   const [profileModalOpened, setProfileModalOpened] = useState(false);

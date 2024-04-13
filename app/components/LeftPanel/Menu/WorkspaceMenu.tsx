@@ -9,7 +9,7 @@ import {
 } from "@tabler/icons-react";
 
 // Components
-import Workspace from "../../RightPanel/Modals/Workspace/Workspace";
+import Workspace from "../Modals/Workspace/Workspace";
 
 type MenuButtonProps = {
   properties: {
@@ -18,7 +18,8 @@ type MenuButtonProps = {
   };
 };
 
-const WorkspaceMenu = () => {
+const WorkspaceMenu = (props: { workspace: any }) => {
+  const { workspace } = props;
   const [openWorkspaceModal, setOpenWorkspaceModal] = useState(false);
 
   const { ref } = useHover();
@@ -26,7 +27,7 @@ const WorkspaceMenu = () => {
     <>
       <Menu width={200}>
         <Menu.Target ref={ref}>
-          <ActionIcon variant="subtle" color="grey">
+          <ActionIcon variant="subtle" color="grey" size="24px">
             <IconSettings />
           </ActionIcon>
         </Menu.Target>
@@ -46,6 +47,7 @@ const WorkspaceMenu = () => {
       <Workspace
         opened={openWorkspaceModal}
         setOpened={setOpenWorkspaceModal}
+        workspace={workspace}
       />
     </>
   );

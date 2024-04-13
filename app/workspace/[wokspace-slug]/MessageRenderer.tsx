@@ -12,6 +12,7 @@ export const MessageRender = (props: any) => {
   return (
     <ReactMarkdown
       remarkPlugins={[remarkMath, remarkGfm, remarkBreaks, remarkGemoji]}
+      className={"markdown"}
       components={{
         code({ node, className, children, ...props }) {
           const match = /language-(\w+)/.exec(className || "");
@@ -28,15 +29,10 @@ export const MessageRender = (props: any) => {
               {children}
             </code>
           );
-          className = "hr";
         },
 
         table({ node, children }) {
-          return (
-            <Table my="lg" striped highlightOnHover>
-              <Table.Tbody>{children}</Table.Tbody>
-            </Table>
-          );
+          return <Table my="lg">{children}</Table>;
         },
 
         hr({ node, children }) {

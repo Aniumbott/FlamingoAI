@@ -1,6 +1,7 @@
-import { Document, Model } from "mongoose";
+import { Model } from "mongoose";
 import * as Mongoose from "mongoose";
 require("./User.ts");
+require("./Assistant.ts");
 
 const workspaceSchema = new Mongoose.Schema(
   {
@@ -11,6 +12,22 @@ const workspaceSchema = new Mongoose.Schema(
     allowPersonal: { type: Boolean, required: true },
     allowPublic: { type: Boolean, required: true },
     apiKey: { type: String, required: false },
+    apiKeys: [
+      {
+        apiKey: { type: String, required: true },
+        assistantId: {
+          type: Mongoose.Types.ObjectId,
+          ref: "assistants",
+          required: true,
+        },
+        model: { type: String, required: true },
+        scope: {
+          type: String,
+          enum: ["personal", "public"],
+          required: true,
+        },
+      },
+    ],
     createdBy: { type: Mongoose.Types.ObjectId, ref: "users", required: true },
   },
   {
@@ -26,6 +43,12 @@ interface IWorkspace {
   allowPersonal: boolean;
   allowPublic: boolean;
   apiKey: string;
+  apiKeys: {
+    apiKey: string;
+    assistantId: Mongoose.Types.ObjectId;
+    model: string;
+    scope: string;
+  }[];
   createdBy: Mongoose.Types.ObjectId;
 }
 

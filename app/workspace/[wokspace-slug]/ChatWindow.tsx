@@ -16,8 +16,10 @@ import {
   Box,
   Combobox,
   useCombobox,
+  Group,
+  Title,
 } from "@mantine/core";
-import { IconSend } from "@tabler/icons-react";
+import { IconLayoutSidebarLeftExpand, IconSend } from "@tabler/icons-react";
 import { useOrganization, useUser } from "@clerk/nextjs";
 
 // Components
@@ -32,8 +34,12 @@ import { getAllPrompts } from "@/app/controllers/prompt";
 import { IPromptDocument } from "@/app/models/Prompt";
 import PromptItem from "@/app/components/RightPanel/PromptItem";
 
-export default function ChatWindow(props: { currentChatId: String }) {
-  const { currentChatId } = props;
+export default function ChatWindow(props: {
+  currentChatId: String;
+  leftOpened: boolean;
+  toggleLeft: () => void;
+}) {
+  const { currentChatId, leftOpened, toggleLeft } = props;
   const { organization } = useOrganization();
   const { user } = useUser();
   const [chat, setChat] = useState<any>({
@@ -59,16 +65,15 @@ export default function ChatWindow(props: { currentChatId: String }) {
     return prompt.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
-
   const updateParticipants = () => {
     if (chat.participants.includes(user?.id)) return chat.participants;
     return [...chat.participants, user?.id];
   };
 
   useEffect(() => {
-    console.log("chat", chat);
+    // console.log("chat", chat);
     socket.on("newMessage", (msg) => {
-      console.log("new message", msg);
+      // console.log("new message", msg);
       setChat({
         ...chat,
         messages: [...chat.messages, msg],
@@ -209,9 +214,27 @@ export default function ChatWindow(props: { currentChatId: String }) {
 
   return (
     <Stack gap={0} h={"100%"} justify="space-between" w="100%" mr={20}>
-      <Text p="0.4rem" size="sm">
-        {chat?.name} : {chat?._id}
-      </Text>
+      <div className="w-full flex flex-row justify-start p-2">
+        {!leftOpened ? (
+          <Group ml={5}>
+            <Title order={4}>TeamGPT</Title>
+            <ActionIcon
+              variant="subtle"
+              color="grey"
+              aria-label="Settings"
+              onClick={toggleLeft}
+            >
+              <IconLayoutSidebarLeftExpand
+                style={{ width: "90%", height: "90%" }}
+                stroke={1.5}
+              />
+            </ActionIcon>
+          </Group>
+        ) : null}
+        <Text p="0.4rem" size="sm" ml={5}>
+          {chat?.name} : {chat?._id}
+        </Text>
+      </div>
       <Divider />
 
       <Paper

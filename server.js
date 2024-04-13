@@ -39,6 +39,13 @@ app.prepare().then(() => {
       console.log(`User with ID: ${socket.id} left Workspace: ${roomId}`);
     });
 
+    socket.on("updateWorkspace", (roomId, workspace) => {
+      console.log(
+        `User with ID: ${socket.id} updated workspace: ${workspace} in room: ${roomId}`
+      );
+      io.to(roomId).emit("updateWorkspace", workspace);
+    });
+
     socket.on("disconnect", () => {
       console.log("user disconnected");
     });

@@ -98,7 +98,7 @@ export default function ForkChatModal(props: {
       await getChat(message.chatId, organization?.id || "");
     collectChat().then((res) => {
       setChat(res.chats[0]);
-      console.log(chat);
+      // console.log(chat);
     });
   }, [message]);
 
@@ -190,7 +190,7 @@ export default function ForkChatModal(props: {
                 user?.id || "",
                 isCommentsIncluded
               ).then((res) => {
-                console.log(res);
+                // console.log(res);
                 setIsOpen(false);
               });
             }}

@@ -12,16 +12,16 @@
   margin-bottom: 0 !important;
 }
 
-a {
+.markdown a {
   color: var(--primary);
   text-decoration: none;
 }
 
-a.absent {
+.markdown a.absent {
   color: #c00;
 }
 
-a.anchor {
+.markdown a.anchor {
   display: block;
   padding-right: 6px;
   padding-left: 0.5rem;
@@ -37,12 +37,12 @@ a.anchor:focus {
   outline: none;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
   font-weight: 700;
   line-height: 1.5;
   cursor: text;
@@ -50,22 +50,22 @@ h6 {
   margin-top: 0.5rem;
 }
 
-h1 .octicon-link,
-h2 .octicon-link,
-h3 .octicon-link,
-h4 .octicon-link,
-h5 .octicon-link,
-h6 .octicon-link {
+.markdown h1 .octicon-link,
+.markdown h2 .octicon-link,
+.markdown h3 .octicon-link,
+.markdown h4 .octicon-link,
+.markdown h5 .octicon-link,
+.markdown h6 .octicon-link {
   display: none;
   color: #000;
 }
 
-h1:hover a.anchor,
-h2:hover a.anchor,
-h3:hover a.anchor,
-h4:hover a.anchor,
-h5:hover a.anchor,
-h6:hover a.anchor {
+.markdown h1:hover a.anchor,
+.markdown h2:hover a.anchor,
+.markdown h3:hover a.anchor,
+.markdown h4:hover a.anchor,
+.markdown h5:hover a.anchor,
+.markdown h6:hover a.anchor {
   text-decoration: none;
   line-height: 1;
   padding-left: 8px;
@@ -73,46 +73,46 @@ h6:hover a.anchor {
   top: 15%;
 }
 
-h1:hover a.anchor .octicon-link,
-h2:hover a.anchor .octicon-link,
-h3:hover a.anchor .octicon-link,
-h4:hover a.anchor .octicon-link,
-h5:hover a.anchor .octicon-link,
-h6:hover a.anchor .octicon-link {
+.markdown h1:hover a.anchor .octicon-link,
+.markdown h2:hover a.anchor .octicon-link,
+.markdown h3:hover a.anchor .octicon-link,
+.markdown h4:hover a.anchor .octicon-link,
+.markdown h5:hover a.anchor .octicon-link,
+.markdown h6:hover a.anchor .octicon-link {
   display: inline-block;
 }
 
-h1 tt,
-h1 code,
-h2 tt,
-h2 code,
-h3 tt,
-h3 code,
-h4 tt,
-h4 code,
-h5 tt,
-h5 code,
-h6 tt,
-h6 code {
+.markdown h1 tt,
+.markdown h1 code,
+.markdown h2 tt,
+.markdown h2 code,
+.markdown h3 tt,
+.markdown h3 code,
+.markdown h4 tt,
+.markdown h4 code,
+.markdown h5 tt,
+.markdown h5 code,
+.markdown h6 tt,
+.markdown h6 code {
   font-size: inherit;
 }
 
-h1 {
+.markdown h1 {
   margin: 1rem 0;
   margin-top: 2rem;
   font-size: 20px;
   position: relative;
 }
 
-h2 {
+.markdown h2 {
   margin: 1rem 0;
   margin-top: 2rem;
   font-size: 18px;
   position: relative;
 }
 
-h1:after,
-h2:after {
+.markdown h1:after,
+.markdown h2:after {
   position: absolute;
   content: "";
   border-bottom: 3px solid var(--mantine-color-default-border);
@@ -122,32 +122,32 @@ h2:after {
   left: 50%;
 }
 
-h3 {
+.markdown h3 {
   font-size: 16px;
 }
 
-h4 {
+.markdown h4 {
   font-size: 14px;
 }
 
-h5 {
+.markdown h5 {
   font-size: 14px;
 }
 
-h6 {
+.markdown h6 {
   font-size: 14px;
 }
 
-p,
-blockquote,
-ul,
-ol,
-dl,
-table {
+.markdown p,
+.markdown blockquote,
+.markdown ul,
+.markdown ol,
+.markdown dl,
+.markdown table {
   margin: 0.5rem 0;
 }
 
-hr {
+.markdown hr {
   background: transparent;
   border: 0 none;
   color: var(--mantine-color-text);
@@ -156,30 +156,30 @@ hr {
   padding: 0;
 }
 
-ul,
-ol {
+.markdown ul,
+.markdown ol {
   padding-left: calc(0.5rem * 1.5);
 }
 
-ul.no-list,
-ol.no-list {
+.markdown ul.no-list,
+.markdown ol.no-list {
   list-style-type: none;
   padding: 0;
 }
 
-ul ul,
-ul ol,
-ol ol,
-ol ul {
+.markdown ul ul,
+.markdown ul ol,
+.markdown ol ol,
+.markdown ol ul {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-dl {
+.markdown dl {
   padding: 0;
 }
 
-dl dt {
+.markdown dl dt {
   font-size: 14px;
   font-weight: 700;
   font-style: italic;
@@ -187,70 +187,70 @@ dl dt {
   padding: 0;
 }
 
-dl dd {
+.markdown dl dd {
   margin-bottom: 0.5rem;
   padding: 0 0.5rem;
 }
 
-blockquote {
+.markdown blockquote {
   border-left: 4px solid var(--mantine-color-default-border);
   color: var(--mantine-color-dimmed);
   padding: 0 0.5rem;
 }
 
-blockquote > :first-child {
+.markdown blockquote > :first-child {
   margin-top: 0;
 }
 
-blockquote > :last-child {
+.markdown blockquote > :last-child {
   margin-bottom: 0;
 }
 
-table {
-  margin: 0.5remtop 0;
+.markdown table {
+  margin: 0.5rem 0;
   width: 100%;
   overflow: auto;
   display: block;
 }
 
-table th {
+.markdown table th {
   font-weight: 700;
 }
 
-table th,
-table td {
+.markdown table th,
+.markdown table td {
   border: 1px solid var(--table-border-color);
   padding: 0.5rem;
 }
 
-table tr {
+.markdown table tr {
   border-top: 1px solid var(--table-border-color);
   background-color: var(--table-striped-color);
 }
 
-table tr:nth-child(2n) {
+.markdown table tr:nth-child(2n) {
   background-color: transparent;
 }
 
-.code-line {
+.markdown .code-line {
   padding: 2px 0.2rem;
   margin: 0 0.2rem;
   border-radius: 10px;
   background: var(--mantine-color-body);
   display: inline;
 }
-img {
+.markdown img {
   max-width: 100%;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
 
-span.frame {
+.markdown span.frame {
   display: block;
   overflow: hidden;
 }
 
-span.frame > span {
+.markdown span.frame > span {
   border: 1px solid #ddd;
   display: block;
   float: left;
@@ -260,69 +260,69 @@ span.frame > span {
   padding: 0.2rem;
 }
 
-span.frame span img {
+.markdown span.frame span img {
   display: block;
   float: left;
 }
 
-span.frame span span {
+.markdown span.frame span span {
   clear: both;
   color: #333;
   display: block;
   padding: 0.2rem 0 0;
 }
 
-span.align-center > span {
+.markdown span.align-center > span {
   display: block;
   overflow: hidden;
   text-align: center;
   margin: 0.5rem auto 0;
 }
 
-span.align-center span img {
+.markdown span.align-center span img {
   text-align: center;
   margin: 0 auto;
 }
 
-span.align-right > span {
+.markdown span.align-right > span {
   display: block;
   overflow: hidden;
   text-align: right;
   margin: 0.5rem 0 0;
 }
 
-span.align-right span img {
+.markdown span.align-right span img {
   text-align: right;
   margin: 0;
 }
 
-span.float-left {
+.markdown span.float-left {
   display: block;
   margin-right: 0.5rem;
   overflow: hidden;
   float: left;
 }
 
-span.float-left span {
+.markdown span.float-left span {
   margin: 0.5rem 0 0;
 }
 
-span.float-right {
+.markdown span.float-right {
   display: block;
   margin-left: 0.5rem;
   overflow: hidden;
   float: right;
 }
 
-span.float-right > span {
+.markdown span.float-right > span {
   display: block;
   overflow: hidden;
   text-align: right;
   margin: 0.5rem auto 0;
 }
 
-code,
-tt {
+.markdown code,
+.markdown tt {
   background-color: var(--mantine-color-default-border);
   border-radius: 4px;
   margin: 0;
@@ -330,29 +330,29 @@ tt {
     Liberation Mono, monospace;
 }
 
-code:before,
-code:after,
-tt:before,
-tt:after {
+.markdown code:before,
+.markdown code:after,
+.markdown tt:before,
+.markdown tt:after {
   content: "\00a0";
   letter-spacing: -0.2em;
 }
 
-code br,
-tt br {
+.markdown code br,
+.markdown tt br {
   display: none;
 }
 
-del code {
+.markdown del code {
   text-decoration: inherit;
   vertical-align: text-top;
 }
 
-pre div {
+.markdown pre div {
   border: 1px solid var(--mantine-color-default-border);
 }
 
-pre > code {
+.markdown pre > code {
   white-space: pre;
   border: none;
   background: transparent;
@@ -361,14 +361,14 @@ pre > code {
   font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
     Liberation Mono, monospace;
 }
-pre code.code-line {
+.markdown pre code.code-line {
   display: block;
   padding: 1em;
   font-size: 14px;
   margin: 0.5rem 0;
 }
-pre code,
-pre tt {
+.markdown pre code,
+.markdown pre tt {
   background-color: transparent;
   border: none;
   word-wrap: normal;
@@ -380,15 +380,15 @@ pre tt {
   padding: 0;
 }
 
-pre code:before,
-pre code:after,
-pre tt:before,
-pre tt:after {
+.markdown pre code:before,
+.markdown pre code:after,
+.markdown pre tt:before,
+.markdown pre tt:after {
   content: normal;
 }
 
-span.align-center,
-span.align-right {
+.markdown span.align-center,
+.markdown span.align-right {
   display: block;
   overflow: hidden;
   clear: both;

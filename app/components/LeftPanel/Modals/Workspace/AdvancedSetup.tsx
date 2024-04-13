@@ -17,6 +17,7 @@ import { useState } from "react";
 export default function AdvancedSetup(props: {
   activeTab: string;
   setActiveTab: (value: string) => void;
+  workspace: any;
 }) {
   const { activeTab, setActiveTab } = props;
   const [areaValue, setAreaValue] = useState(

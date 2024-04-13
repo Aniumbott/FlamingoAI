@@ -27,11 +27,14 @@ import RecentChats from "./RecentChats";
 import { socket } from "@/socket";
 import FavouriteChats from "./FavouriteChats";
 import ArchivedChats from "./ArchivedChats";
+import { getWorkspace, updateWorkspace } from "@/app/controllers/workspace";
+import { set } from "mongoose";
 
 const LeftPanel = () => {
   const { colorScheme } = useMantineColorScheme();
   const [filterMenu, setFilterMenu] = useState(0);
   const [members, setMembers] = useState<any>([]);
+  const [workspace, setWorkspace] = useState<any>(null);
   const { organization } = useOrganization();
   const { userId, orgId } = useAuth();
 
@@ -44,7 +47,24 @@ const LeftPanel = () => {
       setMembers(userList);
     };
     getmembers();
+
+    if (organization?.id) {
+      const fetchWorkspace = async () => {
+        const res = await getWorkspace(organization.id);
+        setWorkspace(res.workspace);
+      };
+      fetchWorkspace();
+    }
   }, [organization?.id]);
+
+  useEffect(() => {
+    socket.on("updateWorkspace", (wsp) => {
+      setWorkspace(wsp);
+    });
+    return () => {
+      socket.off("updateWorkspace");
+    };
+  }, [workspace]);
 
   return (
     <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
@@ -52,6 +72,7 @@ const LeftPanel = () => {
         justify="space-between"
         align="center"
         grow
+        gap={10}
         preventGrowOverflow={false}
       >
         <OrganizationSwitcher
@@ -62,7 +83,7 @@ const LeftPanel = () => {
         />
 
         <Protect role="org:admin">
-          <WorkspaceMenu />
+          <WorkspaceMenu workspace={workspace} />
         </Protect>
       </Group>
 
@@ -77,13 +98,7 @@ const LeftPanel = () => {
           filterMenu={filterMenu}
           setFilterMenu={setFilterMenu}
         />
-        <Group
-          color="#047857"
-          wrap="nowrap"
-          justify="flex-end"
-          gap={1}
-          w={"10%"}
-        >
+        <Group color="#047857" wrap="nowrap" justify="flex-end" gap={1}>
           <Button
             color="#047857"
             radius="0"

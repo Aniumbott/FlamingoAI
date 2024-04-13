@@ -1,4 +1,4 @@
-import { getWorkspace, updateWorkspace } from "@/app/controllers/Workspace";
+import { updateWorkspace } from "@/app/controllers/workspace";
 import { useOrganization } from "@clerk/nextjs";
 import { Group, Paper, Text, Switch } from "@mantine/core";
 import { useEffect, useState } from "react";
@@ -6,32 +6,9 @@ import { useEffect, useState } from "react";
 export default function WorkspaceSetup(props: {
   activeTab: string;
   setActiveTab: (value: string) => void;
+  workspace: any;
 }) {
-  const [workspace, setWorkspace] = useState<any>(null);
-  const { organization } = useOrganization();
-  const { activeTab, setActiveTab } = props;
-
-  useEffect(() => {
-    if (organization?.id) {
-      const fetchWorkspace = async () => {
-        const res = await getWorkspace(organization.id);
-        // console.log(res);
-        setWorkspace(res.workspace);
-      };
-      fetchWorkspace();
-    }
-  }, [organization?.id]);
-
-  useEffect(() => {
-    if (workspace?._id) {
-      const update = async () => {
-        await updateWorkspace(workspace._id, workspace);
-        // console.log(res);
-      };
-      update();
-    }
-  }, [workspace]);
-
+  const { activeTab, setActiveTab, workspace } = props;
   return (
     <Paper
       style={{ height: "100%", overflowY: "scroll" }}
@@ -53,9 +30,9 @@ export default function WorkspaceSetup(props: {
           <Switch
             color="teal"
             size="md"
-            defaultChecked={workspace?.allowPersonal || true}
+            defaultChecked={workspace?.allowPersonal}
             onChange={(e) => {
-              setWorkspace({
+              updateWorkspace({
                 ...workspace,
                 allowPersonal: e.currentTarget.checked,
               });
@@ -74,9 +51,9 @@ export default function WorkspaceSetup(props: {
           <Switch
             color="teal"
             size="md"
-            defaultChecked={workspace?.allowPublic || true}
+            defaultChecked={workspace?.allowPublic}
             onChange={(e) => {
-              setWorkspace({
+              updateWorkspace({
                 ...workspace,
                 allowPublic: e.currentTarget.checked,
               });

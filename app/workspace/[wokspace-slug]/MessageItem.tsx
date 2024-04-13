@@ -110,8 +110,8 @@ function MessageItem(props: { message: any; participants: any[] }) {
             ) : null}
           </div>
           <div className="w-full ml-10 flex flex-col   ">
-            <div className="flex flex-row justify-between ">
-              <div className="flex flex-row items-center ">
+            <div className="flex flex-row justify-between items-center min-h-8">
+              <div className="flex flex-row items-center">
                 <Text size="md" fw={700}>
                   {message.type === "user"
                     ? `${createdBy?.firstName || ""} ${

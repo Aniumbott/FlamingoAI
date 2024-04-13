@@ -28,6 +28,7 @@ import RightPanel from "../../components/RightPanel/RightPanel";
 import LeftPanel from "../../components/LeftPanel/Leftpanel";
 import ChatWindow from "./ChatWindow";
 import { createChat } from "@/app/controllers/chat";
+import { createAssistant } from "@/app/controllers/assistant";
 
 const Workspace = () => {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
@@ -114,8 +115,10 @@ const Workspace = () => {
           padding="md"
         >
           <AppShell.Navbar p="0.5rem" style={{ margin: 0 }}>
-            <div className="flex justify-between">
-              <Title order={3}>TeamGPT</Title>
+            <div className="flex justify-between my-2">
+              <Title order={3} ml={5}>
+                TeamGPT
+              </Title>
               <ActionIcon
                 variant="subtle"
                 color="grey"
@@ -156,7 +159,11 @@ const Workspace = () => {
               </div> */}
               <div className="grow">
                 {pathname?.split("/")[3] ? (
-                  <ChatWindow currentChatId={currentChatId} />
+                  <ChatWindow
+                    currentChatId={currentChatId}
+                    leftOpened={leftOpened}
+                    toggleLeft={toggleLeft}
+                  />
                 ) : (
                   <Stack>
                     <Container mt={150}>

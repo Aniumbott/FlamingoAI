@@ -1,20 +1,26 @@
 import { Button, Modal, rem, Paper } from "@mantine/core";
 import style from ".././Modals.module.css";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChatAuth from "./ChatAuth";
 import WorkspaceSetup from "./WorkspaceSetup";
 import AdvancedSetup from "./AdvancedSetup";
 
-export default function Workspace(props: { opened: boolean; setOpened: any }) {
-  const { opened, setOpened } = props;
+export default function Workspace(props: {
+  opened: boolean;
+  setOpened: any;
+  workspace: any;
+}) {
+  const { opened, setOpened, workspace } = props;
 
   const tabs = [
     { value: "chatAuth", label: "Chat Authentication" },
     { value: "workspaceSetup", label: "Workspace Setup" },
     { value: "advancedSetup", label: "Advanced Setup" },
   ];
+
   const [activeTab, setActiveTab] = useState("chatAuth");
+
   return (
     <Modal
       opened={opened}
@@ -45,9 +51,21 @@ export default function Workspace(props: { opened: boolean; setOpened: any }) {
 
         {/* Right Container */}
         <div className={style.rightContainer}>
-          <ChatAuth activeTab={activeTab} setActiveTab={setActiveTab} />
-          <WorkspaceSetup activeTab={activeTab} setActiveTab={setActiveTab} />
-          <AdvancedSetup activeTab={activeTab} setActiveTab={setActiveTab} />
+          <ChatAuth
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            workspace={workspace}
+          />
+          <WorkspaceSetup
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            workspace={workspace}
+          />
+          <AdvancedSetup
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            workspace={workspace}
+          />
         </div>
       </div>
       {/* Modal content */}
