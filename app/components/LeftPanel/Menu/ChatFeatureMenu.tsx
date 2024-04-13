@@ -21,7 +21,7 @@ import {
   IconArchive,
 } from "@tabler/icons-react";
 import { useHover } from "@mantine/hooks";
-import { createChat, deleteChat, updateChat } from "@/app/controllers/chat";
+import { deleteChat, updateChat } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import { useAuth } from "@clerk/nextjs";
 

@@ -9,19 +9,22 @@ import {
   showLoadingNotification,
   showSuccessNotification,
 } from "./notification";
-type Scope = "public" | "private";
+type Scope = "public" | "private" | "viewOnly";
 
 async function createChat(
   scope: Scope,
   parentFolder: Mongoose.Types.ObjectId | null,
   createdBy: string,
-  workspaceId: string
+  workspaceId: string,
+  members: any[]
 ) {
   const notificationId = showLoadingNotification("Creating chat...");
   try {
+    const userId = members.map((member) => member.userId);
+    console.log(userId)
     const data = await fetch("/api/chat", {
       method: "POST",
-      body: JSON.stringify({ createdBy, scope, workspaceId, parentFolder }),
+      body: JSON.stringify({ createdBy, scope, workspaceId, parentFolder, members: userId}),
       headers: {
         "Content-Type": "application/json",
       },
@@ -33,6 +36,7 @@ async function createChat(
       socket.emit("updateChat", workspaceId, response.chat);
     else socket.emit("updatePersonalChat", response.chat);
     showSuccessNotification(notificationId, "Chat created");
+    console.log(response)
     return response;
   } catch (err) {
     showErrorNotification(notificationId, "Failed to create chat");

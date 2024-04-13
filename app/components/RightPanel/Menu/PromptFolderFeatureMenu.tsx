@@ -18,14 +18,6 @@ import {
   IconTrash,
 } from "@tabler/icons-react";
 import { useHover } from "@mantine/hooks";
-import {
-  createChatFolder,
-  deleteChatFolders,
-  updateChatFolders,
-} from "@/app/controllers/folders";
-import { createChat } from "@/app/controllers/chat";
-
-import { IChatFolderDocument } from "@/app/models/ChatFolder";
 import { IPromptFolderDocument } from "@/app/models/PromptFolder";
 import { createPrompt } from "@/app/controllers/prompt";
 import {

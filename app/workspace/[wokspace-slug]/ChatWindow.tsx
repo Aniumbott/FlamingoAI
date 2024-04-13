@@ -25,7 +25,7 @@ import { useOrganization, useUser } from "@clerk/nextjs";
 // Components
 import MessageItem from "./MessageItem";
 import { sendAssistantMessage, createMessage } from "@/app/controllers/message";
-import { getChat } from "@/app/controllers/chat";
+import { deleteChat, getChat, updateChat } from "@/app/controllers/chat";
 import { socket } from "@/socket";
 import { useScrollIntoView } from "@mantine/hooks";
 import { ICommentDocument } from "@/app/models/Comment";
@@ -33,6 +33,7 @@ import ForkChatModal from "./ForkChatModal";
 import { getAllPrompts } from "@/app/controllers/prompt";
 import { IPromptDocument } from "@/app/models/Prompt";
 import PromptItem from "@/app/components/RightPanel/PromptItem";
+import ShareChatModal from "@/app/components/ShareChatModal";
 
 export default function ChatWindow(props: {
   currentChatId: String;
@@ -65,13 +66,30 @@ export default function ChatWindow(props: {
     return prompt.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
 
+  const [shareChatOpened, setShareChatOpened] = useState(false);
   const updateParticipants = () => {
     if (chat.participants.includes(user?.id)) return chat.participants;
     return [...chat.participants, user?.id];
   };
 
+  let isViewOnly = false;
+
   useEffect(() => {
-    // console.log("chat", chat);
+    console.log("chat", chat);
+
+    isViewOnly =
+      (chat?.createdBy !== user?.id &&
+        chat?.memberAccess?.find((m: any) => m.userId === user?.id)?.access ===
+          "view") ||
+      (chat?.createdBy !== user?.id &&
+        chat?.scope === "viewOnly" &&
+        chat?.memberAccess?.find((m: any) => m.userId === user?.id)?.access !==
+          "edit") ||
+      (chat?.createdBy !== user?.id &&
+        chat?.scope === "public" &&
+        chat?.memberAccess?.find((m: any) => m.userId === user?.id)?.access ===
+          "viewOnly");
+
     socket.on("newMessage", (msg) => {
       // console.log("new message", msg);
       setChat({
@@ -214,7 +232,8 @@ export default function ChatWindow(props: {
 
   return (
     <Stack gap={0} h={"100%"} justify="space-between" w="100%" mr={20}>
-      <div className="w-full flex flex-row justify-start p-2">
+      {/* <Group gap={30} justify="space-between" py={5} px={10}> */}
+      <div clGrouame="w-full flex flex-row justify-start p-2">
         {!leftOpened ? (
           <Group ml={5}>
             <Title order={4}>TeamGPT</Title>
@@ -231,10 +250,28 @@ export default function ChatWindow(props: {
             </ActionIcon>
           </Group>
         ) : null}
-        <Text p="0.4rem" size="sm" ml={5}>
-          {chat?.name} : {chat?._id}
+        <Text size="sm" ml={5} fw={500}>
+          {chat?.name}
         </Text>
+        <Button
+          variant="subtle"
+          color="white"
+          onClick={() => setShareChatOpened(true)}
+          mx={10}
+        >
+          Share
+        </Button>
+        {shareChatOpened && (
+          <ShareChatModal
+            opened={shareChatOpened}
+            setOpened={setShareChatOpened}
+            chat={chat}
+            setChat={setChat}
+            members={participants}
+          />
+        )}
       </div>
+      {/* </Group> */}
       <Divider />
 
       <Paper
@@ -276,14 +313,7 @@ export default function ChatWindow(props: {
         <div ref={targetRef}></div>
       </Paper>
 
-      <Combobox
-        store={combobox}
-        onOptionSubmit={(val) => {
-          combobox.closeDropdown();
-          setSearchTerm("");
-        }}
-        position="top"
-      >
+      {chat?.archived ? (
         <div
           className="w-full h-fit py-2 pb-4 flex justify-center items-center"
           style={{
@@ -293,99 +323,183 @@ export default function ChatWindow(props: {
                 : "var(--mantine-color-gray-0)",
           }}
         >
-          <Combobox.Target>
-            <TextInput
-              variant="filled"
-              placeholder="Type a message"
-              w="75%"
-              size="lg"
-              radius="0"
-              value={messageInput}
-              onChange={(e) => {
-                setMessageInput(e.currentTarget.value);
-                if (e.currentTarget.value.includes("/")) {
-                  // Set searchTerm with the value after "/"
-                  setSearchTerm(e.currentTarget.value.split("/").pop() ?? "");
-                  combobox.openDropdown();
-                } else {
-                  combobox.closeDropdown();
-                }
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !messageInput.includes("/")) {
-                  createMessage(
-                    user?.id || "",
-                    messageInput,
-                    "user",
-                    currentChatId
-                  ).then((res) => {
-                    sendAssistantMessage(
-                      res.message,
-                      chat.workspaceId,
-                      "gpt-3.5-turbo"
-                    );
-                    setMessageInput("");
+          <Group
+            gap={25}
+            justify="space-between"
+            w={"80%"}
+            c={"white"}
+            bg={
+              colorScheme === "dark"
+                ? "var(--mantine-color-gray-8)"
+                : "var(--mantine-color-gray-4)"
+            }
+            p={10}
+          >
+            <Text ta={"center"} style={{ flexGrow: 1 }}>
+              This chat has been archived.
+            </Text>
+            <Group gap={15}>
+              <Button
+                variant="default"
+                onClick={() => {
+                  updateChat(chat?._id, {
+                    archived: false,
+                  }).then((res) => {
+                    console.log(res);
                   });
-                }
-              }}
-            />
-          </Combobox.Target>
-          <ActionIcon
-            size="50"
-            radius="0"
-            color="teal"
-            onClick={() => {
-              createMessage(
-                user?.id || "",
-                messageInput,
-                "user",
-                currentChatId
-              ).then((res) => {
-                sendAssistantMessage(
-                  res.message,
-                  chat.workspaceId,
-                  "gpt-3.5-turbo"
-                );
-                setMessageInput("");
-              });
+                }}
+              >
+                Restore
+              </Button>
+              <Button
+                variant="default"
+                onClick={() => {
+                  deleteChat(chat).then((res) => {
+                    console.log(res);
+                  });
+                }}
+              >
+                Delete
+              </Button>
+            </Group>
+          </Group>
+        </div>
+      ) : isViewOnly ? (
+        <div
+          className="w-full h-fit py-2 pb-4 flex justify-center items-center"
+          style={{
+            background:
+              colorScheme == "dark"
+                ? "var(--mantine-color-dark-8)"
+                : "var(--mantine-color-gray-0)",
+          }}
+        >
+          <Text
+            p={20}
+            bg={
+              colorScheme === "dark"
+                ? "var(--mantine-color-gray-8)"
+                : "var(--mantine-color-gray-4)"
+            }
+            w={"80%"}
+            ta={"center"}
+            style={{ borderRadius: "10px" }}
+          >
+            You can only view this chat. Ask the owner to grant you access.
+          </Text>
+        </div>
+      ) : (
+        <Combobox
+          store={combobox}
+          onOptionSubmit={(val) => {
+            combobox.closeDropdown();
+            setSearchTerm("");
+          }}
+          position="top"
+        >
+          <div
+            className="w-full h-fit py-2 pb-4 flex justify-center items-center"
+            style={{
+              background:
+                colorScheme == "dark"
+                  ? "var(--mantine-color-dark-8)"
+                  : "var(--mantine-color-gray-0)",
             }}
           >
-            <IconSend size="24" />
-          </ActionIcon>
-        </div>
+            <Combobox.Target>
+              <TextInput
+                variant="filled"
+                placeholder="Type a message"
+                w="75%"
+                size="lg"
+                radius="0"
+                value={messageInput}
+                onChange={(e) => {
+                  setMessageInput(e.currentTarget.value);
+                  if (e.currentTarget.value.includes("/")) {
+                    // Set searchTerm with the value after "/"
+                    setSearchTerm(e.currentTarget.value.split("/").pop() ?? "");
+                    combobox.openDropdown();
+                  } else {
+                    combobox.closeDropdown();
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !messageInput.includes("/")) {
+                    createMessage(
+                      user?.id || "",
+                      messageInput,
+                      "user",
+                      currentChatId
+                    ).then((res) => {
+                      sendAssistantMessage(
+                        res.message,
+                        chat.workspaceId,
+                        "gpt-3.5-turbo"
+                      );
+                      setMessageInput("");
+                    });
+                  }
+                }}
+              />
+            </Combobox.Target>
+            <ActionIcon
+              size="50"
+              radius="0"
+              color="teal"
+              onClick={() => {
+                createMessage(
+                  user?.id || "",
+                  messageInput,
+                  "user",
+                  currentChatId
+                ).then((res) => {
+                  sendAssistantMessage(
+                    res.message,
+                    chat.workspaceId,
+                    "gpt-3.5-turbo"
+                  );
+                  setMessageInput("");
+                });
+              }}
+            >
+              <IconSend size="24" />
+            </ActionIcon>
+          </div>
 
-        <Combobox.Dropdown>
-          <Combobox.Options>
-            {/* <Text>Select Prompts</Text>
+          <Combobox.Dropdown>
+            <Combobox.Options>
+              {/* <Text>Select Prompts</Text>
             <Divider /> */}
-            <ScrollArea.Autosize mah={200} type="scroll">
-              {filteredPrompts?.length > 0 ? (
-                filteredPrompts.map((prompt) => (
-                  <Combobox.Option
-                    key={prompt._id}
-                    value={prompt._id}
-                    onClick={() => {
-                      let newMessageInput = messageInput;
-                      if (newMessageInput.includes("/")) {
-                        newMessageInput = newMessageInput.substring(
-                          0,
-                          newMessageInput.lastIndexOf("/")
-                        );
-                      }
-                      setMessageInput(newMessageInput + prompt.content);
-                      setSearchTerm("");
-                    }}
-                  >
-                    <Text c={"white"}>{prompt.name}</Text>
-                  </Combobox.Option>
-                ))
-              ) : (
-                <Combobox.Empty>No prompts found</Combobox.Empty>
-              )}
-            </ScrollArea.Autosize>
-          </Combobox.Options>
-        </Combobox.Dropdown>
-      </Combobox>
+              <ScrollArea.Autosize mah={200} type="scroll">
+                {filteredPrompts?.length > 0 ? (
+                  filteredPrompts.map((prompt) => (
+                    <Combobox.Option
+                      key={prompt._id}
+                      value={prompt._id}
+                      onClick={() => {
+                        let newMessageInput = messageInput;
+                        if (newMessageInput.includes("/")) {
+                          newMessageInput = newMessageInput.substring(
+                            0,
+                            newMessageInput.lastIndexOf("/")
+                          );
+                        }
+                        setMessageInput(newMessageInput + prompt.content);
+                        setSearchTerm("");
+                      }}
+                    >
+                      <Text c={"white"}>{prompt.name}</Text>
+                    </Combobox.Option>
+                  ))
+                ) : (
+                  <Combobox.Empty>No prompts found</Combobox.Empty>
+                )}
+              </ScrollArea.Autosize>
+            </Combobox.Options>
+          </Combobox.Dropdown>
+        </Combobox>
+      )}
     </Stack>
   );
 }

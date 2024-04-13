@@ -36,6 +36,7 @@ export default function FolderFeatureMenu(props: {
   setOpen: (value: boolean) => void;
   setRename: (value: boolean) => void;
   setMoveModal: (value: boolean) => void;
+  members: any[]
 }) {
   const colors = [
     "#2596FF",
@@ -101,7 +102,8 @@ export default function FolderFeatureMenu(props: {
               props.scope,
               props.folder._id,
               props.userId,
-              props.workspaceId
+              props.workspaceId,
+              props.members
             )
           }
         >

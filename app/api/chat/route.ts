@@ -104,6 +104,10 @@ export async function POST(req: any, res: NextApiResponse) {
         parentFolder: body.parentFolder,
         workspaceId: body.workspaceId,
         participants: [body.createdBy],
+        memberAccess: body.members.map((memberId:string) => ({
+          userId: memberId,
+          access: 'inherit',
+        }))
       });
 
       // If parentFolder was provided, add the new chat ID to the parent folder's chats array
@@ -138,17 +142,27 @@ export async function GET(req: NextRequest, res: NextResponse) {
       if (scope === "public") {
         chats = await Chat.find({
           workspaceId: workspaceId,
-          scope: scope,
+          scope: { $ne: "private" },
           parentFolder: null,
           archived: false,
         }).sort({ updatedAt: -1 });
       } else if (scope === "private") {
         chats = await Chat.find({
           workspaceId: workspaceId,
-          scope: scope,
-          createdBy: createdBy,
           parentFolder: null,
           archived: false,
+          scope: scope,
+          $or: [
+            { createdBy: createdBy },
+            {
+              memberAccess: {
+                $elemMatch: {
+                  userId: createdBy,
+                  access: { $ne: "inherit" },
+                },
+              },
+            },
+          ],
         }).sort({ updatedAt: -1 });
       }
     }
@@ -156,7 +170,23 @@ export async function GET(req: NextRequest, res: NextResponse) {
     else if (id === "all" && workspaceId && createdBy) {
       chats = await Chat.find({
         workspaceId: workspaceId,
-        $or: [{ scope: "public" }, { scope: "private", createdBy: createdBy }],
+        $or: [
+          { scope: { $ne: "private" } },
+          {
+            scope: "private",
+            $or: [
+              { createdBy: createdBy },
+              {
+                memberAccess: {
+                  $elemMatch: {
+                    userId: createdBy,
+                    access: { $ne: "inherit" },
+                  },
+                },
+              },
+            ],
+          },
+        ],
         archived: false,
       }).sort({ updatedAt: -1 });
     }
@@ -164,7 +194,23 @@ export async function GET(req: NextRequest, res: NextResponse) {
     else if (id === "archived" && workspaceId && createdBy) {
       chats = await Chat.find({
         workspaceId: workspaceId,
-        $or: [{ scope: "public" }, { scope: "private", createdBy: createdBy }],
+        $or: [
+          { scope: { $ne: "private" } },
+          {
+            scope: "private",
+            $or: [
+              { createdBy: createdBy },
+              {
+                memberAccess: {
+                  $elemMatch: {
+                    userId: createdBy,
+                    access: { $ne: "inherit" },
+                  },
+                },
+              },
+            ],
+          },
+        ],
         archived: true,
       }).sort({ updatedAt: -1 });
     }
@@ -197,7 +243,7 @@ export async function PUT(req: any, res: NextApiResponse) {
     const body = await req.json();
     let chat;
     const { id, targetFolderId, parentFolderId, newScope } = body;
-
+    // MOVE Chat Operation
     if (id && targetFolderId && parentFolderId) {
       // If the chat currently has a parent folder, remove it from the parent folder's chats
       if (parentFolderId !== "null") {
@@ -242,7 +288,6 @@ export async function PUT(req: any, res: NextApiResponse) {
           },
         },
       });
-      
     } else {
       chat = await Chat.findByIdAndUpdate(body.id, body, {
         new: true,

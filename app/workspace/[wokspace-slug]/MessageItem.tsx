@@ -61,11 +61,13 @@ function MessageItem(props: { message: any; participants: any[] }) {
 
   return (
     <Box ref={ref}>
-      <ForkChatModal
-        isOpen={isForkModalOpen}
-        setIsOpen={setIsForkModalOpen}
-        message={message}
-      />
+      {isForkModalOpen && (
+        <ForkChatModal
+          isOpen={isForkModalOpen}
+          setIsOpen={setIsForkModalOpen}
+          message={message}
+        />
+      )}
       <div
         className="w-full  py-10 flex justify-center items-start"
         style={{

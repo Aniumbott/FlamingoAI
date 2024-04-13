@@ -9,7 +9,7 @@ const ChatSchema = new Mongoose.Schema(
   {
     name: { type: String, required: true },
     createdBy: { type: String, ref: "users", required: true },
-    scope: { type: String, enum: ["public", "private"], required: true },
+    scope: { type: String, enum: ["public", "private", "viewOnly"], required: true },
     parentFolder: {
       type: Mongoose.Types.ObjectId || null,
       ref: "chat_folders",
@@ -23,6 +23,11 @@ const ChatSchema = new Mongoose.Schema(
     },
     participants: [{ type: String, ref: "users", default: [] }],
     favourites: [{ type: String, ref: "users", default: [] }],
+    memberAccess:[{
+      // _id: false,
+      userId: { type: String, ref: "users", required: true },
+      access: { type: String, enum: ["inherit", "view", "edit"], required: true },
+    }]
     // model
   },
   {
@@ -40,6 +45,10 @@ interface IChat {
   favourites: string[];
   messages: Mongoose.Types.ObjectId[];
   participants: string[];
+  memberAccess: {
+    userId: string;
+    access: string;
+  }[];
 }
 
 interface IChatDocument extends IChat, Document {}

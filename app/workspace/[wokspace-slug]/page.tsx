@@ -38,14 +38,19 @@ const Workspace = () => {
   const { organization } = useOrganization();
   const router = useRouter();
   const pathname = usePathname();
+  
+  const [orgMembers , setOrgMembers] = useState<any>([]);
+  useEffect(() => {
+    const fetchOrgMembers = async () => {
+      const res =
+        (await organization?.getMemberships())?.map(
+          (member: any) => member.publicUserData
+        ) || [];
+      setOrgMembers(res);
+    };
+    fetchOrgMembers();
+  }, [organization?.membersCount]);
 
-  // useEffect(() => {
-  //   const members = await organization?.getMemberships();
-  //   // check if the userId is in the members list
-  //   if (!members?.find((member) => member.id === userId)) {
-  //     notFound();
-  //   }
-  // }, [organization?.id]);
   useEffect(() => {
     console.log("organization ID", orgId);
     socket.emit("joinWorkspaceRoom", orgId);
@@ -178,7 +183,8 @@ const Workspace = () => {
                             "public",
                             null,
                             userId || "",
-                            orgId || ""
+                            orgId || "",
+                            orgMembers
                           );
 
                           req.then((res) => {
