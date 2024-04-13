@@ -63,6 +63,7 @@ export default function FolderItem(props: {
               userId={userId}
               workspaceId={workspaceId}
               setMoveModal={setOpenMoveModal}
+              members={members}
             />
           </Accordion.Control>
         </div>
@@ -113,6 +114,7 @@ const FolderLabel = (props: {
   userId: string;
   workspaceId: string;
   setMoveModal: (value: boolean) => void;
+  members: any[];
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   let actionIconVisible = props.isHovered || menuOpen;
@@ -210,7 +212,8 @@ const FolderLabel = (props: {
                 props.scope,
                 props.folder._id,
                 props.userId,
-                props.workspaceId
+                props.workspaceId,
+                props.members
               );
 
               // Add any additional logic for the ActionIcon click here
@@ -240,6 +243,7 @@ const FolderLabel = (props: {
               setOpen={setMenuOpen}
               setRename={setRename}
               setMoveModal={props.setMoveModal}
+              members={props.members}
             />
           </ActionIcon>
         </Group>

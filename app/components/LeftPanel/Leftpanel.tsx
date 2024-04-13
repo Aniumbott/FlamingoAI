@@ -91,11 +91,11 @@ const LeftPanel = () => {
             style={{
               borderRadius: "5px 0 0 5px ",
             }}
-            onClick={() => createPublicChat(userId || "", orgId || "")}
+            onClick={() => createPublicChat(userId || "", orgId || "", members)}
           >
             <IconPlus size={15} />
           </Button>
-          <ChatMenu />
+          <ChatMenu members={members} />
         </Group>
       </Group>
 
@@ -121,11 +121,11 @@ const LeftPanel = () => {
   );
 };
 
-const createPublicChat = async (userId: string, workspaceId: string) => {
+const createPublicChat = async (userId: string, workspaceId: string, members: any) => {
   // console.log("creating a chat");
   socket.emit("hello", "world");
   // console.log("emmiting");
-  const res = await createChat("public", null, userId, workspaceId);
+  const res = await createChat("public", null, userId, workspaceId, members);
   // console.log("res", res);
 };
 

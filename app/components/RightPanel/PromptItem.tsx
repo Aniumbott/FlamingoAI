@@ -14,9 +14,7 @@ import {
 
 // Compoonents
 import style from "../RightPanel/RightPanel.module.css";
-import { IChatDocument } from "@/app/models/Chat";
-import { createChat, updateChat } from "@/app/controllers/chat";
-import { useAuth } from "@clerk/nextjs";
+ import { useAuth } from "@clerk/nextjs";
 import { IPromptDocument } from "@/app/models/Prompt";
 import PromptFeatureMenu from "./Menu/PromptFeatureMenu";
 import { ModalControls } from "./PromptPanel";

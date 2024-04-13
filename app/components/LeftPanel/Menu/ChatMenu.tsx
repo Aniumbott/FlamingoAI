@@ -30,7 +30,9 @@ type MenuButtonProps = {
   };
 };
 
-const ChatMenu = () => {
+const ChatMenu = (props:{
+  members: any[]
+}) => {
   const { orgId, userId } = useAuth();
   return (
     <Menu
@@ -68,12 +70,12 @@ const ChatMenu = () => {
       </Menu.Target>
       <Menu.Dropdown>
         <Menu.Item
-          onClick={() => createPublicChat(userId as string, orgId as string)}
+          onClick={() => createPublicChat(userId as string, orgId as string, props.members)}
         >
           <MenuButton properties={MenuData[0]} />
         </Menu.Item>
         <Menu.Item
-          onClick={() => createPrivateChat(userId as string, orgId as string)}
+          onClick={() => createPrivateChat(userId as string, orgId as string, props.members)}
         >
           <MenuButton properties={MenuData[1]} />
         </Menu.Item>
@@ -95,15 +97,15 @@ const ChatMenu = () => {
   );
 };
 
-const createPublicChat = async (userId: string, orgId: string) => {
+const createPublicChat = async (userId: string, orgId: string, members: any[]) => {
   // console.log("creating public chat");
-  const res = await createChat("public", null, userId, orgId);
+  const res = await createChat("public", null, userId, orgId, members);
   // console.log("res", res);
 };
 
-const createPrivateChat = async (userId: string, orgId: string) => {
+const createPrivateChat = async (userId: string, orgId: string, members: any[]) => {
   // console.log("creating private chat");
-  const res = await createChat("private", null, userId, orgId);
+  const res = await createChat("private", null, userId, orgId, members);
   console.log("res", res.chat);
 };
 

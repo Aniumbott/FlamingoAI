@@ -68,7 +68,7 @@ const GeneralChats = (props: { members: any[] }) => {
     let results: any = [];
     for (let folder of folders) {
       if (folder.chats) {
-        const matchedChats = folder.chats.filter((chat: any) =>
+        const matchedChats = folder.chats?.filter((chat: any) =>
           chat.name.toLowerCase().includes(searchTerm.toLowerCase())
         );
         results = results.concat(matchedChats);
@@ -82,7 +82,7 @@ const GeneralChats = (props: { members: any[] }) => {
     return results;
   };
 
-  const filteredPublicChat = publicChats.filter((chat) =>
+  const filteredPublicChat = publicChats?.filter((chat) =>
     chat.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const filteredPublicFolderChats = searchChatsInFolders(
@@ -94,7 +94,7 @@ const GeneralChats = (props: { members: any[] }) => {
     ...filteredPublicFolderChats,
   ];
 
-  const filteredPrivateChat = privateChats.filter((chat) =>
+  const filteredPrivateChat = privateChats?.filter((chat) =>
     chat.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
   const filteredPrivateFolderChats = searchChatsInFolders(
@@ -168,10 +168,13 @@ const GeneralChats = (props: { members: any[] }) => {
 
   return (
     <Stack gap={"sm"}>
-      <Combobox store={combobox} onOptionSubmit={(val)=>{
-        combobox.closeDropdown();
-        setSearchTerm("");
-      }}>
+      <Combobox
+        store={combobox}
+        onOptionSubmit={(val) => {
+          combobox.closeDropdown();
+          setSearchTerm("");
+        }}
+      >
         <Combobox.Target>
           <TextInput
             placeholder="Search Chats..."
@@ -196,7 +199,7 @@ const GeneralChats = (props: { members: any[] }) => {
                     <Text fw={500}>Shared Chats</Text>
                     {combinedFilteredPublicChats.map((chat, key) => (
                       <Combobox.Option key={key} value={chat._id}>
-                      <ChatItem item={chat} members={members} />
+                        <ChatItem item={chat} members={members} />
                       </Combobox.Option>
                     ))}
                   </>
@@ -206,7 +209,7 @@ const GeneralChats = (props: { members: any[] }) => {
                     <Text mt={5}>Personal Chats</Text>
                     {combinedFilteredPrivateChats.map((chat, key) => (
                       <Combobox.Option key={key} value={chat._id}>
-                      <ChatItem item={chat} members={members} />
+                        <ChatItem item={chat} members={members} />
                       </Combobox.Option>
                     ))}
                   </>
@@ -232,6 +235,7 @@ const GeneralChats = (props: { members: any[] }) => {
               workspaceId={orgId || ""}
               sort={sort}
               setSort={setSort}
+              members={members}
             />
           </Accordion.Control>
           <AccordionPanel>
@@ -268,6 +272,7 @@ const GeneralChats = (props: { members: any[] }) => {
               workspaceId={orgId || ""}
               sort={sort}
               setSort={setSort}
+              members={members}
             />
           </AccordionControl>
           <AccordionPanel>
@@ -306,6 +311,7 @@ const AccordianLabel = (props: {
   workspaceId: string;
   sort: string;
   setSort: (sort: string) => void;
+  members: any[];
 }) => {
   return (
     <Group wrap="nowrap" justify="space-between">
@@ -347,7 +353,13 @@ const AccordianLabel = (props: {
           }}
           onClick={(event) => {
             event.stopPropagation();
-            createChat(props.scope, null, props.userId, props.workspaceId);
+            createChat(
+              props.scope,
+              null,
+              props.userId,
+              props.workspaceId,
+              props.members
+            );
             // Add any additional logic for the ActionIcon click here
           }}
         >

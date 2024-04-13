@@ -542,7 +542,6 @@ const AccordianLabel = (props: {
                 props.modalControls?.setModalParentFolder(null);
                 props.modalControls?.setOpenModal(true);
                 console.log("new prompt");
-                // createChat(props.scope, null, props.userId, props.workspaceId);
                 // Add any additional logic for the ActionIcon click here
               }}
             >

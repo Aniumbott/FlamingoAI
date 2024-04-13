@@ -9,7 +9,7 @@ import { IconAlignJustified, IconStarFilled } from "@tabler/icons-react";
 // Compoonents
 import style from "../RightPanel/RightPanel.module.css";
 import { IChatDocument } from "@/app/models/Chat";
-import { createChat, updateChat } from "@/app/controllers/chat";
+import { updateChat } from "@/app/controllers/chat";
 import ChatFeatureMenu from "./Menu/ChatFeatureMenu";
 import MoveChats from "./Modals/MoveItems";
 import { useAuth } from "@clerk/nextjs";
