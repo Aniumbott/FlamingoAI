@@ -16,13 +16,14 @@ import {
   TextInput,
   Title,
   Tooltip,
+  ScrollArea,
 } from "@mantine/core";
 import { IconBuilding, IconCheck, IconCopy } from "@tabler/icons-react";
 import { Organization } from "@clerk/nextjs/server";
 import { useOrganization } from "@clerk/nextjs";
 import { IChatDocument } from "../models/Chat";
 import { usePathname } from "next/navigation";
-import { updateChat } from "../controllers/chat";
+import { updateChat, updateChatAccess } from "../controllers/chat";
 import { access } from "fs";
 
 const ShareChatModal = (props: {
@@ -33,7 +34,6 @@ const ShareChatModal = (props: {
   members: any[];
 }) => {
   const { opened, setOpened, chat, setChat, members } = props;
-  const [scope, setScope] = useState(chat?.scope);
   return (
     <Modal
       opened={opened}
@@ -41,7 +41,8 @@ const ShareChatModal = (props: {
         setOpened(false);
       }}
       padding={20}
-      size={"80%"}
+      size="xl"
+      centered
       withCloseButton={false}
     >
       <Title order={3}>Share Chat</Title>
@@ -93,14 +94,22 @@ const ShareChatModal = (props: {
             </Stack>
           </Group>
           <SegmentedControl
-            value={scope}
+            value={chat?.scope}
             onChange={(value) => {
-              setScope;
-              updateChat(chat?._id, {
-                scope: value,
-              }).then((res) => {
-                setChat(res.chat);
-              });
+              if (chat.parentFolder) {
+                updateChatAccess(chat?._id, {
+                  scope: value,
+                  parentFolder: null,
+                }).then((res) => {
+                  setChat(res.chat);
+                });
+              } else {
+                updateChatAccess(chat?._id, {
+                  scope: value,
+                }).then((res) => {
+                  setChat(res.chat);
+                });
+              }
             }}
             fullWidth
             style={{ flexGrow: 1 }}
@@ -161,16 +170,16 @@ const MembersTable = (props: {
   // }, [organization?.membersCount]);
 
   return (
-    <>
+    <ScrollArea.Autosize mah={"35vh"} offsetScrollbars={true}>
       <Table
         withColumnBorders={false}
         withRowBorders={true}
         withTableBorder={false}
-        layout="fixed"
+        layout="auto"
       >
         <Table.Thead>
           <Table.Tr>
-            <Table.Th style={{ flexGrow: 1 }}>MEMBERS</Table.Th>
+            <Table.Th w={"70%"}>MEMBERS</Table.Th>
             <Table.Th>ACCESS</Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -179,14 +188,14 @@ const MembersTable = (props: {
             <Table.Tr key={index}>
               <Table.Td>{User(member)}</Table.Td>
               {/* <Table.Td>{member.dateJoined}</Table.Td> */}
-              <Table.Td align="center">
+              <Table.Td>
                 <NativeSelect
                   value={
-                    chat?.memberAccess.find((m) => m.userId === member.userId)
+                    chat?.memberAccess?.find((m) => m.userId === member.userId)
                       ?.access
                   }
                   onChange={(e) => {
-                    updateChat(chat?._id, {
+                    updateChatAccess(chat?._id, {
                       memberAccess: [
                         ...chat?.memberAccess.filter(
                           (m) => m.userId !== member.userId
@@ -205,11 +214,11 @@ const MembersTable = (props: {
                     {(() => {
                       switch (chat?.scope) {
                         case "private":
-                          return "Inherit - private";
+                          return "Inherit (No Access)";
                         case "public":
-                          return "Inherit - public";
+                          return "Inherit (Can view)";
                         case "viewOnly":
-                          return "Inherit - viewOnly";
+                          return "Inherit (Can edit";
                         default:
                           return "Inherit";
                       }
@@ -223,7 +232,7 @@ const MembersTable = (props: {
           ))}
         </Table.Tbody>
       </Table>
-    </>
+    </ScrollArea.Autosize>
   );
 };
 
@@ -236,10 +245,12 @@ const User = (member: any) => (
       radius="sm"
     ></Avatar>
     <Stack gap={1}>
-      <Text c="white" fw={600} fz={"md"}>
+      <Text c="white" fw={600} size="sm">
         {member?.firstName + " " + member?.lastName}
       </Text>
-      <Text>{member?.identifier}</Text>
+      <Text size="sm" truncate>
+        {member?.identifier}
+      </Text>
     </Stack>
   </Group>
 );

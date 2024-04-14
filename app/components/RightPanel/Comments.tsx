@@ -20,6 +20,7 @@ import CommentItem from "@/app/workspace/[wokspace-slug]/CommentItem";
 import { useToggle } from "@mantine/hooks";
 import { comment } from "postcss";
 import { socket } from "@/socket";
+import { getMessages } from "@/app/controllers/message";
 
 export default function Comments(props: { toggleRight: () => void }) {
   const { toggleRight } = props;
@@ -33,13 +34,10 @@ export default function Comments(props: { toggleRight: () => void }) {
   const pathname = usePathname();
   useEffect(() => {
     if (chatId) {
-      getChat(chatId, organization?.id || "").then((res) => {
-        const comments = res.chats[0].messages
-          .map((message: any) => {
-            return message.comments;
-          })
-          .flat();
-        setComments(comments);
+      getMessages(chatId).then((res) => {
+        res.messages.forEach((message: any) => {
+          setComments((comments) => [...comments, ...message.comments]);
+        });
       });
     }
   }, [chatId]);
@@ -97,9 +95,9 @@ export default function Comments(props: { toggleRight: () => void }) {
     setChatId(pathname?.split("/")[3]);
   }, [pathname]);
 
-  useEffect(() => {
-    console.log("comment", comment);
-  }, [comment]);
+  // useEffect(() => {
+  //   console.log("comment", comment);
+  // }, [comment]);
 
   useEffect(() => {
     const fetchParticipants = async () => {

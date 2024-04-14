@@ -72,14 +72,13 @@ app.prepare().then(() => {
       );
       io.to(roomId).emit("refreshChats");
     });
+    
     socket.on("updatePersonalChat", (item) => {
       console.log(
         `User with ID: ${socket.id} created private chat: ${item} to user: ${socket.id}`
       );
       io.to(socket.id).emit("refreshChats");
     });
-
-    
 
     // Message
     socket.on("createMessage", (roomId, message) => {

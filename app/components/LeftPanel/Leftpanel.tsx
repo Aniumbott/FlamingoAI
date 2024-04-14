@@ -77,6 +77,9 @@ const LeftPanel = () => {
       >
         <OrganizationSwitcher
           hidePersonal
+          afterCreateOrganizationUrl="/workspace/:slug"
+          afterSelectPersonalUrl="/user/:id"
+          afterSelectOrganizationUrl="/workspace/:slug"
           appearance={{
             baseTheme: colorScheme === "dark" ? dark : undefined,
           }}
@@ -136,7 +139,11 @@ const LeftPanel = () => {
   );
 };
 
-const createPublicChat = async (userId: string, workspaceId: string, members: any) => {
+const createPublicChat = async (
+  userId: string,
+  workspaceId: string,
+  members: any
+) => {
   // console.log("creating a chat");
   socket.emit("hello", "world");
   // console.log("emmiting");

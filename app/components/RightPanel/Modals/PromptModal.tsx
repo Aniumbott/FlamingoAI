@@ -24,20 +24,29 @@ const PromptModal = (props: {
   parentFolder: Mongoose.Types.ObjectId | null;
   modalItem: IPromptDocument | null;
   setModalItem: (value: IPromptDocument | null) => void;
+  messageContent?: string;
 }) => {
-  const { opened, setOpened, modalItem, setModalItem, scope, parentFolder } =
-    props;
+  const {
+    opened,
+    setOpened,
+    modalItem,
+    setModalItem,
+    scope,
+    parentFolder,
+    messageContent,
+  } = props;
   const [name, setName] = useState(modalItem ? modalItem.name : "");
   const [description, setDescription] = useState(
     modalItem ? modalItem.description : ""
   );
-  const [content, setContent] = useState(modalItem ? modalItem.content : "");
+  const [content, setContent] = useState(
+    modalItem ? modalItem.content : messageContent || ""
+  );
 
   const [initialName, setInitialName] = useState(name);
   const [initialDescription, setInitialDescription] = useState(description);
   const [initialContent, setInitialContent] = useState(content);
 
-  const [showInstructions, setShowInstructions] = useState(false);
   const hasChanged =
     name !== initialName ||
     description !== initialDescription ||
@@ -89,6 +98,7 @@ const PromptModal = (props: {
             withAsterisk
             rows={10}
             value={content}
+            defaultValue={props.messageContent}
             onChange={(e) => setContent(e.target.value)}
           />
           {modalItem && (
@@ -126,15 +136,6 @@ const PromptModal = (props: {
             <Button variant="default" fw={400} fullWidth disabled={!hasChanged}>
               Save
             </Button>
-            // <Group gap={5} w={"100%"} grow preventGrowOverflow={true}>
-            //   <Button
-            //     variant="default"
-            //     fw={400}
-            //     onClick={() => setShowInstructions(!showInstructions)}
-            //   >
-            //     Use
-            //   </Button>
-            //  </Group>
           )}
         </Stack>
       </Stack>

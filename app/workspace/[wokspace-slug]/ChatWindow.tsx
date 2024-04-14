@@ -18,6 +18,9 @@ import {
   useCombobox,
   Group,
   Title,
+  Textarea,
+  LoadingOverlay,
+  Affix,
 } from "@mantine/core";
 import { IconLayoutSidebarLeftExpand, IconSend } from "@tabler/icons-react";
 import { useOrganization, useUser } from "@clerk/nextjs";
@@ -33,7 +36,12 @@ import ForkChatModal from "./ForkChatModal";
 import { getAllPrompts } from "@/app/controllers/prompt";
 import { IPromptDocument } from "@/app/models/Prompt";
 import PromptItem from "@/app/components/RightPanel/PromptItem";
+import PromptModal from "@/app/components/RightPanel/Modals/PromptModal";
 import ShareChatModal from "@/app/components/ShareChatModal";
+import { notFound } from "next/navigation";
+import { showErrorNotification } from "@/app/controllers/notification";
+import { set } from "mongoose";
+import ErrorPage from "@/app/components/ErrorPage";
 
 export default function ChatWindow(props: {
   currentChatId: String;
@@ -72,12 +80,8 @@ export default function ChatWindow(props: {
     return [...chat.participants, user?.id];
   };
 
-  let isViewOnly = false;
-
-  useEffect(() => {
-    console.log("chat", chat);
-
-    isViewOnly =
+  function isViewOnly(chat: any) {
+    const ans =
       (chat?.createdBy !== user?.id &&
         chat?.memberAccess?.find((m: any) => m.userId === user?.id)?.access ===
           "view") ||
@@ -89,9 +93,15 @@ export default function ChatWindow(props: {
         chat?.scope === "public" &&
         chat?.memberAccess?.find((m: any) => m.userId === user?.id)?.access ===
           "viewOnly");
+    return ans;
+  }
+
+  useEffect(() => {
+    console.log("chat", chat);
 
     socket.on("newMessage", (msg) => {
-      // console.log("new message", msg);
+      console.log("new message", msg);
+      setProcessing(msg.type != "assistant");
       setChat({
         ...chat,
         messages: [...chat.messages, msg],
@@ -106,6 +116,7 @@ export default function ChatWindow(props: {
     });
 
     socket.on("updateMessage", (msg) => {
+      console.log("updateMessage", msg);
       // delete all messages from index to end
       const index = chat.messages.findIndex((m: any) => m._id == msg._id);
       setChat({
@@ -186,6 +197,7 @@ export default function ChatWindow(props: {
     });
 
     return () => {
+      socket.off("refreshChat");
       socket.off("newMessage");
       socket.off("deleteMessage");
       socket.off("newComment");
@@ -210,18 +222,38 @@ export default function ChatWindow(props: {
   }, [organization?.membersCount]);
 
   useEffect(() => {
+    setMessageInput("");
+
+    socket.on("refreshChats", () => {
+      console.log("refreshing chat");
+      getChat(currentChatId, organization?.id || "", user?.id || "").then(
+        (res) => {
+          setChat(res.chats?.[0]);
+        }
+      );
+    });
+
     if (currentChatId != "") {
       socket.emit("joinChatRoom", currentChatId);
       const getCurrentChat = async () => {
-        return await getChat(currentChatId, organization?.id || "");
+        return await getChat(
+          currentChatId,
+          organization?.id || "",
+          user?.id || ""
+        );
       };
       getCurrentChat().then((res) => {
         setChat(res.chats?.[0]);
+        setLoading(false);
       });
       getAllPrompts(organization?.id || "", user?.id || "").then((res) => {
         setPrompts(res.prompts);
       });
     }
+
+    return () => {
+      socket.off("refreshChats");
+    };
   }, [currentChatId]);
 
   useEffect(() => {
@@ -230,276 +262,323 @@ export default function ChatWindow(props: {
     }
   }, [chat?.messages?.length]);
 
+  const [promptOpened, setPromptOpened] = useState(false);
+  const [newPrompt, setnewPrompt] = useState<IPromptDocument | null>(null);
+  const [messageContent, setMessageContent] = useState("");
+  const [processing, setProcessing] = useState(false);
+  const [loading, setLoading] = useState(true);
+
   return (
-    <Stack gap={0} h={"100%"} justify="space-between" w="100%" mr={20}>
-      {/* <Group gap={30} justify="space-between" py={5} px={10}> */}
-      <div clGrouame="w-full flex flex-row justify-start p-2">
-        {!leftOpened ? (
-          <Group ml={5}>
-            <Title order={4}>TeamGPT</Title>
-            <ActionIcon
-              variant="subtle"
-              color="grey"
-              aria-label="Settings"
-              onClick={toggleLeft}
-            >
-              <IconLayoutSidebarLeftExpand
-                style={{ width: "90%", height: "90%" }}
-                stroke={1.5}
-              />
-            </ActionIcon>
-          </Group>
-        ) : null}
-        <Text size="sm" ml={5} fw={500}>
-          {chat?.name}
-        </Text>
-        <Button
-          variant="subtle"
-          color="white"
-          onClick={() => setShareChatOpened(true)}
-          mx={10}
-        >
-          Share
-        </Button>
-        {shareChatOpened && (
-          <ShareChatModal
-            opened={shareChatOpened}
-            setOpened={setShareChatOpened}
-            chat={chat}
-            setChat={setChat}
-            members={participants}
-          />
-        )}
-      </div>
-      {/* </Group> */}
-      <Divider />
-
-      <Paper
-        h={"70vh"}
-        w={"100%"}
-        style={{
-          overflowY: "scroll",
-          flexGrow: "1",
-        }}
-        ref={scrollableRef}
-      >
-        {chat?.messages ? (
-          chat?.messages?.map((message: any, index: Number) => {
-            const user = participants.find(
-              (participant: any) => participant.userId == message.createdBy
-            ) || {
-              hasImage: false,
-              firstName: "Unknown",
-              lastName: "User",
-              imageUrl: "",
-            };
-            return (
-              <div key={message._id} className="mb-1">
-                <MessageItem message={message} participants={participants} />
-              </div>
-            );
-          })
-        ) : (
-          <Loader
-            style={{
-              position: "absolute",
-              top: "30%",
-              left: "50%",
-            }}
-            type="dots"
-          />
-        )}
-
-        <div ref={targetRef}></div>
-      </Paper>
-
-      {chat?.archived ? (
-        <div
-          className="w-full h-fit py-2 pb-4 flex justify-center items-center"
-          style={{
-            background:
-              colorScheme == "dark"
-                ? "var(--mantine-color-dark-8)"
-                : "var(--mantine-color-gray-0)",
-          }}
-        >
-          <Group
-            gap={25}
-            justify="space-between"
-            w={"80%"}
-            c={"white"}
-            bg={
-              colorScheme === "dark"
-                ? "var(--mantine-color-gray-8)"
-                : "var(--mantine-color-gray-4)"
-            }
-            p={10}
-          >
-            <Text ta={"center"} style={{ flexGrow: 1 }}>
-              This chat has been archived.
-            </Text>
-            <Group gap={15}>
+    <>
+      {!chat ? (
+        <Affix top={0} left={0} right={0} bottom={0} zIndex={1000} bg="dark">
+          <ErrorPage />
+        </Affix>
+      ) : (
+        <Stack gap={0} h={"100%"} justify="space-between" w="100%" mr={20}>
+          {/* <Group gap={30} justify="space-between" py={5} px={10}> */}
+          <div className="w-full flex flex-row justify-start p-1">
+            {!leftOpened ? (
+              <Group ml={5}>
+                <Title order={4}>TeamGPT</Title>
+                <ActionIcon
+                  variant="subtle"
+                  color="grey"
+                  aria-label="Settings"
+                  onClick={toggleLeft}
+                >
+                  <IconLayoutSidebarLeftExpand
+                    style={{ width: "90%", height: "90%" }}
+                    stroke={1.5}
+                  />
+                </ActionIcon>
+              </Group>
+            ) : null}
+            <Group justify="space-between" px={"md"} w={"100%"}>
+              <Text size="sm" ml={5} fw={500}>
+                {chat?.name}
+              </Text>
               <Button
-                variant="default"
-                onClick={() => {
-                  updateChat(chat?._id, {
-                    archived: false,
-                  }).then((res) => {
-                    console.log(res);
-                  });
-                }}
+                variant="subtle"
+                color="var(--mantine-color-gray-4)"
+                onClick={() => setShareChatOpened(true)}
+                mx={10}
               >
-                Restore
-              </Button>
-              <Button
-                variant="default"
-                onClick={() => {
-                  deleteChat(chat).then((res) => {
-                    console.log(res);
-                  });
-                }}
-              >
-                Delete
+                Share
               </Button>
             </Group>
-          </Group>
-        </div>
-      ) : isViewOnly ? (
-        <div
-          className="w-full h-fit py-2 pb-4 flex justify-center items-center"
-          style={{
-            background:
-              colorScheme == "dark"
-                ? "var(--mantine-color-dark-8)"
-                : "var(--mantine-color-gray-0)",
-          }}
-        >
-          <Text
-            p={20}
-            bg={
-              colorScheme === "dark"
-                ? "var(--mantine-color-gray-8)"
-                : "var(--mantine-color-gray-4)"
-            }
-            w={"80%"}
-            ta={"center"}
-            style={{ borderRadius: "10px" }}
-          >
-            You can only view this chat. Ask the owner to grant you access.
-          </Text>
-        </div>
-      ) : (
-        <Combobox
-          store={combobox}
-          onOptionSubmit={(val) => {
-            combobox.closeDropdown();
-            setSearchTerm("");
-          }}
-          position="top"
-        >
-          <div
-            className="w-full h-fit py-2 pb-4 flex justify-center items-center"
-            style={{
-              background:
-                colorScheme == "dark"
-                  ? "var(--mantine-color-dark-8)"
-                  : "var(--mantine-color-gray-0)",
-            }}
-          >
-            <Combobox.Target>
-              <TextInput
-                variant="filled"
-                placeholder="Type a message"
-                w="75%"
-                size="lg"
-                radius="0"
-                value={messageInput}
-                onChange={(e) => {
-                  setMessageInput(e.currentTarget.value);
-                  if (e.currentTarget.value.includes("/")) {
-                    // Set searchTerm with the value after "/"
-                    setSearchTerm(e.currentTarget.value.split("/").pop() ?? "");
-                    combobox.openDropdown();
-                  } else {
-                    combobox.closeDropdown();
-                  }
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !messageInput.includes("/")) {
-                    createMessage(
-                      user?.id || "",
-                      messageInput,
-                      "user",
-                      currentChatId
-                    ).then((res) => {
-                      sendAssistantMessage(
-                        res.message,
-                        chat.workspaceId,
-                        "gpt-3.5-turbo"
-                      );
-                      setMessageInput("");
-                    });
-                  }
-                }}
+            {shareChatOpened && (
+              <ShareChatModal
+                opened={shareChatOpened}
+                setOpened={setShareChatOpened}
+                chat={chat}
+                setChat={setChat}
+                members={participants}
               />
-            </Combobox.Target>
-            <ActionIcon
-              size="50"
-              radius="0"
-              color="teal"
-              onClick={() => {
-                createMessage(
-                  user?.id || "",
-                  messageInput,
-                  "user",
-                  currentChatId
-                ).then((res) => {
-                  sendAssistantMessage(
-                    res.message,
-                    chat.workspaceId,
-                    "gpt-3.5-turbo"
-                  );
-                  setMessageInput("");
-                });
+            )}
+            {promptOpened && (
+              <PromptModal
+                opened={promptOpened}
+                setOpened={setPromptOpened}
+                scope="public"
+                modalItem={newPrompt}
+                setModalItem={setnewPrompt}
+                parentFolder={null}
+                messageContent={messageContent}
+              />
+            )}
+          </div>
+          {/* </Group> */}
+          <Divider />
+
+          <Paper
+            h={"70vh"}
+            w={"100%"}
+            style={{
+              overflowY: "scroll",
+              flexGrow: "1",
+            }}
+            ref={scrollableRef}
+          >
+            {!loading ? (
+              chat?.messages?.map((message: any, index: Number) => {
+                const user = participants.find(
+                  (participant: any) => participant.userId == message?.createdBy
+                ) || {
+                  hasImage: false,
+                  firstName: "Unknown",
+                  lastName: "User",
+                  imageUrl: "",
+                };
+                return (
+                  <div key={message._id} className="mb-1">
+                    <MessageItem
+                      message={message}
+                      participants={participants}
+                      setPromptOpened={setPromptOpened}
+                      setPromptContent={setMessageContent}
+                    />
+                  </div>
+                );
+              })
+            ) : (
+              <Loader
+                style={{
+                  position: "absolute",
+                  top: "30%",
+                  left: "50%",
+                }}
+                type="dots"
+              />
+            )}
+
+            <div ref={targetRef}></div>
+          </Paper>
+
+          {chat?.archived ? (
+            <div
+              className="w-full h-fit py-2 pb-4 flex justify-center items-center"
+              style={{
+                background:
+                  colorScheme == "dark"
+                    ? "var(--mantine-color-dark-8)"
+                    : "var(--mantine-color-gray-0)",
               }}
             >
-              <IconSend size="24" />
-            </ActionIcon>
-          </div>
+              <Group
+                gap={25}
+                justify="space-between"
+                w={"80%"}
+                c={"white"}
+                bg={
+                  colorScheme === "dark"
+                    ? "var(--mantine-color-gray-8)"
+                    : "var(--mantine-color-gray-4)"
+                }
+                p={10}
+              >
+                <Text ta={"center"} style={{ flexGrow: 1 }}>
+                  This chat has been archived.
+                </Text>
+                <Group gap={15}>
+                  <Button
+                    variant="default"
+                    onClick={() => {
+                      updateChat(chat?._id, {
+                        archived: false,
+                      }).then((res) => {
+                        console.log(res);
+                      });
+                    }}
+                  >
+                    Restore
+                  </Button>
+                  <Button
+                    variant="default"
+                    onClick={() => {
+                      deleteChat(chat).then((res) => {
+                        console.log(res);
+                      });
+                    }}
+                  >
+                    Delete
+                  </Button>
+                </Group>
+              </Group>
+            </div>
+          ) : isViewOnly(chat) ? (
+            <div
+              className="w-full h-fit py-2 pb-4 flex justify-center items-center"
+              style={{
+                background:
+                  colorScheme == "dark"
+                    ? "var(--mantine-color-dark-8)"
+                    : "var(--mantine-color-gray-0)",
+              }}
+            >
+              <Text
+                p={20}
+                bg={
+                  colorScheme === "dark"
+                    ? "var(--mantine-color-gray-8)"
+                    : "var(--mantine-color-gray-4)"
+                }
+                w={"80%"}
+                ta={"center"}
+                style={{ borderRadius: "10px" }}
+              >
+                You can only view this chat. Ask the owner to grant you access.
+              </Text>
+            </div>
+          ) : (
+            <Combobox
+              store={combobox}
+              onOptionSubmit={(val) => {
+                combobox.closeDropdown();
+                setSearchTerm("");
+              }}
+              position="top"
+            >
+              <div
+                className="w-full h-fit py-2 pb-4 flex justify-center items-center"
+                style={{
+                  background:
+                    colorScheme == "dark"
+                      ? "var(--mantine-color-dark-8)"
+                      : "var(--mantine-color-gray-0)",
+                }}
+              >
+                <Combobox.Target>
+                  <Textarea
+                    autosize
+                    maxRows={4}
+                    variant="filled"
+                    size="lg"
+                    radius="0"
+                    w="75%"
+                    placeholder="Type a message"
+                    value={messageInput}
+                    disabled={processing}
+                    onChange={(e) => {
+                      setMessageInput(e.currentTarget.value);
 
-          <Combobox.Dropdown>
-            <Combobox.Options>
-              {/* <Text>Select Prompts</Text>
-            <Divider /> */}
-              <ScrollArea.Autosize mah={200} type="scroll">
-                {filteredPrompts?.length > 0 ? (
-                  filteredPrompts.map((prompt) => (
-                    <Combobox.Option
-                      key={prompt._id}
-                      value={prompt._id}
-                      onClick={() => {
-                        let newMessageInput = messageInput;
-                        if (newMessageInput.includes("/")) {
-                          newMessageInput = newMessageInput.substring(
-                            0,
-                            newMessageInput.lastIndexOf("/")
+                      if (e.currentTarget.value.includes("/")) {
+                        setSearchTerm(
+                          e.currentTarget.value.split("/").pop() ?? ""
+                        );
+                        combobox.openDropdown();
+                      } else {
+                        combobox.closeDropdown();
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (
+                        messageInput != "" &&
+                        e.key === "Enter" &&
+                        !e.shiftKey &&
+                        !messageInput.includes("/")
+                      ) {
+                        setProcessing(true);
+                        createMessage(
+                          user?.id || "",
+                          messageInput,
+                          "user",
+                          currentChatId
+                        ).then((res) => {
+                          sendAssistantMessage(
+                            res.message,
+                            chat.workspaceId,
+                            "gpt-3.5-turbo"
                           );
-                        }
-                        setMessageInput(newMessageInput + prompt.content);
-                        setSearchTerm("");
-                      }}
-                    >
-                      <Text c={"white"}>{prompt.name}</Text>
-                    </Combobox.Option>
-                  ))
-                ) : (
-                  <Combobox.Empty>No prompts found</Combobox.Empty>
-                )}
-              </ScrollArea.Autosize>
-            </Combobox.Options>
-          </Combobox.Dropdown>
-        </Combobox>
+                          setMessageInput("");
+                        });
+                      }
+                    }}
+                  />
+                </Combobox.Target>
+                <ActionIcon
+                  size="50"
+                  radius="0"
+                  color="teal"
+                  disabled={processing}
+                  onClick={() => {
+                    if (messageInput != "") {
+                      setProcessing(true);
+                      createMessage(
+                        user?.id || "",
+                        messageInput,
+                        "user",
+                        currentChatId
+                      ).then((res) => {
+                        sendAssistantMessage(
+                          res.message,
+                          chat.workspaceId,
+                          "gpt-3.5-turbo"
+                        );
+                        setMessageInput("");
+                      });
+                    }
+                  }}
+                >
+                  <IconSend size="24" />
+                </ActionIcon>
+              </div>
+
+              <Combobox.Dropdown>
+                <Combobox.Options>
+                  {/* <Text>Select Prompts</Text>
+            <Divider /> */}
+                  <ScrollArea.Autosize mah={200} type="scroll">
+                    {filteredPrompts?.length > 0 ? (
+                      filteredPrompts.map((prompt) => (
+                        <Combobox.Option
+                          key={prompt._id}
+                          value={prompt._id}
+                          onClick={() => {
+                            let newMessageInput = messageInput;
+                            if (newMessageInput.includes("/")) {
+                              newMessageInput = newMessageInput.substring(
+                                0,
+                                newMessageInput.lastIndexOf("/")
+                              );
+                            }
+                            setMessageInput(newMessageInput + prompt.content);
+                            setSearchTerm("");
+                          }}
+                        >
+                          <Text c={"white"}>{prompt.name}</Text>
+                        </Combobox.Option>
+                      ))
+                    ) : (
+                      <Combobox.Empty>No prompts found</Combobox.Empty>
+                    )}
+                  </ScrollArea.Autosize>
+                </Combobox.Options>
+              </Combobox.Dropdown>
+            </Combobox>
+          )}
+        </Stack>
       )}
-    </Stack>
+    </>
   );
 }

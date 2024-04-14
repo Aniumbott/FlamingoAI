@@ -39,11 +39,16 @@ function getDate(date: string) {
   return new Date(date).toLocaleDateString();
 }
 
-function MessageItem(props: { message: any; participants: any[] }) {
-  const { message, participants } = props;
+function MessageItem(props: {
+  message: any;
+  participants: any[];
+  setPromptOpened: (value: boolean) => void;
+  setPromptContent: (value: string) => void;
+}) {
+  const { message, participants, setPromptOpened, setPromptContent } = props;
   const { colorScheme } = useMantineColorScheme();
   const { hovered, ref } = useHover();
-  const [messageText, setMessageText] = useState(message.content || "");
+  const [messageText, setMessageText] = useState<string>("");
   const [isEdit, setIsEdit] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentInput, setCommentInput] = useState("");
@@ -58,6 +63,14 @@ function MessageItem(props: { message: any; participants: any[] }) {
     });
     setCreatedBy(getCreatedBy);
   }, [participants]);
+
+  useEffect(() => {
+    setMessageText(message.content);
+  }, [message]);
+
+  // useEffect(() => {
+  //   console.log(messageText);
+  // }, [messageText]);
 
   return (
     <Box ref={ref}>
@@ -144,7 +157,13 @@ function MessageItem(props: { message: any; participants: any[] }) {
                         <IconEdit style={{ width: rem(16) }} />
                       </ActionIcon>
                       <ActionIcon color="grey" variant="subtle">
-                        <IconBookmarkPlus style={{ width: rem(16) }} />
+                        <IconBookmarkPlus
+                          style={{ width: rem(16) }}
+                          onClick={() => {
+                            setPromptContent(message.content);
+                            setPromptOpened(true);
+                          }}
+                        />
                       </ActionIcon>
                       <ActionIcon
                         color="grey"
@@ -174,8 +193,11 @@ function MessageItem(props: { message: any; participants: any[] }) {
               <div className="w-full flex flex-row items-center justify-center mt-3">
                 <TextInput
                   w="100%"
-                  value={messageText.toString()}
-                  onChange={(e) => setMessageText(e.currentTarget.value)}
+                  defaultValue={messageText}
+                  onChange={(e) => {
+                    // console.log(e.currentTarget.value);
+                    setMessageText(e.currentTarget.value);
+                  }}
                 />
                 <ActionIcon
                   color="teal"
@@ -183,16 +205,18 @@ function MessageItem(props: { message: any; participants: any[] }) {
                   size="lg"
                   variant="light"
                   onClick={() => {
+                    console.log(messageText);
                     if (
                       confirm(
                         "All messages sent after the one you are about to edit will be deleted!"
                       ).valueOf()
                     ) {
-                      updateMessageContent({
-                        ...message,
-                        creaatedBy: createdBy?.userId,
-                        content: messageText,
-                      })
+                      let msg = message;
+                      msg.content = messageText;
+                      msg.createdBy = createdBy?.userId;
+
+                      console.log("msg", msg);
+                      updateMessageContent(msg)
                         .then((res) => {
                           sendAssistantMessage(
                             res.message,
@@ -203,6 +227,7 @@ function MessageItem(props: { message: any; participants: any[] }) {
                         .then(() => {
                           setIsEdit(!isEdit);
                         });
+                      setMessageText("");
                     }
                   }}
                 >

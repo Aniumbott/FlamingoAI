@@ -85,7 +85,7 @@ export async function POST(req: any, res: NextApiResponse) {
         messages.push(message);
       }
 
-      console.log("messages", messages);
+      // console.log("messages", messages);
 
       chat = await Chat.create({
         name: body.name,
@@ -104,10 +104,10 @@ export async function POST(req: any, res: NextApiResponse) {
         parentFolder: body.parentFolder,
         workspaceId: body.workspaceId,
         participants: [body.createdBy],
-        memberAccess: body.members.map((memberId:string) => ({
+        memberAccess: body.members.map((memberId: string) => ({
           userId: memberId,
-          access: 'inherit',
-        }))
+          access: "inherit",
+        })),
       });
 
       // If parentFolder was provided, add the new chat ID to the parent folder's chats array
@@ -134,11 +134,11 @@ export async function GET(req: NextRequest, res: NextResponse) {
     const workspaceId = reqParam.get("workspaceId") || "";
     const createdBy = reqParam.get("createdBy") || "";
     const id = reqParam.get("id");
-    const independent = reqParam.get("independent");
+    const action = reqParam.get("action");
     let chats;
 
     // get independent chats based on scope
-    if (independent && workspaceId && createdBy) {
+    if (action === "independent") {
       if (scope === "public") {
         chats = await Chat.find({
           workspaceId: workspaceId,
@@ -166,10 +166,12 @@ export async function GET(req: NextRequest, res: NextResponse) {
         }).sort({ updatedAt: -1 });
       }
     }
+
     //get all chats relevant to workspace and user
-    else if (id === "all" && workspaceId && createdBy) {
+    else if (action === "all") {
       chats = await Chat.find({
         workspaceId: workspaceId,
+        archived: false,
         $or: [
           { scope: { $ne: "private" } },
           {
@@ -187,13 +189,13 @@ export async function GET(req: NextRequest, res: NextResponse) {
             ],
           },
         ],
-        archived: false,
       }).sort({ updatedAt: -1 });
     }
     // get archived chats
-    else if (id === "archived" && workspaceId && createdBy) {
+    else if (action === "archived") {
       chats = await Chat.find({
         workspaceId: workspaceId,
+        archived: true,
         $or: [
           { scope: { $ne: "private" } },
           {
@@ -211,14 +213,30 @@ export async function GET(req: NextRequest, res: NextResponse) {
             ],
           },
         ],
-        archived: true,
       }).sort({ updatedAt: -1 });
     }
     // get specific chat by id
-    else if (id && workspaceId) {
+    else if (id) {
       chats = await Chat.find({
         workspaceId: workspaceId,
         _id: id,
+        $or: [
+          { scope: { $ne: "private" } },
+          {
+            scope: "private",
+            $or: [
+              { createdBy: createdBy },
+              {
+                memberAccess: {
+                  $elemMatch: {
+                    userId: createdBy,
+                    access: { $ne: "inherit" },
+                  },
+                },
+              },
+            ],
+          },
+        ],
       }).populate({
         path: "messages",
         populate: {
@@ -274,9 +292,7 @@ export async function PUT(req: any, res: NextApiResponse) {
       );
 
       if (newScope) {
-        // If newScope is not null, update the scope of all messages in the chat
         await Chat.findByIdAndUpdate(id, { scope: newScope });
-        await Message.updateMany({ chat: id }, { scope: newScope });
       }
 
       chat = await chat?.populate({

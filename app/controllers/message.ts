@@ -32,6 +32,17 @@ async function getMessage(id: String) {
   return response;
 }
 
+async function getMessages(chatId: String) {
+  const data = await fetch(`/api/message/?chatId=${chatId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const response = await data.json();
+  return response;
+}
+
 async function updateMessage(id: String, body: any) {
   const data = await fetch("/api/message", {
     method: "PUT",
@@ -61,6 +72,7 @@ async function deleteMessage(body: any) {
 }
 
 async function updateMessageContent(body: any) {
+  console.log("body at updateMessageContent", body);
   // get all messages from chat
   const data = await fetch("/api/message", {
     method: "PUT",
@@ -116,6 +128,7 @@ async function sendAssistantMessage(
 export {
   createMessage,
   getMessage,
+  getMessages,
   updateMessage,
   deleteMessage,
   updateMessageContent,

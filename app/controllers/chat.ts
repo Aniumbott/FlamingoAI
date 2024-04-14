@@ -21,10 +21,16 @@ async function createChat(
   const notificationId = showLoadingNotification("Creating chat...");
   try {
     const userId = members.map((member) => member.userId);
-    console.log(userId)
+    console.log(userId);
     const data = await fetch("/api/chat", {
       method: "POST",
-      body: JSON.stringify({ createdBy, scope, workspaceId, parentFolder, members: userId}),
+      body: JSON.stringify({
+        createdBy,
+        scope,
+        workspaceId,
+        parentFolder,
+        members: userId,
+      }),
       headers: {
         "Content-Type": "application/json",
       },
@@ -32,11 +38,10 @@ async function createChat(
 
     const response = await data.json();
 
-    if (scope === "public")
-      socket.emit("updateChat", workspaceId, response.chat);
-    else socket.emit("updatePersonalChat", response.chat);
+    if (scope === "private") socket.emit("updatePersonalChat", response.chat);
+    else socket.emit("updateChat", workspaceId, response.chat);
     showSuccessNotification(notificationId, "Chat created");
-    console.log(response)
+    console.log(response);
     return response;
   } catch (err) {
     showErrorNotification(notificationId, "Failed to create chat");
@@ -72,15 +77,15 @@ async function createChatFork(
   });
   const response = await data.json();
 
-  if (scope === "public") socket.emit("createChat", workspaceId, response.chat);
-  else socket.emit("createPersonalChat", response.chat);
+  if (scope === "private") socket.emit("updatePersonalChat", response.chat);
+  else socket.emit("updateChat", workspaceId, response.chat);
   return response;
 }
 
-async function getChat(id: String, workspaceId: String) {
+async function getChat(id: String, workspaceId: String, createdBy: string) {
   try {
     const data = await fetch(
-      `/api/chat/?&workspaceId=${workspaceId}&id=${id}`,
+      `/api/chat/?&workspaceId=${workspaceId}&id=${id}&createdBy=${createdBy}`,
       {
         method: "GET",
         headers: {
@@ -96,6 +101,7 @@ async function getChat(id: String, workspaceId: String) {
   }
 }
 
+// chats that done haae any parent
 async function getIndependentChats(
   scope: Scope,
   createdBy: string,
@@ -103,7 +109,7 @@ async function getIndependentChats(
 ) {
   try {
     const data = await fetch(
-      `/api/chat/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}&independent=true`,
+      `/api/chat/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}&action=independent`,
       {
         method: "GET",
         headers: {
@@ -123,7 +129,7 @@ async function getIndependentChats(
 async function getAllChats(createdBy: string, workspaceId: string) {
   try {
     const data = await fetch(
-      `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&id=all`,
+      `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&action=all`,
       {
         method: "GET",
         headers: {
@@ -142,7 +148,7 @@ async function getAllChats(createdBy: string, workspaceId: string) {
 async function getArchivedChats(createdBy: string, workspaceId: string) {
   try {
     const data = await fetch(
-      `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&id=archived`,
+      `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&action=archived`,
       {
         method: "GET",
         headers: {
@@ -169,9 +175,32 @@ async function updateChat(id: String, body: any) {
       },
     });
     const response = await data.json();
-    if (response.chat.scope === "public")
-      socket.emit("updateChat", response.chat.workspaceId, response.chat);
-    else socket.emit("updatePersonalChat", response.chat);
+    if (response.chat.scope === "private")
+      socket.emit("updatePersonalChat", response.chat);
+    else socket.emit("updateChat", response.chat.workspaceId, response.chat);
+
+    showSuccessNotification(notificationId, "Changes Saved");
+    return response;
+  } catch (err) {
+    showErrorNotification(notificationId, "Failed to save changes");
+    console.error(err);
+    return err;
+  }
+}
+
+async function updateChatAccess(id: String, body: any) {
+  const notificationId = showLoadingNotification("Saving Changes...");
+  try {
+    const data = await fetch("/api/chat", {
+      method: "PUT",
+      body: JSON.stringify({ id, ...body }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const response = await data.json();
+
+    socket.emit("updateChat", response.chat.workspaceId, response.chat);
 
     showSuccessNotification(notificationId, "Changes Saved");
     return response;
@@ -196,9 +225,8 @@ async function deleteChat(chat: IChatDocument) {
     });
 
     const response = await data.json();
-    if (chat.scope === "public")
-      socket.emit("updateChat", chat.workspaceId, chat);
-    else socket.emit("updatePersonalChat", chat);
+    if (chat.scope === "private") socket.emit("updatePersonalChat", chat);
+    else socket.emit("updateChat", chat.workspaceId, chat);
 
     showSuccessNotification(notificationId, "Chat Deleted");
     return response;
@@ -252,6 +280,7 @@ export {
   getAllChats,
   getArchivedChats,
   updateChat,
+  updateChatAccess,
   deleteChat,
   sortItems,
 };

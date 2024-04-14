@@ -1,6 +1,8 @@
 .root {
+  position: relative;
   padding-top: rem(80px);
   padding-bottom: rem(80px);
+  z-index: 1000;
 }
 
 .inner {

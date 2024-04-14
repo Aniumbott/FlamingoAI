@@ -29,6 +29,7 @@ import LeftPanel from "../../components/LeftPanel/Leftpanel";
 import ChatWindow from "./ChatWindow";
 import { createChat } from "@/app/controllers/chat";
 import { createAssistant } from "@/app/controllers/assistant";
+import path from "path";
 
 const Workspace = () => {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
@@ -38,8 +39,8 @@ const Workspace = () => {
   const { organization } = useOrganization();
   const router = useRouter();
   const pathname = usePathname();
-  
-  const [orgMembers , setOrgMembers] = useState<any>([]);
+
+  const [orgMembers, setOrgMembers] = useState<any>([]);
   useEffect(() => {
     const fetchOrgMembers = async () => {
       const res =
@@ -53,6 +54,7 @@ const Workspace = () => {
 
   useEffect(() => {
     console.log("organization ID", orgId);
+
     socket.emit("joinWorkspaceRoom", orgId);
     return () => {
       socket.emit("leaveWorkspaceRoom", orgId);
@@ -84,9 +86,20 @@ const Workspace = () => {
   }, []);
 
   useEffect(() => {
+    // console.log("slug", organization?.slug);
+    // if (pathname?.split("/")[2] != organization?.slug) {
+    //   // notFound();
+    //}
+
     if (currentChatId != "") socket.emit("leaveChatRoom", currentChatId);
     setCurrentChatId(pathname?.split("/")[3] || "");
   }, [pathname]);
+
+  useEffect(() => {
+    if (organization && pathname?.split("/")[2] != organization?.slug) {
+      notFound();
+    }
+  }, [organization]);
 
   // useEffect(() => {
   // console.log("orgId", orgId);

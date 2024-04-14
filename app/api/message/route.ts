@@ -58,6 +58,8 @@ export async function GET(req: any, res: NextApiResponse) {
       });
     } // console.log("chatId", chatId);
 
+    // console.log("messages", messages);
+
     return NextResponse.json({ message, messages }, { status: 200 });
   } catch (error: any) {
     // console.log("error from route", error);
@@ -81,17 +83,20 @@ export async function PUT(req: any, res: NextApiResponse) {
         createdAt: { $gt: body.createdAt },
       });
 
-      const message = await Message.findByIdAndUpdate(body._id, body).populate({
+      // console.log("message", body);
+
+      const message = await Message.findByIdAndUpdate(body._id, body, {
+        new: true,
+      }).populate({
         path: "comments",
         populate: {
           path: "replies",
         },
       });
 
-      // Delete the current message
-      // await Message.findByIdAndDelete(body.id);
+      // console.log("updated message", message);
 
-      return NextResponse.json({ message }, { status: 200 });
+      return NextResponse.json({ messages, message }, { status: 200 });
     } else {
       const message = await Message.findByIdAndUpdate(body.id, body, {
         new: true,

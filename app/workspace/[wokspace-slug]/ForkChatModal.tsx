@@ -92,10 +92,10 @@ export default function ForkChatModal(props: {
   const [chat, setChat] = useState<any>({});
   const [isCommentsIncluded, setIsCommentsIncluded] = useState(true);
   const { user } = useUser();
-
+// console.log('hello');
   useEffect(() => {
     const collectChat = async () =>
-      await getChat(message.chatId, organization?.id || "");
+      await getChat(message.chatId, organization?.id || "", user?.id || "");
     collectChat().then((res) => {
       setChat(res.chats[0]);
       // console.log(chat);
