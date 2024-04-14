@@ -27,8 +27,7 @@ import {
 } from "@/app/controllers/promptFolder";
 import { IPromptDocument } from "@/app/models/Prompt";
 import Mongoose from "mongoose";
-import { ModalControls } from "../PromptPanel"; 
-
+import { ModalControls } from "../Panels/PromptPanel/PromptPanel";
 
 export default function PromptFolderFeatureMenu(props: {
   folder: IPromptFolderDocument;

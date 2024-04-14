@@ -1,0 +1,30 @@
+.parent .chevron {
+  &[data-rotate] {
+    transform: rotate(90deg);
+  }
+  &[data-active] {
+    background-color: aqua;
+  }
+  margin: 0.5rem 0.2rem;
+}
+
+.accordionControl[data-active] {
+  background-color: #404040;
+}
+
+.parent {
+  border: 0;
+}
+
+.parent * {
+  border: 0;
+}
+
+.prompt {
+  padding: 0.5rem;
+  display: flex;
+  &:hover {
+    cursor: pointer;
+    background: #ffffff0a;
+  }
+}

@@ -1,7 +1,7 @@
 // Modules
 import { useState } from "react";
 import { useHover } from "@mantine/hooks";
-import { Menu, Button, Text, ActionIcon, rem } from "@mantine/core";
+import { Menu, Button, Text, ActionIcon, rem, Stack } from "@mantine/core";
 import {
   IconBuilding,
   IconFileImport,
@@ -9,7 +9,7 @@ import {
 } from "@tabler/icons-react";
 
 // Components
-import Workspace from "../Modals/Workspace/Workspace";
+import Workspace from "../Modals/WorkspaceSettings/WorkspaceSettings";
 
 type MenuButtonProps = {
   properties: {
@@ -25,40 +25,79 @@ const WorkspaceMenu = (props: { workspace: any }) => {
   const { ref } = useHover();
   return (
     <>
-      <Menu width={200}>
+      <Menu
+        position="bottom-end"
+        width={200}
+        styles={{
+          dropdown: {
+            backgroundColor: "#ffffff",
+          },
+          item: {
+            backgroundColor: "#ffffff",
+            color: "#000000",
+            hover: {
+              backgroundColor: "#000000",
+            },
+            height: "auto",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            padding: "0px",
+          },
+        }}
+      >
         <Menu.Target ref={ref}>
           <ActionIcon variant="subtle" color="grey" size="24px">
             <IconSettings />
           </ActionIcon>
         </Menu.Target>
         <Menu.Dropdown>
-          <Menu.Item
-            onClick={() => setOpenWorkspaceModal(true)}
-            leftSection={WorkspaceMenuData[0].icon}
-          >
-            {WorkspaceMenuData[0].title}
+          <Menu.Item onClick={() => setOpenWorkspaceModal(true)}>
+            <MenuButton properties={WorkspaceMenuData[0]} />
           </Menu.Item>
-          <Menu.Item leftSection={WorkspaceMenuData[1].icon}>
-            {WorkspaceMenuData[1].title}
+          <Menu.Item>
+            <MenuButton properties={WorkspaceMenuData[1]} />
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
 
-      <Workspace
-        opened={openWorkspaceModal}
-        setOpened={setOpenWorkspaceModal}
-        workspace={workspace}
-      />
+      {openWorkspaceModal && (
+        <Workspace
+          opened={openWorkspaceModal}
+          setOpened={setOpenWorkspaceModal}
+          workspace={workspace}
+        />
+      )}
     </>
   );
 };
 
-const MenuButton = (props: MenuButtonProps) => {
+const MenuButton = (props: {
+  properties: { title: string; icon: React.ReactNode };
+}) => {
   const { hovered, ref } = useHover();
   return (
     <div ref={ref}>
-      <Button leftSection={props.properties.icon}>
-        <Text fz={"sm"}>{props.properties.title}</Text>
+      <Button
+        leftSection={props.properties.icon}
+        fullWidth
+        {...(hovered
+          ? { color: "green", variant: "outline", fz: "xl" }
+          : { color: "0F172A", variant: "transparent" })}
+        justify="flex-start"
+        styles={{
+          root: {
+            padding: "6px",
+            height: "auto",
+          },
+        }}
+        // onClick={props.properties.onClickAction}
+      >
+        <Stack gap={1} align="start">
+          <Text fw={"400"} fz={"xs"}>
+            {props.properties.title}
+          </Text>
+        </Stack>
       </Button>
     </div>
   );

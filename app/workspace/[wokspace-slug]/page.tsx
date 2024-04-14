@@ -23,10 +23,9 @@ import {
 import { socket } from "@/socket";
 
 // Compontets
-import NavigationBar from "../../components/NavigationBar";
 import RightPanel from "../../components/RightPanel/RightPanel";
 import LeftPanel from "../../components/LeftPanel/Leftpanel";
-import ChatWindow from "./ChatWindow";
+import ChatWindow from "../../components/ChatWindow/ChatWindow";
 import { createChat } from "@/app/controllers/chat";
 import { createAssistant } from "@/app/controllers/assistant";
 import path from "path";
@@ -169,12 +168,6 @@ const Workspace = () => {
                 marginLeft: "-15px",
               }}
             >
-              {/* <div className="max-h-[50px]">
-                <NavigationBar
-                  leftOpened={leftOpened}
-                  toggleLeft={toggleLeft}
-                />
-              </div> */}
               <div className="grow">
                 {pathname?.split("/")[3] ? (
                   <ChatWindow

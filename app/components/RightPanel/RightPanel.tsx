@@ -22,8 +22,9 @@ import {
 // Components
 import style from "./RightPanel.module.css";
 import { UserButton, useAuth } from "@clerk/nextjs";
-import PromptPanel from "./PromptPanel";
-import Comments from "./Comments";
+import PromptPanel from "./Panels/PromptPanel/PromptPanel";
+import Comments from "./Panels/CommentsPanel";
+import CommentsPanel from "./Panels/CommentsPanel";
 
 export default function RightPanel(props: {
   rightOpened: boolean;
@@ -194,7 +195,7 @@ export default function RightPanel(props: {
       {/* Ralaven Content */}
       {active == 0 ? <PromptPanel toggleRight={toggleRight} /> : <></>}
       {active == 1 ? reports(toggleRight) : <></>}
-      {active == 2 ? <Comments toggleRight={toggleRight} /> : <></>}
+      {active == 2 ? <CommentsPanel toggleRight={toggleRight} /> : <></>}
       {active == 3 ? help(toggleRight) : <></>}
     </>
   );

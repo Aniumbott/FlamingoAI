@@ -25,7 +25,7 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { IPromptDocument } from "@/app/models/Prompt";
 import { createPrompt, deletePrompt } from "@/app/controllers/prompt";
-import { ModalControls } from "../PromptPanel";
+import { ModalControls } from "../Panels/PromptPanel/PromptPanel";
 
 export default function PromptFeatureMenu(props: {
   prompt: IPromptDocument;

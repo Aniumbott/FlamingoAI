@@ -19,16 +19,16 @@ import {
 import WorkspaceMenu from "./Menu/WorkspaceMenu";
 import ChatMenu from "./Menu/ChatMenu";
 import FilterMenuComponent from "./Menu/FilterMenu";
-import GeneralChats from "./GeneralChats";
 import { dark } from "@clerk/themes";
 import { createChat } from "../../controllers/chat";
-import PeopleChats from "./PeopleChats";
-import RecentChats from "./RecentChats";
+import PeopleChats from "./ChatFilters/PeopleChats";
+import RecentChats from "./ChatFilters/RecentChats";
 import { socket } from "@/socket";
-import FavouriteChats from "./FavouriteChats";
-import ArchivedChats from "./ArchivedChats";
+import FavouriteChats from "./ChatFilters/FavouriteChats";
+import ArchivedChats from "./ChatFilters/ArchivedChats";
 import { getWorkspace, updateWorkspace } from "@/app/controllers/workspace";
 import { set } from "mongoose";
+import GeneralChats from "./ChatFilters/GeneralChats";
 
 const LeftPanel = () => {
   const { colorScheme } = useMantineColorScheme();
