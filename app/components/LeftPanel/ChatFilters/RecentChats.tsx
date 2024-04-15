@@ -6,7 +6,7 @@ import { getAllChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import ChatItem from "../Items/ChatItem";
 import { useAuth } from "@clerk/nextjs";
-import { ScrollArea } from "@mantine/core";
+import { ScrollArea, Loader } from "@mantine/core";
 import { socket } from "@/socket";
 
 const RecentChats = (props: { members: any[] }) => {
@@ -27,6 +27,7 @@ const RecentChats = (props: { members: any[] }) => {
     });
 
     return () => {
+      console.log("unmounting recent chats");
       socket.off("refreshChats");
     };
   }, []);
@@ -36,9 +37,13 @@ const RecentChats = (props: { members: any[] }) => {
   return (
     <div>
       <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
-        {recentChats.map((chat, key) => {
-          return <ChatItem item={chat} key={key} members={members} />;
-        })}
+        {recentChats.length > 0 ? (
+          recentChats.map((chat, key) => {
+            return <ChatItem item={chat} key={key} members={members} />;
+          })
+        ) : (
+          <Loader type="dots" w={"100%"} color="teal" />
+        )}
       </ScrollArea>
     </div>
   );

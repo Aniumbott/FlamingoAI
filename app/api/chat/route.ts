@@ -30,13 +30,43 @@ export async function POST(req: any, res: NextApiResponse) {
         )
       );
 
+      chat = await Chat.create({
+        name: body.name,
+        createdBy: body.createdBy,
+        scope: body.scope,
+        parentFolder: null,
+        workspaceId: body?.workspaceId,
+        participants: [body.createdBy],
+        messages: [],
+        // messages: messages.map((message: any) => message._id),
+      });
+
       let messages = [];
 
       for (const messageToClone of messagesToClone as any) {
+        const newMessage = await Message.create({
+          createdBy: messageToClone.createdBy,
+          content: messageToClone.content,
+          type: messageToClone.type,
+          chatId: chat._id,
+          comments: [],
+        });
+        messages.push(newMessage);
+
         let comments = [];
 
         if (body.isComments) {
           for (const commentToClone of messageToClone.comments) {
+            const newComment = await Comment.create({
+              createdBy: commentToClone.createdBy,
+              content: commentToClone.content,
+              status: commentToClone.status,
+              messageId: newMessage._id,
+              replies: [],
+              parent: null,
+            });
+            comments.push(newComment);
+
             let replies = [];
             for (const replyToClone of commentToClone.replies) {
               replies.push(
@@ -44,58 +74,49 @@ export async function POST(req: any, res: NextApiResponse) {
                   createdBy: replyToClone.createdBy,
                   content: replyToClone.content,
                   status: replyToClone.status,
-                  messageId: replyToClone.messageId,
+                  messageId: newMessage._id,
                   replies: [],
-                  parent: replyToClone.parent,
+                  parent: newComment._id,
                 })
               );
             }
-            comments.push(
-              await Comment.create({
-                createdBy: commentToClone.createdBy,
-                content: commentToClone.content,
-                status: commentToClone.status,
-                messageId: commentToClone.messageId,
-                replies: replies.map((reply: any) => reply._id),
-                parent: null,
-              })
-            );
+            // console.log("replies", replies);
+            replies.length > 0
+              ? await Comment.findByIdAndUpdate(
+                  newComment._id,
+                  {
+                    replies: replies.map((reply: any) => reply._id),
+                  },
+                  { new: true }
+                )
+              : null;
           }
         }
-        const message = await Message.create({
-          createdBy: messageToClone.createdBy,
-          content: messageToClone.content,
-          type: messageToClone.type,
-          chatId: messageToClone.chatId,
-          comments: comments.map((comment: any) => comment._id),
-        });
-
-        // Update the messageId in comments and replies
-        for (const comment of comments) {
-          await Comment.findByIdAndUpdate(comment._id, {
-            messageId: message._id,
-          });
-          for (const reply of comment.replies) {
-            await Comment.findByIdAndUpdate(reply._id, {
-              messageId: message._id,
-            });
-          }
-        }
-
-        messages.push(message);
+        // console.log("comments", comments);
+        comments.length > 0
+          ? await Message.findByIdAndUpdate(
+              newMessage._id,
+              {
+                comments: comments.map((comment: any) => comment._id),
+              },
+              {
+                new: true,
+              }
+            )
+          : null;
       }
-
       // console.log("messages", messages);
+      chat = await Chat.findByIdAndUpdate(
+        chat._id,
+        {
+          messages: messages.map((message: any) => message._id),
+        },
+        {
+          new: true,
+        }
+      );
 
-      chat = await Chat.create({
-        name: body.name,
-        createdBy: body.createdBy,
-        scope: body.scope,
-        parentFolder: null,
-        workspaceId: body?.workspaceId,
-        participants: chatToClone?.participants,
-        messages: messages.map((message: any) => message._id),
-      });
+      // console.log("chat", chat);
     } else {
       chat = await Chat.create({
         name: "New Chat",
@@ -118,7 +139,6 @@ export async function POST(req: any, res: NextApiResponse) {
         // console.log("pushed ", chat._id, "to parent folder ", body.parentFolder);
       }
     }
-
     return NextResponse.json({ chat }, { status: 200 });
   } catch (error: any) {
     // console.log("error at POST in Chat route", error);

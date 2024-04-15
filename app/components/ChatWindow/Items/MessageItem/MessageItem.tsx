@@ -44,15 +44,23 @@ function MessageItem(props: {
   participants: any[];
   setPromptOpened: (value: boolean) => void;
   setPromptContent: (value: string) => void;
+  setForkMessage: (value: any) => void;
+  setIsForkModalOpen: (value: boolean) => void;
 }) {
-  const { message, participants, setPromptOpened, setPromptContent } = props;
+  const {
+    message,
+    participants,
+    setPromptOpened,
+    setPromptContent,
+    setForkMessage,
+    setIsForkModalOpen,
+  } = props;
   const { colorScheme } = useMantineColorScheme();
   const { hovered, ref } = useHover();
   const [messageText, setMessageText] = useState<string>("");
   const [isEdit, setIsEdit] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentInput, setCommentInput] = useState("");
-  const [isForkModalOpen, setIsForkModalOpen] = useState(false);
   const { user } = useUser();
   const [createdBy, setCreatedBy] = useState<any>(null);
   const { organization } = useOrganization();
@@ -74,13 +82,6 @@ function MessageItem(props: {
 
   return (
     <Box ref={ref}>
-      {isForkModalOpen && (
-        <ForkChatModal
-          isOpen={isForkModalOpen}
-          setIsOpen={setIsForkModalOpen}
-          message={message}
-        />
-      )}
       <div
         className="w-full  py-10 flex justify-center items-start"
         style={{
@@ -113,12 +114,15 @@ function MessageItem(props: {
                 />
               </Avatar>
             )}
-            {(hovered && !isEdit) || isForkModalOpen ? (
+            {hovered && !isEdit ? (
               <ActionIcon
                 color="grey"
                 variant="subtle"
                 mt="1rem"
-                onClick={() => setIsForkModalOpen(true)}
+                onClick={() => {
+                  setForkMessage(message);
+                  setIsForkModalOpen(true);
+                }}
               >
                 <IconArrowFork style={{ width: rem(24), rotate: "180deg" }} />
               </ActionIcon>

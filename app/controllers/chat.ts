@@ -59,6 +59,8 @@ async function createChatFork(
   createdBy: String,
   isComments: Boolean
 ) {
+  const notificationId = showLoadingNotification("Forking chat...");
+
   const data = await fetch("/api/chat", {
     method: "POST",
     body: JSON.stringify({
@@ -77,6 +79,7 @@ async function createChatFork(
   });
   const response = await data.json();
 
+  showSuccessNotification(notificationId, "Chat Forked");
   if (scope === "private") socket.emit("updatePersonalChat", response.chat);
   else socket.emit("updateChat", workspaceId, response.chat);
   return response;

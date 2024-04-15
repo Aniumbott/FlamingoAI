@@ -12,6 +12,7 @@ import {
   Text,
   TextInput,
   useCombobox,
+  Loader,
 } from "@mantine/core";
 import {
   IconCaretRightFilled,
@@ -142,29 +143,32 @@ const GeneralChats = (props: { members: any[] }) => {
     fetchChatsAndFolders();
 
     socket.on("refreshChats", () => {
+      console.log("refreshchats fetching chats and folder");
       fetchChatsAndFolders();
+      console.log("refreshchats fetching chats and folder");
     });
 
     return () => {
+      console.log("turning off socket at generatChats");
       socket.off("refreshChats");
     };
   }, []);
 
   const handleSort = () => {
-    console.log("sorting items", sort);
+    // console.log("sorting items", sort);
     if (publicChats.length > 0) setPublicChats(sortItems(publicChats, sort));
     if (privateChats.length > 0) setPrivateChats(sortItems(privateChats, sort));
     if (publicFolders.length > 0)
       setPublicFolders(sortItems(publicFolders, sort));
     if (privateFolders.length > 0)
       setPrivateFolders(sortItems(privateFolders, sort));
-    console.log("items sorted");
+    // console.log("items sorted");
   };
 
-  useEffect(() => {
-    console.log("useeffect");
-    handleSort();
-  }, [sort]);
+  // useEffect(() => {
+  //   console.log("useeffect");
+  //   handleSort();
+  // }, [sort]);
 
   return (
     <Stack gap={"sm"}>
@@ -240,25 +244,31 @@ const GeneralChats = (props: { members: any[] }) => {
           </Accordion.Control>
           <AccordionPanel>
             <ScrollArea.Autosize mah="50vh" scrollbarSize={10} offsetScrollbars>
-              {publicFolders?.map((folder, key) => (
-                <Accordion
-                  chevronPosition="left"
-                  classNames={{ chevron: style.chevron }}
-                  chevron={<IconCaretRightFilled className={style.icon} />}
-                  key={key}
-                >
-                  <FolderItem
-                    folder={folder}
-                    scope={"public"}
-                    members={members}
-                    userId={userId || ""}
-                    workspaceId={orgId || ""}
-                  />
-                </Accordion>
-              ))}
-              {publicChats?.map((chat, key) => (
-                <ChatItem item={chat} key={key} members={members} />
-              ))}
+              {publicFolders.length > 0 || publicChats.length > 0 ? (
+                <>
+                  {publicFolders?.map((folder, key) => (
+                    <Accordion
+                      chevronPosition="left"
+                      classNames={{ chevron: style.chevron }}
+                      chevron={<IconCaretRightFilled className={style.icon} />}
+                      key={key}
+                    >
+                      <FolderItem
+                        folder={folder}
+                        scope={"public"}
+                        members={members}
+                        userId={userId || ""}
+                        workspaceId={orgId || ""}
+                      />
+                    </Accordion>
+                  ))}
+                  {publicChats?.map((chat, key) => (
+                    <ChatItem item={chat} key={key} members={members} />
+                  ))}
+                </>
+              ) : (
+                <Loader type="dots" w={"100%"} color="teal" />
+              )}
             </ScrollArea.Autosize>
           </AccordionPanel>
         </Accordion.Item>
@@ -277,25 +287,31 @@ const GeneralChats = (props: { members: any[] }) => {
           </AccordionControl>
           <AccordionPanel>
             <ScrollArea.Autosize mah="50vh" scrollbarSize={10} offsetScrollbars>
-              {privateFolders?.map((folder, key) => (
-                <Accordion
-                  chevronPosition="left"
-                  classNames={{ chevron: style.chevron }}
-                  chevron={<IconCaretRightFilled className={style.icon} />}
-                  key={key}
-                >
-                  <FolderItem
-                    folder={folder}
-                    scope={"private"}
-                    members={members}
-                    userId={userId || ""}
-                    workspaceId={orgId || ""}
-                  />
-                </Accordion>
-              ))}
-              {privateChats?.map((chat, key) => (
-                <ChatItem item={chat} key={key} members={members} />
-              ))}
+              {privateFolders.length > 0 || privateChats.length > 0 ? (
+                <>
+                  {privateFolders?.map((folder, key) => (
+                    <Accordion
+                      chevronPosition="left"
+                      classNames={{ chevron: style.chevron }}
+                      chevron={<IconCaretRightFilled className={style.icon} />}
+                      key={key}
+                    >
+                      <FolderItem
+                        folder={folder}
+                        scope={"private"}
+                        members={members}
+                        userId={userId || ""}
+                        workspaceId={orgId || ""}
+                      />
+                    </Accordion>
+                  ))}
+                  {privateChats?.map((chat, key) => (
+                    <ChatItem item={chat} key={key} members={members} />
+                  ))}
+                </>
+              ) : (
+                <Loader type="dots" w={"100%"} color="teal" />
+              )}
             </ScrollArea.Autosize>
           </AccordionPanel>
         </Accordion.Item>

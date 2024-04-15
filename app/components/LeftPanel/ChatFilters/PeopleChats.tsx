@@ -12,6 +12,7 @@ import {
   Text,
   TextInput,
   ThemeIcon,
+  Loader,
 } from "@mantine/core";
 import { IconCaretRightFilled, IconSearch } from "@tabler/icons-react";
 
@@ -51,6 +52,8 @@ const PeopleChats = (props: { members: any[] }) => {
     });
 
     return () => {
+      console.log("unmounting people chats");
+
       socket.off("refreshChats");
     };
   }, []);
@@ -72,7 +75,7 @@ const PeopleChats = (props: { members: any[] }) => {
             chevron={<IconCaretRightFilled className={style.icon} />}
             variant="default"
           >
-            {allChats.length > 0 &&
+            {allChats.length > 0 ? (
               filteredMembers.map((user: any) => (
                 <UserAccordionItem
                   user={user}
@@ -80,7 +83,10 @@ const PeopleChats = (props: { members: any[] }) => {
                   members={members}
                   key={user.userId}
                 />
-              ))}
+              ))
+            ) : (
+              <Loader type="dots" w={"100%"} color="teal" />
+            )}
           </Accordion>
         )}
       </ScrollArea>

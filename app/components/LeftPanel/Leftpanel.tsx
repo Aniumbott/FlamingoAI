@@ -6,6 +6,7 @@ import {
   Group,
   Divider,
   useMantineColorScheme,
+  Tooltip,
 } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import {
@@ -102,17 +103,21 @@ const LeftPanel = () => {
           setFilterMenu={setFilterMenu}
         />
         <Group color="#047857" wrap="nowrap" justify="flex-end" gap={1}>
-          <Button
-            color="#047857"
-            radius="0"
-            px={12}
-            style={{
-              borderRadius: "5px 0 0 5px ",
-            }}
-            onClick={() => createPublicChat(userId || "", orgId || "", members)}
-          >
-            <IconPlus size={15} />
-          </Button>
+          <Tooltip label="New Chat" color={"gray"} fz={"xs"}>
+            <Button
+              color="#047857"
+              radius="0"
+              px={12}
+              style={{
+                borderRadius: "5px 0 0 5px ",
+              }}
+              onClick={() =>
+                createPublicChat(userId || "", orgId || "", members)
+              }
+            >
+              <IconPlus size={15} />
+            </Button>
+          </Tooltip>
           <ChatMenu members={members} />
         </Group>
       </Group>

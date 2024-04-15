@@ -6,7 +6,15 @@ import { getArchivedChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import ChatItem from "../Items/ChatItem";
 import { useAuth } from "@clerk/nextjs";
-import { Button, Group, Menu, ScrollArea, Stack, Text } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Menu,
+  ScrollArea,
+  Stack,
+  Text,
+  Loader,
+} from "@mantine/core";
 import { socket } from "@/socket";
 import { useHover } from "@mantine/hooks";
 import {
@@ -34,6 +42,7 @@ const ArchivedChats = (props: { members: any[] }) => {
       fetchAllChats();
     });
     return () => {
+      console.log("unmounting archived chats");
       socket.off("refreshChats");
     };
   }, []);
@@ -45,9 +54,13 @@ const ArchivedChats = (props: { members: any[] }) => {
   return (
     <div className="flex flex-col justify-between h-full w-full">
       <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
-        {archivedChats.map((chat, key) => {
-          return <ChatItem item={chat} key={key} members={members} />;
-        })}
+        {archivedChats.length > 0 ? (
+          archivedChats.map((chat, key) => {
+            return <ChatItem item={chat} key={key} members={members} />;
+          })
+        ) : (
+          <Loader type="dots" w={"100%"} color="teal" />
+        )}
       </ScrollArea>
       <div className="flex gap-1">
         <AutomaticArchive

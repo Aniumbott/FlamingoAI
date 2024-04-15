@@ -83,27 +83,27 @@ export default function ForkChatModal(props: {
   isOpen: boolean;
   setIsOpen: (value: boolean) => void;
   message: any;
+  chat: any;
 }) {
-  const { isOpen, setIsOpen, message } = props;
-  const [scope, setScope] = useState("view-only");
+  const { isOpen, setIsOpen, message, chat } = props;
+  const [scope, setScope] = useState("viewOnly");
   const [model, setModel] = useState(openAIModels[0].value);
   const { organization } = useOrganization();
   const [chatName, setChatName] = useState("Fork of Chat");
-  const [chat, setChat] = useState<any>({});
+  // const [chat, setChat] = useState<any>({});
   const [isCommentsIncluded, setIsCommentsIncluded] = useState(true);
   const { user } = useUser();
-// console.log('hello');
-  useEffect(() => {
-    const collectChat = async () =>
-      await getChat(message.chatId, organization?.id || "", user?.id || "");
-    collectChat().then((res) => {
-      setChat(res.chats[0]);
-      // console.log(chat);
-    });
-  }, [message]);
+  // console.log('hello');
+  // useEffect(() => {
+  //   const collectChat = async () =>
+  //     await getChat(message.chatId, organization?.id || "", user?.id || "");
+  //   collectChat().then((res) => {
+  //     setChat(res.chats[0]);
+  //   });
+  // }, [message]);
 
   useEffect(() => {
-    setChatName(`Fork of ${chat.name}`);
+    setChatName(`Fork of ${chat?.name}`);
   }, [chat]);
 
   return (
@@ -129,7 +129,7 @@ export default function ForkChatModal(props: {
             ),
           },
           {
-            value: "view-only",
+            value: "viewOnly",
             label: (
               <Center style={{ gap: 10 }}>
                 <IconBuilding style={{ width: rem(16), height: rem(16) }} />
@@ -161,7 +161,7 @@ export default function ForkChatModal(props: {
           required
           label="New Chat Name"
           mt="1.5rem"
-          defaultValue={chatName}
+          value={chatName}
           onChange={(e) => setChatName(e.currentTarget.value)}
         />
         <Text mt="2rem">
@@ -186,13 +186,11 @@ export default function ForkChatModal(props: {
                 message.chatId,
                 organization?.id || "",
                 chatName,
-                scope == "public" ? "public" : "private",
+                scope,
                 user?.id || "",
                 isCommentsIncluded
-              ).then((res) => {
-                // console.log(res);
-                setIsOpen(false);
-              });
+              );
+              setIsOpen(false);
             }}
           >
             OK

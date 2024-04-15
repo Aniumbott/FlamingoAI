@@ -61,6 +61,7 @@ export default function ChatWindow(props: {
   const { colorScheme } = useMantineColorScheme();
   const [participants, setParticipants] = useState<any>([]);
   const [messageInput, setMessageInput] = useState("");
+  const [forkMessage, setForkMessage] = useState<any>(null);
   const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
     HTMLDivElement,
     HTMLDivElement
@@ -75,6 +76,7 @@ export default function ChatWindow(props: {
   });
 
   const [shareChatOpened, setShareChatOpened] = useState(false);
+
   const updateParticipants = () => {
     if (chat.participants.includes(user?.id)) return chat.participants;
     return [...chat.participants, user?.id];
@@ -97,7 +99,15 @@ export default function ChatWindow(props: {
   }
 
   useEffect(() => {
-    console.log("chat", chat);
+    // console.log("chat", chat);
+    socket.on("refreshChatWindow", () => {
+      console.log("refreshing chat");
+      getChat(currentChatId, organization?.id || "", user?.id || "").then(
+        (res) => {
+          setChat(res.chats?.[0]);
+        }
+      );
+    });
 
     socket.on("newMessage", (msg) => {
       console.log("new message", msg);
@@ -197,7 +207,7 @@ export default function ChatWindow(props: {
     });
 
     return () => {
-      socket.off("refreshChat");
+      socket.off("refreshChatWindow");
       socket.off("newMessage");
       socket.off("deleteMessage");
       socket.off("newComment");
@@ -224,15 +234,6 @@ export default function ChatWindow(props: {
   useEffect(() => {
     setMessageInput("");
 
-    socket.on("refreshChats", () => {
-      console.log("refreshing chat");
-      getChat(currentChatId, organization?.id || "", user?.id || "").then(
-        (res) => {
-          setChat(res.chats?.[0]);
-        }
-      );
-    });
-
     if (currentChatId != "") {
       socket.emit("joinChatRoom", currentChatId);
       const getCurrentChat = async () => {
@@ -250,10 +251,6 @@ export default function ChatWindow(props: {
         setPrompts(res.prompts);
       });
     }
-
-    return () => {
-      socket.off("refreshChats");
-    };
   }, [currentChatId]);
 
   useEffect(() => {
@@ -267,6 +264,7 @@ export default function ChatWindow(props: {
   const [messageContent, setMessageContent] = useState("");
   const [processing, setProcessing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isForkModalOpen, setIsForkModalOpen] = useState(false);
 
   return (
     <>
@@ -279,8 +277,10 @@ export default function ChatWindow(props: {
           {/* <Group gap={30} justify="space-between" py={5} px={10}> */}
           <div className="w-full flex flex-row justify-start p-1">
             {!leftOpened ? (
-              <Group ml={5}>
-                <Title order={4}>TeamGPT</Title>
+              <div className="flex flex-row items-center justify-between">
+                <Title order={4} mr={10}>
+                  TeamGPT
+                </Title>
                 <ActionIcon
                   variant="subtle"
                   color="grey"
@@ -292,7 +292,7 @@ export default function ChatWindow(props: {
                     stroke={1.5}
                   />
                 </ActionIcon>
-              </Group>
+              </div>
             ) : null}
             <Group justify="space-between" px={"md"} w={"100%"}>
               <Text size="sm" ml={5} fw={500}>
@@ -340,6 +340,13 @@ export default function ChatWindow(props: {
             }}
             ref={scrollableRef}
           >
+            <ForkChatModal
+              isOpen={isForkModalOpen}
+              setIsOpen={setIsForkModalOpen}
+              message={forkMessage}
+              chat={chat}
+            />
+
             {!loading ? (
               chat?.messages?.map((message: any, index: Number) => {
                 const user = participants.find(
@@ -357,6 +364,8 @@ export default function ChatWindow(props: {
                       participants={participants}
                       setPromptOpened={setPromptOpened}
                       setPromptContent={setMessageContent}
+                      setForkMessage={setForkMessage}
+                      setIsForkModalOpen={setIsForkModalOpen}
                     />
                   </div>
                 );
@@ -451,53 +460,111 @@ export default function ChatWindow(props: {
               </Text>
             </div>
           ) : (
-            <Combobox
-              store={combobox}
-              onOptionSubmit={(val) => {
-                combobox.closeDropdown();
-                setSearchTerm("");
+            <Stack
+              align="center"
+              gap={3}
+              style={{
+                background:
+                  colorScheme == "dark"
+                    ? "var(--mantine-color-dark-8)"
+                    : "var(--mantine-color-gray-0)",
               }}
-              position="top"
             >
-              <div
-                className="w-full h-fit py-2 pb-4 flex justify-center items-center"
-                style={{
-                  background:
-                    colorScheme == "dark"
-                      ? "var(--mantine-color-dark-8)"
-                      : "var(--mantine-color-gray-0)",
+              {chat?.messages?.length &&
+              chat.messages.some((message: any) => message.type === "user") ? (
+                <Button
+                  variant="outline"
+                  color="gray"
+                  fw={300}
+                  w={"fit-content"}
+                  disabled={processing}
+                  onClick={() => {
+                    setProcessing(true);
+                    sendAssistantMessage(
+                      chat?.messages
+                        ?.slice()
+                        .reverse()
+                        .find((message: any) => message.type === "user"),
+                      chat.workspaceId,
+                      "gpt-3.5-turbo"
+                    );
+                  }}
+                >
+                  Regenerate
+                </Button>
+              ) : null}
+              <Combobox
+                store={combobox}
+                onOptionSubmit={(val) => {
+                  combobox.closeDropdown();
+                  setSearchTerm("");
                 }}
+                position="top"
               >
-                <Combobox.Target>
-                  <Textarea
-                    autosize
-                    maxRows={4}
-                    variant="filled"
-                    size="lg"
-                    radius="0"
-                    w="75%"
-                    placeholder="Type a message"
-                    value={messageInput}
-                    disabled={processing}
-                    onChange={(e) => {
-                      setMessageInput(e.currentTarget.value);
+                <div
+                  className="w-full h-fit py-2 pb-4 flex justify-center items-center"
+                  style={{
+                    background:
+                      colorScheme == "dark"
+                        ? "var(--mantine-color-dark-8)"
+                        : "var(--mantine-color-gray-0)",
+                  }}
+                >
+                  <Combobox.Target>
+                    <Textarea
+                      autosize
+                      maxRows={4}
+                      variant="filled"
+                      size="lg"
+                      radius="0"
+                      w="75%"
+                      placeholder="Type a message"
+                      value={messageInput}
+                      disabled={processing}
+                      onChange={(e) => {
+                        setMessageInput(e.currentTarget.value);
 
-                      if (e.currentTarget.value.includes("/")) {
-                        setSearchTerm(
-                          e.currentTarget.value.split("/").pop() ?? ""
-                        );
-                        combobox.openDropdown();
-                      } else {
-                        combobox.closeDropdown();
-                      }
-                    }}
-                    onKeyDown={(e) => {
-                      if (
-                        messageInput != "" &&
-                        e.key === "Enter" &&
-                        !e.shiftKey &&
-                        !messageInput.includes("/")
-                      ) {
+                        if (e.currentTarget.value.includes("/")) {
+                          setSearchTerm(
+                            e.currentTarget.value.split("/").pop() ?? ""
+                          );
+                          combobox.openDropdown();
+                        } else {
+                          combobox.closeDropdown();
+                        }
+                      }}
+                      onKeyDown={(e) => {
+                        if (
+                          messageInput != "" &&
+                          e.key === "Enter" &&
+                          !e.shiftKey &&
+                          !messageInput.includes("/")
+                        ) {
+                          setProcessing(true);
+                          createMessage(
+                            user?.id || "",
+                            messageInput,
+                            "user",
+                            currentChatId
+                          ).then((res) => {
+                            sendAssistantMessage(
+                              res.message,
+                              chat.workspaceId,
+                              "gpt-3.5-turbo"
+                            );
+                            setMessageInput("");
+                          });
+                        }
+                      }}
+                    />
+                  </Combobox.Target>
+                  <ActionIcon
+                    size="50"
+                    radius="0"
+                    color="teal"
+                    disabled={processing}
+                    onClick={() => {
+                      if (messageInput != "") {
                         setProcessing(true);
                         createMessage(
                           user?.id || "",
@@ -514,68 +581,44 @@ export default function ChatWindow(props: {
                         });
                       }
                     }}
-                  />
-                </Combobox.Target>
-                <ActionIcon
-                  size="50"
-                  radius="0"
-                  color="teal"
-                  disabled={processing}
-                  onClick={() => {
-                    if (messageInput != "") {
-                      setProcessing(true);
-                      createMessage(
-                        user?.id || "",
-                        messageInput,
-                        "user",
-                        currentChatId
-                      ).then((res) => {
-                        sendAssistantMessage(
-                          res.message,
-                          chat.workspaceId,
-                          "gpt-3.5-turbo"
-                        );
-                        setMessageInput("");
-                      });
-                    }
-                  }}
-                >
-                  <IconSend size="24" />
-                </ActionIcon>
-              </div>
+                  >
+                    <IconSend size="24" />
+                  </ActionIcon>
+                </div>
 
-              <Combobox.Dropdown>
-                <Combobox.Options>
-                  {/* <Text>Select Prompts</Text>
+                <Combobox.Dropdown>
+                  <Combobox.Options>
+                    {/* <Text>Select Prompts</Text>
             <Divider /> */}
-                  <ScrollArea.Autosize mah={200} type="scroll">
-                    {filteredPrompts?.length > 0 ? (
-                      filteredPrompts.map((prompt) => (
-                        <Combobox.Option
-                          key={prompt._id}
-                          value={prompt._id}
-                          onClick={() => {
-                            let newMessageInput = messageInput;
-                            if (newMessageInput.includes("/")) {
-                              newMessageInput = newMessageInput.substring(
-                                0,
-                                newMessageInput.lastIndexOf("/")
-                              );
-                            }
-                            setMessageInput(newMessageInput + prompt.content);
-                            setSearchTerm("");
-                          }}
-                        >
-                          <Text c={"white"}>{prompt.name}</Text>
-                        </Combobox.Option>
-                      ))
-                    ) : (
-                      <Combobox.Empty>No prompts found</Combobox.Empty>
-                    )}
-                  </ScrollArea.Autosize>
-                </Combobox.Options>
-              </Combobox.Dropdown>
-            </Combobox>
+                    <ScrollArea.Autosize mah={200} type="scroll">
+                      {filteredPrompts?.length > 0 ? (
+                        filteredPrompts.map((prompt) => (
+                          <Combobox.Option
+                            key={prompt._id}
+                            value={prompt._id}
+                            onClick={() => {
+                              let newMessageInput = messageInput;
+                              if (newMessageInput.includes("/")) {
+                                newMessageInput = newMessageInput.substring(
+                                  0,
+                                  newMessageInput.lastIndexOf("/")
+                                );
+                              }
+                              setMessageInput(newMessageInput + prompt.content);
+                              setSearchTerm("");
+                            }}
+                          >
+                            <Text c={"white"}>{prompt.name}</Text>
+                          </Combobox.Option>
+                        ))
+                      ) : (
+                        <Combobox.Empty>No prompts found</Combobox.Empty>
+                      )}
+                    </ScrollArea.Autosize>
+                  </Combobox.Options>
+                </Combobox.Dropdown>
+              </Combobox>
+            </Stack>
           )}
         </Stack>
       )}

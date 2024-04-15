@@ -6,7 +6,7 @@ import { getAllChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import ChatItem from "../Items/ChatItem";
 import { useAuth } from "@clerk/nextjs";
-import { ScrollArea } from "@mantine/core";
+import { ScrollArea, Loader, Text } from "@mantine/core";
 import { socket } from "@/socket";
 
 const FavouriteChats = (props: { members: any[] }) => {
@@ -28,18 +28,31 @@ const FavouriteChats = (props: { members: any[] }) => {
     });
 
     return () => {
+      console.log("unmounting favourite chats");
       socket.off("refreshChats");
     };
   }, []);
 
-  const [favouriteChats, setFavouriteChats] = useState<IChatDocument[]>([]);
+  const [favouriteChats, setFavouriteChats] = useState<IChatDocument[] | null>(
+    null
+  );
 
   return (
     <div>
       <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
-        {favouriteChats.map((chat, key) => {
-          return <ChatItem item={chat} key={key} members={members} />;
-        })}
+        {favouriteChats ? (
+          favouriteChats.length === 0 ? (
+            <Text style={{ textAlign: "center" }} c="gray" size="xs">
+              No favourite Chats
+            </Text>
+          ) : (
+            favouriteChats.map((chat, key) => {
+              return <ChatItem item={chat} key={key} members={members} />;
+            })
+          )
+        ) : (
+          <Loader type="dots" w={"100%"} color="teal" />
+        )}
       </ScrollArea>
     </div>
   );

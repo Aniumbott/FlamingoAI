@@ -71,6 +71,7 @@ app.prepare().then(() => {
         `User with ID: ${socket.id} created chat: ${item} in room: ${roomId}`
       );
       io.to(roomId).emit("refreshChats");
+      io.to(roomId).emit("refreshChatWindow");
     });
     
     socket.on("updatePersonalChat", (item) => {
@@ -78,6 +79,7 @@ app.prepare().then(() => {
         `User with ID: ${socket.id} created private chat: ${item} to user: ${socket.id}`
       );
       io.to(socket.id).emit("refreshChats");
+      io.to(socket.id).emit("refreshChatWindow");
     });
 
     // Message

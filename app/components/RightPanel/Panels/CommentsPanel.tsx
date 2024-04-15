@@ -34,7 +34,9 @@ export default function CommentsPanel(props: { toggleRight: () => void }) {
   const pathname = usePathname();
   useEffect(() => {
     if (chatId) {
+      setComments([]);
       getMessages(chatId).then((res) => {
+        console.log(res.messages);
         res.messages.forEach((message: any) => {
           setComments((comments) => [...comments, ...message.comments]);
         });
