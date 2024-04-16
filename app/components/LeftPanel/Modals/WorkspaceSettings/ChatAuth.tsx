@@ -30,7 +30,7 @@ export default function ChatAuth(props: {
   const [update, setUpdate] = useState<boolean>(false);
   const [assistants, setAssistants] = useState<any>([]);
   const [selectAssistant, setSelectAssistants] = useState<string | null>();
-  const [scope, setScope] = useState("personal");
+  const [scope, setScope] = useState("private");
   const [apiKey, setApiKey] = useState("");
   const [model, setModel] = useState("gpt-3.5-turbo");
 
@@ -42,10 +42,10 @@ export default function ChatAuth(props: {
     };
     collectAssistants();
 
-    if (workspace?.apiKeys.length > 0) {
-      // console.log(workspace.apiKeys[0]);
-      setSelectAssistants(workspace.apiKeys[0].assistantId);
-      setScope(workspace.apiKeys[0].scope);
+    if (workspace?.assistants.length > 0) {
+      // console.log(workspace.assistants[0]);
+      setSelectAssistants(workspace.assistants[0].assistantId);
+      setScope(workspace.assistants[0].scope);
     }
   }, []);
 
@@ -55,7 +55,7 @@ export default function ChatAuth(props: {
 
   useEffect(() => {
     if (selectAssistant) {
-      const key = workspace?.apiKeys.find(
+      const key = workspace?.assistants.find(
         (key: any) => key.assistantId == selectAssistant && key.scope == scope
       );
       if (key) {
@@ -100,7 +100,7 @@ export default function ChatAuth(props: {
             data={[
               {
                 label: "Personal",
-                value: "personal",
+                value: "private",
               },
               {
                 label: "Workspace",
@@ -119,7 +119,7 @@ export default function ChatAuth(props: {
         {update ||
         (selectAssistant &&
           workspace &&
-          !workspace?.apiKeys.find(
+          !workspace?.assistants.find(
             (key: any) =>
               key.assistantId == selectAssistant && key.scope == scope
           )) ? (
@@ -130,7 +130,7 @@ export default function ChatAuth(props: {
                 label="Input your OpenAI API key"
                 placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                 defaultValue={
-                  workspace?.apiKeys.find(
+                  workspace?.assistants.find(
                     (key: any) =>
                       key.assistantId == selectAssistant && key.scope == scope
                   )?.apiKey || ""
@@ -162,8 +162,8 @@ export default function ChatAuth(props: {
                 };
                 updateWorkspace({
                   ...workspace,
-                  apiKeys: [
-                    ...workspace.apiKeys.filter(
+                  assistants: [
+                    ...workspace.assistants.filter(
                       (key: any) =>
                         !(
                           key.assistantId == selectAssistant &&
@@ -187,14 +187,14 @@ export default function ChatAuth(props: {
           data={assistants.find((a: any) => a._id == selectAssistant)?.models}
           value={model}
           onChange={(value) => {
-            let key = workspace?.apiKeys.find((key: any) => {
+            let key = workspace?.assistants.find((key: any) => {
               return key.assistantId == selectAssistant && key.scope == scope;
             });
             key.model = value;
             updateWorkspace({
               ...workspace,
-              apiKeys: [
-                ...workspace.apiKeys.filter(
+              assistants: [
+                ...workspace.assistants.filter(
                   (key: any) =>
                     !(key.assistantId == selectAssistant && key.scope == scope)
                 ),
@@ -209,7 +209,7 @@ export default function ChatAuth(props: {
 
         {selectAssistant &&
         workspace &&
-        workspace?.apiKeys.find(
+        workspace?.assistants.find(
           (key: any) =>
             key.assistantId == selectAssistant &&
             key.scope == scope &&
@@ -250,8 +250,8 @@ export default function ChatAuth(props: {
                     ) {
                       updateWorkspace({
                         ...workspace,
-                        apiKeys: [
-                          ...workspace.apiKeys.filter(
+                        assistants: [
+                          ...workspace.assistants.filter(
                             (key: any) =>
                               !(
                                 key.assistantId == selectAssistant &&

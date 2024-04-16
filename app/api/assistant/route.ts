@@ -3,7 +3,6 @@ import { dbConnect } from "@/app/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 // import get from workspace route
 import Workspace from "@/app/models/Workspace";
-import Assitant from "@/app/models/Assistant";
 import Assistant from "@/app/models/Assistant";
 
 export async function POST(req: any, res: NextApiResponse) {
@@ -48,12 +47,20 @@ export async function POST(req: any, res: NextApiResponse) {
   }
 }
 
-export async function GET(req: any, res: NextApiResponse) {
+export async function GET(req: NextRequest, res: NextApiResponse) {
   try {
     await dbConnect();
-    const assistants = await Assistant.find();
+    const reqParam = req.nextUrl.searchParams;
+    const id = reqParam.get("id");
+    // console.log("assistant", id);
+    if (id) {
+      const assistant = await Assistant.findById(id);
+      return NextResponse.json({ assistant }, { status: 200 });
+    } else {
+      const assistants = await Assistant.find();
+      return NextResponse.json({ assistants }, { status: 200 });
+    }
     // console.log("assistants", assistants);
-    return NextResponse.json({ assistants }, { status: 200 });
   } catch (error: any) {
     console.log("error at GET in Assistant route", error);
     return NextResponse.json(error.message, { status: 500 });

@@ -21,27 +21,36 @@ import {
   Textarea,
   LoadingOverlay,
   Affix,
+  SegmentedControl,
+  Center,
+  Select,
 } from "@mantine/core";
-import { IconLayoutSidebarLeftExpand, IconSend } from "@tabler/icons-react";
+import {
+  IconBuilding,
+  IconLayoutSidebarLeftExpand,
+  IconSend,
+} from "@tabler/icons-react";
 import { useOrganization, useUser } from "@clerk/nextjs";
 
 // Components
 import MessageItem from "./Items/MessageItem/MessageItem";
 import { sendAssistantMessage, createMessage } from "@/app/controllers/message";
-import { deleteChat, getChat, updateChat } from "@/app/controllers/chat";
+import {
+  deleteChat,
+  getChat,
+  updateChat,
+  updateChatAccess,
+} from "@/app/controllers/chat";
 import { socket } from "@/socket";
 import { useScrollIntoView } from "@mantine/hooks";
 import { ICommentDocument } from "@/app/models/Comment";
 import ForkChatModal from "./Modals/ForkChatModal";
 import { getAllPrompts } from "@/app/controllers/prompt";
 import { IPromptDocument } from "@/app/models/Prompt";
-import PromptItem from "@/app/components/RightPanel/Panels/PromptPanel/PromptItem";
 import PromptModal from "@/app/components/RightPanel/Modals/PromptModal";
 import ShareChatModal from "@/app/components/ChatWindow/Modals/ShareChatModal";
-import { notFound } from "next/navigation";
-import { showErrorNotification } from "@/app/controllers/notification";
-import { set } from "mongoose";
 import ErrorPage from "./ErrorPage/ErrorPage";
+import SettingsModal from "./Modals/SettingsModal";
 
 export default function ChatWindow(props: {
   currentChatId: String;
@@ -76,11 +85,12 @@ export default function ChatWindow(props: {
   });
 
   const [shareChatOpened, setShareChatOpened] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
-  const updateParticipants = () => {
-    if (chat.participants.includes(user?.id)) return chat.participants;
-    return [...chat.participants, user?.id];
-  };
+  // const updateParticipants = () => {
+  //   if (chat.participants.includes(user?.id)) return chat.participants;
+  //   return [...chat.participants, user?.id];
+  // };
 
   function isViewOnly(chat: any) {
     const ans =
@@ -99,7 +109,7 @@ export default function ChatWindow(props: {
   }
 
   useEffect(() => {
-    // console.log("chat", chat);
+    console.log("chat", chat);
     socket.on("refreshChatWindow", () => {
       console.log("refreshing chat");
       getChat(currentChatId, organization?.id || "", user?.id || "").then(
@@ -253,12 +263,6 @@ export default function ChatWindow(props: {
     }
   }, [currentChatId]);
 
-  useEffect(() => {
-    if (chat?.messages) {
-      scrollIntoView();
-    }
-  }, [chat?.messages?.length]);
-
   const [promptOpened, setPromptOpened] = useState(false);
   const [newPrompt, setnewPrompt] = useState<IPromptDocument | null>(null);
   const [messageContent, setMessageContent] = useState("");
@@ -298,14 +302,24 @@ export default function ChatWindow(props: {
               <Text size="sm" ml={5} fw={500}>
                 {chat?.name}
               </Text>
-              <Button
-                variant="subtle"
-                color="var(--mantine-color-gray-4)"
-                onClick={() => setShareChatOpened(true)}
-                mx={10}
-              >
-                Share
-              </Button>
+              <Group gap={0}>
+                <Button
+                  variant="subtle"
+                  color="var(--mantine-color-gray-4)"
+                  onClick={() => setShareChatOpened(true)}
+                  mx={10}
+                >
+                  Share
+                </Button>
+                <Button
+                  variant="subtle"
+                  color="var(--mantine-color-gray-4)"
+                  onClick={() => setSettingsOpen(true)}
+                  mx={10}
+                >
+                  Settings
+                </Button>
+              </Group>
             </Group>
             {shareChatOpened && (
               <ShareChatModal
@@ -314,6 +328,14 @@ export default function ChatWindow(props: {
                 chat={chat}
                 setChat={setChat}
                 members={participants}
+              />
+            )}
+            {settingsOpen && (
+              <SettingsModal
+                opened={settingsOpen}
+                setOpened={setSettingsOpen}
+                chat={chat}
+                setChat={setChat}
               />
             )}
             {promptOpened && (
@@ -346,6 +368,85 @@ export default function ChatWindow(props: {
               message={forkMessage}
               chat={chat}
             />
+
+            {!chat?.messages?.length ? (
+              <div className="w-full flex flex-col items-center justify-center pt-20">
+                <div
+                  className="p-5"
+                  style={{
+                    width: "500px",
+                    border: "1px solid var(--mantine-color-default-border)",
+                    borderRadius: "var(--mantine-radius-md)",
+                  }}
+                >
+                  <SegmentedControl
+                    value={chat?.scope}
+                    onChange={(value) => {
+                      if (chat.parentFolder) {
+                        updateChatAccess(chat?._id, {
+                          scope: value,
+                          parentFolder: null,
+                        }).then((res) => {
+                          setChat(res.chat);
+                        });
+                      } else {
+                        updateChatAccess(chat?._id, {
+                          scope: value,
+                        }).then((res) => {
+                          setChat(res.chat);
+                        });
+                      }
+                    }}
+                    fullWidth
+                    style={{ flexGrow: 1 }}
+                    data={[
+                      {
+                        value: "private",
+                        label: (
+                          <Center style={{ gap: 10 }}>
+                            <Text size="sm">Private</Text>
+                          </Center>
+                        ),
+                      },
+                      {
+                        value: "viewOnly",
+                        label: (
+                          <Center style={{ gap: 10 }}>
+                            <IconBuilding size={16} />
+                            <Text size="sm">View Only</Text>
+                          </Center>
+                        ),
+                      },
+                      {
+                        value: "public",
+                        label: (
+                          <Center style={{ gap: 10 }}>
+                            <IconBuilding size={16} />
+                            <Text size="sm">Public</Text>
+                          </Center>
+                        ),
+                      },
+                    ]}
+                  />
+                  <Select
+                    allowDeselect={false}
+                    description="Assistant Model"
+                    data={chat?.assistant?.assistantId?.models}
+                    value={chat?.assistant?.model}
+                    onChange={(e) => {
+                      updateChat(chat?._id, {
+                        assistant: {
+                          assistantId: chat?.assistant?.assistantId,
+                          model: e,
+                        },
+                      });
+                    }}
+                    mt={20}
+                    color="teal"
+                  />
+                </div>
+              </div>
+            ) : null}
 
             {!loading ? (
               chat?.messages?.map((message: any, index: Number) => {

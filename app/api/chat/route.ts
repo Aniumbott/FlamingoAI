@@ -5,6 +5,7 @@ import Chat from "@/app/models/Chat";
 import ChatFolder from "@/app/models/ChatFolder";
 import Message from "@/app/models/Message";
 import Comment from "@/app/models/Comment";
+import Workspace from "@/app/models/Workspace";
 
 export async function POST(req: any, res: NextApiResponse) {
   try {
@@ -38,6 +39,8 @@ export async function POST(req: any, res: NextApiResponse) {
         workspaceId: body?.workspaceId,
         participants: [body.createdBy],
         messages: [],
+        instructions: chatToClone?.instructions,
+        assistant: chatToClone?.assistant,
         // messages: messages.map((message: any) => message._id),
       });
 
@@ -118,6 +121,8 @@ export async function POST(req: any, res: NextApiResponse) {
 
       // console.log("chat", chat);
     } else {
+      const workspace = await Workspace.findById(body.workspaceId);
+
       chat = await Chat.create({
         name: "New Chat",
         createdBy: body.createdBy,
@@ -129,6 +134,8 @@ export async function POST(req: any, res: NextApiResponse) {
           userId: memberId,
           access: "inherit",
         })),
+        instructions: workspace?.instructions,
+        assistant: workspace?.assistants[0],
       });
 
       // If parentFolder was provided, add the new chat ID to the parent folder's chats array
@@ -257,15 +264,17 @@ export async function GET(req: NextRequest, res: NextResponse) {
             ],
           },
         ],
-      }).populate({
-        path: "messages",
-        populate: {
-          path: "comments",
+      })
+        .populate({
+          path: "messages",
           populate: {
-            path: "replies",
+            path: "comments",
+            populate: {
+              path: "replies",
+            },
           },
-        },
-      });
+        })
+        .populate("assistant.assistantId");
     }
     return NextResponse.json({ chats }, { status: 200 });
   } catch (error: any) {

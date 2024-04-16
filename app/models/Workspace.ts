@@ -12,7 +12,7 @@ const workspaceSchema = new Mongoose.Schema(
     allowPersonal: { type: Boolean, required: true },
     allowPublic: { type: Boolean, required: true },
     apiKey: { type: String, required: false },
-    apiKeys: [
+    assistants: [
       {
         apiKey: { type: String, required: true },
         assistantId: {
@@ -23,11 +23,12 @@ const workspaceSchema = new Mongoose.Schema(
         model: { type: String, required: true },
         scope: {
           type: String,
-          enum: ["personal", "public"],
+          enum: ["private", "public"],
           required: true,
         },
       },
     ],
+    instructions: { type: String, required: false },
     createdBy: { type: Mongoose.Types.ObjectId, ref: "users", required: true },
   },
   {
@@ -43,12 +44,13 @@ interface IWorkspace {
   allowPersonal: boolean;
   allowPublic: boolean;
   apiKey: string;
-  apiKeys: {
+  assistants: {
     apiKey: string;
     assistantId: Mongoose.Types.ObjectId;
     model: string;
     scope: string;
   }[];
+  instructions: string;
   createdBy: Mongoose.Types.ObjectId;
 }
 

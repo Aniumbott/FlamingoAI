@@ -1,3 +1,4 @@
+import { updateWorkspace } from "@/app/controllers/workspace";
 import {
   Badge,
   Group,
@@ -12,17 +13,20 @@ import {
   Switch,
   Textarea,
 } from "@mantine/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function AdvancedSetup(props: {
   activeTab: string;
   setActiveTab: (value: string) => void;
   workspace: any;
 }) {
-  const { activeTab, setActiveTab } = props;
-  const [areaValue, setAreaValue] = useState(
-    "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown."
-  );
+  const { activeTab, setActiveTab, workspace } = props;
+  const [areaValue, setAreaValue] = useState("");
+
+  useEffect(() => {
+    setAreaValue(workspace.instructions);
+  }, [workspace]);
+
   return (
     <Paper
       style={{ height: "100%", overflowY: "scroll" }}
@@ -62,7 +66,13 @@ export default function AdvancedSetup(props: {
               Reset
             </Button>
           ) : null}
-          <Button radius={0} color="teal">
+          <Button
+            radius={0}
+            color="teal"
+            onClick={() => {
+              updateWorkspace({ ...workspace, instructions: areaValue });
+            }}
+          >
             Save
           </Button>
         </Group>

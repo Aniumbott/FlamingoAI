@@ -20,6 +20,7 @@ export async function POST(req: any, res: NextApiResponse) {
 
     const chat = await Chat.findByIdAndUpdate(body.chatId, {
       $push: { messages: message._id },
+      $addToSet: { participants: body.createdBy },
     });
 
     // console.log("newMessage", message, chat);
