@@ -135,7 +135,11 @@ export async function POST(req: any, res: NextApiResponse) {
           access: "inherit",
         })),
         instructions: workspace?.instructions,
-        assistant: workspace?.assistants[0],
+        assistant: workspace?.assistants.find(
+          (assistant) =>
+            (assistant.scope == "private" && body.scope == "private") ||
+            (assistant.scope == "pbulic" && body.scope != "private")
+        ),
       });
 
       // If parentFolder was provided, add the new chat ID to the parent folder's chats array

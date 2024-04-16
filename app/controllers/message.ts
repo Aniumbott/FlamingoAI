@@ -89,33 +89,42 @@ async function updateMessageContent(body: any) {
 }
 
 async function sendAssistantMessage(
+  messages: any[],
   message: any,
+  instruction: string,
   workspaceId: string,
-  model: string
+  assistant: any // assistantId, scope, model
 ) {
-  const getMessages = await fetch(`/api/message/?chatId=${message.chatId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
+  if (messages.length === 0) {
+    const getMessages = await fetch(`/api/message/?chatId=${message.chatId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    messages = (await getMessages.json()).messages;
+    messages = messages.filter((msg: any) => msg.createdAt < message.createdAt);
+  }
+
+  messages = [...messages, message];
+
+  let messagesContent = messages.map((msg: any) => {
+    return {
+      role: msg.type,
+      content: msg.content,
+    };
   });
 
-  const messages = (await getMessages.json()).messages;
+  messagesContent = [
+    {
+      role: "system",
+      content: instruction,
+    },
+    ...messagesContent,
+  ];
 
-  getAssistantResponse(
-    messages
-      .filter((msg: any) => {
-        return msg.createdAt <= message.createdAt;
-      })
-      .map((msg: any) => {
-        return {
-          role: msg.type,
-          content: msg.content,
-        };
-      }),
-    workspaceId,
-    model
-  ).then((res) => {
+  getAssistantResponse(messagesContent, workspaceId, assistant).then((res) => {
     createMessage(
       message.createdBy,
       res.gptRes.choices[0].message.content,

@@ -13,9 +13,13 @@ export async function POST(req: any, res: NextApiResponse) {
     const { action } = body;
     // console.log("ASSISTANT-------->", messages);
     if (action && action == "apiCall") {
-      const { messages, workspaceId, model } = body;
+      const { messages, workspaceId, assistant } = body;
       const workspace = await getWorkspace(workspaceId);
-      const apiKey = workspace?.toJSON().apiKey;
+      const apiKey = workspace?.assistants.find(
+        (a) =>
+          a.assistantId == assistant.assistantId._id &&
+          a.scope == assistant.scope
+      )?.apiKey;
 
       const gptRes = await (
         await fetch("https://api.openai.com/v1/chat/completions", {
@@ -25,7 +29,7 @@ export async function POST(req: any, res: NextApiResponse) {
             Authorization: `Bearer ${apiKey}`,
           },
           body: JSON.stringify({
-            model: model,
+            model: assistant.model,
             messages: messages,
           }),
         })

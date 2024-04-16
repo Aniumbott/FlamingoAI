@@ -32,7 +32,6 @@ import { useEffect, useState } from "react";
 import CommentItem from "../CommentItem/CommentItem";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import MentionInput from "../CommentItem/MentionInput";
-import ForkChatModal from "../../Modals/ForkChatModal";
 import { MessageRender } from "./MessageRenderer";
 
 function getDate(date: string) {
@@ -42,6 +41,8 @@ function getDate(date: string) {
 function MessageItem(props: {
   message: any;
   participants: any[];
+  instructions: string;
+  assistant: any;
   setPromptOpened: (value: boolean) => void;
   setPromptContent: (value: string) => void;
   setForkMessage: (value: any) => void;
@@ -50,6 +51,8 @@ function MessageItem(props: {
   const {
     message,
     participants,
+    instructions,
+    assistant,
     setPromptOpened,
     setPromptContent,
     setForkMessage,
@@ -223,9 +226,11 @@ function MessageItem(props: {
                       updateMessageContent(msg)
                         .then((res) => {
                           sendAssistantMessage(
-                            res.message,
+                            [],
+                            msg,
+                            instructions,
                             organization?.id || "",
-                            "gpt-3.5-turbo"
+                            assistant
                           );
                         })
                         .then(() => {

@@ -27,8 +27,6 @@ import RightPanel from "../../components/RightPanel/RightPanel";
 import LeftPanel from "../../components/LeftPanel/Leftpanel";
 import ChatWindow from "../../components/ChatWindow/ChatWindow";
 import { createChat } from "@/app/controllers/chat";
-import { createAssistant } from "@/app/controllers/assistant";
-import path from "path";
 
 const Workspace = () => {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);

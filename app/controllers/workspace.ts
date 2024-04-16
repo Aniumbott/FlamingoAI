@@ -36,7 +36,7 @@ async function updateWorkspace(body: any) {
   }
 
   const response = await data.json();
-  socket.emit("updateWorkspace", body._id, response.workspace);
+  socket.emit("updateWorkspace", body._id);
   console.log("response at updateWorkspace", response);
 
   return response;

@@ -1,14 +1,14 @@
 async function getAssistantResponse(
   messages: any[],
   workspaceId: string,
-  model: string
+  assistant: any
 ) {
   const data = await fetch("/api/assistant", {
     method: "POST",
     body: JSON.stringify({
       messages,
       workspaceId,
-      model,
+      assistant,
       action: "apiCall",
     }),
     headers: {
@@ -24,26 +24,6 @@ async function getAssistantResponse(
   return response;
 }
 
-async function createAssistant(name: string, models: any[]) {
-  console.log("name", name, "models", models);
-  const data = await fetch("/api/assistant", {
-    method: "POST",
-    body: JSON.stringify({
-      name,
-      models,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const response = await data.json();
-
-  console.log("response at addAssistant", response);
-
-  return response;
-}
-
 async function getAssistants() {
   const data = await fetch(`/api/assistant`, {
     method: "GET",
@@ -56,4 +36,4 @@ async function getAssistants() {
   return response;
 }
 
-export { getAssistantResponse, createAssistant, getAssistants };
+export { getAssistantResponse, getAssistants };

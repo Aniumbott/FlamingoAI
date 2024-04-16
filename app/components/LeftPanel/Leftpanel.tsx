@@ -59,8 +59,12 @@ const LeftPanel = () => {
   }, [organization?.id]);
 
   useEffect(() => {
-    socket.on("updateWorkspace", (wsp) => {
-      setWorkspace(wsp);
+    socket.on("updateWorkspace", () => {
+      const fetchWorkspace = async () => {
+        const res = await getWorkspace(organization?.id || "");
+        setWorkspace(res.workspace);
+      };
+      fetchWorkspace();
     });
     return () => {
       socket.off("updateWorkspace");

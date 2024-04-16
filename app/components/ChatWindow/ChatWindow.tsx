@@ -109,7 +109,7 @@ export default function ChatWindow(props: {
   }
 
   useEffect(() => {
-    console.log("chat", chat);
+    // console.log("chat", chat);
     socket.on("refreshChatWindow", () => {
       console.log("refreshing chat");
       getChat(currentChatId, organization?.id || "", user?.id || "").then(
@@ -262,6 +262,17 @@ export default function ChatWindow(props: {
       });
     }
   }, [currentChatId]);
+
+  function tillLastUserMessage(messages: any[]) {
+    let lastUserMessageIndex = 0;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].type === "user") {
+        lastUserMessageIndex = i;
+        break;
+      }
+    }
+    return messages.slice(0, lastUserMessageIndex + 1);
+  }
 
   const [promptOpened, setPromptOpened] = useState(false);
   const [newPrompt, setnewPrompt] = useState<IPromptDocument | null>(null);
@@ -463,6 +474,11 @@ export default function ChatWindow(props: {
                     <MessageItem
                       message={message}
                       participants={participants}
+                      instructions={chat.instructions}
+                      assistant={{
+                        ...chat.assistant,
+                        scope: chat.scope == "private" ? "private" : "public",
+                      }}
                       setPromptOpened={setPromptOpened}
                       setPromptContent={setMessageContent}
                       setForkMessage={setForkMessage}
@@ -581,13 +597,16 @@ export default function ChatWindow(props: {
                   disabled={processing}
                   onClick={() => {
                     setProcessing(true);
+                    let contexWindow = tillLastUserMessage(chat.messages);
                     sendAssistantMessage(
-                      chat?.messages
-                        ?.slice()
-                        .reverse()
-                        .find((message: any) => message.type === "user"),
+                      contexWindow.slice(0, -1),
+                      contexWindow[contexWindow.length - 1],
+                      chat.instructions,
                       chat.workspaceId,
-                      "gpt-3.5-turbo"
+                      {
+                        ...chat.assistant,
+                        scope: chat.scope == "private" ? "private" : "public",
+                      }
                     );
                   }}
                 >
@@ -649,9 +668,17 @@ export default function ChatWindow(props: {
                             currentChatId
                           ).then((res) => {
                             sendAssistantMessage(
+                              chat.messages,
                               res.message,
+                              chat.instructions,
                               chat.workspaceId,
-                              "gpt-3.5-turbo"
+                              {
+                                ...chat.assistant,
+                                scope:
+                                  chat.scope == "private"
+                                    ? "private"
+                                    : "public",
+                              }
                             );
                             setMessageInput("");
                           });
@@ -674,9 +701,15 @@ export default function ChatWindow(props: {
                           currentChatId
                         ).then((res) => {
                           sendAssistantMessage(
+                            chat.messages,
                             res.message,
+                            chat.instructions,
                             chat.workspaceId,
-                            "gpt-3.5-turbo"
+                            {
+                              ...chat.assistant,
+                              scope:
+                                chat.scope == "private" ? "private" : "public",
+                            }
                           );
                           setMessageInput("");
                         });
