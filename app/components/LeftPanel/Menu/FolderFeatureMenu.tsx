@@ -36,7 +36,9 @@ export default function FolderFeatureMenu(props: {
   setOpen: (value: boolean) => void;
   setRename: (value: boolean) => void;
   setMoveModal: (value: boolean) => void;
-  members: any[]
+  members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
 }) {
   const colors = [
     "#2596FF",
@@ -106,6 +108,9 @@ export default function FolderFeatureMenu(props: {
               props.members
             )
           }
+          disabled={
+            props.scope === "public" ? !props.allowPublic : !props.allowPersonal
+          }
         >
           <MenuButton properties={MenuData[1]} />
         </Menu.Item>
@@ -117,6 +122,9 @@ export default function FolderFeatureMenu(props: {
               props.userId,
               props.workspaceId
             )
+          }
+          disabled={
+            props.scope === "public" ? !props.allowPublic : !props.allowPersonal
           }
         >
           <MenuButton properties={MenuData[2]} />

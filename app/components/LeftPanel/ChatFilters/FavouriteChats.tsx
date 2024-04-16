@@ -9,8 +9,12 @@ import { useAuth } from "@clerk/nextjs";
 import { ScrollArea, Loader, Text } from "@mantine/core";
 import { socket } from "@/socket";
 
-const FavouriteChats = (props: { members: any[] }) => {
-  const { members } = props;
+const FavouriteChats = (props: {
+  members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
+}) => {
+  const { members, allowPersonal, allowPublic } = props;
   const { userId, orgId } = useAuth();
   useEffect(() => {
     const fetchAllChats = async () => {
@@ -47,7 +51,15 @@ const FavouriteChats = (props: { members: any[] }) => {
             </Text>
           ) : (
             favouriteChats.map((chat, key) => {
-              return <ChatItem item={chat} key={key} members={members} />;
+              return (
+                <ChatItem
+                  item={chat}
+                  key={key}
+                  members={members}
+                  allowPersonal={allowPersonal}
+                  allowPublic={allowPublic}
+                />
+              );
             })
           )
         ) : (

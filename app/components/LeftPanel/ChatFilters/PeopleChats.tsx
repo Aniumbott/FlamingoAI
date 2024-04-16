@@ -25,8 +25,12 @@ import SortMenu from "../Menu/SortMenu";
 import { socket } from "@/socket";
 import { sortItems } from "@/app/controllers/chat";
 
-const PeopleChats = (props: { members: any[] }) => {
-  const { members } = props;
+const PeopleChats = (props: {
+  members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
+}) => {
+  const { members, allowPersonal, allowPublic } = props;
   const [allChats, setAllChats] = useState<IChatDocument[]>([]);
   const { userId, orgId } = useAuth();
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -82,6 +86,9 @@ const PeopleChats = (props: { members: any[] }) => {
                   allChats={allChats}
                   members={members}
                   key={user.userId}
+                  allowPersonal={allowPersonal}
+                  allowPublic={allowPublic}
+                  
                 />
               ))
             ) : (
@@ -98,6 +105,8 @@ const UserAccordionItem = (props: {
   user: any;
   allChats: IChatDocument[];
   members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
 }) => {
   const { user, allChats, members } = props;
   const [sort, setSort] = useState<string>("New");
@@ -127,7 +136,7 @@ const UserAccordionItem = (props: {
       </Accordion.Control>
       <AccordionPanel>
         {sortedChats.map((chat: IChatDocument, key: any) => (
-          <ChatItem item={chat} key={key} members={members} />
+          <ChatItem item={chat} key={key} members={members} allowPersonal={props.allowPersonal} allowPublic={props.allowPublic}  />
         ))}
       </AccordionPanel>
     </Accordion.Item>

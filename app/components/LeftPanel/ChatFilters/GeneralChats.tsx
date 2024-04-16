@@ -13,12 +13,15 @@ import {
   TextInput,
   useCombobox,
   Loader,
+  Menu,
+  Checkbox,
 } from "@mantine/core";
 import {
   IconCaretRightFilled,
   IconFolderPlus,
   IconPlus,
   IconSearch,
+  IconSettings,
 } from "@tabler/icons-react";
 
 // Components
@@ -28,6 +31,7 @@ import {
   getIndependentChats,
   createChat,
   sortItems,
+  getAllPopulatedChats,
 } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
@@ -37,75 +41,29 @@ import style from "../LeftPanel.module.css";
 import { useAuth } from "@clerk/nextjs";
 import { socket } from "@/socket";
 
-interface Chats {
-  title: string;
-  content: ChatItem[];
-}
-interface ChatItem {
-  id: string;
-  type: string;
-  title: string;
-  scope: "personal" | "shared";
-  content: string | ChatItem[];
-}
-
-const GeneralChats = (props: { members: any[] }) => {
-  const { members } = props;
+const GeneralChats = (props: {
+  members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
+}) => {
+  const { members, allowPersonal, allowPublic } = props;
+  const { userId, orgId } = useAuth();
   const [publicChats, setPublicChats] = useState<IChatDocument[]>([]);
   const [privateChats, setPrivateChats] = useState<IChatDocument[]>([]);
   const [publicFolders, setPublicFolders] = useState<IChatFolderDocument[]>([]);
   const [privateFolders, setPrivateFolders] = useState<IChatFolderDocument[]>(
     []
   );
-  const { userId, orgId } = useAuth();
+  const [allPopulatedChats, setAllPopulatedChats] = useState<IChatDocument[]>(
+    []
+  );
+  const [searchContent, setSearchContent] = useState<boolean>(false);
   const [sort, setSort] = useState<string>("New");
 
   const [searchTerm, setSearchTerm] = useState<string>("");
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
-
-  const searchChatsInFolders = (folders: any, searchTerm: string) => {
-    let results: any = [];
-    for (let folder of folders) {
-      if (folder.chats) {
-        const matchedChats = folder.chats?.filter((chat: any) =>
-          chat.name.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        results = results.concat(matchedChats);
-      }
-      if (folder.subfolders) {
-        results = results.concat(
-          searchChatsInFolders(folder.subfolders, searchTerm)
-        );
-      }
-    }
-    return results;
-  };
-
-  const filteredPublicChat = publicChats?.filter((chat) =>
-    chat.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const filteredPublicFolderChats = searchChatsInFolders(
-    publicFolders,
-    searchTerm
-  );
-  const combinedFilteredPublicChats = [
-    ...filteredPublicChat,
-    ...filteredPublicFolderChats,
-  ];
-
-  const filteredPrivateChat = privateChats?.filter((chat) =>
-    chat.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const filteredPrivateFolderChats = searchChatsInFolders(
-    privateFolders,
-    searchTerm
-  );
-  const combinedFilteredPrivateChats = [
-    ...filteredPrivateChat,
-    ...filteredPrivateFolderChats,
-  ];
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -136,16 +94,27 @@ const GeneralChats = (props: { members: any[] }) => {
       }
     };
 
+    const fetchAllPopulatedChats = async () => {
+      try {
+        setAllPopulatedChats(
+          (await getAllPopulatedChats(userId || "", orgId || "")).chats
+        );
+      } catch (error) {
+        console.error("Failed to fetch all populated chats:", error);
+      }
+    };
+
     const fetchChatsAndFolders = () => {
       fetchChats().then(() => fetchFolders());
     };
 
     fetchChatsAndFolders();
+    fetchAllPopulatedChats();
 
     socket.on("refreshChats", () => {
       console.log("refreshchats fetching chats and folder");
       fetchChatsAndFolders();
-      console.log("refreshchats fetching chats and folder");
+      fetchAllPopulatedChats();
     });
 
     return () => {
@@ -153,6 +122,15 @@ const GeneralChats = (props: { members: any[] }) => {
       socket.off("refreshChats");
     };
   }, []);
+
+  const allFilteredChats = allPopulatedChats?.filter(
+    (chat) =>
+      chat.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (searchContent &&
+        chat.messages.some((message: any) =>
+          message.content.toLowerCase().includes(searchTerm.toLowerCase())
+        ))
+  );
 
   const handleSort = () => {
     // console.log("sorting items", sort);
@@ -165,10 +143,10 @@ const GeneralChats = (props: { members: any[] }) => {
     // console.log("items sorted");
   };
 
-  // useEffect(() => {
-  //   console.log("useeffect");
-  //   handleSort();
-  // }, [sort]);
+  useEffect(() => {
+    console.log("useeffect");
+    handleSort();
+  }, [sort]);
 
   return (
     <Stack gap={"sm"}>
@@ -183,6 +161,12 @@ const GeneralChats = (props: { members: any[] }) => {
           <TextInput
             placeholder="Search Chats..."
             leftSection={<IconSearch size={16} />}
+            rightSection={
+              <SearchMenu
+                searchContent={searchContent}
+                setSearchContent={setSearchContent}
+              />
+            }
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             onClick={() => combobox.openDropdown()}
@@ -194,26 +178,21 @@ const GeneralChats = (props: { members: any[] }) => {
           <Combobox.Dropdown>
             <Combobox.Options>
               <ScrollArea.Autosize mah={200} type="scroll">
-                {combinedFilteredPublicChats.length === 0 &&
-                  combinedFilteredPrivateChats.length === 0 && (
+                {allFilteredChats.length === 0 &&
+                  allFilteredChats.length === 0 && (
                     <Combobox.Empty>Nothing found</Combobox.Empty>
                   )}
-                {combinedFilteredPublicChats.length > 0 && (
+                {allFilteredChats.length > 0 && (
                   <>
-                    <Text fw={500}>Shared Chats</Text>
-                    {combinedFilteredPublicChats.map((chat, key) => (
+                    {/* <Text fw={500}>Shared Chats</Text> */}
+                    {allFilteredChats.map((chat, key) => (
                       <Combobox.Option key={key} value={chat._id}>
-                        <ChatItem item={chat} members={members} />
-                      </Combobox.Option>
-                    ))}
-                  </>
-                )}
-                {combinedFilteredPrivateChats.length > 0 && (
-                  <>
-                    <Text mt={5}>Personal Chats</Text>
-                    {combinedFilteredPrivateChats.map((chat, key) => (
-                      <Combobox.Option key={key} value={chat._id}>
-                        <ChatItem item={chat} members={members} />
+                        <ChatItem
+                          item={chat}
+                          members={members}
+                          allowPublic={allowPublic}
+                          allowPersonal={allowPersonal}
+                        />
                       </Combobox.Option>
                     ))}
                   </>
@@ -240,6 +219,8 @@ const GeneralChats = (props: { members: any[] }) => {
               sort={sort}
               setSort={setSort}
               members={members}
+              allowPublic={allowPublic}
+              allowPersonal={allowPersonal}
             />
           </Accordion.Control>
           <AccordionPanel>
@@ -259,54 +240,19 @@ const GeneralChats = (props: { members: any[] }) => {
                         members={members}
                         userId={userId || ""}
                         workspaceId={orgId || ""}
+                        allowPublic={allowPublic}
+                        allowPersonal={allowPersonal}
                       />
                     </Accordion>
                   ))}
                   {publicChats?.map((chat, key) => (
-                    <ChatItem item={chat} key={key} members={members} />
-                  ))}
-                </>
-              ) : (
-                <Loader type="dots" w={"100%"} color="teal" />
-              )}
-            </ScrollArea.Autosize>
-          </AccordionPanel>
-        </Accordion.Item>
-
-        <Accordion.Item value={"PERSONAL"} key={"PERSONAL"}>
-          <AccordionControl>
-            <AccordianLabel
-              title={"PERSONAL"}
-              scope="private"
-              userId={userId || ""}
-              workspaceId={orgId || ""}
-              sort={sort}
-              setSort={setSort}
-              members={members}
-            />
-          </AccordionControl>
-          <AccordionPanel>
-            <ScrollArea.Autosize mah="50vh" scrollbarSize={10} offsetScrollbars>
-              {privateFolders.length > 0 || privateChats.length > 0 ? (
-                <>
-                  {privateFolders?.map((folder, key) => (
-                    <Accordion
-                      chevronPosition="left"
-                      classNames={{ chevron: style.chevron }}
-                      chevron={<IconCaretRightFilled className={style.icon} />}
+                    <ChatItem
+                      item={chat}
                       key={key}
-                    >
-                      <FolderItem
-                        folder={folder}
-                        scope={"private"}
-                        members={members}
-                        userId={userId || ""}
-                        workspaceId={orgId || ""}
-                      />
-                    </Accordion>
-                  ))}
-                  {privateChats?.map((chat, key) => (
-                    <ChatItem item={chat} key={key} members={members} />
+                      members={members}
+                      allowPublic={allowPublic}
+                      allowPersonal={allowPersonal}
+                    />
                   ))}
                 </>
               ) : (
@@ -315,6 +261,66 @@ const GeneralChats = (props: { members: any[] }) => {
             </ScrollArea.Autosize>
           </AccordionPanel>
         </Accordion.Item>
+        {allowPersonal && (
+          <Accordion.Item value={"PERSONAL"} key={"PERSONAL"}>
+            <AccordionControl>
+              <AccordianLabel
+                title={"PERSONAL"}
+                scope="private"
+                userId={userId || ""}
+                workspaceId={orgId || ""}
+                sort={sort}
+                setSort={setSort}
+                members={members}
+                allowPersonal={allowPersonal}
+                allowPublic={allowPublic}
+              />
+            </AccordionControl>
+            <AccordionPanel>
+              <ScrollArea.Autosize
+                mah="50vh"
+                scrollbarSize={10}
+                offsetScrollbars
+              >
+                {privateFolders.length > 0 || privateChats.length > 0 ? (
+                  <>
+                    {privateFolders?.map((folder, key) => (
+                      <Accordion
+                        chevronPosition="left"
+                        classNames={{ chevron: style.chevron }}
+                        chevron={
+                          <IconCaretRightFilled className={style.icon} />
+                        }
+                        key={key}
+                      >
+                        <FolderItem
+                          folder={folder}
+                          scope={"private"}
+                          members={members}
+                          userId={userId || ""}
+                          workspaceId={orgId || ""}
+                          allowPublic={allowPublic}
+                          allowPersonal={allowPersonal}
+                        />
+                      </Accordion>
+                    ))}
+                    {privateChats?.map((chat, key) => (
+                      <ChatItem
+                        item={chat}
+                        key={key}
+                        members={members}
+                        allowPublic={allowPublic}
+                        allowPersonal={allowPersonal}
+                      />
+                    ))}
+                  </>
+                ) : (
+                  <Loader type="dots" w={"100%"} color="teal" />
+                )}
+              </ScrollArea.Autosize>
+            </AccordionPanel>
+          </Accordion.Item>
+        )}
       </Accordion>
     </Stack>
   );
@@ -328,6 +334,8 @@ const AccordianLabel = (props: {
   sort: string;
   setSort: (sort: string) => void;
   members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
 }) => {
   return (
     <Group wrap="nowrap" justify="space-between">
@@ -355,6 +363,9 @@ const AccordianLabel = (props: {
             newFolder(props.scope, null, props.userId, props.workspaceId);
             // Add any additional logic for the ActionIcon click here
           }}
+          disabled={
+            props.scope === "public" ? !props.allowPublic : !props.allowPersonal
+          }
         >
           <IconFolderPlus size={"1rem"} />
         </ActionIcon>
@@ -378,11 +389,61 @@ const AccordianLabel = (props: {
             );
             // Add any additional logic for the ActionIcon click here
           }}
+          disabled={
+            props.scope === "public" ? !props.allowPublic : !props.allowPersonal
+          }
         >
           <IconPlus size={"1rem"} />
         </ActionIcon>
       </Group>
     </Group>
+  );
+};
+
+const SearchMenu = (props: {
+  searchContent: boolean;
+  setSearchContent: (searchContent: boolean) => void;
+}) => {
+  const { searchContent, setSearchContent } = props;
+  return (
+    <Menu
+      position="bottom-end"
+      styles={{
+        dropdown: {
+          backgroundColor: "#ffffff",
+        },
+        item: {
+          backgroundColor: "#ffffff",
+          color: "#000000",
+          hover: {
+            backgroundColor: "#000000",
+          },
+          height: "auto",
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-start",
+          padding: "0px",
+        },
+      }}
+    >
+      <Menu.Target>
+        <ActionIcon variant="subtle" color="grey" size="24px">
+          <IconSettings size={20} />
+        </ActionIcon>
+      </Menu.Target>
+      <Menu.Dropdown>
+        <Menu.Item>
+          <Checkbox
+            label="Search chat content"
+            checked={searchContent}
+            onChange={(event) => setSearchContent(event.currentTarget.checked)}
+            color="teal"
+            size="xs"
+            p={"xs"}
+          />
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
   );
 };
 

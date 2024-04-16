@@ -29,8 +29,12 @@ import {
 import { IconSortDescending } from "@tabler/icons-react";
 import { IconSortAscendingLetters } from "@tabler/icons-react";
 
-const ArchivedChats = (props: { members: any[] }) => {
-  const { members } = props;
+const ArchivedChats = (props: {
+  members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
+}) => {
+  const { members, allowPersonal, allowPublic } = props;
   const { userId, orgId } = useAuth();
   useEffect(() => {
     const fetchAllChats = async () => {
@@ -56,7 +60,15 @@ const ArchivedChats = (props: { members: any[] }) => {
       <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
         {archivedChats.length > 0 ? (
           archivedChats.map((chat, key) => {
-            return <ChatItem item={chat} key={key} members={members} />;
+            return (
+              <ChatItem
+                item={chat}
+                key={key}
+                members={members}
+                allowPersonal={allowPersonal}
+                allowPublic={allowPublic}
+              />
+            );
           })
         ) : (
           <Loader type="dots" w={"100%"} color="teal" />

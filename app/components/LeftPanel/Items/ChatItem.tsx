@@ -17,6 +17,8 @@ import { useAuth } from "@clerk/nextjs";
 export default function ChatItem(props: {
   item: IChatDocument;
   members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -130,6 +132,8 @@ export default function ChatItem(props: {
           opened={openMoveModal}
           setOpened={setOpenMoveModal}
           item={item}
+          allowPublic={props.allowPublic}
+          allowPersonal={props.allowPersonal}
         />
       )}
     </>

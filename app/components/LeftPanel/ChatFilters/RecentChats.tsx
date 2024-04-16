@@ -9,8 +9,12 @@ import { useAuth } from "@clerk/nextjs";
 import { ScrollArea, Loader } from "@mantine/core";
 import { socket } from "@/socket";
 
-const RecentChats = (props: { members: any[] }) => {
-  const { members } = props;
+const RecentChats = (props: {
+  members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
+}) => {
+  const { members, allowPersonal, allowPublic } = props;
   const { userId, orgId } = useAuth();
   useEffect(() => {
     const fetchAllChats = async () => {
@@ -39,7 +43,15 @@ const RecentChats = (props: { members: any[] }) => {
       <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
         {recentChats.length > 0 ? (
           recentChats.map((chat, key) => {
-            return <ChatItem item={chat} key={key} members={members} />;
+            return (
+              <ChatItem
+                item={chat}
+                key={key}
+                members={members}
+                allowPersonal={allowPersonal}
+                allowPublic={allowPublic}
+              />
+            );
           })
         ) : (
           <Loader type="dots" w={"100%"} color="teal" />
