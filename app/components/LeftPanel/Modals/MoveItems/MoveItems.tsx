@@ -29,15 +29,17 @@ const MoveItems = (props: {
   opened: boolean;
   setOpened: (value: boolean) => void;
   item: IChatDocument | IChatFolderDocument;
+  allowPublic: boolean;
+  allowPersonal: boolean;
 }) => {
-  const { opened, setOpened, item } = props;
+  const { opened, setOpened, item, allowPersonal, allowPublic } = props;
   const [publicFolders, setPublicFolders] = useState<IChatFolderDocument[]>([]);
   const [privateFolders, setPrivateFolders] = useState<IChatFolderDocument[]>(
     []
   );
   const { userId, orgId } = useAuth();
   const [selectedTab, setSelectedTab] = useState<"public" | "private">(
-    "public"
+    allowPublic ? "public" : "private"
   );
 
   const [breadcrumb, setBreadcrumb] = useState([
@@ -122,32 +124,36 @@ const MoveItems = (props: {
           </div>
 
           <Group>
-            <Button
-              color={"teal"}
-              c={"white"}
-              onClick={() => {
-                setSelectedTab("public");
-                setBreadcrumb([{ id: "null", name: "public" }]);
-              }}
-              {...(selectedTab === "public"
-                ? { variant: "outline" }
-                : { variant: "subtle" })}
-            >
-              SHARED
-            </Button>
-            <Button
-              color={"teal"}
-              c={"white"}
-              onClick={() => {
-                setSelectedTab("private");
-                setBreadcrumb([{ id: "null", name: "private" }]);
-              }}
-              {...(selectedTab === "private"
-                ? { variant: "outline" }
-                : { variant: "subtle" })}
-            >
-              PERSONAL
-            </Button>
+            {allowPublic && (
+              <Button
+                color={"teal"}
+                c={"white"}
+                onClick={() => {
+                  setSelectedTab("public");
+                  setBreadcrumb([{ id: "null", name: "public" }]);
+                }}
+                {...(selectedTab === "public"
+                  ? { variant: "outline" }
+                  : { variant: "subtle" })}
+              >
+                SHARED
+              </Button>
+            )}
+            {allowPersonal && (
+              <Button
+                color={"teal"}
+                c={"white"}
+                onClick={() => {
+                  setSelectedTab("private");
+                  setBreadcrumb([{ id: "null", name: "private" }]);
+                }}
+                {...(selectedTab === "private"
+                  ? { variant: "outline" }
+                  : { variant: "subtle" })}
+              >
+                PERSONAL
+              </Button>
+            )}
           </Group>
           <Divider />
           <ScrollArea h="40vh" scrollbarSize={10} offsetScrollbars>
@@ -201,6 +207,9 @@ const MoveItems = (props: {
                   userId || "",
                   orgId || ""
                 ).then(() => fetchFolders())
+              }
+              disabled={
+                selectedTab === "public" ? !allowPublic : !allowPersonal
               }
             >
               Create New Folder

@@ -73,7 +73,7 @@ const updatePromptFolder = async (id: string, body: any) => {
     const response = await data.json();
     if (response.promptFolder.scope === "public")
       socket.emit(
-        "changeInPromptFolder",
+        "updatePrompt",
         response.promptFolder.workspaceId,
         response.promptFolder
       );

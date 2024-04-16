@@ -30,10 +30,13 @@ type MenuButtonProps = {
   };
 };
 
-const ChatMenu = (props:{
-  members: any[]
+const ChatMenu = (props: {
+  members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
 }) => {
   const { orgId, userId } = useAuth();
+  const { allowPublic, allowPersonal } = props;
   return (
     <Menu
       position="top-start"
@@ -69,41 +72,69 @@ const ChatMenu = (props:{
         </Button>
       </Menu.Target>
       <Menu.Dropdown>
-        <Menu.Item
-          onClick={() => createPublicChat(userId as string, orgId as string, props.members)}
-        >
-          <MenuButton properties={MenuData[0]} />
-        </Menu.Item>
-        <Menu.Item
-          onClick={() => createPrivateChat(userId as string, orgId as string, props.members)}
-        >
-          <MenuButton properties={MenuData[1]} />
-        </Menu.Item>
-        <Menu.Item
-          onClick={() => createPublicFolder(userId as string, orgId as string)}
-        >
-          <MenuButton properties={MenuData[2]} />
-        </Menu.Item>
-        <Menu.Item
-          onClick={() => createPrivateFolder(userId as string, orgId as string)}
-        >
-          <MenuButton properties={MenuData[3]} />
-        </Menu.Item>
-        <Menu.Item>
+        {allowPublic && (
+          <Menu.Item
+            onClick={() =>
+              createPublicChat(userId as string, orgId as string, props.members)
+            }
+          >
+            <MenuButton properties={MenuData[0]} />
+          </Menu.Item>
+        )}
+        {allowPersonal && (
+          <Menu.Item
+            onClick={() =>
+              createPrivateChat(
+                userId as string,
+                orgId as string,
+                props.members
+              )
+            }
+          >
+            <MenuButton properties={MenuData[1]} />
+          </Menu.Item>
+        )}
+        {allowPublic && (
+          <Menu.Item
+            onClick={() =>
+              createPublicFolder(userId as string, orgId as string)
+            }
+          >
+            <MenuButton properties={MenuData[2]} />
+          </Menu.Item>
+        )}
+        {allowPersonal && (
+          <Menu.Item
+            onClick={() =>
+              createPrivateFolder(userId as string, orgId as string)
+            }
+          >
+            <MenuButton properties={MenuData[3]} />
+          </Menu.Item>
+        )}
+        {/* <Menu.Item>
           <MenuButton properties={MenuData[4]} />
-        </Menu.Item>
+        </Menu.Item> */}
       </Menu.Dropdown>
     </Menu>
   );
 };
 
-const createPublicChat = async (userId: string, orgId: string, members: any[]) => {
+const createPublicChat = async (
+  userId: string,
+  orgId: string,
+  members: any[]
+) => {
   // console.log("creating public chat");
   const res = await createChat("public", null, userId, orgId, members);
   // console.log("res", res);
 };
 
-const createPrivateChat = async (userId: string, orgId: string, members: any[]) => {
+const createPrivateChat = async (
+  userId: string,
+  orgId: string,
+  members: any[]
+) => {
   // console.log("creating private chat");
   const res = await createChat("private", null, userId, orgId, members);
   console.log("res", res.chat);

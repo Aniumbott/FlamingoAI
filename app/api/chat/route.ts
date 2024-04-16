@@ -210,7 +210,40 @@ export async function GET(req: NextRequest, res: NextResponse) {
           },
         ],
       }).sort({ updatedAt: -1 });
+    } else if (action === "allPopulated") {
+      chats = await Chat.find({
+        workspaceId: workspaceId,
+        archived: false,
+        $or: [
+          { scope: { $ne: "private" } },
+          {
+            scope: "private",
+            $or: [
+              { createdBy: createdBy },
+              {
+                memberAccess: {
+                  $elemMatch: {
+                    userId: createdBy,
+                    access: { $ne: "inherit" },
+                  },
+                },
+              },
+            ],
+          },
+        ],
+      })
+        .populate({
+          path: "messages",
+          populate: {
+            path: "comments",
+            populate: {
+              path: "replies",
+            },
+          },
+        })
+        .sort({ updatedAt: -1 });
     }
+
     // get archived chats
     else if (action === "archived") {
       chats = await Chat.find({
@@ -235,6 +268,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         ],
       }).sort({ updatedAt: -1 });
     }
+
     // get specific chat by id
     else if (id) {
       chats = await Chat.find({
@@ -267,6 +301,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         },
       });
     }
+
     return NextResponse.json({ chats }, { status: 200 });
   } catch (error: any) {
     console.log("error at GET in Chat route", error);

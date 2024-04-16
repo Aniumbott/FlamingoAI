@@ -44,12 +44,23 @@ export default function FolderItem(props: {
   members: any[];
   userId: string;
   workspaceId: string;
+  allowPublic: boolean;
+  allowPersonal: boolean;
 }) {
-  const { folder, scope, members, userId, workspaceId } = props;
+  const {
+    folder,
+    scope,
+    members,
+    userId,
+    workspaceId,
+    allowPersonal,
+    allowPublic,
+  } = props;
   const [isOpened, setIsOpened] = useState(false);
   const { ref, hovered } = useHover();
   const [openMoveModal, setOpenMoveModal] = useState(false);
-
+  props.members.find((member) => member.userId === userId)?.role ===
+    "org:admin";
   return (
     <>
       <Accordion.Item value={folder._id}>
@@ -64,6 +75,8 @@ export default function FolderItem(props: {
               workspaceId={workspaceId}
               setMoveModal={setOpenMoveModal}
               members={members}
+              allowPublic={allowPublic}
+              allowPersonal={allowPersonal}
             />
           </Accordion.Control>
         </div>
@@ -83,6 +96,8 @@ export default function FolderItem(props: {
                     members={members}
                     userId={props.userId}
                     workspaceId={props.workspaceId}
+                    allowPersonal={allowPersonal}
+                    allowPublic={allowPublic}
                   />
                 </Accordion>
               </div>
@@ -90,7 +105,12 @@ export default function FolderItem(props: {
           {folder.chats?.length > 0 &&
             folder.chats.map((chat, chatIndex) => (
               <div key={chatIndex}>
-                <ChatItem item={chat as IChatDocument} members={members} />
+                <ChatItem
+                  item={chat as IChatDocument}
+                  members={members}
+                  allowPublic={allowPublic}
+                  allowPersonal={allowPersonal}
+                />
               </div>
             ))}
         </Accordion.Panel>
@@ -100,6 +120,8 @@ export default function FolderItem(props: {
           opened={openMoveModal}
           setOpened={setOpenMoveModal}
           item={folder}
+          allowPublic={allowPublic}
+          allowPersonal={allowPersonal}
         />
       )}
     </>
@@ -115,6 +137,8 @@ const FolderLabel = (props: {
   workspaceId: string;
   setMoveModal: (value: boolean) => void;
   members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
 }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   let actionIconVisible = props.isHovered || menuOpen;
@@ -194,6 +218,11 @@ const FolderLabel = (props: {
               );
               // Add any additional logic for the ActionIcon click here
             }}
+            disabled={
+              props.scope === "public"
+                ? !props.allowPublic
+                : !props.allowPersonal
+            }
           >
             <IconFolderPlus size={"1rem"} />
           </ActionIcon>
@@ -215,9 +244,12 @@ const FolderLabel = (props: {
                 props.workspaceId,
                 props.members
               );
-
-              // Add any additional logic for the ActionIcon click here
             }}
+            disabled={
+              props.scope === "public"
+                ? !props.allowPublic
+                : !props.allowPersonal
+            }
           >
             <IconPlus size={"1rem"} />
           </ActionIcon>
@@ -244,6 +276,8 @@ const FolderLabel = (props: {
               setRename={setRename}
               setMoveModal={props.setMoveModal}
               members={props.members}
+              allowPublic={props.allowPublic}
+              allowPersonal={props.allowPersonal}
             />
           </ActionIcon>
         </Group>

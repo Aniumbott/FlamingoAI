@@ -167,6 +167,25 @@ async function getArchivedChats(createdBy: string, workspaceId: string) {
   }
 }
 
+async function getAllPopulatedChats(createdBy: string, workspaceId: string) {
+  try {
+    const data = await fetch(
+      `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&action=allPopulated`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const response = await data.json();
+    return response;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+}
+
 async function updateChat(id: String, body: any) {
   const notificationId = showLoadingNotification("Saving Changes...");
   try {
@@ -281,6 +300,7 @@ export {
   getChat,
   getIndependentChats,
   getAllChats,
+  getAllPopulatedChats,
   getArchivedChats,
   updateChat,
   updateChatAccess,

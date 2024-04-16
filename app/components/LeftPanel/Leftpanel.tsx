@@ -38,13 +38,19 @@ const LeftPanel = () => {
   const [workspace, setWorkspace] = useState<any>(null);
   const { organization } = useOrganization();
   const { userId, orgId } = useAuth();
+  const isAdmin =
+    members?.find((member: any) => member.userId === userId)?.role ===
+    "org:admin";
+  const allowPublic = isAdmin || workspace?.allowPublic;
+  const allowPersonal = isAdmin || workspace?.allowPersonal;
 
   useEffect(() => {
     const getmembers = async () => {
       const userList =
-        (await organization?.getMemberships())?.map(
-          (member: any) => member.publicUserData
-        ) ?? [];
+        (await organization?.getMemberships())?.map((member: any) => {
+          console.log(member);
+          return { ...member.publicUserData, role: member.role };
+        }) ?? [];
       setMembers(userList);
     };
     getmembers();
@@ -61,6 +67,7 @@ const LeftPanel = () => {
   useEffect(() => {
     socket.on("updateWorkspace", (wsp) => {
       setWorkspace(wsp);
+      console.log(wsp);
     });
     return () => {
       socket.off("updateWorkspace");
@@ -108,6 +115,7 @@ const LeftPanel = () => {
               color="#047857"
               radius="0"
               px={12}
+              disabled={!workspace?.allowPublic}
               style={{
                 borderRadius: "5px 0 0 5px ",
               }}
@@ -118,22 +126,52 @@ const LeftPanel = () => {
               <IconPlus size={15} />
             </Button>
           </Tooltip>
-          <ChatMenu members={members} />
+          <ChatMenu members={members} allowPersonal={allowPersonal} allowPublic={allowPublic} />
         </Group>
       </Group>
 
       {(() => {
         switch (filterMenu) {
           case 0:
-            return <GeneralChats members={members} />;
+            return (
+              <GeneralChats
+                members={members}
+                allowPublic={allowPublic}
+                allowPersonal={allowPersonal}
+              />
+            );
           case 1:
-            return <PeopleChats members={members} />;
+            return (
+              <PeopleChats
+                members={members}
+                allowPublic={allowPublic}
+                allowPersonal={allowPersonal}
+              />
+            );
           case 2:
-            return <RecentChats members={members} />;
+            return (
+              <RecentChats
+                members={members}
+                allowPublic={allowPublic}
+                allowPersonal={allowPersonal}
+              />
+            );
           case 3:
-            return <FavouriteChats members={members} />;
+            return (
+              <FavouriteChats
+                members={members}
+                allowPublic={allowPublic}
+                allowPersonal={allowPersonal}
+              />
+            );
           case 4:
-            return <ArchivedChats members={members} />;
+            return (
+              <ArchivedChats
+                members={members}
+                allowPublic={allowPublic}
+                allowPersonal={allowPersonal}
+              />
+            );
           default:
             return null;
         }
