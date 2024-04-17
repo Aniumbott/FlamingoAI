@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useHover } from "@mantine/hooks";
 import { Menu, Button, Text, ActionIcon, rem, Stack } from "@mantine/core";
 import {
+  IconBrandOpenai,
   IconBuilding,
   IconFileImport,
   IconSettings,
@@ -10,6 +11,7 @@ import {
 
 // Components
 import Workspace from "../Modals/WorkspaceSettings/WorkspaceSettings";
+import { usePathname, useRouter } from "next/navigation";
 
 type MenuButtonProps = {
   properties: {
@@ -21,6 +23,8 @@ type MenuButtonProps = {
 const WorkspaceMenu = (props: { workspace: any }) => {
   const { workspace } = props;
   const [openWorkspaceModal, setOpenWorkspaceModal] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
 
   const { ref } = useHover();
   return (
@@ -55,7 +59,13 @@ const WorkspaceMenu = (props: { workspace: any }) => {
           <Menu.Item onClick={() => setOpenWorkspaceModal(true)}>
             <MenuButton properties={WorkspaceMenuData[0]} />
           </Menu.Item>
-          <Menu.Item>
+          <Menu.Item
+            onClick={() => {
+              router.replace(
+                pathname.split("/").slice(0, 3).join("/") + "/import"
+              );
+            }}
+          >
             <MenuButton properties={WorkspaceMenuData[1]} />
           </Menu.Item>
         </Menu.Dropdown>
@@ -110,7 +120,7 @@ const WorkspaceMenuData: any = [
   },
   {
     title: "Import from ChatGPT",
-    icon: <IconFileImport style={{ width: rem(14), height: rem(14) }} />,
+    icon: <IconBrandOpenai style={{ width: rem(14), height: rem(14) }} />,
   },
 ];
 

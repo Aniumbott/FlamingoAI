@@ -16,7 +16,9 @@ async function createChat(
   parentFolder: Mongoose.Types.ObjectId | null,
   createdBy: string,
   workspaceId: string,
-  members: any[]
+  members: any[],
+  name: string = "New Chat",
+  assistant: any = null
 ) {
   const notificationId = showLoadingNotification("Creating chat...");
   try {
@@ -25,11 +27,13 @@ async function createChat(
     const data = await fetch("/api/chat", {
       method: "POST",
       body: JSON.stringify({
-        createdBy,
         scope,
-        workspaceId,
         parentFolder,
+        createdBy,
+        workspaceId,
         members: userId,
+        name,
+        assistant,
       }),
       headers: {
         "Content-Type": "application/json",

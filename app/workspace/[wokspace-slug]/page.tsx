@@ -12,7 +12,11 @@ import {
   Loader,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconLayoutSidebarRightExpand, IconPlus } from "@tabler/icons-react";
+import {
+  IconLayoutSidebarLeftExpand,
+  IconLayoutSidebarRightExpand,
+  IconPlus,
+} from "@tabler/icons-react";
 import { notFound, usePathname, useRouter } from "next/navigation";
 import {
   ClerkLoaded,
@@ -160,6 +164,25 @@ const Workspace = () => {
               overflowY: "hidden",
             }}
           >
+            {!leftOpened ? (
+              <div className="absolute top-3 flex flex-row items-center justify-between">
+                <Title order={4} mr={10}>
+                  TeamGPT
+                </Title>
+                <ActionIcon
+                  variant="subtle"
+                  color="grey"
+                  aria-label="Settings"
+                  onClick={toggleLeft}
+                >
+                  <IconLayoutSidebarLeftExpand
+                    style={{ width: "90%", height: "90%" }}
+                    stroke={1.5}
+                  />
+                </ActionIcon>
+              </div>
+            ) : null}
+
             <div
               className="h-[100vh] w-full flex flex-col"
               style={{

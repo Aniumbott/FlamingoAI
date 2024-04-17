@@ -124,7 +124,7 @@ export async function POST(req: any, res: NextApiResponse) {
       const workspace = await Workspace.findById(body.workspaceId);
 
       chat = await Chat.create({
-        name: "New Chat",
+        name: body.name,
         createdBy: body.createdBy,
         scope: body.scope,
         parentFolder: body.parentFolder,
@@ -135,11 +135,13 @@ export async function POST(req: any, res: NextApiResponse) {
           access: "inherit",
         })),
         instructions: workspace?.instructions,
-        assistant: workspace?.assistants.find(
-          (assistant) =>
-            (assistant.scope == "private" && body.scope == "private") ||
-            (assistant.scope == "pbulic" && body.scope != "private")
-        ),
+        assistant: body.assistant
+          ? body.assistant
+          : workspace?.assistants.find(
+              (assistant) =>
+                (assistant.scope == "private" && body.scope == "private") ||
+                (assistant.scope == "pbulic" && body.scope != "private")
+            ),
       });
 
       // If parentFolder was provided, add the new chat ID to the parent folder's chats array
