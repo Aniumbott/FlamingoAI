@@ -8,6 +8,7 @@ import {
   Avatar,
   Divider,
   ActionIcon,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconDots,
@@ -59,21 +60,22 @@ export default function ChatFeatureMenu(props: {
         opened={props.open}
         onChange={props.setOpen}
       >
-        <Menu.Target>
-          <ActionIcon
-            size="25px"
-            variant="subtle"
-            aria-label=""
-            color="#9CA3AF"
-            // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
-            style={{
-              "--ai-hover-color": "white",
-            }}
-           
-          >
-            <IconDots size={15} stroke={1.5} />
-          </ActionIcon>
-        </Menu.Target>
+        <Tooltip label="Menu" fz="xs">
+          <Menu.Target>
+            <ActionIcon
+              size="25px"
+              variant="subtle"
+              aria-label=""
+              color="#9CA3AF"
+              // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
+              style={{
+                "--ai-hover-color": "white",
+              }}
+            >
+              <IconDots size={15} stroke={1.5} />
+            </ActionIcon>
+          </Menu.Target>
+        </Tooltip>
 
         <Menu.Dropdown>
           <Menu.Label>

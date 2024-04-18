@@ -1,7 +1,15 @@
 // Modules
 import { useState } from "react";
 import { useHover } from "@mantine/hooks";
-import { Menu, Button, Text, ActionIcon, rem, Stack } from "@mantine/core";
+import {
+  Menu,
+  Button,
+  Text,
+  ActionIcon,
+  rem,
+  Stack,
+  Tooltip,
+} from "@mantine/core";
 import {
   IconBrandOpenai,
   IconBuilding,
@@ -50,11 +58,13 @@ const WorkspaceMenu = (props: { workspace: any }) => {
           },
         }}
       >
-        <Menu.Target ref={ref}>
-          <ActionIcon variant="subtle" color="grey" size="24px">
-            <IconSettings />
-          </ActionIcon>
-        </Menu.Target>
+        <Tooltip label="Menu" fz="xs">
+          <Menu.Target ref={ref}>
+            <ActionIcon variant="subtle" color="grey" size="24px">
+              <IconSettings />
+            </ActionIcon>
+          </Menu.Target>
+        </Tooltip>
         <Menu.Dropdown>
           <Menu.Item onClick={() => setOpenWorkspaceModal(true)}>
             <MenuButton properties={WorkspaceMenuData[0]} />

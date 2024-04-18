@@ -7,6 +7,7 @@ import {
   Text,
   Title,
   Select,
+  Tooltip,
 } from "@mantine/core";
 import style from ".././RightPanel.module.css";
 import { useEffect, useState } from "react";
@@ -128,7 +129,9 @@ export default function CommentsPanel(props: { toggleRight: () => void }) {
     <div className="mx-2">
       <div className={style.activeTitle}>
         <Text>COMMENTS</Text>
-        <CloseButton onClick={toggleRight} />
+        <Tooltip label="Close" position="left" fz="xs">
+          <CloseButton onClick={toggleRight} />
+        </Tooltip>
       </div>
       <Divider my="md" />
       <div className="flex flex-row justify-between">
@@ -170,12 +173,12 @@ export default function CommentsPanel(props: { toggleRight: () => void }) {
 
       <div className="mt-3 h-full">
         {!chatId ? (
-          <div className="w-full h-full flex justify-center items-center">
-            <Text size="md" c="dimmed" fw={700} ta="center">
-              SELECT A CHAT
-            </Text>
-          </div>
-        ) : null}
+          // <div className="w-full h-full flex justify-center items-center">
+          <Text mt="xl" size="xs" c="dimmed" ta="center">
+            Select a chat
+          </Text>
+        ) : // </div>
+        null}
         <ScrollArea h="85vh" scrollbarSize={0}>
           {[
             filter == "unresolved"

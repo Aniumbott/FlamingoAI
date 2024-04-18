@@ -46,8 +46,8 @@ const FavouriteChats = (props: {
       <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
         {favouriteChats ? (
           favouriteChats.length === 0 ? (
-            <Text style={{ textAlign: "center" }} c="gray" size="xs">
-              No favourite Chats
+            <Text style={{ textAlign: "center" }} c="dimmed" size="xs">
+              No favourite chats
             </Text>
           ) : (
             favouriteChats.map((chat, key) => {

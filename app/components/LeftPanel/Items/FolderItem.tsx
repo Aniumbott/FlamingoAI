@@ -2,7 +2,14 @@
 import { useState, useEffect } from "react";
 import { useHover } from "@mantine/hooks";
 import Mongoose from "mongoose";
-import { Accordion, Text, Group, ActionIcon, TextInput } from "@mantine/core";
+import {
+  Accordion,
+  Text,
+  Group,
+  ActionIcon,
+  TextInput,
+  Tooltip,
+} from "@mantine/core";
 import {
   IconCaretRightFilled,
   IconFolderOpen,
@@ -199,60 +206,64 @@ const FolderLabel = (props: {
       </Group>
       {!rename && actionIconVisible && (
         <Group wrap="nowrap" gap={5} align="center">
-          <ActionIcon
-            size="sm"
-            variant="subtle"
-            aria-label="Sort"
-            color="#9CA3AF"
-            style={{
-              "--ai-hover-color": "white",
-              "--ai-hover": "#047857",
-            }}
-            onClick={(event) => {
-              event.stopPropagation();
-              newFolder(
-                props.scope,
-                props.folder._id,
-                props.userId,
-                props.workspaceId
-              );
-              // Add any additional logic for the ActionIcon click here
-            }}
-            disabled={
-              props.scope === "public"
-                ? !props.allowPublic
-                : !props.allowPersonal
-            }
-          >
-            <IconFolderPlus size={"1rem"} />
-          </ActionIcon>
-          <ActionIcon
-            size="sm"
-            variant="subtle"
-            aria-label="Sort"
-            color="#9CA3AF"
-            style={{
-              "--ai-hover-color": "white",
-              "--ai-hover": "#047857",
-            }}
-            onClick={(event) => {
-              event.stopPropagation();
-              createChat(
-                props.scope,
-                props.folder._id,
-                props.userId,
-                props.workspaceId,
-                props.members
-              );
-            }}
-            disabled={
-              props.scope === "public"
-                ? !props.allowPublic
-                : !props.allowPersonal
-            }
-          >
-            <IconPlus size={"1rem"} />
-          </ActionIcon>
+          <Tooltip label="Create new folder" fz="xs">
+            <ActionIcon
+              size="sm"
+              variant="subtle"
+              aria-label="Sort"
+              color="#9CA3AF"
+              style={{
+                "--ai-hover-color": "white",
+                "--ai-hover": "#6bcb99",
+              }}
+              onClick={(event) => {
+                event.stopPropagation();
+                newFolder(
+                  props.scope,
+                  props.folder._id,
+                  props.userId,
+                  props.workspaceId
+                );
+                // Add any additional logic for the ActionIcon click here
+              }}
+              disabled={
+                props.scope === "public"
+                  ? !props.allowPublic
+                  : !props.allowPersonal
+              }
+            >
+              <IconFolderPlus size={"1rem"} />
+            </ActionIcon>
+          </Tooltip>
+          <Tooltip label="Create new chat" fz="xs">
+            <ActionIcon
+              size="sm"
+              variant="subtle"
+              aria-label="Sort"
+              color="#9CA3AF"
+              style={{
+                "--ai-hover-color": "white",
+                "--ai-hover": "#6bcb99",
+              }}
+              onClick={(event) => {
+                event.stopPropagation();
+                createChat(
+                  props.scope,
+                  props.folder._id,
+                  props.userId,
+                  props.workspaceId,
+                  props.members
+                );
+              }}
+              disabled={
+                props.scope === "public"
+                  ? !props.allowPublic
+                  : !props.allowPersonal
+              }
+            >
+              <IconPlus size={"1rem"} />
+            </ActionIcon>
+          </Tooltip>
           <ActionIcon
             size="sm"
             variant="subtle"
@@ -285,23 +296,3 @@ const FolderLabel = (props: {
     </Group>
   );
 };
-
-// const PromptItem = (props: { item: AccordionItem }) => {
-//   const { item } = props;
-//   return (
-//     <>
-//       <div className={style.prompt}>
-//         <IconBulbFilled
-//           style={{
-//             width: "1rem",
-//             height: "1rem",
-//             color: "var(--mantine-color-teal-3)",
-//           }}
-//         />
-//         <Text size="sm" style={{ marginLeft: "0.5rem" }}>
-//           {item.title}
-//         </Text>
-//       </div>
-//     </>
-//   );
-// };

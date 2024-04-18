@@ -1,27 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
-  ActionIcon,
-  Avatar,
   Button,
-  Center,
-  CopyButton,
-  Divider,
   Group,
   Modal,
-  NativeSelect,
-  SegmentedControl,
   Stack,
-  Table,
-  Text,
-  TextInput,
   Title,
-  Tooltip,
-  ScrollArea,
   Select,
   Textarea,
 } from "@mantine/core";
-import { IconBuilding, IconCheck, IconCopy } from "@tabler/icons-react";
-import { IChatDocument } from "../../../models/Chat";
 import { updateChat } from "@/app/controllers/chat";
 
 const SettingsModal = (props: {

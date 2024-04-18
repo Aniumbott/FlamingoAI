@@ -88,7 +88,6 @@ const PeopleChats = (props: {
                   key={user.userId}
                   allowPersonal={allowPersonal}
                   allowPublic={allowPublic}
-                  
                 />
               ))
             ) : (
@@ -136,7 +135,13 @@ const UserAccordionItem = (props: {
       </Accordion.Control>
       <AccordionPanel>
         {sortedChats.map((chat: IChatDocument, key: any) => (
-          <ChatItem item={chat} key={key} members={members} allowPersonal={props.allowPersonal} allowPublic={props.allowPublic}  />
+          <ChatItem
+            item={chat}
+            key={key}
+            members={members}
+            allowPersonal={props.allowPersonal}
+            allowPublic={props.allowPublic}
+          />
         ))}
       </AccordionPanel>
     </Accordion.Item>
@@ -164,7 +169,6 @@ const AccordianLabel = (props: {
         }}
         ta={"left"}
         size="sm"
-        c={"white"}
         fw={500}
       >
         {user.firstName} {user.lastName}

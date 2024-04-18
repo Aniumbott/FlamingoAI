@@ -419,6 +419,7 @@ export default function Reports() {
                       multiline
                       w={400}
                       label="The total number of tokens utilised in the chat; the chat length, in tokens."
+                      fz="xs"
                     >
                       <IconInfoCircle size="14px" />
                     </Tooltip>
@@ -432,6 +433,7 @@ export default function Reports() {
                       multiline
                       w={400}
                       label="The GPT model the chat is using. If chats started with one model, but then switched, the latest model is shown here."
+                      fz="xs"
                     >
                       <IconInfoCircle size="14px" />
                     </Tooltip>
@@ -445,6 +447,7 @@ export default function Reports() {
                       multiline
                       w={400}
                       label="The number of tokens the model can maintain as context when processing a request. When the conversation exceeds the context window, older messages are dropped from the context."
+                      fz="xs"
                     >
                       <IconInfoCircle size="14px" />
                     </Tooltip>
@@ -458,6 +461,7 @@ export default function Reports() {
                       multiline
                       w={400}
                       label="The proportion of the model's total context window that is currently being utilized by the chat. Values over 100% indicate that earliest information is dropped from the context."
+                      fz="xs"
                     >
                       <IconInfoCircle size="14px" />
                     </Tooltip>

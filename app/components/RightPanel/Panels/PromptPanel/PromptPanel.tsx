@@ -17,6 +17,7 @@ import {
   Combobox,
   TextInput,
   useCombobox,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconSearch,
@@ -218,7 +219,9 @@ export default function PromptPanel(props: { toggleRight: () => void }) {
     <>
       <div className={style.activeTitle}>
         <Text>SAVED PROMPTS</Text>
-        <CloseButton onClick={toggleRight} />
+        <Tooltip label="Close" position="left" fz="xs">
+          <CloseButton onClick={toggleRight} />
+        </Tooltip>
       </div>
       <Divider my="md" />
       <Stack gap={"sm"} p={"8px"}>
@@ -501,52 +504,54 @@ const AccordianLabel = (props: {
         <SortMenu sort={props.sort} setSort={props.setSort} />
         {props.scope !== "system" ? (
           <>
-            <ActionIcon
-              size="sm"
-              variant="subtle"
-              aria-label="Sort"
-              color="#9CA3AF"
-              style={{
-                "--ai-hover-color": "white",
-                "--ai-hover": "#047857",
-              }}
-              onClick={(event) => {
-                event.stopPropagation();
-                createPromptFolder(
-                  props.scope,
-                  null,
-                  props.userId,
-                  props.workspaceId
-                );
-                // newFolder(props.scope, null, props.userId, props.workspaceId);
-                // Add any additional logic for the ActionIcon click here
-              }}
-            >
-              <IconFolderPlus size={"1rem"} />
-            </ActionIcon>
-            <ActionIcon
-              size="sm"
-              variant="subtle"
-              aria-label="Sort"
-              color="#9CA3AF"
-              style={{
-                "--ai-hover-color": "white",
-                "--ai-hover": "#047857",
-              }}
-              onClick={(event) => {
-                event.stopPropagation();
-                props.modalControls?.setModalItem(null);
-                props.modalControls?.setModalScope(
-                  props.scope === "public" ? "public" : "private"
-                );
-                props.modalControls?.setModalParentFolder(null);
-                props.modalControls?.setOpenModal(true);
-                console.log("new prompt");
-                // Add any additional logic for the ActionIcon click here
-              }}
-            >
-              <IconPlus size={"1rem"} />
-            </ActionIcon>
+            <Tooltip label="Create new folder" fz="xs">
+              <ActionIcon
+                size="sm"
+                variant="subtle"
+                aria-label="Sort"
+                color="#9CA3AF"
+                style={{
+                  "--ai-hover-color": "white",
+                  "--ai-hover": "#6bcb99",
+                }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  createPromptFolder(
+                    props.scope,
+                    null,
+                    props.userId,
+                    props.workspaceId
+                  );
+                }}
+              >
+                <IconFolderPlus size={"1rem"} />
+              </ActionIcon>
+            </Tooltip>
+            <Tooltip label="Create new prompt" fz="xs">
+              <ActionIcon
+                size="sm"
+                variant="subtle"
+                aria-label="Sort"
+                color="#9CA3AF"
+                style={{
+                  "--ai-hover-color": "white",
+                  "--ai-hover": "#6bcb99",
+                }}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  props.modalControls?.setModalItem(null);
+                  props.modalControls?.setModalScope(
+                    props.scope === "public" ? "public" : "private"
+                  );
+                  props.modalControls?.setModalParentFolder(null);
+                  props.modalControls?.setOpenModal(true);
+                  console.log("new prompt");
+                  // Add any additional logic for the ActionIcon click here
+                }}
+              >
+                <IconPlus size={"1rem"} />
+              </ActionIcon>
+            </Tooltip>
           </>
         ) : null}
       </Group>

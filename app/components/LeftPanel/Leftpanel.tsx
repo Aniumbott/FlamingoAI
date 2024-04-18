@@ -27,8 +27,7 @@ import RecentChats from "./ChatFilters/RecentChats";
 import { socket } from "@/socket";
 import FavouriteChats from "./ChatFilters/FavouriteChats";
 import ArchivedChats from "./ChatFilters/ArchivedChats";
-import { getWorkspace, updateWorkspace } from "@/app/controllers/workspace";
-import { set } from "mongoose";
+import { getWorkspace } from "@/app/controllers/workspace";
 import GeneralChats from "./ChatFilters/GeneralChats";
 
 const LeftPanel = () => {
@@ -112,10 +111,10 @@ const LeftPanel = () => {
           filterMenu={filterMenu}
           setFilterMenu={setFilterMenu}
         />
-        <Group color="#047857" wrap="nowrap" justify="flex-end" gap={1}>
-          <Tooltip label="New Chat" color={"gray"} fz={"xs"}>
+        <Group wrap="nowrap" justify="flex-end" gap={1}>
+          <Tooltip label="New Chat" fz="xs">
             <Button
-              color="#047857"
+              color="teal"
               radius="0"
               px={12}
               disabled={!workspace?.allowPublic}

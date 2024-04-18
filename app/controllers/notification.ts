@@ -2,6 +2,7 @@ import { notifications } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons-react";
 import { createElement } from "react";
 
+// Show loading notification
 function showLoadingNotification(message: string) {
   const notificationId = notifications.show({
     loading: true,
@@ -15,6 +16,7 @@ function showLoadingNotification(message: string) {
   return notificationId;
 }
 
+// Update to success notification
 function showSuccessNotification(notificationId: string, message: string) {
   notifications.update({
     id: notificationId,
@@ -29,6 +31,7 @@ function showSuccessNotification(notificationId: string, message: string) {
   });
 }
 
+// Update to error notification
 function showErrorNotification(notificationId: string, message: string) {
   notifications.update({
     id: notificationId,
@@ -43,5 +46,8 @@ function showErrorNotification(notificationId: string, message: string) {
   });
 }
 
-
-export { showLoadingNotification, showSuccessNotification, showErrorNotification};
+export {
+  showLoadingNotification,
+  showSuccessNotification,
+  showErrorNotification,
+};

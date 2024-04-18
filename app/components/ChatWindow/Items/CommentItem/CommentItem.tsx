@@ -1,16 +1,14 @@
+// Modules
 import {
   ActionIcon,
   Avatar,
-  Group,
   Menu,
   Paper,
   Text,
-  TextInput,
-  Textarea,
-  Title,
   rem,
   Stack,
   Button,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconCheck,
@@ -23,34 +21,29 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useHover } from "@mantine/hooks";
-
 import { useEffect, useState } from "react";
-import ReplyItem from "../ReplyItem";
-import { useOrganization, useUser } from "@clerk/nextjs";
+import { useUser } from "@clerk/nextjs";
+import { usePathname } from "next/navigation";
+
+// Components
 import {
   createComment,
   deleteComment,
   updateComment,
 } from "@/app/controllers/comment";
-import { usePathname } from "next/navigation";
-
-import { MentionsInput, Mention } from "react-mentions";
-import { set } from "mongoose";
-import MentionInput, {
-  MentionParser,
-} from "./MentionInput";
+import ReplyItem from "../ReplyItem";
+import MentionInput, { MentionParser } from "./MentionInput";
 
 function CommentItem(props: { comment: any; participants: any[] }) {
   const { comment, participants } = props;
-  const [isOpen, setIsOpen] = useState(false);
-  // const [participants, setParticipants] = useState<any>([]);
   const { user } = useUser();
-  const [chatId, setChatId] = useState("");
-  const [replyContent, setReplyContent] = useState("");
-  const [commentText, setCommentText] = useState(comment.content.toString());
-  const [isEdit, setIsEdit] = useState(false);
-  const [createdBy, setCreatedBy] = useState<any>(null);
   const pathname = usePathname();
+  const [isOpen, setIsOpen] = useState(false);
+  const [isEdit, setIsEdit] = useState(false);
+  const [chatId, setChatId] = useState("");
+  const [commentText, setCommentText] = useState(comment.content.toString());
+  const [replyContent, setReplyContent] = useState("");
+  const [createdBy, setCreatedBy] = useState<any>(null);
 
   useEffect(() => {
     setChatId(pathname?.split("/")[3] || "");
@@ -91,31 +84,37 @@ function CommentItem(props: { comment: any; participants: any[] }) {
               </Text>
             </div>
             <div className="flex flex-row">
-              <ActionIcon
-                color={comment.status == "resolved" ? "teal" : "grey"}
-                variant="subtle"
-                onClick={() => {
-                  updateComment(chatId, {
-                    id: comment._id,
-                    status:
-                      comment.status == "resolved" ? "unresolved" : "resolved",
-                  });
-                }}
-              >
-                <IconCircleCheck style={{ width: rem(16) }} />
-              </ActionIcon>
-              <ActionIcon
-                color="grey"
-                variant="subtle"
-                onClick={() => setIsOpen(!isOpen)}
-              >
-                <IconChevronDown
-                  style={{
-                    width: rem(16),
-                    rotate: `${isOpen ? "180deg" : "0deg"}`,
+              <Tooltip label="Resolve" fz="xs">
+                <ActionIcon
+                  color={comment.status == "resolved" ? "teal" : "grey"}
+                  variant="subtle"
+                  onClick={() => {
+                    updateComment(chatId, {
+                      id: comment._id,
+                      status:
+                        comment.status == "resolved"
+                          ? "unresolved"
+                          : "resolved",
+                    });
                   }}
-                />
-              </ActionIcon>
+                >
+                  <IconCircleCheck style={{ width: rem(16) }} />
+                </ActionIcon>
+              </Tooltip>
+              <Tooltip label="Expnad" fz="xs">
+                <ActionIcon
+                  color="grey"
+                  variant="subtle"
+                  onClick={() => setIsOpen(!isOpen)}
+                >
+                  <IconChevronDown
+                    style={{
+                      width: rem(16),
+                      rotate: `${isOpen ? "180deg" : "0deg"}`,
+                    }}
+                  />
+                </ActionIcon>
+              </Tooltip>
 
               <Menu
                 position="bottom-end"
@@ -138,11 +137,13 @@ function CommentItem(props: { comment: any; participants: any[] }) {
                   },
                 }}
               >
-                <Menu.Target>
-                  <ActionIcon color="grey" variant="subtle">
-                    <IconDots style={{ width: rem(16) }} />
-                  </ActionIcon>
-                </Menu.Target>
+                <Tooltip label="Menu" fz="xs">
+                  <Menu.Target>
+                    <ActionIcon color="grey" variant="subtle">
+                      <IconDots style={{ width: rem(16) }} />
+                    </ActionIcon>
+                  </Menu.Target>
+                </Tooltip>
                 <Menu.Dropdown>
                   <Menu.Item
                     onClick={() => {
@@ -179,29 +180,33 @@ function CommentItem(props: { comment: any; participants: any[] }) {
                       participants={participants}
                     />
                     <div className="h-full flex flex-col ml-2 items-center justify-center">
-                      <ActionIcon
-                        color="teal"
-                        size="lg"
-                        variant="light"
-                        onClick={() => {
-                          updateComment(chatId, {
-                            id: comment._id,
-                            content: commentText,
-                          });
-                          setIsEdit(!isEdit);
-                        }}
-                      >
-                        <IconCheck size="18px" />
-                      </ActionIcon>
-                      <ActionIcon
-                        color="red"
-                        mt={5}
-                        size="lg"
-                        variant="light"
-                        onClick={() => setIsEdit(!isEdit)}
-                      >
-                        <IconX size="18px" />
-                      </ActionIcon>
+                      <Tooltip label="Save" fz="xs">
+                        <ActionIcon
+                          color="teal"
+                          size="lg"
+                          variant="light"
+                          onClick={() => {
+                            updateComment(chatId, {
+                              id: comment._id,
+                              content: commentText,
+                            });
+                            setIsEdit(!isEdit);
+                          }}
+                        >
+                          <IconCheck size="18px" />
+                        </ActionIcon>
+                      </Tooltip>
+                      <Tooltip label="Cancel" fz="xs">
+                        <ActionIcon
+                          color="red"
+                          mt={5}
+                          size="lg"
+                          variant="light"
+                          onClick={() => setIsEdit(!isEdit)}
+                        >
+                          <IconX size="18px" />
+                        </ActionIcon>
+                      </Tooltip>
                     </div>
                   </div>
                 ) : (
@@ -221,61 +226,37 @@ function CommentItem(props: { comment: any; participants: any[] }) {
                     />
                   ))}
               </div>
-              {/* <Textarea
-                  mt="md"
-                  placeholder="Reply to comment"
-                  value={replyContent}
-                  onChange={(e) => setReplyContent(e.currentTarget.value)}
-                  rightSection={
-                    <ActionIcon
-                      color="grey"
-                      mr="1rem"
-                      onClick={(e) =>
-                        addReply(
-                          user?.id || "",
-                          replyContent,
-                          comment.messageId
-                        ).then((res) => {
-                          updateComment(chatId, {
-                            id: comment._id,
-                            replies: [...comment.replies, res.comment._id],
-                          });
-                          setReplyContent("");
-                        })
-                      }
-                    >
-                      <IconSend style={{ width: rem(16) }} />
-                    </ActionIcon>
-                  }
-                ></Textarea> */}
+
               <div className="relative mt-4">
                 <MentionInput
                   commentText={replyContent}
                   setCommentText={setReplyContent}
                   participants={participants}
                 />
-                <ActionIcon
-                  color="grey"
-                  mr="1rem"
-                  onClick={(e) =>
-                    createComment(
-                      user?.id || "",
-                      replyContent,
-                      comment.messageId,
-                      chatId,
-                      comment._id
-                    ).then(() => {
-                      setReplyContent("");
-                    })
-                  }
-                  style={{
-                    position: "absolute",
-                    right: "0",
-                    bottom: "1rem",
-                  }}
-                >
-                  <IconSend style={{ width: rem(16) }} />
-                </ActionIcon>
+                <Tooltip label="Send a reply" fz="xs">
+                  <ActionIcon
+                    color="grey"
+                    mr="1rem"
+                    onClick={(e) =>
+                      createComment(
+                        user?.id || "",
+                        replyContent,
+                        comment.messageId,
+                        chatId,
+                        comment._id
+                      ).then(() => {
+                        setReplyContent("");
+                      })
+                    }
+                    style={{
+                      position: "absolute",
+                      right: "0",
+                      bottom: "1rem",
+                    }}
+                  >
+                    <IconSend style={{ width: rem(16) }} />
+                  </ActionIcon>
+                </Tooltip>
               </div>
             </>
           )}

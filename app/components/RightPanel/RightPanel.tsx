@@ -7,6 +7,7 @@ import {
   Divider,
   useMantineColorScheme,
   Paper,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconCategory,
@@ -23,7 +24,6 @@ import {
 import style from "./RightPanel.module.css";
 import { UserButton, useAuth } from "@clerk/nextjs";
 import PromptPanel from "./Panels/PromptPanel/PromptPanel";
-import Comments from "./Panels/CommentsPanel";
 import CommentsPanel from "./Panels/CommentsPanel";
 
 export default function RightPanel(props: {
@@ -65,130 +65,152 @@ export default function RightPanel(props: {
             <UserButton />
           </div>
           <div style={{ marginTop: "8rem" }}>
-            <ActionIcon
-              style={buttonStyle(0)}
-              variant={active == 0 ? "light" : "subtle"}
-              aria-label="Settings"
-              radius={0}
-              color={active == 0 ? "teal" : "light"}
-              onClick={() => {
-                !rightOpened ? toggleRight() : "";
-                setActive(0);
-              }}
-            >
-              <IconCategory
-                style={{ width: "70%", height: "70%" }}
-                stroke={1.5}
-              />
-            </ActionIcon>
+            <Tooltip label="Prompts" position="left" fz="xs">
+              <ActionIcon
+                style={buttonStyle(0)}
+                variant={active == 0 ? "light" : "subtle"}
+                aria-label="Settings"
+                radius={0}
+                color={active == 0 ? "teal" : "light"}
+                onClick={() => {
+                  !rightOpened ? toggleRight() : "";
+                  setActive(0);
+                }}
+              >
+                <IconCategory
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Tooltip>
 
-            <ActionIcon
-              style={buttonStyle(1)}
-              variant={active == 1 ? "light" : "subtle"}
-              aria-label="Settings"
-              radius={0}
-              color={active == 1 ? "teal" : "light"}
-              onClick={() => {
-                !rightOpened ? toggleRight() : "";
-                setActive(1);
-              }}
-            >
-              <IconTrendingUp
-                style={{ width: "70%", height: "70%" }}
-                stroke={1.5}
-              />
-            </ActionIcon>
+            <Tooltip label="Reports" position="left" fz="xs">
+              <ActionIcon
+                style={buttonStyle(1)}
+                variant={active == 1 ? "light" : "subtle"}
+                aria-label="Settings"
+                radius={0}
+                color={active == 1 ? "teal" : "light"}
+                onClick={() => {
+                  !rightOpened ? toggleRight() : "";
+                  setActive(1);
+                }}
+              >
+                <IconTrendingUp
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Tooltip>
 
-            <ActionIcon
-              style={buttonStyle(2)}
-              variant={active == 2 ? "light" : "subtle"}
-              aria-label="Settings"
-              radius={0}
-              color={active == 2 ? "teal" : "light"}
-              onClick={() => {
-                !rightOpened ? toggleRight() : "";
-                setActive(2);
-              }}
-            >
-              <IconMessages
-                style={{ width: "70%", height: "70%" }}
-                stroke={1.5}
-              />
-            </ActionIcon>
+            <Tooltip label="Comments" position="left" fz="xs">
+              <ActionIcon
+                style={buttonStyle(2)}
+                variant={active == 2 ? "light" : "subtle"}
+                aria-label="Settings"
+                radius={0}
+                color={active == 2 ? "teal" : "light"}
+                onClick={() => {
+                  !rightOpened ? toggleRight() : "";
+                  setActive(2);
+                }}
+              >
+                <IconMessages
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Tooltip>
 
-            <ActionIcon
-              style={buttonStyle(3)}
-              variant={active == 3 ? "light" : "subtle"}
-              aria-label="Settings"
-              radius={0}
-              color={active == 3 ? "teal" : "light"}
-              onClick={() => {
-                !rightOpened ? toggleRight() : "";
-                setActive(3);
-              }}
-            >
-              <IconHelp style={{ width: "70%", height: "70%" }} stroke={1.5} />
-            </ActionIcon>
+            <Tooltip label="Help" position="left" fz="xs">
+              <ActionIcon
+                style={buttonStyle(3)}
+                variant={active == 3 ? "light" : "subtle"}
+                aria-label="Settings"
+                radius={0}
+                color={active == 3 ? "teal" : "light"}
+                onClick={() => {
+                  !rightOpened ? toggleRight() : "";
+                  setActive(3);
+                }}
+              >
+                <IconHelp
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Tooltip>
           </div>
         </div>
         <div>
           {colorScheme == "dark" ? (
-            <ActionIcon
-              style={buttonStyle(999)}
-              variant="subtle"
-              aria-label="Settings"
-              radius={0}
-              color="light"
-              onClick={() => setColorScheme("light")}
-            >
-              <IconSun style={{ width: "70%", height: "70%" }} stroke={1.5} />
-            </ActionIcon>
+            <Tooltip label="Light Mode" position="left" fz="xs">
+              <ActionIcon
+                style={buttonStyle(999)}
+                variant="subtle"
+                aria-label="Settings"
+                radius={0}
+                color="light"
+                onClick={() => setColorScheme("light")}
+              >
+                <IconSun style={{ width: "70%", height: "70%" }} stroke={1.5} />
+              </ActionIcon>
+            </Tooltip>
           ) : (
-            <ActionIcon
-              style={buttonStyle(999)}
-              variant="subtle"
-              aria-label="Settings"
-              radius={0}
-              color="light"
-              onClick={() => setColorScheme("dark")}
-            >
-              <IconMoon style={{ width: "70%", height: "70%" }} stroke={1.5} />
-            </ActionIcon>
+            <Tooltip label="Dark Mode" position="left" fz="xs">
+              <ActionIcon
+                style={buttonStyle(999)}
+                variant="subtle"
+                aria-label="Settings"
+                radius={0}
+                color="light"
+                onClick={() => setColorScheme("dark")}
+              >
+                <IconMoon
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Tooltip>
           )}
           {rightOpened ? (
-            <ActionIcon
-              style={buttonStyle(999)}
-              variant="subtle"
-              aria-label="Settings"
-              radius={0}
-              color="light"
-              onClick={() => {
-                toggleRight();
-                rightOpened ? setActive(-1) : "";
-              }}
-            >
-              <IconLayoutSidebarLeftExpand
-                style={{ width: "70%", height: "70%" }}
-                stroke={1.5}
-              />
-            </ActionIcon>
+            <Tooltip label="Colapse panel" position="left" fz="xs">
+              <ActionIcon
+                style={buttonStyle(999)}
+                variant="subtle"
+                aria-label="Settings"
+                radius={0}
+                color="light"
+                onClick={() => {
+                  toggleRight();
+                  rightOpened ? setActive(-1) : "";
+                }}
+              >
+                <IconLayoutSidebarLeftExpand
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Tooltip>
           ) : (
-            <ActionIcon
-              style={buttonStyle(999)}
-              variant="subtle"
-              aria-label="Settings"
-              radius={0}
-              color="light"
-              onClick={() => {
-                toggleRight();
-                !rightOpened ? setActive(0) : "";
-              }}
-            >
-              <IconLayoutSidebarRightExpand
-                style={{ width: "70%", height: "70%" }}
-                stroke={1.5}
-              />
-            </ActionIcon>
+            <Tooltip label="Expand panel" position="left" fz="xs">
+              <ActionIcon
+                style={buttonStyle(999)}
+                variant="subtle"
+                aria-label="Settings"
+                radius={0}
+                color="light"
+                onClick={() => {
+                  toggleRight();
+                  !rightOpened ? setActive(0) : "";
+                }}
+              >
+                <IconLayoutSidebarRightExpand
+                  style={{ width: "70%", height: "70%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Tooltip>
           )}
         </div>
       </Paper>
@@ -206,7 +228,9 @@ const reports = (toggleRight: () => void) => {
     <>
       <div className={style.activeTitle}>
         <Text>REPORTS</Text>
-        <CloseButton onClick={toggleRight} />
+        <Tooltip label="Close" position="left" fz="xs">
+          <CloseButton onClick={toggleRight} />
+        </Tooltip>
       </div>
       <Divider my="md" />
     </>
@@ -218,7 +242,9 @@ const help = (toggleRight: () => void) => {
     <>
       <div className={style.activeTitle}>
         <Text>HELP</Text>
-        <CloseButton onClick={toggleRight} />
+        <Tooltip label="Close" position="left" fz="xs">
+          <CloseButton onClick={toggleRight} />
+        </Tooltip>
       </div>
       <Divider my="md" />
     </>

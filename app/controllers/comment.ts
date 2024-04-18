@@ -1,5 +1,18 @@
 import { socket } from "@/socket";
 
+// Function to get comments
+async function getComments(messageId: String) {
+  const data = await fetch(`/api/comment/?&messageId=${messageId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const response = await data.json();
+  return response;
+}
+
+// Function to create comment
 async function createComment(
   createdBy: String,
   content: String,
@@ -21,17 +34,7 @@ async function createComment(
   return response;
 }
 
-async function getComments(messageId: String) {
-  const data = await fetch(`/api/comment/?&messageId=${messageId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const response = await data.json();
-  return response;
-}
-
+// Function to update comment
 async function updateComment(chatId: String, body: any) {
   const data = await fetch("/api/comment", {
     method: "PUT",
@@ -42,12 +45,12 @@ async function updateComment(chatId: String, body: any) {
   });
 
   const response = await data.json();
-
   socket.emit("updateComment", chatId, response.comment);
 
   return response;
 }
 
+// Function to delete comment
 async function deleteComment(chatId: String, body: any) {
   const data = await fetch("/api/comment", {
     method: "DELETE",
@@ -59,7 +62,8 @@ async function deleteComment(chatId: String, body: any) {
 
   const response = await data.json();
   socket.emit("deleteComment", chatId, body);
+
   return response;
 }
 
-export { createComment, getComments, updateComment, deleteComment };
+export { getComments, createComment, updateComment, deleteComment };

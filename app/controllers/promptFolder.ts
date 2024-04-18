@@ -8,6 +8,31 @@ import {
 } from "./notification";
 type Scope = "public" | "private" | "system";
 
+// Function to get prompt folders
+const getPromptFolders = async (
+  workspaceId: string,
+  scope: Scope,
+  createdBy: string
+) => {
+  try {
+    const data = await fetch(
+      `/api/promptfolder/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const response = await data.json();
+    return response;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+};
+
+// Function to create prompt folder
 const createPromptFolder = async (
   scope: Scope,
   parentFolder: Mongoose.Types.ObjectId | null,
@@ -37,29 +62,7 @@ const createPromptFolder = async (
   }
 };
 
-const getPromptFolders = async (
-  workspaceId: string,
-  scope: Scope,
-  createdBy: string
-) => {
-  try {
-    const data = await fetch(
-      `/api/promptfolder/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const response = await data.json();
-    return response;
-  } catch (err) {
-    console.error(err);
-    return err;
-  }
-};
-
+// Function to update prompt folder
 const updatePromptFolder = async (id: string, body: any) => {
   const notificationId = showLoadingNotification("Saving changes...");
   try {
@@ -87,6 +90,7 @@ const updatePromptFolder = async (id: string, body: any) => {
   }
 };
 
+// Function to delete prompt folder
 const deletePromptFolder = async (folder: IPromptFolderDocument) => {
   const notificationId = showLoadingNotification("Deleting prompt folder...");
   try {
@@ -111,8 +115,8 @@ const deletePromptFolder = async (folder: IPromptFolderDocument) => {
 };
 
 export {
-  createPromptFolder,
   getPromptFolders,
+  createPromptFolder,
   updatePromptFolder,
   deletePromptFolder,
 };

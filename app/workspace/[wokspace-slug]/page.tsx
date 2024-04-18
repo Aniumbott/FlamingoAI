@@ -10,6 +10,7 @@ import {
   Container,
   Text,
   Loader,
+  Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
@@ -117,6 +118,7 @@ const Workspace = () => {
             left: "50%",
             transform: "translate(-50%, -50%)",
           }}
+          color="teal"
         />
       </ClerkLoading>
       <ClerkLoaded>
@@ -138,17 +140,19 @@ const Workspace = () => {
               <Title order={3} ml={5}>
                 TeamGPT
               </Title>
-              <ActionIcon
-                variant="subtle"
-                color="grey"
-                aria-label="Settings"
-                onClick={toggleLeft}
-              >
-                <IconLayoutSidebarRightExpand
-                  style={{ width: "90%", height: "90%" }}
-                  stroke={1.5}
-                />
-              </ActionIcon>
+              <Tooltip label="Colapse panel" fz="xs" position="right">
+                <ActionIcon
+                  variant="subtle"
+                  color="grey"
+                  aria-label="Settings"
+                  onClick={toggleLeft}
+                >
+                  <IconLayoutSidebarRightExpand
+                    style={{ width: "90%", height: "90%" }}
+                    stroke={1.5}
+                  />
+                </ActionIcon>
+              </Tooltip>
             </div>
 
             <LeftPanel />
@@ -164,22 +168,24 @@ const Workspace = () => {
               overflowY: "hidden",
             }}
           >
-            {!leftOpened ? (
+            {!leftOpened && !pathname.split("/")[3] ? (
               <div className="absolute top-3 flex flex-row items-center justify-between">
                 <Title order={4} mr={10}>
                   TeamGPT
                 </Title>
-                <ActionIcon
-                  variant="subtle"
-                  color="grey"
-                  aria-label="Settings"
-                  onClick={toggleLeft}
-                >
-                  <IconLayoutSidebarLeftExpand
-                    style={{ width: "90%", height: "90%" }}
-                    stroke={1.5}
-                  />
-                </ActionIcon>
+                <Tooltip label="Expand panel" fz="xs" position="right">
+                  <ActionIcon
+                    variant="subtle"
+                    color="grey"
+                    aria-label="Settings"
+                    onClick={toggleLeft}
+                  >
+                    <IconLayoutSidebarLeftExpand
+                      style={{ width: "90%", height: "90%" }}
+                      stroke={1.5}
+                    />
+                  </ActionIcon>
+                </Tooltip>
               </div>
             ) : null}
 

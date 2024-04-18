@@ -1,41 +1,12 @@
+// Modules
 import type { NextApiResponse } from "next";
-import { dbConnect } from "@/app/lib/db";
 import { NextResponse } from "next/server";
+import { dbConnect } from "@/app/lib/db";
 import ChatFolder from "@/app/models/ChatFolder";
 import Chat from "@/app/models/Chat";
 import Message from "@/app/models/Message";
 
-export async function POST(req: any, res: NextApiResponse) {
-  try {
-    await dbConnect();
-    const body = await req.json();
-    const chatFolder = await ChatFolder.create({
-      name: "New Folder",
-      createdBy: body.createdBy,
-      workspaceId: body.workspaceId,
-      scope: body.scope,
-      subFolders: body.subFolders,
-      chats: body.chats,
-      parentFolder: body.parentFolder,
-    });
-    if (body.parentFolder) {
-      await ChatFolder.findByIdAndUpdate(body.parentFolder, {
-        $push: { subFolders: chatFolder._id },
-      });
-      // console.log(
-      //   "pushed ",
-      //   chatFolder._id,
-      //   "to parent folder ",
-      //   body.parentFolder
-      // );
-    }
-    return NextResponse.json({ chatFolder }, { status: 200 });
-  } catch (error: any) {
-    // console.log("error in POST at chatfolder route");
-    return NextResponse.json(error.message, { status: 500 });
-  }
-}
-
+// GET request handler
 export async function GET(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
@@ -71,17 +42,41 @@ export async function GET(req: any, res: NextApiResponse) {
       chatFolder = populatedFolders;
     }
 
-    // chatFolder = await Promise.all(chatFolder.map(populateSubFolders));
-
     return NextResponse.json({ chatFolder }, { status: 200 });
   } catch (error: any) {
-    // console.log("error at GET in Chatfolder route", error);
+    console.log("error at GET in Chatfolder route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
+// POST request handler
+export async function POST(req: any, res: NextApiResponse) {
+  try {
+    await dbConnect();
+    const body = await req.json();
+    const chatFolder = await ChatFolder.create({
+      name: "New Folder",
+      createdBy: body.createdBy,
+      workspaceId: body.workspaceId,
+      scope: body.scope,
+      subFolders: body.subFolders,
+      chats: body.chats,
+      parentFolder: body.parentFolder,
+    });
+    if (body.parentFolder) {
+      await ChatFolder.findByIdAndUpdate(body.parentFolder, {
+        $push: { subFolders: chatFolder._id },
+      });
+    }
+    return NextResponse.json({ chatFolder }, { status: 200 });
+  } catch (error: any) {
+    console.log("error in POST at chatfolder route: ", error);
+    return NextResponse.json(error.message, { status: 500 });
+  }
+}
+
+// PUT request handler
 export async function PUT(req: any, res: NextApiResponse) {
-  // console.log("hit put chatfolder");
   try {
     await dbConnect();
     const body = await req.json();
@@ -128,28 +123,28 @@ export async function PUT(req: any, res: NextApiResponse) {
     }
     return NextResponse.json({ chatFolder }, { status: 200 });
   } catch (error: any) {
-    // console.log("error at PUT in Chatfolder route", error);
+    console.log("error at PUT in Chatfolder route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
+// DELETE request handler
 export async function DELETE(req: any, res: NextApiResponse) {
-  // console.log("hit delete chatfolder");
   try {
     await dbConnect();
     const body = await req.json();
-    // const chatFolder = await ChatFolder.findByIdAndDelete(body.id);
     await deleteFolderAndContents(body.id);
     return NextResponse.json(
       { message: "Chat Folder deleted successfully" },
       { status: 200 }
     );
   } catch (error: any) {
-    // console.log("error at DELETE in Chatfolder route", error);
+    console.log("error at DELETE in Chatfolder route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
+// Helper functions
 async function deleteFolderAndContents(folderId: string) {
   const folder = await ChatFolder.findById(folderId);
 

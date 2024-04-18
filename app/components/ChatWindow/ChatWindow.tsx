@@ -24,9 +24,12 @@ import {
   SegmentedControl,
   Center,
   Select,
+  Tooltip,
+  HoverCard,
 } from "@mantine/core";
 import {
   IconBuilding,
+  IconInfoCircle,
   IconLayoutSidebarLeftExpand,
   IconSend,
 } from "@tabler/icons-react";
@@ -86,11 +89,6 @@ export default function ChatWindow(props: {
 
   const [shareChatOpened, setShareChatOpened] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
-
-  // const updateParticipants = () => {
-  //   if (chat.participants.includes(user?.id)) return chat.participants;
-  //   return [...chat.participants, user?.id];
-  // };
 
   function isViewOnly(chat: any) {
     const ans =
@@ -296,27 +294,42 @@ export default function ChatWindow(props: {
                 <Title order={4} mr={10}>
                   TeamGPT
                 </Title>
-                <ActionIcon
-                  variant="subtle"
-                  color="grey"
-                  aria-label="Settings"
-                  onClick={toggleLeft}
-                >
-                  <IconLayoutSidebarLeftExpand
-                    style={{ width: "90%", height: "90%" }}
-                    stroke={1.5}
-                  />
-                </ActionIcon>
+                <Tooltip label="Expand panel" fz="xs" position="right">
+                  <ActionIcon
+                    variant="subtle"
+                    color="grey"
+                    aria-label="Settings"
+                    onClick={toggleLeft}
+                  >
+                    <IconLayoutSidebarLeftExpand
+                      style={{ width: "90%", height: "90%" }}
+                      stroke={1.5}
+                    />
+                  </ActionIcon>
+                </Tooltip>
               </div>
             ) : null}
             <Group justify="space-between" px={"md"} w={"100%"}>
-              <Text size="sm" ml={5} fw={500}>
-                {chat?.name}
-              </Text>
+              <Group>
+                <HoverCard width={280} position="bottom-start" withArrow>
+                  <HoverCard.Target>
+                    <IconInfoCircle size={20} />
+                  </HoverCard.Target>
+                  <HoverCard.Dropdown>
+                    <Text fw={700} c="dimmed" mb="xs">
+                      Instructions
+                    </Text>
+                    <Text size="sm">{chat.instructions}</Text>
+                  </HoverCard.Dropdown>
+                </HoverCard>
+                <Text size="sm" ml={5} fw={500}>
+                  {chat?.name}
+                </Text>
+              </Group>
               <Group gap={0}>
                 <Button
                   variant="subtle"
-                  color="var(--mantine-color-gray-4)"
+                  color="default"
                   onClick={() => setShareChatOpened(true)}
                   mx={10}
                 >
@@ -324,7 +337,7 @@ export default function ChatWindow(props: {
                 </Button>
                 <Button
                   variant="subtle"
-                  color="var(--mantine-color-gray-4)"
+                  color="default"
                   onClick={() => setSettingsOpen(true)}
                   mx={10}
                 >
@@ -638,7 +651,7 @@ export default function ChatWindow(props: {
                       size="lg"
                       radius="0"
                       w="75%"
-                      placeholder="Type a message"
+                      placeholder="Type a message or type '/' to select a prompt"
                       value={messageInput}
                       disabled={processing}
                       onChange={(e) => {
@@ -686,38 +699,42 @@ export default function ChatWindow(props: {
                       }}
                     />
                   </Combobox.Target>
-                  <ActionIcon
-                    size="50"
-                    radius="0"
-                    color="teal"
-                    disabled={processing}
-                    onClick={() => {
-                      if (messageInput != "") {
-                        setProcessing(true);
-                        createMessage(
-                          user?.id || "",
-                          messageInput,
-                          "user",
-                          currentChatId
-                        ).then((res) => {
-                          sendAssistantMessage(
-                            chat.messages,
-                            res.message,
-                            chat.instructions,
-                            chat.workspaceId,
-                            {
-                              ...chat.assistant,
-                              scope:
-                                chat.scope == "private" ? "private" : "public",
-                            }
-                          );
-                          setMessageInput("");
-                        });
-                      }
-                    }}
-                  >
-                    <IconSend size="24" />
-                  </ActionIcon>
+                  <Tooltip label="Send message" fz="xs">
+                    <ActionIcon
+                      size="50"
+                      radius="0"
+                      color="teal"
+                      disabled={processing}
+                      onClick={() => {
+                        if (messageInput != "") {
+                          setProcessing(true);
+                          createMessage(
+                            user?.id || "",
+                            messageInput,
+                            "user",
+                            currentChatId
+                          ).then((res) => {
+                            sendAssistantMessage(
+                              chat.messages,
+                              res.message,
+                              chat.instructions,
+                              chat.workspaceId,
+                              {
+                                ...chat.assistant,
+                                scope:
+                                  chat.scope == "private"
+                                    ? "private"
+                                    : "public",
+                              }
+                            );
+                            setMessageInput("");
+                          });
+                        }
+                      }}
+                    >
+                      <IconSend size="24" />
+                    </ActionIcon>
+                  </Tooltip>
                 </div>
 
                 <Combobox.Dropdown>

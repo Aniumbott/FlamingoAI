@@ -15,6 +15,7 @@ import {
   Loader,
   Menu,
   Checkbox,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconCaretRightFilled,
@@ -349,52 +350,60 @@ const AccordianLabel = (props: {
         onClick={(event) => event.stopPropagation()}
       >
         <SortMenu sort={props.sort} setSort={props.setSort} />
-        <ActionIcon
-          size="sm"
-          variant="subtle"
-          aria-label="Sort"
-          color="#9CA3AF"
-          style={{
-            "--ai-hover-color": "white",
-            "--ai-hover": "#047857",
-          }}
-          onClick={(event) => {
-            event.stopPropagation();
-            newFolder(props.scope, null, props.userId, props.workspaceId);
-            // Add any additional logic for the ActionIcon click here
-          }}
-          disabled={
-            props.scope === "public" ? !props.allowPublic : !props.allowPersonal
-          }
-        >
-          <IconFolderPlus size={"1rem"} />
-        </ActionIcon>
-        <ActionIcon
-          size="sm"
-          variant="subtle"
-          aria-label="Sort"
-          color="#9CA3AF"
-          style={{
-            "--ai-hover-color": "white",
-            "--ai-hover": "#047857",
-          }}
-          onClick={(event) => {
-            event.stopPropagation();
-            createChat(
-              props.scope,
-              null,
-              props.userId,
-              props.workspaceId,
-              props.members
-            );
-            // Add any additional logic for the ActionIcon click here
-          }}
-          disabled={
-            props.scope === "public" ? !props.allowPublic : !props.allowPersonal
-          }
-        >
-          <IconPlus size={"1rem"} />
-        </ActionIcon>
+        <Tooltip label="Create new folder" fz="xs">
+          <ActionIcon
+            size="sm"
+            variant="subtle"
+            aria-label="Sort"
+            color="#9CA3AF"
+            style={{
+              "--ai-hover-color": "white",
+              "--ai-hover": "#6bcb99",
+            }}
+            onClick={(event) => {
+              event.stopPropagation();
+              newFolder(props.scope, null, props.userId, props.workspaceId);
+              // Add any additional logic for the ActionIcon click here
+            }}
+            disabled={
+              props.scope === "public"
+                ? !props.allowPublic
+                : !props.allowPersonal
+            }
+          >
+            <IconFolderPlus size={"1rem"} />
+          </ActionIcon>
+        </Tooltip>
+        <Tooltip label="Create new chat" fz="xs">
+          <ActionIcon
+            size="sm"
+            variant="subtle"
+            aria-label="Sort"
+            color="#9CA3AF"
+            style={{
+              "--ai-hover-color": "white",
+              "--ai-hover": "#6bcb99",
+            }}
+            onClick={(event) => {
+              event.stopPropagation();
+              createChat(
+                props.scope,
+                null,
+                props.userId,
+                props.workspaceId,
+                props.members
+              );
+              // Add any additional logic for the ActionIcon click here
+            }}
+            disabled={
+              props.scope === "public"
+                ? !props.allowPublic
+                : !props.allowPersonal
+            }
+          >
+            <IconPlus size={"1rem"} />
+          </ActionIcon>
+        </Tooltip>
       </Group>
     </Group>
   );
@@ -426,11 +435,13 @@ const SearchMenu = (props: {
         },
       }}
     >
-      <Menu.Target>
-        <ActionIcon variant="subtle" color="grey" size="24px">
-          <IconSettings size={20} />
-        </ActionIcon>
-      </Menu.Target>
+      <Tooltip label="Menu" fz="xs">
+        <Menu.Target>
+          <ActionIcon variant="subtle" color="grey" size="24px">
+            <IconSettings size={20} />
+          </ActionIcon>
+        </Menu.Target>
+      </Tooltip>
       <Menu.Dropdown>
         <Menu.Item>
           <Checkbox

@@ -1,5 +1,8 @@
+// Modules
 import { Document, Model } from "mongoose";
 import * as Mongoose from "mongoose";
+
+// Dependencies
 require("./User.ts");
 require("./ChatFolder.ts");
 require("./Message.ts");

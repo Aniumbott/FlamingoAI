@@ -4,24 +4,18 @@ import {
   Button,
   Stack,
   Text,
-  rem,
-  Avatar,
   Divider,
   ActionIcon,
+  Tooltip,
 } from "@mantine/core";
 import {
   IconDots,
   IconFolderUp,
-  IconStar,
   IconTrash,
   IconCopy,
   IconPencilMinus,
-  IconStarFilled,
-  IconStarOff,
-  IconArchive,
 } from "@tabler/icons-react";
 import { useHover } from "@mantine/hooks";
-import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { IPromptDocument } from "@/app/models/Prompt";
 import { createPrompt, deletePrompt } from "@/app/controllers/prompt";
@@ -61,20 +55,22 @@ export default function PromptFeatureMenu(props: {
         opened={props.open}
         onChange={props.setOpen}
       >
-        <Menu.Target>
-          <ActionIcon
-            size="25px"
-            variant="subtle"
-            aria-label=""
-            color="#9CA3AF"
-            // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
-            style={{
-              "--ai-hover-color": "white",
-            }}
-          >
-            <IconDots size={15} stroke={1.5} />
-          </ActionIcon>
-        </Menu.Target>
+        <Tooltip label="Menu" fz="xs">
+          <Menu.Target>
+            <ActionIcon
+              size="25px"
+              variant="subtle"
+              aria-label=""
+              color="#9CA3AF"
+              // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
+              style={{
+                "--ai-hover-color": "white",
+              }}
+            >
+              <IconDots size={15} stroke={1.5} />
+            </ActionIcon>
+          </Menu.Target>
+        </Tooltip>
 
         <Menu.Dropdown>
           <Menu.Label>

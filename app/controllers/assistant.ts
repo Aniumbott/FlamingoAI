@@ -1,3 +1,9 @@
+//  Modules
+import { notifications } from "@mantine/notifications";
+import { createElement } from "react";
+import { IconX } from "@tabler/icons-react";
+
+// Function to collec the assistant response
 async function getAssistantResponse(
   messages: any[],
   workspaceId: string,
@@ -9,21 +15,30 @@ async function getAssistantResponse(
       messages,
       workspaceId,
       assistant,
-      action: "apiCall",
     }),
     headers: {
       "Content-Type": "application/json",
     },
   });
 
-  // console.log(messages);
-
-  // console.log("data at getAssistantResponse", data);
-
+  if (data.status !== 200) {
+    notifications.show({
+      icon: createElement(IconX),
+      color: "red",
+      message: "Invalid API key.",
+      autoClose: 5000,
+      withCloseButton: true,
+      withBorder: true,
+      loading: false,
+      styles: { description: { fontWeight: "bold" } },
+    });
+    return null;
+  }
   const response = await data.json();
   return response;
 }
 
+// Function to get all available assistants
 async function getAssistants() {
   const data = await fetch(`/api/assistant`, {
     method: "GET",

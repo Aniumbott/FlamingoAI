@@ -119,10 +119,17 @@ export default function ChatAuth(props: {
         {update ||
         (selectAssistant &&
           workspace &&
-          !workspace?.assistants.find(
-            (key: any) =>
-              key.assistantId == selectAssistant && key.scope == scope
-          )) ? (
+          (!workspace?.assistants.some(
+            (assistant: any) =>
+              assistant.assistantId == selectAssistant &&
+              assistant.scope == scope
+          ) ||
+            workspace?.assistants.find(
+              (assistant: any) =>
+                assistant.assistantId == selectAssistant &&
+                assistant.scope == scope &&
+                assistant.apiKey == ""
+            ))) ? (
           <Group mt={10} align="flex-end" justify="space-between">
             <div className="grow">
               <TextInput

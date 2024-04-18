@@ -1,8 +1,6 @@
-import React, { useState, useEffect } from "react";
 import {
   ActionIcon,
   Avatar,
-  Button,
   Center,
   CopyButton,
   Divider,
@@ -19,12 +17,8 @@ import {
   ScrollArea,
 } from "@mantine/core";
 import { IconBuilding, IconCheck, IconCopy } from "@tabler/icons-react";
-import { Organization } from "@clerk/nextjs/server";
-import { useOrganization } from "@clerk/nextjs";
 import { IChatDocument } from "../../../models/Chat";
-import { usePathname } from "next/navigation";
-import { updateChat, updateChatAccess } from "../../../controllers/chat";
-import { access } from "fs";
+import { updateChatAccess } from "../../../controllers/chat";
 
 const ShareChatModal = (props: {
   opened: boolean;
@@ -59,8 +53,8 @@ const ShareChatModal = (props: {
                   {({ copied, copy }) => (
                     <Tooltip
                       label={copied ? "Copied" : "Copy"}
-                      withArrow
                       position="right"
+                      fz="xs"
                     >
                       <ActionIcon
                         color={copied ? "teal" : "gray"}
