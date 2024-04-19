@@ -1,9 +1,6 @@
 import * as Mongoose from "mongoose";
 import { IChatDocument } from "../models/Chat";
 import { socket } from "@/socket";
-import { notifications } from "@mantine/notifications";
-import { IconCheck } from "@tabler/icons-react";
-import { createElement } from "react";
 import {
   showErrorNotification,
   showLoadingNotification,

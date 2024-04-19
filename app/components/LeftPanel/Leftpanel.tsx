@@ -48,7 +48,6 @@ const LeftPanel = () => {
     const getmembers = async () => {
       const userList =
         (await organization?.getMemberships())?.map((member: any) => {
-          console.log(member);
           return { ...member.publicUserData, role: member.role };
         }) ?? [];
       setMembers(userList);
@@ -126,7 +125,11 @@ const LeftPanel = () => {
               <IconPlus size={15} />
             </Button>
           </Tooltip>
-          <ChatMenu members={members} allowPersonal={allowPersonal} allowPublic={allowPublic} />
+          <ChatMenu
+            members={members}
+            allowPersonal={allowPersonal}
+            allowPublic={allowPublic}
+          />
         </Group>
       </Group>
 

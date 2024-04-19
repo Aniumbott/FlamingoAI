@@ -15,6 +15,7 @@ import {
   Loader,
   Menu,
   Checkbox,
+  Button,
 } from "@mantine/core";
 import {
   IconCaretRightFilled,
@@ -40,6 +41,7 @@ import SortMenu from "../Menu/SortMenu";
 import style from "../LeftPanel.module.css";
 import { useAuth } from "@clerk/nextjs";
 import { socket } from "@/socket";
+import { createSubscription, getCustomer, getSubscriptions } from "@/app/controllers/payment";
 
 const GeneralChats = (props: {
   members: any[];
@@ -64,6 +66,13 @@ const GeneralChats = (props: {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
+
+  useEffect(() => {
+    console.log("creating customer");
+    // createCustomer();
+    getCustomer();
+    getSubscriptions();
+  }, []);
 
   useEffect(() => {
     const fetchChats = async () => {

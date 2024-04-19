@@ -2,13 +2,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
-import { Notifications } from '@mantine/notifications';
+import { Notifications } from "@mantine/notifications";
 import { ClerkProvider } from "@clerk/nextjs";
-import StoreProvider from "./redux/StoreProvider";
 
 import "@mantine/core/styles.css";
 import "@mantine/charts/styles.css";
-import '@mantine/notifications/styles.css';
+import "@mantine/notifications/styles.css";
 // Componets
 import "./globals.css";
 
@@ -32,20 +31,19 @@ export default function RootLayout({
         },
       }}
     >
-      <StoreProvider>
-        <html lang="en">
-          <head>
-            <ColorSchemeScript />
-            <title>Team GPT PRO !!!</title>
-          </head>
-          <body className={inter.className}>
-            <MantineProvider defaultColorScheme="dark">
-              <Notifications />
-              {children}
-            </MantineProvider>
-          </body>
-        </html>
-      </StoreProvider>
+      {/* <StoreProvider> */}
+      <html lang="en">
+        <head>
+          <ColorSchemeScript />
+          <title>Team GPT PRO !!!</title>
+        </head>
+        <body className={inter.className}>
+          <MantineProvider defaultColorScheme="dark">
+            <Notifications />
+            {children}
+          </MantineProvider>
+        </body>
+      </html>
     </ClerkProvider>
   );
 }
