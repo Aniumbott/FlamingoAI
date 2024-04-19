@@ -48,7 +48,7 @@ export default function WorkspaceSettings(props: {
               onClick={() => {
                 setActiveTab(tab.value);
               }}
-              color="gray"
+              color="grey"
             >
               {tab.label}
             </Button>

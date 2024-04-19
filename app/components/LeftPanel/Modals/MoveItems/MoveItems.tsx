@@ -126,8 +126,6 @@ const MoveItems = (props: {
           <Group>
             {allowPublic && (
               <Button
-                color={"teal"}
-                c={"white"}
                 onClick={() => {
                   setSelectedTab("public");
                   setBreadcrumb([{ id: "null", name: "public" }]);
@@ -141,8 +139,6 @@ const MoveItems = (props: {
             )}
             {allowPersonal && (
               <Button
-                color={"teal"}
-                c={"white"}
                 onClick={() => {
                   setSelectedTab("private");
                   setBreadcrumb([{ id: "null", name: "private" }]);
@@ -215,16 +211,11 @@ const MoveItems = (props: {
               Create New Folder
             </Button>
             <Group>
-              <Button
-                variant="default"
-                color="teal"
-                onClick={() => setOpened(false)}
-              >
+              <Button variant="default" onClick={() => setOpened(false)}>
                 Cancel
               </Button>
               <Button
                 variant="filled"
-                color="teal"
                 onClick={() =>
                   moveItem(item, breadcrumb, searchFolder).then(() =>
                     setOpened(false)

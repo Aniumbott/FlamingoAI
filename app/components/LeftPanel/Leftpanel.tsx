@@ -27,8 +27,7 @@ import RecentChats from "./ChatFilters/RecentChats";
 import { socket } from "@/socket";
 import FavouriteChats from "./ChatFilters/FavouriteChats";
 import ArchivedChats from "./ChatFilters/ArchivedChats";
-import { getWorkspace, updateWorkspace } from "@/app/controllers/workspace";
-import { set } from "mongoose";
+import { getWorkspace } from "@/app/controllers/workspace";
 import GeneralChats from "./ChatFilters/GeneralChats";
 
 const LeftPanel = () => {
@@ -64,9 +63,12 @@ const LeftPanel = () => {
   }, [organization?.id]);
 
   useEffect(() => {
-    socket.on("updateWorkspace", (wsp) => {
-      setWorkspace(wsp);
-      console.log(wsp);
+    socket.on("updateWorkspace", () => {
+      const fetchWorkspace = async () => {
+        const res = await getWorkspace(organization?.id || "");
+        setWorkspace(res.workspace);
+      };
+      fetchWorkspace();
     });
     return () => {
       socket.off("updateWorkspace");
@@ -75,13 +77,7 @@ const LeftPanel = () => {
 
   return (
     <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
-      <Group
-        justify="space-between"
-        align="center"
-        grow
-        gap={10}
-        preventGrowOverflow={false}
-      >
+      <Group justify="space-between" align="center" preventGrowOverflow={false}>
         <OrganizationSwitcher
           hidePersonal
           afterCreateOrganizationUrl="/workspace/:slug"
@@ -108,10 +104,9 @@ const LeftPanel = () => {
           filterMenu={filterMenu}
           setFilterMenu={setFilterMenu}
         />
-        <Group color="#047857" wrap="nowrap" justify="flex-end" gap={1}>
-          <Tooltip label="New Chat" color={"gray"} fz={"xs"}>
+        <Group wrap="nowrap" justify="flex-end" gap={1}>
+          <Tooltip label="New Chat" fz="xs">
             <Button
-              color="#047857"
               radius="0"
               px={12}
               disabled={!workspace?.allowPublic}

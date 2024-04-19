@@ -1,5 +1,13 @@
 // Modules
-import { ActionIcon, Button, Menu, Stack, Text, rem } from "@mantine/core";
+import {
+  ActionIcon,
+  Button,
+  Menu,
+  Stack,
+  Text,
+  rem,
+  Tooltip,
+} from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import {
   IconDots,
@@ -35,24 +43,21 @@ export default function SortMenu(props: {
         },
       }}
     >
-      <Menu.Target>
-        <ActionIcon
-          size="sm"
-          variant="subtle"
-          aria-label="Sort"
-          color="#9CA3AF"
-          style={{
-            "--ai-hover-color": "white",
-            "--ai-hover": "#047857",
-          }}
-          onClick={(event) => {
-            event.stopPropagation();
-            // Add any additional logic for the ActionIcon click here
-          }}
-        >
-          <IconDots size={15} stroke={1.5} />
-        </ActionIcon>
-      </Menu.Target>
+      <Tooltip label="Sort by" fz="xs">
+        <Menu.Target>
+          <ActionIcon
+            size="sm"
+            variant="subtle"
+            color="grey"
+            onClick={(event) => {
+              event.stopPropagation();
+              // Add any additional logic for the ActionIcon click here
+            }}
+          >
+            <IconDots size={15} stroke={1.5} />
+          </ActionIcon>
+        </Menu.Target>
+      </Tooltip>
 
       <Menu.Dropdown>
         <Menu.Label>
@@ -61,7 +66,7 @@ export default function SortMenu(props: {
           </Text>
         </Menu.Label>
         <Menu.Item onClick={() => setSort("A-Z")}>
-          <MenuButton properties={MenuData[0]} sort={sort}  />
+          <MenuButton properties={MenuData[0]} sort={sort} />
         </Menu.Item>
         <Menu.Item onClick={() => setSort("Z-A")}>
           <MenuButton properties={MenuData[1]} sort={sort} />
@@ -88,10 +93,18 @@ const MenuButton = (props: {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
-          : { color: "0F172A", variant: "transparent" })}
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
+          : { color: "#000000", variant: "transparent" })}
         {...(props.properties.id === props.sort
-          ? { color: "teal", variant: "filled", fz: "xl" }
+          ? {
+              color: "var(----mantine-primary-color-filled)",
+              variant: "filled",
+              fz: "xl",
+            }
           : null)}
         justify="flex-start"
         styles={{

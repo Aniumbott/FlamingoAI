@@ -30,7 +30,7 @@ export default function ChatAuth(props: {
   const [update, setUpdate] = useState<boolean>(false);
   const [assistants, setAssistants] = useState<any>([]);
   const [selectAssistant, setSelectAssistants] = useState<string | null>();
-  const [scope, setScope] = useState("personal");
+  const [scope, setScope] = useState("private");
   const [apiKey, setApiKey] = useState("");
   const [model, setModel] = useState("gpt-3.5-turbo");
 
@@ -42,10 +42,10 @@ export default function ChatAuth(props: {
     };
     collectAssistants();
 
-    if (workspace?.apiKeys.length > 0) {
-      // console.log(workspace.apiKeys[0]);
-      setSelectAssistants(workspace.apiKeys[0].assistantId);
-      setScope(workspace.apiKeys[0].scope);
+    if (workspace?.assistants.length > 0) {
+      // console.log(workspace.assistants[0]);
+      setSelectAssistants(workspace.assistants[0].assistantId);
+      setScope(workspace.assistants[0].scope);
     }
   }, []);
 
@@ -55,7 +55,7 @@ export default function ChatAuth(props: {
 
   useEffect(() => {
     if (selectAssistant) {
-      const key = workspace?.apiKeys.find(
+      const key = workspace?.assistants.find(
         (key: any) => key.assistantId == selectAssistant && key.scope == scope
       );
       if (key) {
@@ -75,7 +75,7 @@ export default function ChatAuth(props: {
           <Text size="lg" fw={600}>
             Chat Authentication
           </Text>
-          <Badge color="teal" ml={20} variant="light" radius="md">
+          <Badge ml={20} variant="light" radius="md">
             New
           </Badge>
         </Group>
@@ -90,7 +90,6 @@ export default function ChatAuth(props: {
               label: assistant.name,
               value: assistant._id,
             }))}
-            color="teal"
             value={selectAssistant}
             onChange={setSelectAssistants}
             w="60%"
@@ -100,7 +99,7 @@ export default function ChatAuth(props: {
             data={[
               {
                 label: "Personal",
-                value: "personal",
+                value: "private",
               },
               {
                 label: "Workspace",
@@ -119,10 +118,17 @@ export default function ChatAuth(props: {
         {update ||
         (selectAssistant &&
           workspace &&
-          !workspace?.apiKeys.find(
-            (key: any) =>
-              key.assistantId == selectAssistant && key.scope == scope
-          )) ? (
+          (!workspace?.assistants.some(
+            (assistant: any) =>
+              assistant.assistantId == selectAssistant &&
+              assistant.scope == scope
+          ) ||
+            workspace?.assistants.find(
+              (assistant: any) =>
+                assistant.assistantId == selectAssistant &&
+                assistant.scope == scope &&
+                assistant.apiKey == ""
+            ))) ? (
           <Group mt={10} align="flex-end" justify="space-between">
             <div className="grow">
               <TextInput
@@ -130,7 +136,7 @@ export default function ChatAuth(props: {
                 label="Input your OpenAI API key"
                 placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
                 defaultValue={
-                  workspace?.apiKeys.find(
+                  workspace?.assistants.find(
                     (key: any) =>
                       key.assistantId == selectAssistant && key.scope == scope
                   )?.apiKey || ""
@@ -141,9 +147,7 @@ export default function ChatAuth(props: {
             </div>
 
             <Button
-              color="teal"
               variant="outline"
-              radius={0}
               onClick={() => {
                 setUpdate(false);
               }}
@@ -151,8 +155,6 @@ export default function ChatAuth(props: {
               Cancel
             </Button>
             <Button
-              color="teal"
-              radius={0}
               onClick={() => {
                 const key = {
                   assistantId: selectAssistant,
@@ -162,8 +164,8 @@ export default function ChatAuth(props: {
                 };
                 updateWorkspace({
                   ...workspace,
-                  apiKeys: [
-                    ...workspace.apiKeys.filter(
+                  assistants: [
+                    ...workspace.assistants.filter(
                       (key: any) =>
                         !(
                           key.assistantId == selectAssistant &&
@@ -187,14 +189,14 @@ export default function ChatAuth(props: {
           data={assistants.find((a: any) => a._id == selectAssistant)?.models}
           value={model}
           onChange={(value) => {
-            let key = workspace?.apiKeys.find((key: any) => {
+            let key = workspace?.assistants.find((key: any) => {
               return key.assistantId == selectAssistant && key.scope == scope;
             });
             key.model = value;
             updateWorkspace({
               ...workspace,
-              apiKeys: [
-                ...workspace.apiKeys.filter(
+              assistants: [
+                ...workspace.assistants.filter(
                   (key: any) =>
                     !(key.assistantId == selectAssistant && key.scope == scope)
                 ),
@@ -204,12 +206,11 @@ export default function ChatAuth(props: {
             setModel(value || "gpt-3.5-turbo");
           }}
           mt={20}
-          color="teal"
         />
 
         {selectAssistant &&
         workspace &&
-        workspace?.apiKeys.find(
+        workspace?.assistants.find(
           (key: any) =>
             key.assistantId == selectAssistant &&
             key.scope == scope &&
@@ -219,10 +220,12 @@ export default function ChatAuth(props: {
             <Text
               p={20}
               mt={20}
-              c="teal"
               size="sm"
-              bg="var(--mantine-color-teal-light)"
-              style={{ borderRadius: "8px" }}
+              bg="var(--mantine-primary-color-light)"
+              style={{
+                borderRadius: "8px",
+                color: "var(--mantine-primary-color-filled)",
+              }}
             >
               API Key configured! You&apos;re all set!
             </Text>
@@ -230,8 +233,6 @@ export default function ChatAuth(props: {
             {!update ? (
               <Group mt={20} justify="flex-end">
                 <Button
-                  color="teal"
-                  radius={0}
                   onClick={() => {
                     setUpdate(true);
                   }}
@@ -240,8 +241,6 @@ export default function ChatAuth(props: {
                 </Button>
                 <Button
                   variant="outline"
-                  color="teal"
-                  radius={0}
                   onClick={() => {
                     if (
                       confirm(
@@ -250,8 +249,8 @@ export default function ChatAuth(props: {
                     ) {
                       updateWorkspace({
                         ...workspace,
-                        apiKeys: [
-                          ...workspace.apiKeys.filter(
+                        assistants: [
+                          ...workspace.assistants.filter(
                             (key: any) =>
                               !(
                                 key.assistantId == selectAssistant &&

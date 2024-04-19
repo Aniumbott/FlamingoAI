@@ -1,35 +1,10 @@
+// Modules
+import { NextRequest, NextResponse } from "next/server";
 import { dbConnect } from "@/app/lib/db";
 import Prompt from "@/app/models/Prompt";
 import PromptFolder from "@/app/models/PromptFolder";
-import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(req: NextRequest, res: NextResponse) {
-  try {
-    const body = await req.json();
-    await dbConnect();
-    const promptFolder = await PromptFolder.create({
-      name: "New Folder",
-      createdBy: body.createdBy,
-      scope: body.scope,
-      parentFolder: body.parentFolder,
-      workspaceId: body.workspaceId,
-    });
-
-    // If parentFolder was provided, add the new chat ID to the parent folder's chats array
-    if (body.parentFolder) {
-      await PromptFolder.findByIdAndUpdate(body.parentFolder, {
-        $push: { subFolders: promptFolder._id },
-      });
-      // console.log("pushed ", chat._id, "to parent folder ", body.parentFolder);
-    }
-
-    return NextResponse.json({ promptFolder }, { status: 200 });
-  } catch (error: any) {
-    // console.log("error at POST in Chat route", error);
-    return NextResponse.json(error.message, { status: 500 });
-  }
-}
-
+// GET request handler
 export async function GET(req: NextRequest, res: NextResponse) {
   try {
     await dbConnect();
@@ -70,18 +45,45 @@ export async function GET(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json({ promptFolders }, { status: 200 });
   } catch (error: any) {
-    // console.log("error at POST in Chat route", error);
+    console.log("error at POST in Chat route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
+// POST request handler
+export async function POST(req: NextRequest, res: NextResponse) {
+  try {
+    const body = await req.json();
+    await dbConnect();
+    const promptFolder = await PromptFolder.create({
+      name: "New Folder",
+      createdBy: body.createdBy,
+      scope: body.scope,
+      parentFolder: body.parentFolder,
+      workspaceId: body.workspaceId,
+    });
+
+    // If parentFolder was provided, add the new chat ID to the parent folder's chats array
+    if (body.parentFolder) {
+      await PromptFolder.findByIdAndUpdate(body.parentFolder, {
+        $push: { subFolders: promptFolder._id },
+      });
+    }
+
+    return NextResponse.json({ promptFolder }, { status: 200 });
+  } catch (error: any) {
+    console.log("error at POST in Chat route: ", error);
+    return NextResponse.json(error.message, { status: 500 });
+  }
+}
+
+// PUT request handler
 export async function PUT(req: NextRequest, res: NextResponse) {
-  // console.log("hit put chatfolder");
   try {
     await dbConnect();
     const body = await req.json();
     let promptFolder;
-    const { id, targetFolderId, parentFolderId , newScope } = body;
+    const { id, targetFolderId, parentFolderId, newScope } = body;
 
     if (id && targetFolderId && parentFolderId) {
       // If the prompt folder currently has a parent folder, remove it from the parent folder's subFolders
@@ -124,13 +126,13 @@ export async function PUT(req: NextRequest, res: NextResponse) {
 
     return NextResponse.json({ promptFolder }, { status: 200 });
   } catch (error: any) {
-    // console.log("error at PUT in Chatfolder route", error);
+    console.log("error at PUT in Chatfolder route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
+// DELETE request handler+
 export async function DELETE(req: NextRequest, res: NextResponse) {
-  // console.log("hit delete chatfolder");
   try {
     await dbConnect();
     const body = await req.json();
@@ -141,30 +143,12 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
       { status: 200 }
     );
   } catch (error: any) {
-    // console.log("error at DELETE in Chatfolder route", error);
+    console.log("error at DELETE in Chatfolder route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
-async function deleteFolderAndContents(folderId: string) {
-  const folder = await PromptFolder.findById(folderId);
-
-  if (folder) {
-    // Delete all prompts in folder.prompts
-    for (const promptId of folder.prompts) {
-      console.log("deleting prompt", promptId);
-      await Prompt.findByIdAndDelete(promptId);
-    }
-    // Recursively delete all subfolders
-    for (const subFolderId of folder.subFolders) {
-      console.log("deleting subfolder", subFolderId._id);
-      await deleteFolderAndContents(subFolderId._id);
-    }
-    // Delete the folder
-    await PromptFolder.findByIdAndDelete(folderId);
-  }
-}
-
+// Helper functions
 async function populateSubFolders(folder: any) {
   if (folder.subFolders && folder.subFolders.length > 0) {
     folder = await PromptFolder.populate(folder, {
@@ -204,5 +188,22 @@ async function updateScope(folderId: any, newScope: any) {
     for (let subfolderId of folder.subFolders) {
       await updateScope(subfolderId, newScope);
     }
+  }
+}
+
+async function deleteFolderAndContents(folderId: string) {
+  const folder = await PromptFolder.findById(folderId);
+
+  if (folder) {
+    // Delete all prompts in folder.prompts
+    for (const promptId of folder.prompts) {
+      await Prompt.findByIdAndDelete(promptId);
+    }
+    // Recursively delete all subfolders
+    for (const subFolderId of folder.subFolders) {
+      await deleteFolderAndContents(subFolderId._id);
+    }
+    // Delete the folder
+    await PromptFolder.findByIdAndDelete(folderId);
   }
 }

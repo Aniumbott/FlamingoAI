@@ -1,5 +1,13 @@
 import { deleteComment } from "@/app/controllers/comment";
-import { Avatar, Card, Title, Text, ActionIcon, rem } from "@mantine/core";
+import {
+  Avatar,
+  Card,
+  Title,
+  Text,
+  ActionIcon,
+  rem,
+  Tooltip,
+} from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -49,15 +57,17 @@ export default function ReplyItem(props: { reply: any; participants: any[] }) {
                 {new Date(reply.createdAt).toLocaleDateString() || "now"}
               </Text>
             </div>
-            <ActionIcon
-              color="grey"
-              variant="subtle"
-              onClick={() => {
-                deleteComment(chatId, reply);
-              }}
-            >
-              <IconTrash style={{ width: rem(16) }} />
-            </ActionIcon>
+            <Tooltip label="Delete" fz="xs">
+              <ActionIcon
+                variant="subtle"
+                color="grey"
+                onClick={() => {
+                  deleteComment(chatId, reply);
+                }}
+              >
+                <IconTrash style={{ width: rem(16) }} />
+              </ActionIcon>
+            </Tooltip>
           </div>
           {MentionParser(reply.content)}
         </div>

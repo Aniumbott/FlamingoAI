@@ -1,4 +1,6 @@
 // Modules
+// "use client";
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
@@ -38,12 +40,17 @@ export default function RootLayout({
           <title>Team GPT PRO !!!</title>
         </head>
         <body className={inter.className}>
-          <MantineProvider defaultColorScheme="dark">
+          <MantineProvider
+            theme={{
+              primaryColor: "teal",
+            }}
+          >
             <Notifications />
             {children}
           </MantineProvider>
         </body>
       </html>
+      {/* </StoreProvider> */}
     </ClerkProvider>
   );
 }

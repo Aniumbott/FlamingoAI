@@ -1,6 +1,9 @@
+// Modules
 import { Document, Model } from "mongoose";
 import * as Mongoose from "mongoose";
 import { IPromptDocument } from "./Prompt";
+
+// Dependencies
 require("./User.ts");
 require("./Workspace.ts");
 require("./ChatFolder.ts");

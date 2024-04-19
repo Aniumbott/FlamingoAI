@@ -10,9 +10,14 @@ import {
   Container,
   Text,
   Loader,
+  Tooltip,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconLayoutSidebarRightExpand, IconPlus } from "@tabler/icons-react";
+import {
+  IconLayoutSidebarLeftExpand,
+  IconLayoutSidebarRightExpand,
+  IconPlus,
+} from "@tabler/icons-react";
 import { notFound, usePathname, useRouter } from "next/navigation";
 import {
   ClerkLoaded,
@@ -27,8 +32,6 @@ import RightPanel from "../../components/RightPanel/RightPanel";
 import LeftPanel from "../../components/LeftPanel/Leftpanel";
 import ChatWindow from "../../components/ChatWindow/ChatWindow";
 import { createChat } from "@/app/controllers/chat";
-import { createAssistant } from "@/app/controllers/assistant";
-import path from "path";
 
 const Workspace = () => {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
@@ -136,17 +139,19 @@ const Workspace = () => {
               <Title order={3} ml={5}>
                 TeamGPT
               </Title>
-              <ActionIcon
-                variant="subtle"
-                color="grey"
-                aria-label="Settings"
-                onClick={toggleLeft}
-              >
-                <IconLayoutSidebarRightExpand
-                  style={{ width: "90%", height: "90%" }}
-                  stroke={1.5}
-                />
-              </ActionIcon>
+              <Tooltip label="Colapse panel" fz="xs" position="right">
+                <ActionIcon
+                  variant="subtle"
+                  color="grey"
+                  aria-label="Settings"
+                  onClick={toggleLeft}
+                >
+                  <IconLayoutSidebarRightExpand
+                    style={{ width: "90%", height: "90%" }}
+                    stroke={1.5}
+                  />
+                </ActionIcon>
+              </Tooltip>
             </div>
 
             <LeftPanel />
@@ -162,6 +167,27 @@ const Workspace = () => {
               overflowY: "hidden",
             }}
           >
+            {!leftOpened && !pathname.split("/")[3] ? (
+              <div className="absolute top-3 flex flex-row items-center justify-between">
+                <Title order={4} mr={10}>
+                  TeamGPT
+                </Title>
+                <Tooltip label="Expand panel" fz="xs" position="right">
+                  <ActionIcon
+                    variant="subtle"
+                    color="grey"
+                    aria-label="Settings"
+                    onClick={toggleLeft}
+                  >
+                    <IconLayoutSidebarLeftExpand
+                      style={{ width: "90%", height: "90%" }}
+                      stroke={1.5}
+                    />
+                  </ActionIcon>
+                </Tooltip>
+              </div>
+            ) : null}
+
             <div
               className="h-[100vh] w-full flex flex-col"
               style={{
@@ -183,7 +209,6 @@ const Workspace = () => {
                         radius="md"
                         mt={20}
                         size="lg"
-                        color="teal"
                         onClick={() => {
                           const req = createChat(
                             "public",

@@ -144,7 +144,6 @@ const MovePromptItems = (props: {
 
           <Group>
             <Button
-              color={"teal"}
               c={"white"}
               onClick={() => {
                 setSelectedTab("public");
@@ -157,7 +156,6 @@ const MovePromptItems = (props: {
               WORKSPACE
             </Button>
             <Button
-              color={"teal"}
               c={"white"}
               onClick={() => {
                 setSelectedTab("private");
@@ -227,16 +225,11 @@ const MovePromptItems = (props: {
               Create New Folder
             </Button>
             <Group>
-              <Button
-                variant="default"
-                color="teal"
-                onClick={() => setOpened(false)}
-              >
+              <Button variant="default" onClick={() => setOpened(false)}>
                 Cancel
               </Button>
               <Button
                 variant="filled"
-                color="teal"
                 onClick={() =>
                   moveItem(item, breadcrumb, searchFolder).then(() =>
                     setOpened(false)

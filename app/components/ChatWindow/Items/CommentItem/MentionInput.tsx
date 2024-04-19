@@ -12,7 +12,15 @@ export function MentionParser(text: string) {
   // now replace all with <this>...</this>
   const thisMatch = /<this>(.*?)<\/this>/g;
   const replacedText = reactStringReplace(text, thisMatch, (match, i, name) => (
-    <Text key={i} c="white" bg="teal" px={2} mx={3}>
+    <Text
+      key={i}
+      c="white"
+      px={2}
+      mx={3}
+      style={{
+        background: "var(--mantine-primary-color-filled)",
+      }}
+    >
       {match}
     </Text>
   ));
@@ -58,7 +66,7 @@ export default function MentionInput(props: {
         borderRadius: 4,
         // focus
         "&focused": {
-          borderColor: "var(--mantine-color-teal-7)",
+          borderColor: "var(--mantine-primary-color-filled)",
         },
       },
     },
@@ -74,7 +82,7 @@ export default function MentionInput(props: {
         borderBottom: "1px solid rgba(0,0,0,0.15)",
         "&focused": {
           color: "white",
-          backgroundColor: "var(--mantine-color-teal-7)",
+          backgroundColor: "var(--mantine-primary-color-filled)",
         },
       },
     },
@@ -99,7 +107,7 @@ export default function MentionInput(props: {
           })) || []
         }
         style={{
-          backgroundColor: "var(--mantine-color-teal-8)",
+          backgroundColor: "var(--mantine-primary-color-filled)",
         }}
       />
     </MentionsInput>

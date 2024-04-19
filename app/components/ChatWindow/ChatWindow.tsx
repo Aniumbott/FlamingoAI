@@ -21,27 +21,39 @@ import {
   Textarea,
   LoadingOverlay,
   Affix,
+  SegmentedControl,
+  Center,
+  Select,
+  Tooltip,
+  HoverCard,
 } from "@mantine/core";
-import { IconLayoutSidebarLeftExpand, IconSend } from "@tabler/icons-react";
+import {
+  IconBuilding,
+  IconInfoCircle,
+  IconLayoutSidebarLeftExpand,
+  IconSend,
+} from "@tabler/icons-react";
 import { useOrganization, useUser } from "@clerk/nextjs";
 
 // Components
 import MessageItem from "./Items/MessageItem/MessageItem";
 import { sendAssistantMessage, createMessage } from "@/app/controllers/message";
-import { deleteChat, getChat, updateChat } from "@/app/controllers/chat";
+import {
+  deleteChat,
+  getChat,
+  updateChat,
+  updateChatAccess,
+} from "@/app/controllers/chat";
 import { socket } from "@/socket";
 import { useScrollIntoView } from "@mantine/hooks";
 import { ICommentDocument } from "@/app/models/Comment";
 import ForkChatModal from "./Modals/ForkChatModal";
 import { getAllPrompts } from "@/app/controllers/prompt";
 import { IPromptDocument } from "@/app/models/Prompt";
-import PromptItem from "@/app/components/RightPanel/Panels/PromptPanel/PromptItem";
 import PromptModal from "@/app/components/RightPanel/Modals/PromptModal";
 import ShareChatModal from "@/app/components/ChatWindow/Modals/ShareChatModal";
-import { notFound } from "next/navigation";
-import { showErrorNotification } from "@/app/controllers/notification";
-import { set } from "mongoose";
 import ErrorPage from "./ErrorPage/ErrorPage";
+import SettingsModal from "./Modals/SettingsModal";
 
 export default function ChatWindow(props: {
   currentChatId: String;
@@ -76,11 +88,7 @@ export default function ChatWindow(props: {
   });
 
   const [shareChatOpened, setShareChatOpened] = useState(false);
-
-  const updateParticipants = () => {
-    if (chat.participants.includes(user?.id)) return chat.participants;
-    return [...chat.participants, user?.id];
-  };
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   function isViewOnly(chat: any) {
     const ans =
@@ -253,11 +261,16 @@ export default function ChatWindow(props: {
     }
   }, [currentChatId]);
 
-  useEffect(() => {
-    if (chat?.messages) {
-      scrollIntoView();
+  function tillLastUserMessage(messages: any[]) {
+    let lastUserMessageIndex = 0;
+    for (let i = messages.length - 1; i >= 0; i--) {
+      if (messages[i].type === "user") {
+        lastUserMessageIndex = i;
+        break;
+      }
     }
-  }, [chat?.messages?.length]);
+    return messages.slice(0, lastUserMessageIndex + 1);
+  }
 
   const [promptOpened, setPromptOpened] = useState(false);
   const [newPrompt, setnewPrompt] = useState<IPromptDocument | null>(null);
@@ -281,31 +294,56 @@ export default function ChatWindow(props: {
                 <Title order={4} mr={10}>
                   TeamGPT
                 </Title>
-                <ActionIcon
-                  variant="subtle"
-                  color="grey"
-                  aria-label="Settings"
-                  onClick={toggleLeft}
-                >
-                  <IconLayoutSidebarLeftExpand
-                    style={{ width: "90%", height: "90%" }}
-                    stroke={1.5}
-                  />
-                </ActionIcon>
+                <Tooltip label="Expand panel" fz="xs" position="right">
+                  <ActionIcon
+                    variant="subtle"
+                    color="grey"
+                    aria-label="Settings"
+                    onClick={toggleLeft}
+                  >
+                    <IconLayoutSidebarLeftExpand
+                      style={{ width: "90%", height: "90%" }}
+                      stroke={1.5}
+                    />
+                  </ActionIcon>
+                </Tooltip>
               </div>
             ) : null}
             <Group justify="space-between" px={"md"} w={"100%"}>
-              <Text size="sm" ml={5} fw={500}>
-                {chat?.name}
-              </Text>
-              <Button
-                variant="subtle"
-                color="var(--mantine-color-gray-4)"
-                onClick={() => setShareChatOpened(true)}
-                mx={10}
-              >
-                Share
-              </Button>
+              <Group>
+                <HoverCard width={280} position="bottom-start" withArrow>
+                  <HoverCard.Target>
+                    <IconInfoCircle size={20} />
+                  </HoverCard.Target>
+                  <HoverCard.Dropdown>
+                    <Text fw={700} c="dimmed" mb="xs">
+                      Instructions
+                    </Text>
+                    <Text size="sm">{chat.instructions}</Text>
+                  </HoverCard.Dropdown>
+                </HoverCard>
+                <Text size="sm" ml={5} fw={500}>
+                  {chat?.name}
+                </Text>
+              </Group>
+              <Group gap={0}>
+                <Button
+                  variant="default"
+                  // color="default"
+                  onClick={() => setShareChatOpened(true)}
+                  mx={5}
+                >
+                  Share
+                </Button>
+                <Button
+                  variant="default"
+                  // color="default"
+                  onClick={() => setSettingsOpen(true)}
+                  mx={5}
+                >
+                  Settings
+                </Button>
+              </Group>
             </Group>
             {shareChatOpened && (
               <ShareChatModal
@@ -314,6 +352,14 @@ export default function ChatWindow(props: {
                 chat={chat}
                 setChat={setChat}
                 members={participants}
+              />
+            )}
+            {settingsOpen && (
+              <SettingsModal
+                opened={settingsOpen}
+                setOpened={setSettingsOpen}
+                chat={chat}
+                setChat={setChat}
               />
             )}
             {promptOpened && (
@@ -347,6 +393,84 @@ export default function ChatWindow(props: {
               chat={chat}
             />
 
+            {!chat?.messages?.length ? (
+              <div className="w-full flex flex-col items-center justify-center pt-20">
+                <div
+                  className="p-5"
+                  style={{
+                    width: "500px",
+                    border: "1px solid var(--mantine-color-default-border)",
+                    borderRadius: "var(--mantine-radius-md)",
+                  }}
+                >
+                  <SegmentedControl
+                    value={chat?.scope}
+                    onChange={(value) => {
+                      if (chat.parentFolder) {
+                        updateChatAccess(chat?._id, {
+                          scope: value,
+                          parentFolder: null,
+                        }).then((res) => {
+                          setChat(res.chat);
+                        });
+                      } else {
+                        updateChatAccess(chat?._id, {
+                          scope: value,
+                        }).then((res) => {
+                          setChat(res.chat);
+                        });
+                      }
+                    }}
+                    fullWidth
+                    style={{ flexGrow: 1 }}
+                    data={[
+                      {
+                        value: "private",
+                        label: (
+                          <Center style={{ gap: 10 }}>
+                            <Text size="sm">Private</Text>
+                          </Center>
+                        ),
+                      },
+                      {
+                        value: "viewOnly",
+                        label: (
+                          <Center style={{ gap: 10 }}>
+                            <IconBuilding size={16} />
+                            <Text size="sm">View Only</Text>
+                          </Center>
+                        ),
+                      },
+                      {
+                        value: "public",
+                        label: (
+                          <Center style={{ gap: 10 }}>
+                            <IconBuilding size={16} />
+                            <Text size="sm">Public</Text>
+                          </Center>
+                        ),
+                      },
+                    ]}
+                  />
+                  <Select
+                    allowDeselect={false}
+                    description="Assistant Model"
+                    data={chat?.assistant?.assistantId?.models}
+                    value={chat?.assistant?.model}
+                    onChange={(e) => {
+                      updateChat(chat?._id, {
+                        assistant: {
+                          assistantId: chat?.assistant?.assistantId,
+                          model: e,
+                        },
+                      });
+                    }}
+                    mt={20}
+                  />
+                </div>
+              </div>
+            ) : null}
+
             {!loading ? (
               chat?.messages?.map((message: any, index: Number) => {
                 const user = participants.find(
@@ -362,6 +486,11 @@ export default function ChatWindow(props: {
                     <MessageItem
                       message={message}
                       participants={participants}
+                      instructions={chat.instructions}
+                      assistant={{
+                        ...chat.assistant,
+                        scope: chat.scope == "private" ? "private" : "public",
+                      }}
                       setPromptOpened={setPromptOpened}
                       setPromptContent={setMessageContent}
                       setForkMessage={setForkMessage}
@@ -474,19 +603,21 @@ export default function ChatWindow(props: {
               chat.messages.some((message: any) => message.type === "user") ? (
                 <Button
                   variant="outline"
-                  color="gray"
                   fw={300}
                   w={"fit-content"}
                   disabled={processing}
                   onClick={() => {
                     setProcessing(true);
+                    let contexWindow = tillLastUserMessage(chat.messages);
                     sendAssistantMessage(
-                      chat?.messages
-                        ?.slice()
-                        .reverse()
-                        .find((message: any) => message.type === "user"),
+                      contexWindow.slice(0, -1),
+                      contexWindow[contexWindow.length - 1],
+                      chat.instructions,
                       chat.workspaceId,
-                      "gpt-3.5-turbo"
+                      {
+                        ...chat.assistant,
+                        scope: chat.scope == "private" ? "private" : "public",
+                      }
                     );
                   }}
                 >
@@ -514,11 +645,11 @@ export default function ChatWindow(props: {
                     <Textarea
                       autosize
                       maxRows={4}
-                      variant="filled"
+                      variant="default"
                       size="lg"
                       radius="0"
                       w="75%"
-                      placeholder="Type a message"
+                      placeholder="Type a message or type '/' to select a prompt"
                       value={messageInput}
                       disabled={processing}
                       onChange={(e) => {
@@ -548,9 +679,17 @@ export default function ChatWindow(props: {
                             currentChatId
                           ).then((res) => {
                             sendAssistantMessage(
+                              chat.messages,
                               res.message,
+                              chat.instructions,
                               chat.workspaceId,
-                              "gpt-3.5-turbo"
+                              {
+                                ...chat.assistant,
+                                scope:
+                                  chat.scope == "private"
+                                    ? "private"
+                                    : "public",
+                              }
                             );
                             setMessageInput("");
                           });
@@ -558,32 +697,41 @@ export default function ChatWindow(props: {
                       }}
                     />
                   </Combobox.Target>
-                  <ActionIcon
-                    size="50"
-                    radius="0"
-                    color="teal"
-                    disabled={processing}
-                    onClick={() => {
-                      if (messageInput != "") {
-                        setProcessing(true);
-                        createMessage(
-                          user?.id || "",
-                          messageInput,
-                          "user",
-                          currentChatId
-                        ).then((res) => {
-                          sendAssistantMessage(
-                            res.message,
-                            chat.workspaceId,
-                            "gpt-3.5-turbo"
-                          );
-                          setMessageInput("");
-                        });
-                      }
-                    }}
-                  >
-                    <IconSend size="24" />
-                  </ActionIcon>
+                  <Tooltip label="Send message" fz="xs">
+                    <ActionIcon
+                      size="50"
+                      radius="0"
+                      disabled={processing}
+                      onClick={() => {
+                        if (messageInput != "") {
+                          setProcessing(true);
+                          createMessage(
+                            user?.id || "",
+                            messageInput,
+                            "user",
+                            currentChatId
+                          ).then((res) => {
+                            sendAssistantMessage(
+                              chat.messages,
+                              res.message,
+                              chat.instructions,
+                              chat.workspaceId,
+                              {
+                                ...chat.assistant,
+                                scope:
+                                  chat.scope == "private"
+                                    ? "private"
+                                    : "public",
+                              }
+                            );
+                            setMessageInput("");
+                          });
+                        }
+                      }}
+                    >
+                      <IconSend size="24" />
+                    </ActionIcon>
+                  </Tooltip>
                 </div>
 
                 <Combobox.Dropdown>

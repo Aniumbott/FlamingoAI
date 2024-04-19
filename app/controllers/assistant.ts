@@ -1,49 +1,44 @@
+//  Modules
+import { notifications } from "@mantine/notifications";
+import { createElement } from "react";
+import { IconX } from "@tabler/icons-react";
+
+// Function to collec the assistant response
 async function getAssistantResponse(
   messages: any[],
   workspaceId: string,
-  model: string
+  assistant: any
 ) {
   const data = await fetch("/api/assistant", {
     method: "POST",
     body: JSON.stringify({
       messages,
       workspaceId,
-      model,
-      action: "apiCall",
+      assistant,
     }),
     headers: {
       "Content-Type": "application/json",
     },
   });
 
-  // console.log(messages);
-
-  // console.log("data at getAssistantResponse", data);
-
+  if (data.status !== 200) {
+    notifications.show({
+      icon: createElement(IconX),
+      color: "red",
+      message: "Invalid API key.",
+      autoClose: 5000,
+      withCloseButton: true,
+      withBorder: true,
+      loading: false,
+      styles: { description: { fontWeight: "bold" } },
+    });
+    return null;
+  }
   const response = await data.json();
   return response;
 }
 
-async function createAssistant(name: string, models: any[]) {
-  console.log("name", name, "models", models);
-  const data = await fetch("/api/assistant", {
-    method: "POST",
-    body: JSON.stringify({
-      name,
-      models,
-    }),
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const response = await data.json();
-
-  console.log("response at addAssistant", response);
-
-  return response;
-}
-
+// Function to get all available assistants
 async function getAssistants() {
   const data = await fetch(`/api/assistant`, {
     method: "GET",
@@ -56,4 +51,4 @@ async function getAssistants() {
   return response;
 }
 
-export { getAssistantResponse, createAssistant, getAssistants };
+export { getAssistantResponse, getAssistants };

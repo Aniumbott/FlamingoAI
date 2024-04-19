@@ -1,14 +1,33 @@
+// Modules
 import type { NextApiResponse } from "next";
 import { dbConnect } from "@/app/lib/db";
 import { NextResponse } from "next/server";
-import Comment, { ICommentDocument } from "@/app/models/Comment";
-import Chat from "@/app/models/Chat";
+import Comment from "@/app/models/Comment";
 import Message from "@/app/models/Message";
 
+// GET request handler
+export async function GET(req: any, res: NextApiResponse) {
+  try {
+    await dbConnect();
+    const reqParam = req.nextUrl.searchParams;
+    const messageId = reqParam.get("messageId");
+    // find by messageId
+    const comments = await Comment.find({ messageId: messageId }).populate(
+      "replies"
+    );
+
+    return NextResponse.json({ comments }, { status: 200 });
+  } catch (error: any) {
+    console.log("error at GET in Comment route: ", error);
+    return NextResponse.json(error.Comment, { status: 500 });
+  }
+}
+
+// POST request handler
 export async function POST(req: any, res: NextApiResponse) {
   try {
-    const body = await req.json();
     await dbConnect();
+    const body = await req.json();
     const comment = await Comment.create({
       createdBy: body.createdBy,
       content: body.content,
@@ -21,8 +40,6 @@ export async function POST(req: any, res: NextApiResponse) {
     let parentComment;
     let message;
 
-    console.log("body", body);
-
     if (body.parent != null) {
       parentComment = await Comment.findByIdAndUpdate(body.parent, {
         $push: { replies: comment._id },
@@ -33,41 +50,18 @@ export async function POST(req: any, res: NextApiResponse) {
       });
     }
 
-    console.log("newComment", comment, message, parentComment);
-
     return NextResponse.json(
       { comment, message, parentComment },
       { status: 200 }
     );
   } catch (error: any) {
-    console.log("error from comment route", error);
+    console.log("error at POST in Comment route: ", error);
     return NextResponse.json(error.Comment, { status: 500 });
   }
 }
 
-export async function GET(req: any, res: NextApiResponse) {
-  // console.log("hit get chat");
-  try {
-    await dbConnect();
-    const reqParam = req.nextUrl.searchParams;
-    const messageId = reqParam.get("messageId");
-    // console.log("messageId", messageId);
-    // find by messageId
-    const comments = await Comment.find({ messageId: messageId }).populate(
-      "replies"
-    );
-
-    // console.log("comments", comments);
-
-    return NextResponse.json({ comments }, { status: 200 });
-  } catch (error: any) {
-    // console.log("error from route", error);
-    return NextResponse.json(error.Comment, { status: 500 });
-  }
-}
-
+// PUT request handler
 export async function PUT(req: any, res: NextApiResponse) {
-  // console.log("hit put Comment");
   try {
     await dbConnect();
     const body = await req.json();
@@ -78,18 +72,16 @@ export async function PUT(req: any, res: NextApiResponse) {
 
     return NextResponse.json({ comment }, { status: 200 });
   } catch (error: any) {
-    // console.log("error from route", error);
+    console.log("error at PUT in Comment route: ", error);
     return NextResponse.json(error.Comment, { status: 500 });
   }
 }
 
+// DELETE request handler
 export async function DELETE(req: any, res: NextApiResponse) {
-  // console.log("hit delete Comment");
   try {
     await dbConnect();
     const body = await req.json();
-
-    // console.log("body", body);
 
     if (body.replies.length > 0) {
       for (const replyId of body.replies) {
@@ -114,7 +106,7 @@ export async function DELETE(req: any, res: NextApiResponse) {
       { status: 200 }
     );
   } catch (error: any) {
-    console.log("error from route", error);
+    console.log("error at DELETE in Comment route: ", error);
     return NextResponse.json(error.Comment, { status: 500 });
   }
 }

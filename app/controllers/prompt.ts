@@ -8,6 +8,52 @@ import {
 } from "./notification";
 type Scope = "public" | "private" | "system";
 
+// Function to get all personal prompts
+const getPrompts = async (
+  workspaceId: string,
+  scope: Scope,
+  createdBy: string
+) => {
+  try {
+    const data = await fetch(
+      `/api/prompt/?workspaceId=${workspaceId}&scope=${scope}&createdBy=${createdBy}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const response = await data.json();
+    return response;
+  } catch (err) {
+    // console.error(err);
+    return err;
+  }
+};
+
+// Function to get all prompts
+const getAllPrompts = async (workspaceId: string, createdBy: string) => {
+  try {
+    const data = await fetch(
+      `/api/prompt/?workspaceId=${workspaceId}&createdBy=${createdBy}&id=all`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const response = await data.json();
+    return response;
+  } catch (err) {
+    // console.error(err);
+    return err;
+  }
+};
+
+// Function to create prompt
 const createPrompt = async (
   name: string,
   content: string,
@@ -43,54 +89,12 @@ const createPrompt = async (
     return response;
   } catch (err) {
     showErrorNotification(notificationId, "Failed to create prompt");
-    console.error(err);
+    // console.error(err);
     return err;
   }
 };
 
-const getPrompts = async (
-  workspaceId: string,
-  scope: Scope,
-  createdBy: string
-) => {
-  try {
-    const data = await fetch(
-      `/api/prompt/?workspaceId=${workspaceId}&scope=${scope}&createdBy=${createdBy}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-
-    const response = await data.json();
-    return response;
-  } catch (err) {
-    console.error(err);
-    return err;
-  }
-};
-
-const getAllPrompts = async (workspaceId: string, createdBy: string) => {
-  try {
-    const data = await fetch(
-      `/api/prompt/?workspaceId=${workspaceId}&createdBy=${createdBy}&id=all`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const response = await data.json();
-    return response;
-  } catch (err) {
-    console.error(err);
-    return err;
-  }
-};
-
+// Function to update prompt
 const updatePrompt = async (id: string, body: any) => {
   const notificationId = showLoadingNotification("Saving changes...");
   try {
@@ -110,11 +114,12 @@ const updatePrompt = async (id: string, body: any) => {
     return response;
   } catch (err) {
     showErrorNotification(notificationId, "Failed to save changes");
-    console.error(err);
+    // console.error(err);
     return err;
   }
 };
 
+// Function to delete prompt
 const deletePrompt = async (prompt: IPromptDocument) => {
   const notificationId = showLoadingNotification("Deleting prompt...");
   try {
@@ -135,9 +140,9 @@ const deletePrompt = async (prompt: IPromptDocument) => {
     return response;
   } catch (err) {
     showErrorNotification(notificationId, "Failed to delete prompt");
-    console.error(err);
+    // console.error(err);
     return err;
   }
 };
 
-export { createPrompt, getPrompts, getAllPrompts, updatePrompt, deletePrompt };
+export { getPrompts, getAllPrompts, createPrompt, updatePrompt, deletePrompt };

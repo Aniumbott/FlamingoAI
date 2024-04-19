@@ -5,6 +5,7 @@ import {
   showSuccessNotification,
 } from "./notification";
 
+// Function to get the current workspace
 async function getWorkspace(id: String) {
   console.log("collecting current workspace");
   const data = await fetch(`/api/workspace/?id=${id}`, {
@@ -15,10 +16,10 @@ async function getWorkspace(id: String) {
   });
 
   const response = await data.json();
-  // console.log("data at getWorkspace", response);
   return response;
 }
 
+// Function to update the workspace
 async function updateWorkspace(body: any) {
   const notification = showLoadingNotification("Updating Workspace");
   const data = await fetch("/api/workspace", {
@@ -36,7 +37,7 @@ async function updateWorkspace(body: any) {
   }
 
   const response = await data.json();
-  socket.emit("updateWorkspace", body._id, response.workspace);
+  socket.emit("updateWorkspace", body._id);
   console.log("response at updateWorkspace", response);
 
   return response;

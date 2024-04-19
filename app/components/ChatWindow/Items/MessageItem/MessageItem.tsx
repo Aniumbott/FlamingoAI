@@ -13,6 +13,7 @@ import {
   Text,
   TextInput,
   Textarea,
+  Tooltip,
   rem,
   useMantineColorScheme,
 } from "@mantine/core";
@@ -32,7 +33,6 @@ import { useEffect, useState } from "react";
 import CommentItem from "../CommentItem/CommentItem";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import MentionInput from "../CommentItem/MentionInput";
-import ForkChatModal from "../../Modals/ForkChatModal";
 import { MessageRender } from "./MessageRenderer";
 
 function getDate(date: string) {
@@ -42,6 +42,8 @@ function getDate(date: string) {
 function MessageItem(props: {
   message: any;
   participants: any[];
+  instructions: string;
+  assistant: any;
   setPromptOpened: (value: boolean) => void;
   setPromptContent: (value: string) => void;
   setForkMessage: (value: any) => void;
@@ -50,6 +52,8 @@ function MessageItem(props: {
   const {
     message,
     participants,
+    instructions,
+    assistant,
     setPromptOpened,
     setPromptContent,
     setForkMessage,
@@ -110,22 +114,24 @@ function MessageItem(props: {
               <Avatar size="md" radius="sm" mt={5}>
                 <IconRobotFace
                   size="24px"
-                  color="var(--mantine-color-teal-3)"
+                  color="var(--mantine-primary-color-3)"
                 />
               </Avatar>
             )}
             {hovered && !isEdit ? (
-              <ActionIcon
-                color="grey"
-                variant="subtle"
-                mt="1rem"
-                onClick={() => {
-                  setForkMessage(message);
-                  setIsForkModalOpen(true);
-                }}
-              >
-                <IconArrowFork style={{ width: rem(24), rotate: "180deg" }} />
-              </ActionIcon>
+              <Tooltip label="Fork Chat" fz="xs" position="bottom">
+                <ActionIcon
+                  color="grey"
+                  variant="subtle"
+                  mt="1rem"
+                  onClick={() => {
+                    setForkMessage(message);
+                    setIsForkModalOpen(true);
+                  }}
+                >
+                  <IconArrowFork style={{ width: rem(24), rotate: "180deg" }} />
+                </ActionIcon>
+              </Tooltip>
             ) : null}
           </div>
           <div className="w-full ml-10 flex flex-col   ">
@@ -152,23 +158,42 @@ function MessageItem(props: {
                 {hovered && !isEdit ? (
                   message.type === "user" ? (
                     <>
-                      <ActionIcon
-                        color="grey"
-                        variant="subtle"
-                        display={isEdit ? "none" : "block"}
-                        onClick={() => setIsEdit(!isEdit)}
-                      >
-                        <IconEdit style={{ width: rem(16) }} />
-                      </ActionIcon>
-                      <ActionIcon color="grey" variant="subtle">
-                        <IconBookmarkPlus
-                          style={{ width: rem(16) }}
+                      <Tooltip label="Edit" fz="xs">
+                        <ActionIcon
+                          color="grey"
+                          variant="subtle"
+                          display={isEdit ? "none" : "block"}
+                          onClick={() => setIsEdit(!isEdit)}
+                        >
+                          <IconEdit style={{ width: rem(16) }} />
+                        </ActionIcon>
+                      </Tooltip>
+
+                      <Tooltip label="Save prompt" fz="xs">
+                        <ActionIcon color="grey" variant="subtle">
+                          <IconBookmarkPlus
+                            style={{ width: rem(16) }}
+                            onClick={() => {
+                              setPromptContent(message.content);
+                              setPromptOpened(true);
+                            }}
+                          />
+                        </ActionIcon>
+                      </Tooltip>
+                      <Tooltip label="Delete" fz="xs">
+                        <ActionIcon
+                          color="grey"
+                          variant="subtle"
                           onClick={() => {
-                            setPromptContent(message.content);
-                            setPromptOpened(true);
+                            deleteMessage(message);
                           }}
-                        />
-                      </ActionIcon>
+                        >
+                          <IconTrash style={{ width: rem(16) }} />
+                        </ActionIcon>
+                      </Tooltip>
+                    </>
+                  ) : (
+                    <Tooltip label="Delete" fz="xs">
                       <ActionIcon
                         color="grey"
                         variant="subtle"
@@ -178,17 +203,7 @@ function MessageItem(props: {
                       >
                         <IconTrash style={{ width: rem(16) }} />
                       </ActionIcon>
-                    </>
-                  ) : (
-                    <ActionIcon
-                      color="grey"
-                      variant="subtle"
-                      onClick={() => {
-                        deleteMessage(message);
-                      }}
-                    >
-                      <IconTrash style={{ width: rem(16) }} />
-                    </ActionIcon>
+                    </Tooltip>
                   )
                 ) : null}
               </div>
@@ -203,49 +218,54 @@ function MessageItem(props: {
                     setMessageText(e.currentTarget.value);
                   }}
                 />
-                <ActionIcon
-                  color="teal"
-                  ml="1rem"
-                  size="lg"
-                  variant="light"
-                  onClick={() => {
-                    console.log(messageText);
-                    if (
-                      confirm(
-                        "All messages sent after the one you are about to edit will be deleted!"
-                      ).valueOf()
-                    ) {
-                      let msg = message;
-                      msg.content = messageText;
-                      msg.createdBy = createdBy?.userId;
+                <Tooltip label="Save" fz="xs">
+                  <ActionIcon
+                    ml="1rem"
+                    size="lg"
+                    variant="light"
+                    onClick={() => {
+                      console.log(messageText);
+                      if (
+                        confirm(
+                          "All messages sent after the one you are about to edit will be deleted!"
+                        ).valueOf()
+                      ) {
+                        let msg = message;
+                        msg.content = messageText;
+                        msg.createdBy = createdBy?.userId;
 
-                      console.log("msg", msg);
-                      updateMessageContent(msg)
-                        .then((res) => {
-                          sendAssistantMessage(
-                            res.message,
-                            organization?.id || "",
-                            "gpt-3.5-turbo"
-                          );
-                        })
-                        .then(() => {
-                          setIsEdit(!isEdit);
-                        });
-                      setMessageText("");
-                    }
-                  }}
-                >
-                  <IconCheck size="18px" />
-                </ActionIcon>
-                <ActionIcon
-                  color="red"
-                  ml="0.5rem"
-                  size="lg"
-                  variant="light"
-                  onClick={() => setIsEdit(!isEdit)}
-                >
-                  <IconX size="18px" />
-                </ActionIcon>
+                        console.log("msg", msg);
+                        updateMessageContent(msg)
+                          .then((res) => {
+                            sendAssistantMessage(
+                              [],
+                              msg,
+                              instructions,
+                              organization?.id || "",
+                              assistant
+                            );
+                          })
+                          .then(() => {
+                            setIsEdit(!isEdit);
+                          });
+                        setMessageText("");
+                      }
+                    }}
+                  >
+                    <IconCheck size="18px" />
+                  </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Cancel" fz="xs">
+                  <ActionIcon
+                    color="red"
+                    ml="0.5rem"
+                    size="lg"
+                    variant="light"
+                    onClick={() => setIsEdit(!isEdit)}
+                  >
+                    <IconX size="18px" />
+                  </ActionIcon>
+                </Tooltip>
               </div>
             ) : (
               // <Text size="md">{message.content}</Text>
@@ -254,28 +274,36 @@ function MessageItem(props: {
             <div className="flex flex-row mt-2">
               <CopyButton value={String(message.content)} timeout={2000}>
                 {({ copied, copy }) => (
-                  <ActionIcon
-                    color={copied ? "teal" : "gray"}
-                    variant="subtle"
-                    onClick={copy}
+                  <Tooltip
+                    label={copied ? "Copied message" : "Copy message text"}
+                    fz="xs"
+                    position="bottom"
                   >
-                    {copied ? (
-                      <IconCheck style={{ width: rem(16) }} />
-                    ) : (
-                      <IconCopy style={{ width: rem(16) }} />
-                    )}
-                  </ActionIcon>
+                    <ActionIcon
+                      color={!copied ? "grey" : ""}
+                      variant="subtle"
+                      onClick={copy}
+                    >
+                      {copied ? (
+                        <IconCheck style={{ width: rem(16) }} />
+                      ) : (
+                        <IconCopy style={{ width: rem(16) }} />
+                      )}
+                    </ActionIcon>
+                  </Tooltip>
                 )}
               </CopyButton>
-              <ActionIcon
-                color={showComments ? "teal" : "grey"}
-                variant="subtle"
-                onClick={() => {
-                  setShowComments(!showComments);
-                }}
-              >
-                <IconMessages style={{ width: rem(16) }} />
-              </ActionIcon>
+              <Tooltip label="Show comments" fz="xs" position="bottom">
+                <ActionIcon
+                  color={showComments ? "" : "grey"}
+                  variant="subtle"
+                  onClick={() => {
+                    setShowComments(!showComments);
+                  }}
+                >
+                  <IconMessages style={{ width: rem(16) }} />
+                </ActionIcon>
+              </Tooltip>
             </div>
             <div className="flex flex-row mt-2 w-full">
               {showComments ? (
@@ -289,11 +317,14 @@ function MessageItem(props: {
                       />
                     );
                   })}
-                  {/* <Textarea
-                    mt="md"
-                    onChange={(e) => setCommentInput(e.currentTarget.value)}
-                    placeholder="Add a comment."
-                    rightSection={
+
+                  <div className="relative mt-4">
+                    <MentionInput
+                      commentText={commentInput}
+                      setCommentText={setCommentInput}
+                      participants={participants}
+                    />
+                    <Tooltip label="Add a comment" fz="xs">
                       <ActionIcon
                         color="grey"
                         mr="1rem"
@@ -302,43 +333,20 @@ function MessageItem(props: {
                             String(user?.id),
                             commentInput,
                             message._id,
-                            message.chatId
+                            message.chatId,
+                            null
                           );
                           setCommentInput("");
+                        }}
+                        style={{
+                          position: "absolute",
+                          right: "0",
+                          bottom: "1rem",
                         }}
                       >
                         <IconSend style={{ width: rem(16) }} />
                       </ActionIcon>
-                    }
-                  ></Textarea> */}
-
-                  <div className="relative mt-4">
-                    <MentionInput
-                      commentText={commentInput}
-                      setCommentText={setCommentInput}
-                      participants={participants}
-                    />
-                    <ActionIcon
-                      color="grey"
-                      mr="1rem"
-                      onClick={() => {
-                        createComment(
-                          String(user?.id),
-                          commentInput,
-                          message._id,
-                          message.chatId,
-                          null
-                        );
-                        setCommentInput("");
-                      }}
-                      style={{
-                        position: "absolute",
-                        right: "0",
-                        bottom: "1rem",
-                      }}
-                    >
-                      <IconSend style={{ width: rem(16) }} />
-                    </ActionIcon>
+                    </Tooltip>
                   </div>
                 </div>
               ) : null}

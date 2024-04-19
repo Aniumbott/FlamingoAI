@@ -88,11 +88,10 @@ const PeopleChats = (props: {
                   key={user.userId}
                   allowPersonal={allowPersonal}
                   allowPublic={allowPublic}
-                  
                 />
               ))
             ) : (
-              <Loader type="dots" w={"100%"} color="teal" />
+              <Loader type="dots" w={"100%"} />
             )}
           </Accordion>
         )}
@@ -136,7 +135,13 @@ const UserAccordionItem = (props: {
       </Accordion.Control>
       <AccordionPanel>
         {sortedChats.map((chat: IChatDocument, key: any) => (
-          <ChatItem item={chat} key={key} members={members} allowPersonal={props.allowPersonal} allowPublic={props.allowPublic}  />
+          <ChatItem
+            item={chat}
+            key={key}
+            members={members}
+            allowPersonal={props.allowPersonal}
+            allowPublic={props.allowPublic}
+          />
         ))}
       </AccordionPanel>
     </Accordion.Item>
@@ -164,7 +169,6 @@ const AccordianLabel = (props: {
         }}
         ta={"left"}
         size="sm"
-        c={"white"}
         fw={500}
       >
         {user.firstName} {user.lastName}
@@ -185,7 +189,7 @@ const AccordianLabel = (props: {
         >
           <SortMenu sort={props.sort} setSort={props.setSort} />
         </ActionIcon>
-        <ThemeIcon size="sm" color="gray" variant="filled" radius="sm">
+        <ThemeIcon size="sm" color="grey" variant="filled" radius="sm">
           <Text size="xs">{chatCount}</Text>
         </ThemeIcon>
       </Group>

@@ -7,11 +7,33 @@ import {
   showSuccessNotification,
 } from "./notification";
 
-// const createdBy = "user_2dsZmTZTBij5xjWmPjvirpXKtsL";
-// const workspaceId = "org_2dz9SJPInQzTNl4R7qBx7DfFYby";
-
 type Scope = "public" | "private";
 
+// Function to get chat folders
+async function getChatFolders(
+  scope: Scope,
+  createdBy: string,
+  workspaceId: string
+) {
+  try {
+    const data = await fetch(
+      `/api/chatfolder/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const response = await data.json();
+    return response;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+}
+
+// Function to create chat folder
 async function createChatFolder(
   scope: Scope,
   parentFolder: Mongoose.Types.ObjectId | null,
@@ -41,29 +63,7 @@ async function createChatFolder(
   }
 }
 
-async function getChatFolders(
-  scope: Scope,
-  createdBy: string,
-  workspaceId: string
-) {
-  try {
-    const data = await fetch(
-      `/api/chatfolder/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const response = await data.json();
-    return response;
-  } catch (err) {
-    console.error(err);
-    return err;
-  }
-}
-
+// Function to update chat folders
 async function updateChatFolders(id: String, body: any) {
   const notificationId = showLoadingNotification("Saving changes...");
   try {
@@ -86,11 +86,11 @@ async function updateChatFolders(id: String, body: any) {
     return response;
   } catch (err) {
     showErrorNotification(notificationId, "Failed to save changes");
-    console.error(err);
     return err;
   }
 }
 
+// Function to delete chat folders
 async function deleteChatFolders(folder: IChatFolderDocument) {
   const notificationId = showLoadingNotification("Deleting chat folder...");
   try {
@@ -117,8 +117,8 @@ async function deleteChatFolders(folder: IChatFolderDocument) {
 }
 
 export {
-  createChatFolder,
   getChatFolders,
+  createChatFolder,
   updateChatFolders,
   deleteChatFolders,
 };

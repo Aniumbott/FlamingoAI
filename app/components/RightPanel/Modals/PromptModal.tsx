@@ -102,7 +102,13 @@ const PromptModal = (props: {
             onChange={(e) => setContent(e.target.value)}
           />
           {modalItem && (
-            <Alert variant="default" c={"teal"} icon={<IconInfoCircle />}>
+            <Alert
+              variant="default"
+              style={{
+                color: "var(--mantine-primary-color-filled)",
+              }}
+              icon={<IconInfoCircle />}
+            >
               {`To use this prompt in chat, type "/${name}"`}
             </Alert>
           )}

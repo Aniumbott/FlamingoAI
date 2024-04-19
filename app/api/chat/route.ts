@@ -1,15 +1,185 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import { dbConnect } from "@/app/lib/db";
+// Modules
 import { NextRequest, NextResponse } from "next/server";
+import type { NextApiResponse } from "next";
+import { dbConnect } from "@/app/lib/db";
 import Chat from "@/app/models/Chat";
 import ChatFolder from "@/app/models/ChatFolder";
 import Message from "@/app/models/Message";
 import Comment from "@/app/models/Comment";
+import Workspace from "@/app/models/Workspace";
 
+// GET Request handler
+export async function GET(req: NextRequest, res: NextResponse) {
+  try {
+    await dbConnect();
+    const reqParam = req.nextUrl.searchParams;
+    const id = reqParam.get("id");
+    const scope = reqParam.get("scope");
+    const workspaceId = reqParam.get("workspaceId") || "";
+    const createdBy = reqParam.get("createdBy") || "";
+    const action = reqParam.get("action");
+    let chats;
+
+    switch (action) {
+      case "independent": // Chats with no parent folder
+        if (scope === "public") {
+          chats = await Chat.find({
+            workspaceId: workspaceId,
+            scope: { $ne: "private" },
+            parentFolder: null,
+            archived: false,
+          }).sort({ updatedAt: -1 });
+        } else if (scope === "private") {
+          chats = await Chat.find({
+            workspaceId: workspaceId,
+            parentFolder: null,
+            archived: false,
+            scope: scope,
+            $or: [
+              { createdBy: createdBy },
+              {
+                memberAccess: {
+                  $elemMatch: {
+                    userId: createdBy,
+                    access: { $ne: "inherit" },
+                  },
+                },
+              },
+            ],
+          }).sort({ updatedAt: -1 });
+        }
+        break;
+
+      case "archived": // All archived chats
+        chats = await Chat.find({
+          workspaceId: workspaceId,
+          archived: true,
+          $or: [
+            { scope: { $ne: "private" } },
+            {
+              scope: "private",
+              $or: [
+                { createdBy: createdBy },
+                {
+                  memberAccess: {
+                    $elemMatch: {
+                      userId: createdBy,
+                      access: { $ne: "inherit" },
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        }).sort({ updatedAt: -1 });
+        break;
+
+      case "all": // All chats form the workspace
+        chats = await Chat.find({
+          workspaceId: workspaceId,
+          archived: false,
+          $or: [
+            { scope: { $ne: "private" } },
+            {
+              scope: "private",
+              $or: [
+                { createdBy: createdBy },
+                {
+                  memberAccess: {
+                    $elemMatch: {
+                      userId: createdBy,
+                      access: { $ne: "inherit" },
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        }).sort({ updatedAt: -1 });
+        break;
+
+      case "allPopulated": // All chats with messages and comments, replies populated
+        chats = await Chat.find({
+          workspaceId: workspaceId,
+          archived: false,
+          $or: [
+            { scope: { $ne: "private" } },
+            {
+              scope: "private",
+              $or: [
+                { createdBy: createdBy },
+                {
+                  memberAccess: {
+                    $elemMatch: {
+                      userId: createdBy,
+                      access: { $ne: "inherit" },
+                    },
+                  },
+                },
+              ],
+            },
+          ],
+        })
+          .populate({
+            path: "messages",
+            populate: {
+              path: "comments",
+              populate: {
+                path: "replies",
+              },
+            },
+          })
+          .sort({ updatedAt: -1 });
+        break;
+
+      default: // Indipendent populated chat
+        if (id) {
+          chats = await Chat.find({
+            workspaceId: workspaceId,
+            _id: id,
+            $or: [
+              { scope: { $ne: "private" } },
+              {
+                scope: "private",
+                $or: [
+                  { createdBy: createdBy },
+                  {
+                    memberAccess: {
+                      $elemMatch: {
+                        userId: createdBy,
+                        access: { $ne: "inherit" },
+                      },
+                    },
+                  },
+                ],
+              },
+            ],
+          })
+            .populate({
+              path: "messages",
+              populate: {
+                path: "comments",
+                populate: {
+                  path: "replies",
+                },
+              },
+            })
+            .populate("assistant.assistantId");
+        }
+        break;
+    }
+    return NextResponse.json({ chats }, { status: 200 });
+  } catch (error: any) {
+    console.log("error at GET in Chat route: ", error);
+    return NextResponse.json(error.message, { status: 500 });
+  }
+}
+
+// POST Request handler
 export async function POST(req: any, res: NextApiResponse) {
   try {
-    const body = await req.json();
     await dbConnect();
+    const body = await req.json();
 
     let chat;
 
@@ -25,9 +195,10 @@ export async function POST(req: any, res: NextApiResponse) {
       });
 
       const messagesToClone = chatToClone?.messages.slice(
+        0,
         chatToClone?.messages.findIndex(
           (message: any) => String(message._id) === body.messageId
-        )
+        ) + 1
       );
 
       chat = await Chat.create({
@@ -38,7 +209,8 @@ export async function POST(req: any, res: NextApiResponse) {
         workspaceId: body?.workspaceId,
         participants: [body.createdBy],
         messages: [],
-        // messages: messages.map((message: any) => message._id),
+        instructions: chatToClone?.instructions,
+        assistant: chatToClone?.assistant,
       });
 
       let messages = [];
@@ -80,7 +252,6 @@ export async function POST(req: any, res: NextApiResponse) {
                 })
               );
             }
-            // console.log("replies", replies);
             replies.length > 0
               ? await Comment.findByIdAndUpdate(
                   newComment._id,
@@ -92,7 +263,6 @@ export async function POST(req: any, res: NextApiResponse) {
               : null;
           }
         }
-        // console.log("comments", comments);
         comments.length > 0
           ? await Message.findByIdAndUpdate(
               newMessage._id,
@@ -105,7 +275,6 @@ export async function POST(req: any, res: NextApiResponse) {
             )
           : null;
       }
-      // console.log("messages", messages);
       chat = await Chat.findByIdAndUpdate(
         chat._id,
         {
@@ -115,11 +284,11 @@ export async function POST(req: any, res: NextApiResponse) {
           new: true,
         }
       );
-
-      // console.log("chat", chat);
     } else {
+      const workspace = await Workspace.findById(body.workspaceId);
+
       chat = await Chat.create({
-        name: "New Chat",
+        name: body.name,
         createdBy: body.createdBy,
         scope: body.scope,
         parentFolder: body.parentFolder,
@@ -129,6 +298,14 @@ export async function POST(req: any, res: NextApiResponse) {
           userId: memberId,
           access: "inherit",
         })),
+        instructions: workspace?.instructions,
+        assistant: body.assistant
+          ? body.assistant
+          : workspace?.assistants.find(
+              (assistant) =>
+                (assistant.scope == "private" && body.scope == "private") ||
+                (assistant.scope == "pbulic" && body.scope != "private")
+            ),
       });
 
       // If parentFolder was provided, add the new chat ID to the parent folder's chats array
@@ -136,186 +313,23 @@ export async function POST(req: any, res: NextApiResponse) {
         await ChatFolder.findByIdAndUpdate(body.parentFolder, {
           $push: { chats: chat._id },
         });
-        // console.log("pushed ", chat._id, "to parent folder ", body.parentFolder);
       }
     }
     return NextResponse.json({ chat }, { status: 200 });
   } catch (error: any) {
-    // console.log("error at POST in Chat route", error);
+    console.log("error at POST in Chat route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
-export async function GET(req: NextRequest, res: NextResponse) {
-  try {
-    await dbConnect();
-    const reqParam = req.nextUrl.searchParams;
-    const scope = reqParam.get("scope");
-    const workspaceId = reqParam.get("workspaceId") || "";
-    const createdBy = reqParam.get("createdBy") || "";
-    const id = reqParam.get("id");
-    const action = reqParam.get("action");
-    let chats;
-
-    // get independent chats based on scope
-    if (action === "independent") {
-      if (scope === "public") {
-        chats = await Chat.find({
-          workspaceId: workspaceId,
-          scope: { $ne: "private" },
-          parentFolder: null,
-          archived: false,
-        }).sort({ updatedAt: -1 });
-      } else if (scope === "private") {
-        chats = await Chat.find({
-          workspaceId: workspaceId,
-          parentFolder: null,
-          archived: false,
-          scope: scope,
-          $or: [
-            { createdBy: createdBy },
-            {
-              memberAccess: {
-                $elemMatch: {
-                  userId: createdBy,
-                  access: { $ne: "inherit" },
-                },
-              },
-            },
-          ],
-        }).sort({ updatedAt: -1 });
-      }
-    }
-
-    //get all chats relevant to workspace and user
-    else if (action === "all") {
-      chats = await Chat.find({
-        workspaceId: workspaceId,
-        archived: false,
-        $or: [
-          { scope: { $ne: "private" } },
-          {
-            scope: "private",
-            $or: [
-              { createdBy: createdBy },
-              {
-                memberAccess: {
-                  $elemMatch: {
-                    userId: createdBy,
-                    access: { $ne: "inherit" },
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      }).sort({ updatedAt: -1 });
-    } else if (action === "allPopulated") {
-      chats = await Chat.find({
-        workspaceId: workspaceId,
-        archived: false,
-        $or: [
-          { scope: { $ne: "private" } },
-          {
-            scope: "private",
-            $or: [
-              { createdBy: createdBy },
-              {
-                memberAccess: {
-                  $elemMatch: {
-                    userId: createdBy,
-                    access: { $ne: "inherit" },
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      })
-        .populate({
-          path: "messages",
-          populate: {
-            path: "comments",
-            populate: {
-              path: "replies",
-            },
-          },
-        })
-        .sort({ updatedAt: -1 });
-    }
-
-    // get archived chats
-    else if (action === "archived") {
-      chats = await Chat.find({
-        workspaceId: workspaceId,
-        archived: true,
-        $or: [
-          { scope: { $ne: "private" } },
-          {
-            scope: "private",
-            $or: [
-              { createdBy: createdBy },
-              {
-                memberAccess: {
-                  $elemMatch: {
-                    userId: createdBy,
-                    access: { $ne: "inherit" },
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      }).sort({ updatedAt: -1 });
-    }
-
-    // get specific chat by id
-    else if (id) {
-      chats = await Chat.find({
-        workspaceId: workspaceId,
-        _id: id,
-        $or: [
-          { scope: { $ne: "private" } },
-          {
-            scope: "private",
-            $or: [
-              { createdBy: createdBy },
-              {
-                memberAccess: {
-                  $elemMatch: {
-                    userId: createdBy,
-                    access: { $ne: "inherit" },
-                  },
-                },
-              },
-            ],
-          },
-        ],
-      }).populate({
-        path: "messages",
-        populate: {
-          path: "comments",
-          populate: {
-            path: "replies",
-          },
-        },
-      });
-    }
-
-    return NextResponse.json({ chats }, { status: 200 });
-  } catch (error: any) {
-    console.log("error at GET in Chat route", error);
-    return NextResponse.json(error.message, { status: 500 });
-  }
-}
-
+// PUT Request handler
 export async function PUT(req: any, res: NextApiResponse) {
-  // console.log("hit put chat");
   try {
     await dbConnect();
     const body = await req.json();
     let chat;
     const { id, targetFolderId, parentFolderId, newScope } = body;
+
     // MOVE Chat Operation
     if (id && targetFolderId && parentFolderId) {
       // If the chat currently has a parent folder, remove it from the parent folder's chats
@@ -375,16 +389,16 @@ export async function PUT(req: any, res: NextApiResponse) {
 
     return NextResponse.json({ chat }, { status: 200 });
   } catch (error: any) {
-    console.log("error at PUT in Chat route", error);
+    console.log("error at PUT in Chat route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
 
 export async function DELETE(req: any, res: NextApiResponse) {
-  console.log("hit delete chat");
   try {
     await dbConnect();
     const body = await req.json();
+
     const chat = await Chat.findById(body.id).populate({
       path: "messages",
       populate: {
@@ -412,6 +426,7 @@ export async function DELETE(req: any, res: NextApiResponse) {
       { status: 200 }
     );
   } catch (error: any) {
+    console.log("error at DELETE in Chat route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }

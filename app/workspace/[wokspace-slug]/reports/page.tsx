@@ -246,13 +246,11 @@ export default function Reports() {
           </Title>
         </div>
         <Button
-          unstyled
           onClick={() => {
             // go back
             window.history.back();
           }}
         >
-          {" "}
           Go to Dashboard
         </Button>
       </Group>
@@ -346,7 +344,7 @@ export default function Reports() {
                 series={[
                   {
                     name: "users",
-                    color: "teal",
+                    color: "var(--mantine-primary-color-filled)",
                   },
                 ]}
               />
@@ -382,7 +380,10 @@ export default function Reports() {
             orientation="vertical"
             barProps={{}}
             series={[
-              { name: "efficient", color: "teal" },
+              {
+                name: "efficient",
+                color: "var(--mantine-primary-color-filled)",
+              },
               { name: "moderate", color: "yellow" },
               { name: "inefficient", color: "red" },
             ]}
@@ -419,6 +420,7 @@ export default function Reports() {
                       multiline
                       w={400}
                       label="The total number of tokens utilised in the chat; the chat length, in tokens."
+                      fz="xs"
                     >
                       <IconInfoCircle size="14px" />
                     </Tooltip>
@@ -432,6 +434,7 @@ export default function Reports() {
                       multiline
                       w={400}
                       label="The GPT model the chat is using. If chats started with one model, but then switched, the latest model is shown here."
+                      fz="xs"
                     >
                       <IconInfoCircle size="14px" />
                     </Tooltip>
@@ -445,6 +448,7 @@ export default function Reports() {
                       multiline
                       w={400}
                       label="The number of tokens the model can maintain as context when processing a request. When the conversation exceeds the context window, older messages are dropped from the context."
+                      fz="xs"
                     >
                       <IconInfoCircle size="14px" />
                     </Tooltip>
@@ -458,6 +462,7 @@ export default function Reports() {
                       multiline
                       w={400}
                       label="The proportion of the model's total context window that is currently being utilized by the chat. Values over 100% indicate that earliest information is dropped from the context."
+                      fz="xs"
                     >
                       <IconInfoCircle size="14px" />
                     </Tooltip>
@@ -512,7 +517,7 @@ export default function Reports() {
             data={tocketnDistribution}
             barProps={{}}
             series={[
-              { name: "input", color: "teal" },
+              { name: "input", color: "var(--mantine-primary-color-filled)" },
               { name: "output", color: "yellow" },
             ]}
           ></BarChart>
@@ -544,7 +549,9 @@ export default function Reports() {
             data={tokenUsageByUser}
             orientation="vertical"
             barProps={{}}
-            series={[{ name: "tockens", color: "teal" }]}
+            series={[
+              { name: "tockens", color: "var(--mantine-primary-color-filled)" },
+            ]}
           ></BarChart>
         </Paper>
         <Paper

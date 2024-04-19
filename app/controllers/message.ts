@@ -1,6 +1,32 @@
 import { socket } from "@/socket";
 import { getAssistantResponse } from "./assistant";
 
+// Function to get messages
+async function getMessages(chatId: String) {
+  const data = await fetch(`/api/message/?chatId=${chatId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const response = await data.json();
+  return response;
+}
+
+// Function to get a single message
+async function getMessage(id: String) {
+  const data = await fetch(`/api/message/?id=${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const response = await data.json();
+  return response;
+}
+
+// Function to create message
 async function createMessage(
   createdBy: String,
   content: String,
@@ -20,29 +46,7 @@ async function createMessage(
   return response;
 }
 
-async function getMessage(id: String) {
-  const data = await fetch(`/api/message/?id=${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-
-  const response = await data.json();
-  return response;
-}
-
-async function getMessages(chatId: String) {
-  const data = await fetch(`/api/message/?chatId=${chatId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
-  const response = await data.json();
-  return response;
-}
-
+// Function to update message
 async function updateMessage(id: String, body: any) {
   const data = await fetch("/api/message", {
     method: "PUT",
@@ -58,19 +62,7 @@ async function updateMessage(id: String, body: any) {
   return response;
 }
 
-async function deleteMessage(body: any) {
-  const data = await fetch("/api/message", {
-    method: "DELETE",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-  const response = await data.json();
-  socket.emit("deleteMessage", body.chatId, body);
-  return response;
-}
-
+// Function to update message content
 async function updateMessageContent(body: any) {
   console.log("body at updateMessageContent", body);
   // get all messages from chat
@@ -88,49 +80,75 @@ async function updateMessageContent(body: any) {
   return response;
 }
 
-async function sendAssistantMessage(
-  message: any,
-  workspaceId: string,
-  model: string
-) {
-  const getMessages = await fetch(`/api/message/?chatId=${message.chatId}`, {
-    method: "GET",
+// Function to delete message
+async function deleteMessage(body: any) {
+  const data = await fetch("/api/message", {
+    method: "DELETE",
     headers: {
       "Content-Type": "application/json",
     },
+    body: JSON.stringify(body),
+  });
+  const response = await data.json();
+  socket.emit("deleteMessage", body.chatId, body);
+  return response;
+}
+
+// Function to send message to assistant
+async function sendAssistantMessage(
+  messages: any[],
+  message: any,
+  instruction: string,
+  workspaceId: string,
+  assistant: any // assistantId, scope, model
+) {
+  if (messages.length === 0) {
+    const getMessages = await fetch(`/api/message/?chatId=${message.chatId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    messages = (await getMessages.json()).messages;
+    messages = messages.filter((msg: any) => msg.createdAt < message.createdAt);
+  }
+
+  messages = [...messages, message];
+
+  let messagesContent = messages.map((msg: any) => {
+    return {
+      role: msg.type,
+      content: msg.content,
+    };
   });
 
-  const messages = (await getMessages.json()).messages;
+  messagesContent = [
+    {
+      role: "system",
+      content: instruction,
+    },
+    ...messagesContent,
+  ];
 
-  getAssistantResponse(
-    messages
-      .filter((msg: any) => {
-        return msg.createdAt <= message.createdAt;
-      })
-      .map((msg: any) => {
-        return {
-          role: msg.type,
-          content: msg.content,
-        };
-      }),
-    workspaceId,
-    model
-  ).then((res) => {
-    createMessage(
-      message.createdBy,
-      res.gptRes.choices[0].message.content,
-      "assistant",
-      message.chatId
-    );
+  getAssistantResponse(messagesContent, workspaceId, assistant).then((res) => {
+    if (res) {
+      createMessage(
+        message.createdBy,
+        res.gptRes.choices[0].message.content,
+        "assistant",
+        message.chatId
+      );
+    }
   });
 }
 
 export {
-  createMessage,
-  getMessage,
   getMessages,
+  getMessage,
+  createMessage,
   updateMessage,
-  deleteMessage,
   updateMessageContent,
+  deleteMessage,
   sendAssistantMessage,
 };

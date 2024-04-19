@@ -2,7 +2,14 @@
 import { useState, useEffect } from "react";
 import { useHover } from "@mantine/hooks";
 import Mongoose from "mongoose";
-import { Accordion, Text, Group, ActionIcon, TextInput } from "@mantine/core";
+import {
+  Accordion,
+  Text,
+  Group,
+  ActionIcon,
+  TextInput,
+  Tooltip,
+} from "@mantine/core";
 import {
   IconCaretRightFilled,
   IconFolderOpen,
@@ -162,35 +169,28 @@ const FolderLabel = (props: {
       </Group>
       {!rename && actionIconVisible && (
         <Group wrap="nowrap" gap={5} align="center">
+          <Tooltip label="create new prompt" fz="xs">
+            <ActionIcon
+              size="sm"
+              variant="subtle"
+              color="grey"
+              onClick={(event) => {
+                event.stopPropagation();
+                props.modalControls.setModalItem(null);
+                props.modalControls.setModalScope(
+                  props.scope === "public" ? "public" : "private"
+                );
+                props.modalControls.setModalParentFolder(props.folder._id);
+                props.modalControls.setOpenModal(true);
+              }}
+            >
+              <IconPlus size={"1rem"} />
+            </ActionIcon>
+          </Tooltip>
           <ActionIcon
-            size="16px"
+            size="sm"
             variant="subtle"
-            aria-label="Sort"
-            color="#9CA3AF"
-            style={{
-              "--ai-hover-color": "white",
-              "--ai-hover": "#047857",
-            }}
-            onClick={(event) => {
-              event.stopPropagation();
-              props.modalControls.setModalItem(null);
-              props.modalControls.setModalScope(
-                props.scope === "public" ? "public" : "private"
-              );
-              props.modalControls.setModalParentFolder(props.folder._id);
-              props.modalControls.setOpenModal(true);
-            }}
-          >
-            <IconPlus size={"1rem"} />
-          </ActionIcon>
-          <ActionIcon
-            size="16px"
-            variant="subtle"
-            aria-label="Sort"
-            color="#9CA3AF"
-            style={{
-              "--ai-hover-color": "white",
-            }}
+            color="grey"
             onClick={(event) => {
               event.stopPropagation();
               // Add any additional logic for the ActionIcon click here

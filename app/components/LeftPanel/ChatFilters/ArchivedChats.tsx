@@ -19,11 +19,7 @@ import { socket } from "@/socket";
 import { useHover } from "@mantine/hooks";
 import {
   IconChevronRight,
-  IconCircle,
-  IconCircleFilled,
-  IconFolderUp,
   IconSortAscending,
-  IconSortDescending2,
   IconSortDescendingLetters,
 } from "@tabler/icons-react";
 import { IconSortDescending } from "@tabler/icons-react";
@@ -51,33 +47,41 @@ const ArchivedChats = (props: {
     };
   }, []);
 
-  const [archivedChats, setArchivedChats] = useState<IChatDocument[]>([]);
+  const [archivedChats, setArchivedChats] = useState<IChatDocument[] | null>(
+    null
+  );
   const [sort, setSort] = useState<string>("New");
-  const [autoArchive, setAutoArchive] = useState<string>("Never");
+  const [autoDelete, setAutoDelete] = useState<string>("Never");
 
   return (
     <div className="flex flex-col justify-between h-full w-full">
       <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
-        {archivedChats.length > 0 ? (
-          archivedChats.map((chat, key) => {
-            return (
-              <ChatItem
-                item={chat}
-                key={key}
-                members={members}
-                allowPersonal={allowPersonal}
-                allowPublic={allowPublic}
-              />
-            );
-          })
+        {archivedChats ? (
+          archivedChats.length > 0 ? (
+            archivedChats.map((chat, key) => {
+              return (
+                <ChatItem
+                  item={chat}
+                  key={key}
+                  members={members}
+                  allowPersonal={allowPersonal}
+                  allowPublic={allowPublic}
+                />
+              );
+            })
+          ) : (
+            <Text style={{ textAlign: "center" }} c="dimmed" size="xs">
+              No archived chats
+            </Text>
+          )
         ) : (
-          <Loader type="dots" w={"100%"} color="teal" />
+          <Loader type="dots" w={"100%"} />
         )}
       </ScrollArea>
       <div className="flex gap-1">
-        <AutomaticArchive
-          autoArchive={autoArchive}
-          setAutoArchive={setAutoArchive}
+        <AutomaticDelete
+          autoDelete={autoDelete}
+          setAutoDelete={setAutoDelete}
         />
         <SortMenu sort={sort} setSort={setSort} />
       </div>
@@ -85,9 +89,9 @@ const ArchivedChats = (props: {
   );
 };
 
-const AutomaticArchive = (props: {
-  autoArchive: string;
-  setAutoArchive: (value: string) => void;
+const AutomaticDelete = (props: {
+  autoDelete: string;
+  setAutoDelete: (value: string) => void;
 }) => {
   return (
     <Menu
@@ -130,41 +134,41 @@ const AutomaticArchive = (props: {
         >
           <Stack gap={1} align="start">
             <Text fw={"400"} fz={"xs"}>
-              Auto Archive
+              Auto Delete
             </Text>
           </Stack>
         </Button>
       </Menu.Target>
 
       <Menu.Dropdown>
-        <Menu.Item onClick={() => props.setAutoArchive("Never")}>
-          <AutoArchiveMenuButton
+        <Menu.Item onClick={() => props.setAutoDelete("Never")}>
+          <AutoDeleteMenuButton
             properties={{ title: "Never" }}
-            autoArchive={props.autoArchive}
+            autoDelete={props.autoDelete}
           />
         </Menu.Item>
-        <Menu.Item onClick={() => props.setAutoArchive("7 days")}>
-          <AutoArchiveMenuButton
+        <Menu.Item onClick={() => props.setAutoDelete("7 days")}>
+          <AutoDeleteMenuButton
             properties={{ title: "7 days" }}
-            autoArchive={props.autoArchive}
+            autoDelete={props.autoDelete}
           />
         </Menu.Item>
-        <Menu.Item onClick={() => props.setAutoArchive("14 days")}>
-          <AutoArchiveMenuButton
+        <Menu.Item onClick={() => props.setAutoDelete("14 days")}>
+          <AutoDeleteMenuButton
             properties={{ title: "14 days" }}
-            autoArchive={props.autoArchive}
+            autoDelete={props.autoDelete}
           />
         </Menu.Item>
-        <Menu.Item onClick={() => props.setAutoArchive("30 days")}>
-          <AutoArchiveMenuButton
+        <Menu.Item onClick={() => props.setAutoDelete("30 days")}>
+          <AutoDeleteMenuButton
             properties={{ title: "30 days" }}
-            autoArchive={props.autoArchive}
+            autoDelete={props.autoDelete}
           />
         </Menu.Item>
-        <Menu.Item onClick={() => props.setAutoArchive("90 days")}>
-          <AutoArchiveMenuButton
+        <Menu.Item onClick={() => props.setAutoDelete("90 days")}>
+          <AutoDeleteMenuButton
             properties={{ title: "90 days" }}
-            autoArchive={props.autoArchive}
+            autoDelete={props.autoDelete}
           />
         </Menu.Item>
       </Menu.Dropdown>
@@ -172,9 +176,9 @@ const AutomaticArchive = (props: {
   );
 };
 
-const AutoArchiveMenuButton = (props: {
+const AutoDeleteMenuButton = (props: {
   properties: { title: string };
-  autoArchive: string;
+  autoDelete: string;
 }) => {
   const { hovered, ref } = useHover();
   return (
@@ -182,10 +186,14 @@ const AutoArchiveMenuButton = (props: {
       <Button
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
           : { color: "0F172A", variant: "transparent" })}
-        {...(props.properties.title === props.autoArchive
-          ? { variant: "filled", color: "teal" }
+        {...(props.properties.title === props.autoDelete
+          ? { variant: "filled" }
           : null)}
         justify="flex-start"
         styles={{
@@ -292,10 +300,14 @@ const MenuButton = (props: {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
           : { color: "0F172A", variant: "transparent" })}
         {...(props.properties.id === props.sort
-          ? { color: "teal", variant: "filled", fz: "xl" }
+          ? { variant: "filled", fz: "xl" }
           : null)}
         justify="flex-start"
         styles={{

@@ -1,4 +1,4 @@
-import { createChatFork, getChat } from "@/app/controllers/chat";
+import { createChatFork } from "@/app/controllers/chat";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import {
   Button,
@@ -13,7 +13,6 @@ import {
   rem,
 } from "@mantine/core";
 import { IconBuilding } from "@tabler/icons-react";
-import { set } from "mongoose";
 import { useEffect, useState } from "react";
 
 const openAIModels = [
@@ -93,14 +92,6 @@ export default function ForkChatModal(props: {
   // const [chat, setChat] = useState<any>({});
   const [isCommentsIncluded, setIsCommentsIncluded] = useState(true);
   const { user } = useUser();
-  // console.log('hello');
-  // useEffect(() => {
-  //   const collectChat = async () =>
-  //     await getChat(message.chatId, organization?.id || "", user?.id || "");
-  //   collectChat().then((res) => {
-  //     setChat(res.chats[0]);
-  //   });
-  // }, [message]);
 
   useEffect(() => {
     setChatName(`Fork of ${chat?.name}`);
@@ -170,14 +161,12 @@ export default function ForkChatModal(props: {
         </Text>
         <Switch
           label="Include Comemnts"
-          color="teal"
           mt="1.5rem"
           defaultChecked={isCommentsIncluded}
           onChange={(e) => setIsCommentsIncluded(e.currentTarget.checked)}
         />
         <div className="w-full flex flex-row justify-end mt-8">
           <Button
-            color="teal"
             w="5rem"
             mr="md"
             onClick={() => {

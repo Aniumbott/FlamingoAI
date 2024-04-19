@@ -1,5 +1,5 @@
 // Modules
-import { Menu, Button, Stack, Text } from "@mantine/core";
+import { Menu, Button, Stack, Text, Tooltip } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import {
   IconChevronDown,
@@ -14,7 +14,6 @@ import {
 import { createChat } from "@/app/controllers/chat";
 import { createChatFolder } from "@/app/controllers/folders";
 import { useAuth } from "@clerk/nextjs";
-import { socket } from "@/socket";
 type MenuData = {
   title: string;
   description: string;
@@ -59,18 +58,20 @@ const ChatMenu = (props: {
         },
       }}
     >
-      <Menu.Target>
-        <Button
-          color="#047857"
-          px={6}
-          radius="0"
-          style={{
-            borderRadius: " 0 5px 5px 0",
-          }}
-        >
-          <IconChevronDown size={15} />
-        </Button>
-      </Menu.Target>
+      <Tooltip label="Menu" fz="xs">
+        <Menu.Target>
+          <Button
+            px={6}
+            radius="0"
+            style={{
+              borderRadius: " 0 5px 5px 0",
+            }}
+          >
+            <IconChevronDown size={15} />
+          </Button>
+        </Menu.Target>
+      </Tooltip>
+
       <Menu.Dropdown>
         {allowPublic && (
           <Menu.Item
@@ -160,8 +161,12 @@ const MenuButton = (props: MenuButtonProps) => {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
-          : { color: "0F172A", variant: "transparent" })}
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
+          : { color: "00000000", variant: "transparent" })}
         justify="flex-start"
         styles={{
           root: {

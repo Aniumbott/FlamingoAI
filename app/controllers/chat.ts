@@ -8,45 +8,112 @@ import {
 } from "./notification";
 type Scope = "public" | "private" | "viewOnly";
 
-async function createChat(
+// Function to get chats that has no parent
+async function getIndependentChats(
   scope: Scope,
-  parentFolder: Mongoose.Types.ObjectId | null,
   createdBy: string,
-  workspaceId: string,
-  members: any[]
+  workspaceId: string
 ) {
-  const notificationId = showLoadingNotification("Creating chat...");
   try {
-    const userId = members.map((member) => member.userId);
-    console.log(userId);
-    const data = await fetch("/api/chat", {
-      method: "POST",
-      body: JSON.stringify({
-        createdBy,
-        scope,
-        workspaceId,
-        parentFolder,
-        members: userId,
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const data = await fetch(
+      `/api/chat/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}&action=independent`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
 
     const response = await data.json();
-
-    if (scope === "private") socket.emit("updatePersonalChat", response.chat);
-    else socket.emit("updateChat", workspaceId, response.chat);
-    showSuccessNotification(notificationId, "Chat created");
-    console.log(response);
     return response;
   } catch (err) {
-    showErrorNotification(notificationId, "Failed to create chat");
     console.error(err);
     return err;
   }
 }
 
+// Function to get all the archived chats
+async function getArchivedChats(createdBy: string, workspaceId: string) {
+  try {
+    const data = await fetch(
+      `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&action=archived`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const response = await data.json();
+    return response;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+}
+
+// Function to get all workspace chats
+async function getAllChats(createdBy: string, workspaceId: string) {
+  try {
+    const data = await fetch(
+      `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&action=all`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const response = await data.json();
+    return response;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+}
+
+// Funtion to get all workspace chats with members populated
+async function getAllPopulatedChats(createdBy: string, workspaceId: string) {
+  try {
+    const data = await fetch(
+      `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&action=allPopulated`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const response = await data.json();
+    return response;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+}
+
+// Funtion to get single populated Chat
+async function getChat(id: String, workspaceId: String, createdBy: string) {
+  try {
+    const data = await fetch(
+      `/api/chat/?&workspaceId=${workspaceId}&id=${id}&createdBy=${createdBy}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const response = await data.json();
+    return response;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+}
+
+// Funtion to create chat fork
 async function createChatFork(
   messageId: String,
   id: String,
@@ -82,107 +149,51 @@ async function createChatFork(
   return response;
 }
 
-async function getChat(id: String, workspaceId: String, createdBy: string) {
-  try {
-    const data = await fetch(
-      `/api/chat/?&workspaceId=${workspaceId}&id=${id}&createdBy=${createdBy}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const response = await data.json();
-    return response;
-  } catch (err) {
-    console.error(err);
-    return err;
-  }
-}
-
-// chats that done haae any parent
-async function getIndependentChats(
+// Function to create a new chat
+async function createChat(
   scope: Scope,
+  parentFolder: Mongoose.Types.ObjectId | null,
   createdBy: string,
-  workspaceId: string
+  workspaceId: string,
+  members: any[],
+  name: string = "New Chat",
+  assistant: any = null
 ) {
+  const notificationId = showLoadingNotification("Creating chat...");
   try {
-    const data = await fetch(
-      `/api/chat/?scope=${scope}&workspaceId=${workspaceId}&createdBy=${createdBy}&action=independent`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
+    const userId = members.map((member) => member.userId);
+    console.log(userId);
+    const data = await fetch("/api/chat", {
+      method: "POST",
+      body: JSON.stringify({
+        scope,
+        parentFolder,
+        createdBy,
+        workspaceId,
+        members: userId,
+        name,
+        assistant,
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
 
     const response = await data.json();
+
+    if (scope === "private") socket.emit("updatePersonalChat", response.chat);
+    else socket.emit("updateChat", workspaceId, response.chat);
+    showSuccessNotification(notificationId, "Chat created");
+    console.log(response);
     return response;
   } catch (err) {
+    showErrorNotification(notificationId, "Failed to create chat");
     console.error(err);
     return err;
   }
 }
 
-async function getAllChats(createdBy: string, workspaceId: string) {
-  try {
-    const data = await fetch(
-      `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&action=all`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const response = await data.json();
-    return response;
-  } catch (err) {
-    console.error(err);
-    return err;
-  }
-}
-
-async function getArchivedChats(createdBy: string, workspaceId: string) {
-  try {
-    const data = await fetch(
-      `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&action=archived`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const response = await data.json();
-    return response;
-  } catch (err) {
-    console.error(err);
-    return err;
-  }
-}
-
-async function getAllPopulatedChats(createdBy: string, workspaceId: string) {
-  try {
-    const data = await fetch(
-      `/api/chat/?workspaceId=${workspaceId}&createdBy=${createdBy}&action=allPopulated`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    const response = await data.json();
-    return response;
-  } catch (err) {
-    console.error(err);
-    return err;
-  }
-}
-
+// Function to update chat
 async function updateChat(id: String, body: any) {
   const notificationId = showLoadingNotification("Saving Changes...");
   try {
@@ -207,6 +218,7 @@ async function updateChat(id: String, body: any) {
   }
 }
 
+// Function to update chat access
 async function updateChatAccess(id: String, body: any) {
   const notificationId = showLoadingNotification("Saving Changes...");
   try {
@@ -230,8 +242,8 @@ async function updateChatAccess(id: String, body: any) {
   }
 }
 
+// Function to delete chat and all its contents
 async function deleteChat(chat: IChatDocument) {
-  // call controller to delete messages message ref array
   const notificationId = showLoadingNotification("Deleting Chat...");
   try {
     const id = chat._id;
@@ -256,6 +268,7 @@ async function deleteChat(chat: IChatDocument) {
   }
 }
 
+// Function to sort items
 const sortItems = (items: any, sortType: string): any => {
   let sortedItems;
   switch (sortType) {
@@ -292,13 +305,13 @@ const sortItems = (items: any, sortType: string): any => {
 };
 
 export {
-  createChat,
-  createChatFork,
-  getChat,
   getIndependentChats,
+  getArchivedChats,
   getAllChats,
   getAllPopulatedChats,
-  getArchivedChats,
+  getChat,
+  createChatFork,
+  createChat,
   updateChat,
   updateChatAccess,
   deleteChat,

@@ -39,11 +39,11 @@ app.prepare().then(() => {
       console.log(`User with ID: ${socket.id} left Workspace: ${roomId}`);
     });
 
-    socket.on("updateWorkspace", (roomId, workspace) => {
+    socket.on("updateWorkspace", (roomId) => {
       console.log(
-        `User with ID: ${socket.id} updated workspace: ${workspace} in room: ${roomId}`
+        `User with ID: ${socket.id} updated workspace in room: ${roomId}`
       );
-      io.to(roomId).emit("updateWorkspace", workspace);
+      io.to(roomId).emit("updateWorkspace");
     });
 
     socket.on("disconnect", () => {
