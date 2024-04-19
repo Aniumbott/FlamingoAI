@@ -9,7 +9,6 @@ function showLoadingNotification(message: string) {
     message: message,
     autoClose: false,
     withCloseButton: true,
-    color: "teal",
     withBorder: true,
     styles: { description: { fontWeight: "bold" } },
   });
@@ -21,7 +20,6 @@ function showSuccessNotification(notificationId: string, message: string) {
   notifications.update({
     id: notificationId,
     icon: createElement(IconCheck),
-    color: "teal",
     message: message,
     autoClose: 2000,
     withCloseButton: true,

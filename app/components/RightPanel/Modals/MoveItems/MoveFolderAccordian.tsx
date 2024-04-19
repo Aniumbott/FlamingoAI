@@ -32,14 +32,19 @@ const MoveFolderAccordian = (props: {
   };
   return (
     <AccordionItem
-      c={"teal"}
+      style={{
+        color: "var(--mantine-primary-color-filled)",
+      }}
       value={folder._id + ":" + folder.name}
       key={folder._id}
     >
       <Accordion.Control
-        {...(breadcrumb[breadcrumb.length - 1].id === folder._id
-          ? { c: "teal" }
-          : { c: "white" })}
+        style={{
+          color:
+            breadcrumb[breadcrumb.length - 1].id === folder._id
+              ? "var(--mantine-primary-color-filled)"
+              : "",
+        }}
         variant="subtle"
         disabled={folder._id === currentId}
       >

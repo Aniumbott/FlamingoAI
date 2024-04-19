@@ -328,18 +328,18 @@ export default function ChatWindow(props: {
               </Group>
               <Group gap={0}>
                 <Button
-                  variant="subtle"
-                  color="default"
+                  variant="default"
+                  // color="default"
                   onClick={() => setShareChatOpened(true)}
-                  mx={10}
+                  mx={5}
                 >
                   Share
                 </Button>
                 <Button
-                  variant="subtle"
-                  color="default"
+                  variant="default"
+                  // color="default"
                   onClick={() => setSettingsOpen(true)}
-                  mx={10}
+                  mx={5}
                 >
                   Settings
                 </Button>
@@ -466,7 +466,6 @@ export default function ChatWindow(props: {
                       });
                     }}
                     mt={20}
-                    color="teal"
                   />
                 </div>
               </div>
@@ -604,7 +603,6 @@ export default function ChatWindow(props: {
               chat.messages.some((message: any) => message.type === "user") ? (
                 <Button
                   variant="outline"
-                  color="gray"
                   fw={300}
                   w={"fit-content"}
                   disabled={processing}
@@ -647,7 +645,7 @@ export default function ChatWindow(props: {
                     <Textarea
                       autosize
                       maxRows={4}
-                      variant="filled"
+                      variant="default"
                       size="lg"
                       radius="0"
                       w="75%"
@@ -703,7 +701,6 @@ export default function ChatWindow(props: {
                     <ActionIcon
                       size="50"
                       radius="0"
-                      color="teal"
                       disabled={processing}
                       onClick={() => {
                         if (messageInput != "") {

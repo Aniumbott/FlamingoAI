@@ -86,7 +86,7 @@ function CommentItem(props: { comment: any; participants: any[] }) {
             <div className="flex flex-row">
               <Tooltip label="Resolve" fz="xs">
                 <ActionIcon
-                  color={comment.status == "resolved" ? "teal" : "grey"}
+                  color={comment.status == "resolved" ? "" : "grey"}
                   variant="subtle"
                   onClick={() => {
                     updateComment(chatId, {
@@ -182,7 +182,6 @@ function CommentItem(props: { comment: any; participants: any[] }) {
                     <div className="h-full flex flex-col ml-2 items-center justify-center">
                       <Tooltip label="Save" fz="xs">
                         <ActionIcon
-                          color="teal"
                           size="lg"
                           variant="light"
                           onClick={() => {
@@ -276,7 +275,11 @@ const MenuButton = (props: {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
           : { color: "0F172A", variant: "transparent" })}
         justify="flex-start"
         styles={{

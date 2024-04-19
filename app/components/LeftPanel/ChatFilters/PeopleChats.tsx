@@ -91,7 +91,7 @@ const PeopleChats = (props: {
                 />
               ))
             ) : (
-              <Loader type="dots" w={"100%"} color="teal" />
+              <Loader type="dots" w={"100%"} />
             )}
           </Accordion>
         )}
@@ -189,7 +189,7 @@ const AccordianLabel = (props: {
         >
           <SortMenu sort={props.sort} setSort={props.setSort} />
         </ActionIcon>
-        <ThemeIcon size="sm" color="gray" variant="filled" radius="sm">
+        <ThemeIcon size="sm" color="grey" variant="filled" radius="sm">
           <Text size="xs">{chatCount}</Text>
         </ThemeIcon>
       </Group>

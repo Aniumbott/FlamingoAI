@@ -15,6 +15,7 @@ import {
   Title,
   Tooltip,
   ScrollArea,
+  ThemeIcon,
 } from "@mantine/core";
 import { IconBuilding, IconCheck, IconCopy } from "@tabler/icons-react";
 import { IChatDocument } from "../../../models/Chat";
@@ -57,7 +58,7 @@ const ShareChatModal = (props: {
                       fz="xs"
                     >
                       <ActionIcon
-                        color={copied ? "teal" : "gray"}
+                        color={copied ? "" : "grey"}
                         variant="filled"
                         onClick={copy}
                         size={36}
@@ -77,13 +78,18 @@ const ShareChatModal = (props: {
         </Stack>
         <Group gap={50}>
           <Group gap={10}>
-            <ActionIcon color={"gray"} variant="filled" size={36}>
-              <IconBuilding size={26} />
-            </ActionIcon>
+            <ThemeIcon variant="filled" size="40px">
+              <IconBuilding size={24} />
+            </ThemeIcon>
             <Stack gap={3} style={{ flexGrow: 1 }}>
               <Title order={4}>Aniket Workspace</Title>
-              <Text size="sm" c="gray">
-                Teammates can edit
+              <Text size="sm" c="grey">
+                Teammates{" "}
+                {chat?.scope == "private"
+                  ? "cannot access"
+                  : chat?.scope == "public"
+                  ? "can edit"
+                  : "can only view"}
               </Text>
             </Stack>
           </Group>
@@ -235,11 +241,11 @@ const User = (member: any) => (
     <Avatar
       src={member?.imageUrl}
       style={{ margin: "0.3rem" }}
-      color="green"
+      color="var(--mantine-primary-color-filled)"
       radius="sm"
     ></Avatar>
     <Stack gap={1}>
-      <Text c="white" fw={600} size="sm">
+      <Text fw={600} size="sm">
         {member?.firstName + " " + member?.lastName}
       </Text>
       <Text size="sm" truncate>

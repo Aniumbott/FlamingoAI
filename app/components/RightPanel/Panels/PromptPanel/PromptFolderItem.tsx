@@ -171,14 +171,9 @@ const FolderLabel = (props: {
         <Group wrap="nowrap" gap={5} align="center">
           <Tooltip label="create new prompt" fz="xs">
             <ActionIcon
-              size="16px"
+              size="sm"
               variant="subtle"
-              aria-label="Sort"
-              color="#9CA3AF"
-              style={{
-                "--ai-hover-color": "white",
-                "--ai-hover": "#6bcb99",
-              }}
+              color="grey"
               onClick={(event) => {
                 event.stopPropagation();
                 props.modalControls.setModalItem(null);
@@ -193,13 +188,9 @@ const FolderLabel = (props: {
             </ActionIcon>
           </Tooltip>
           <ActionIcon
-            size="16px"
+            size="sm"
             variant="subtle"
-            aria-label="Sort"
-            color="#9CA3AF"
-            style={{
-              "--ai-hover-color": "white",
-            }}
+            color="grey"
             onClick={(event) => {
               event.stopPropagation();
               // Add any additional logic for the ActionIcon click here

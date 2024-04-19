@@ -118,7 +118,6 @@ const Workspace = () => {
             left: "50%",
             transform: "translate(-50%, -50%)",
           }}
-          color="teal"
         />
       </ClerkLoading>
       <ClerkLoaded>
@@ -210,7 +209,6 @@ const Workspace = () => {
                         radius="md"
                         mt={20}
                         size="lg"
-                        color="teal"
                         onClick={() => {
                           const req = createChat(
                             "public",

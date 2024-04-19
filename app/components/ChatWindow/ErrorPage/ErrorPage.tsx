@@ -29,7 +29,6 @@ export default function ErrorPage() {
               onClick={() => {
                 router.push("/");
               }}
-              color="teal"
             >
               Take me back to home page
             </Button>

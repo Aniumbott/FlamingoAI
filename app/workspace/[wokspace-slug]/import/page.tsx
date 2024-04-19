@@ -258,7 +258,6 @@ export default function ImportPage() {
                   <Button
                     size="xs"
                     variant="subtle"
-                    color="teal"
                     radius="md"
                     onClick={() => {
                       setChats(
@@ -295,7 +294,6 @@ export default function ImportPage() {
                 <Button
                   size="xs"
                   variant="filled"
-                  color="teal"
                   radius="md"
                   onClick={() => {
                     let selectedChats = selected;
@@ -340,11 +338,10 @@ export default function ImportPage() {
                       data={assistant?.models}
                       value={model}
                       onChange={(e) => setModel(e || "")}
-                      color="teal"
                     />
                   </div>
                   <div className="flex flex-row items-center">
-                    <Badge variant="light" color="teal" radius="sm">
+                    <Badge variant="light" radius="sm">
                       {selected.length}/{chats.length} conversations are
                       selected.
                     </Badge>
@@ -437,7 +434,6 @@ const ChatsTable = (props: {
                     })
                   );
                 }}
-                color="teal"
                 disabled={chat.chatId !== ""}
               />
             </Table.Td>
@@ -506,7 +502,7 @@ const ChatsTable = (props: {
             ) : (
               <>
                 <Table.Td>
-                  <Badge variant="light" color="teal" radius="xl" size="md">
+                  <Badge variant="light" radius="xl" size="md">
                     OK
                   </Badge>
                 </Table.Td>

@@ -114,7 +114,7 @@ function MessageItem(props: {
               <Avatar size="md" radius="sm" mt={5}>
                 <IconRobotFace
                   size="24px"
-                  color="var(--mantine-color-teal-3)"
+                  color="var(--mantine-primary-color-3)"
                 />
               </Avatar>
             )}
@@ -220,7 +220,6 @@ function MessageItem(props: {
                 />
                 <Tooltip label="Save" fz="xs">
                   <ActionIcon
-                    color="teal"
                     ml="1rem"
                     size="lg"
                     variant="light"
@@ -281,7 +280,7 @@ function MessageItem(props: {
                     position="bottom"
                   >
                     <ActionIcon
-                      color={copied ? "teal" : "gray"}
+                      color={!copied ? "grey" : ""}
                       variant="subtle"
                       onClick={copy}
                     >
@@ -296,7 +295,7 @@ function MessageItem(props: {
               </CopyButton>
               <Tooltip label="Show comments" fz="xs" position="bottom">
                 <ActionIcon
-                  color={showComments ? "teal" : "grey"}
+                  color={showComments ? "" : "grey"}
                   variant="subtle"
                   onClick={() => {
                     setShowComments(!showComments);

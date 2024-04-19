@@ -20,7 +20,6 @@ export default function ChatItem(props: {
   allowPublic: boolean;
   allowPersonal: boolean;
 }) {
-  const router = useRouter();
   const pathname = usePathname();
   const { item, members } = props;
   const { hovered, ref } = useHover();
@@ -32,6 +31,10 @@ export default function ChatItem(props: {
   useEffect(() => {
     actionIconVisible = hovered || menuOpen;
   }, [hovered, menuOpen]);
+
+  function isActive(pathname: string, id: string) {
+    return pathname.split("/")[3] === id;
+  }
 
   return (
     <>
@@ -48,15 +51,19 @@ export default function ChatItem(props: {
             {item.favourites.includes(userId || "") ? (
               <IconStarFilled
                 style={{
-                  color: "#FFD700",
+                  color: isActive(pathname, item._id)
+                    ? "var(--mantine-primary-color-filled)"
+                    : "#FFD700",
                   width: "1rem",
                   height: "1rem",
                 }}
               />
             ) : (
               <IconAlignJustified
-                color="gray"
                 style={{
+                  color: isActive(pathname, item._id)
+                    ? "var(--mantine-primary-color-filled)"
+                    : "grey",
                   width: "1rem",
                   height: "1rem",
                 }}
@@ -84,35 +91,29 @@ export default function ChatItem(props: {
                 }}
               />
             ) : (
-              <Text size="sm" style={{ marginLeft: "0.1rem" }}>
+              <Text
+                size="sm"
+                style={{
+                  marginLeft: "0.1rem",
+                  color: isActive(pathname, item._id)
+                    ? "var(--mantine-primary-color-filled)"
+                    : "",
+                }}
+              >
                 {item.name}
               </Text>
             )}
           </Group>
           {!rename ? (
             actionIconVisible ? (
-              <ActionIcon
-                size="25px"
-                variant="subtle"
-                aria-label=""
-                color="#9CA3AF"
-                // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
-                style={{
-                  "--ai-hover-color": "white",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                }}
-              >
-                <ChatFeatureMenu
-                  chat={item}
-                  members={members}
-                  open={menuOpen}
-                  setOpen={setMenuOpen}
-                  setRename={setRename}
-                  setMoveModal={setOpenMoveModal}
-                />
-              </ActionIcon>
+              <ChatFeatureMenu
+                chat={item}
+                members={members}
+                open={menuOpen}
+                setOpen={setMenuOpen}
+                setRename={setRename}
+                setMoveModal={setOpenMoveModal}
+              />
             ) : (
               <Avatar.Group
               // {...(hovered ? { opacity: "0" } : { opacity: "1" })}

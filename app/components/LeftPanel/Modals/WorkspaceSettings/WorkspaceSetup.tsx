@@ -28,7 +28,6 @@ export default function WorkspaceSetup(props: {
             </Text>
           </div>
           <Switch
-            color="teal"
             size="md"
             defaultChecked={workspace?.allowPersonal}
             onChange={(e) => {
@@ -49,7 +48,6 @@ export default function WorkspaceSetup(props: {
             </Text>
           </div>
           <Switch
-            color="teal"
             size="md"
             defaultChecked={workspace?.allowPublic}
             onChange={(e) => {

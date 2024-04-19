@@ -60,8 +60,8 @@ const WorkspaceMenu = (props: { workspace: any }) => {
       >
         <Tooltip label="Menu" fz="xs">
           <Menu.Target ref={ref}>
-            <ActionIcon variant="subtle" color="grey" size="24px">
-              <IconSettings />
+            <ActionIcon variant="subtle" color="grey" size="md">
+              <IconSettings size="20px" />
             </ActionIcon>
           </Menu.Target>
         </Tooltip>
@@ -102,7 +102,11 @@ const MenuButton = (props: {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
           : { color: "0F172A", variant: "transparent" })}
         justify="flex-start"
         styles={{

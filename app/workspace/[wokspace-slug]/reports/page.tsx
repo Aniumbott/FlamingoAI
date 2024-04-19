@@ -246,13 +246,11 @@ export default function Reports() {
           </Title>
         </div>
         <Button
-          unstyled
           onClick={() => {
             // go back
             window.history.back();
           }}
         >
-          {" "}
           Go to Dashboard
         </Button>
       </Group>
@@ -346,7 +344,7 @@ export default function Reports() {
                 series={[
                   {
                     name: "users",
-                    color: "teal",
+                    color: "var(--mantine-primary-color-filled)",
                   },
                 ]}
               />
@@ -382,7 +380,10 @@ export default function Reports() {
             orientation="vertical"
             barProps={{}}
             series={[
-              { name: "efficient", color: "teal" },
+              {
+                name: "efficient",
+                color: "var(--mantine-primary-color-filled)",
+              },
               { name: "moderate", color: "yellow" },
               { name: "inefficient", color: "red" },
             ]}
@@ -516,7 +517,7 @@ export default function Reports() {
             data={tocketnDistribution}
             barProps={{}}
             series={[
-              { name: "input", color: "teal" },
+              { name: "input", color: "var(--mantine-primary-color-filled)" },
               { name: "output", color: "yellow" },
             ]}
           ></BarChart>
@@ -548,7 +549,9 @@ export default function Reports() {
             data={tokenUsageByUser}
             orientation="vertical"
             barProps={{}}
-            series={[{ name: "tockens", color: "teal" }]}
+            series={[
+              { name: "tockens", color: "var(--mantine-primary-color-filled)" },
+            ]}
           ></BarChart>
         </Paper>
         <Paper

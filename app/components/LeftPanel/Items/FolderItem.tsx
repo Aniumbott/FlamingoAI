@@ -210,12 +210,7 @@ const FolderLabel = (props: {
             <ActionIcon
               size="sm"
               variant="subtle"
-              aria-label="Sort"
-              color="#9CA3AF"
-              style={{
-                "--ai-hover-color": "white",
-                "--ai-hover": "#6bcb99",
-              }}
+              color="grey"
               onClick={(event) => {
                 event.stopPropagation();
                 newFolder(
@@ -239,12 +234,7 @@ const FolderLabel = (props: {
             <ActionIcon
               size="sm"
               variant="subtle"
-              aria-label="Sort"
-              color="#9CA3AF"
-              style={{
-                "--ai-hover-color": "white",
-                "--ai-hover": "#6bcb99",
-              }}
+              color="grey"
               onClick={(event) => {
                 event.stopPropagation();
                 createChat(
@@ -264,33 +254,30 @@ const FolderLabel = (props: {
               <IconPlus size={"1rem"} />
             </ActionIcon>
           </Tooltip>
-          <ActionIcon
+          {/* <ActionIcon
             size="sm"
-            variant="subtle"
-            aria-label="Sort"
-            color="#9CA3AF"
-            style={{
-              "--ai-hover-color": "white",
-            }}
-            onClick={(event) => {
-              event.stopPropagation();
-              // Add any additional logic for the ActionIcon click here
-            }}
-          >
-            <FolderFeatureMenu
-              folder={props.folder}
-              scope={props.scope}
-              workspaceId={props.workspaceId}
-              userId={props.userId}
-              open={menuOpen}
-              setOpen={setMenuOpen}
-              setRename={setRename}
-              setMoveModal={props.setMoveModal}
-              members={props.members}
-              allowPublic={props.allowPublic}
-              allowPersonal={props.allowPersonal}
-            />
-          </ActionIcon>
+            // variant="unstyled"
+            // aria-label="Sort"
+            // color="#9CA3AF"
+            // style={{
+            //   "--ai-hover-color": "white",
+            // }}
+            
+          > */}
+          <FolderFeatureMenu
+            folder={props.folder}
+            scope={props.scope}
+            workspaceId={props.workspaceId}
+            userId={props.userId}
+            open={menuOpen}
+            setOpen={setMenuOpen}
+            setRename={setRename}
+            setMoveModal={props.setMoveModal}
+            members={props.members}
+            allowPublic={props.allowPublic}
+            allowPersonal={props.allowPersonal}
+          />
+          {/* </ActionIcon> */}
         </Group>
       )}
     </Group>

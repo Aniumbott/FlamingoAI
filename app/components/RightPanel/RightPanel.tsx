@@ -38,7 +38,8 @@ export default function RightPanel(props: {
       width: "100%",
       height: "3rem",
       padding: "0.5rem",
-      borderLeft: active == ind ? "3px solid var(--mantine-color-teal-5)" : "",
+      borderLeft:
+        active == ind ? "3px solid var(--mantine-primary-color-filled)" : "",
     };
   };
 
@@ -71,7 +72,7 @@ export default function RightPanel(props: {
                 variant={active == 0 ? "light" : "subtle"}
                 aria-label="Settings"
                 radius={0}
-                color={active == 0 ? "teal" : "light"}
+                color={active == 0 ? "" : "light"}
                 onClick={() => {
                   !rightOpened ? toggleRight() : "";
                   setActive(0);
@@ -90,7 +91,7 @@ export default function RightPanel(props: {
                 variant={active == 1 ? "light" : "subtle"}
                 aria-label="Settings"
                 radius={0}
-                color={active == 1 ? "teal" : "light"}
+                color={active == 1 ? "" : "light"}
                 onClick={() => {
                   !rightOpened ? toggleRight() : "";
                   setActive(1);
@@ -109,7 +110,7 @@ export default function RightPanel(props: {
                 variant={active == 2 ? "light" : "subtle"}
                 aria-label="Settings"
                 radius={0}
-                color={active == 2 ? "teal" : "light"}
+                color={active == 2 ? "" : "light"}
                 onClick={() => {
                   !rightOpened ? toggleRight() : "";
                   setActive(2);
@@ -128,7 +129,7 @@ export default function RightPanel(props: {
                 variant={active == 3 ? "light" : "subtle"}
                 aria-label="Settings"
                 radius={0}
-                color={active == 3 ? "teal" : "light"}
+                color={active == 3 ? "" : "light"}
                 onClick={() => {
                   !rightOpened ? toggleRight() : "";
                   setActive(3);

@@ -137,7 +137,6 @@ export default function CommentsPanel(props: { toggleRight: () => void }) {
       <div className="flex flex-row justify-between">
         <Select
           variant="filled"
-          color="teal"
           w="48%"
           radius="md"
           value={filter}
@@ -157,11 +156,9 @@ export default function CommentsPanel(props: { toggleRight: () => void }) {
           {...(isMentions
             ? {
                 variant: "filled",
-                color: "teal",
               }
             : {
-                variant: "light",
-                color: "white",
+                variant: "default",
               })}
           onClick={() => setIsMentions(!isMentions)}
         >

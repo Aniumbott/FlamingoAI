@@ -1,14 +1,22 @@
 // Modules
+// "use client";
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { ColorSchemeScript, MantineProvider } from "@mantine/core";
-import { Notifications } from '@mantine/notifications';
+import {
+  CSSVariablesResolver,
+  ColorSchemeScript,
+  MantineProvider,
+  MantineTheme,
+  createTheme,
+} from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import { ClerkProvider } from "@clerk/nextjs";
 import StoreProvider from "./redux/StoreProvider";
 
 import "@mantine/core/styles.css";
 import "@mantine/charts/styles.css";
-import '@mantine/notifications/styles.css';
+import "@mantine/notifications/styles.css";
 // Componets
 import "./globals.css";
 
@@ -39,7 +47,11 @@ export default function RootLayout({
             <title>Team GPT PRO !!!</title>
           </head>
           <body className={inter.className}>
-            <MantineProvider defaultColorScheme="dark">
+            <MantineProvider
+              theme={{
+                primaryColor: "teal",
+              }}
+            >
               <Notifications />
               {children}
             </MantineProvider>

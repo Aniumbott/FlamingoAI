@@ -34,7 +34,7 @@
 }
 
 .accordionControl[data-active] {
-  background-color: #404040;
+  background-color: #0000000f;
 }
 
 .parent {

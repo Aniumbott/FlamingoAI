@@ -67,7 +67,7 @@ const FilterMenu = (props: {
               },
             }}
             leftSection={FilterMenuData[0].icon}
-            rightSection={<IconSelector color="gray" size={20} />}
+            rightSection={<IconSelector color="grey" size={20} />}
             color="grey"
             variant="subtle"
           >
@@ -104,7 +104,11 @@ const MenuButton = (props: MenuButtonProps) => {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
           : { color: "0F172A", variant: "transparent" })}
         justify="flex-start"
         styles={{

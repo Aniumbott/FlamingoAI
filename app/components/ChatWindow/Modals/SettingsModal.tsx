@@ -47,7 +47,6 @@ const SettingsModal = (props: {
               },
             });
           }}
-          color="teal"
         />
         <Stack gap={10}>
           <Textarea
@@ -58,8 +57,6 @@ const SettingsModal = (props: {
           <Group justify="space-between">
             {areaValue.length == 0 ? (
               <Button
-                color="teal"
-                radius={0}
                 size="md"
                 variant="outline"
                 onClick={() => {
@@ -73,8 +70,6 @@ const SettingsModal = (props: {
             ) : null}
 
             <Button
-              color="teal"
-              radius={0}
               size="md"
               onClick={() => {
                 updateChat(chat?._id, {

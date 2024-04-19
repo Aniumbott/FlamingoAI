@@ -75,7 +75,7 @@ const ArchivedChats = (props: {
             </Text>
           )
         ) : (
-          <Loader type="dots" w={"100%"} color="teal" />
+          <Loader type="dots" w={"100%"} />
         )}
       </ScrollArea>
       <div className="flex gap-1">
@@ -186,10 +186,14 @@ const AutoDeleteMenuButton = (props: {
       <Button
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
           : { color: "0F172A", variant: "transparent" })}
         {...(props.properties.title === props.autoDelete
-          ? { variant: "filled", color: "teal" }
+          ? { variant: "filled" }
           : null)}
         justify="flex-start"
         styles={{
@@ -296,10 +300,14 @@ const MenuButton = (props: {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
           : { color: "0F172A", variant: "transparent" })}
         {...(props.properties.id === props.sort
-          ? { color: "teal", variant: "filled", fz: "xl" }
+          ? { variant: "filled", fz: "xl" }
           : null)}
         justify="flex-start"
         styles={{

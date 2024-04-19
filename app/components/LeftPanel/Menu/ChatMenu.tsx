@@ -61,7 +61,6 @@ const ChatMenu = (props: {
       <Tooltip label="Menu" fz="xs">
         <Menu.Target>
           <Button
-            color="teal"
             px={6}
             radius="0"
             style={{
@@ -162,8 +161,12 @@ const MenuButton = (props: MenuButtonProps) => {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
-          : { color: "0F172A", variant: "transparent" })}
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
+          : { color: "00000000", variant: "transparent" })}
         justify="flex-start"
         styles={{
           root: {

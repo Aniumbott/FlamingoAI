@@ -62,16 +62,7 @@ export default function ChatFeatureMenu(props: {
       >
         <Tooltip label="Menu" fz="xs">
           <Menu.Target>
-            <ActionIcon
-              size="25px"
-              variant="subtle"
-              aria-label=""
-              color="#9CA3AF"
-              // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
-              style={{
-                "--ai-hover-color": "white",
-              }}
-            >
+            <ActionIcon size="25px" variant="subtle" color="grey">
               <IconDots size={15} stroke={1.5} />
             </ActionIcon>
           </Menu.Target>
@@ -189,7 +180,11 @@ const MenuButton = (props: {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
           : { color: "0F172A", variant: "transparent" })}
         justify="flex-start"
         styles={{

@@ -54,7 +54,7 @@ const RecentChats = (props: {
             );
           })
         ) : (
-          <Loader type="dots" w={"100%"} color="teal" />
+          <Loader type="dots" w={"100%"} />
         )}
       </ScrollArea>
     </div>

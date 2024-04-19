@@ -195,9 +195,10 @@ export async function POST(req: any, res: NextApiResponse) {
       });
 
       const messagesToClone = chatToClone?.messages.slice(
+        0,
         chatToClone?.messages.findIndex(
           (message: any) => String(message._id) === body.messageId
-        )
+        ) + 1
       );
 
       chat = await Chat.create({

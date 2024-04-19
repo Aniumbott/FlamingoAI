@@ -59,8 +59,8 @@ export default function ReplyItem(props: { reply: any; participants: any[] }) {
             </div>
             <Tooltip label="Delete" fz="xs">
               <ActionIcon
-                color="grey"
                 variant="subtle"
+                color="grey"
                 onClick={() => {
                   deleteComment(chatId, reply);
                 }}

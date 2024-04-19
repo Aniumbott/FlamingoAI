@@ -65,7 +65,6 @@ const GeneralChats = (props: {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
-
   useEffect(() => {
     const fetchChats = async () => {
       try {
@@ -257,7 +256,7 @@ const GeneralChats = (props: {
                   ))}
                 </>
               ) : (
-                <Loader type="dots" w={"100%"} color="teal" />
+                <Loader type="dots" w={"100%"} />
               )}
             </ScrollArea.Autosize>
           </AccordionPanel>
@@ -316,7 +315,7 @@ const GeneralChats = (props: {
                     ))}
                   </>
                 ) : (
-                  <Loader type="dots" w={"100%"} color="teal" />
+                  <Loader type="dots" w={"100%"} />
                 )}
               </ScrollArea.Autosize>
             </AccordionPanel>
@@ -354,12 +353,7 @@ const AccordianLabel = (props: {
           <ActionIcon
             size="sm"
             variant="subtle"
-            aria-label="Sort"
-            color="#9CA3AF"
-            style={{
-              "--ai-hover-color": "white",
-              "--ai-hover": "#6bcb99",
-            }}
+            color="grey"
             onClick={(event) => {
               event.stopPropagation();
               newFolder(props.scope, null, props.userId, props.workspaceId);
@@ -378,12 +372,7 @@ const AccordianLabel = (props: {
           <ActionIcon
             size="sm"
             variant="subtle"
-            aria-label="Sort"
-            color="#9CA3AF"
-            style={{
-              "--ai-hover-color": "white",
-              "--ai-hover": "#6bcb99",
-            }}
+            color="grey"
             onClick={(event) => {
               event.stopPropagation();
               createChat(
@@ -448,7 +437,6 @@ const SearchMenu = (props: {
             label="Search chat content"
             checked={searchContent}
             onChange={(event) => setSearchContent(event.currentTarget.checked)}
-            color="teal"
             size="xs"
             p={"xs"}
           />

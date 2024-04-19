@@ -75,7 +75,7 @@ export default function ChatAuth(props: {
           <Text size="lg" fw={600}>
             Chat Authentication
           </Text>
-          <Badge color="teal" ml={20} variant="light" radius="md">
+          <Badge ml={20} variant="light" radius="md">
             New
           </Badge>
         </Group>
@@ -90,7 +90,6 @@ export default function ChatAuth(props: {
               label: assistant.name,
               value: assistant._id,
             }))}
-            color="teal"
             value={selectAssistant}
             onChange={setSelectAssistants}
             w="60%"
@@ -148,9 +147,7 @@ export default function ChatAuth(props: {
             </div>
 
             <Button
-              color="teal"
               variant="outline"
-              radius={0}
               onClick={() => {
                 setUpdate(false);
               }}
@@ -158,8 +155,6 @@ export default function ChatAuth(props: {
               Cancel
             </Button>
             <Button
-              color="teal"
-              radius={0}
               onClick={() => {
                 const key = {
                   assistantId: selectAssistant,
@@ -211,7 +206,6 @@ export default function ChatAuth(props: {
             setModel(value || "gpt-3.5-turbo");
           }}
           mt={20}
-          color="teal"
         />
 
         {selectAssistant &&
@@ -226,10 +220,12 @@ export default function ChatAuth(props: {
             <Text
               p={20}
               mt={20}
-              c="teal"
               size="sm"
-              bg="var(--mantine-color-teal-light)"
-              style={{ borderRadius: "8px" }}
+              bg="var(--mantine-primary-color-light)"
+              style={{
+                borderRadius: "8px",
+                color: "var(--mantine-primary-color-filled)",
+              }}
             >
               API Key configured! You&apos;re all set!
             </Text>
@@ -237,8 +233,6 @@ export default function ChatAuth(props: {
             {!update ? (
               <Group mt={20} justify="flex-end">
                 <Button
-                  color="teal"
-                  radius={0}
                   onClick={() => {
                     setUpdate(true);
                   }}
@@ -247,8 +241,6 @@ export default function ChatAuth(props: {
                 </Button>
                 <Button
                   variant="outline"
-                  color="teal"
-                  radius={0}
                   onClick={() => {
                     if (
                       confirm(

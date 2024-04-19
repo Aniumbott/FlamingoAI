@@ -78,13 +78,7 @@ const LeftPanel = () => {
 
   return (
     <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
-      <Group
-        justify="space-between"
-        align="center"
-        grow
-        gap={10}
-        preventGrowOverflow={false}
-      >
+      <Group justify="space-between" align="center" preventGrowOverflow={false}>
         <OrganizationSwitcher
           hidePersonal
           afterCreateOrganizationUrl="/workspace/:slug"
@@ -114,7 +108,6 @@ const LeftPanel = () => {
         <Group wrap="nowrap" justify="flex-end" gap={1}>
           <Tooltip label="New Chat" fz="xs">
             <Button
-              color="teal"
               radius="0"
               px={12}
               disabled={!workspace?.allowPublic}

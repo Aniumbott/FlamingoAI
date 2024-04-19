@@ -54,9 +54,7 @@ export default function AdvancedSetup(props: {
         <Group mt={20} justify="space-between">
           {areaValue.length == 0 ? (
             <Button
-              radius={0}
               variant="outline"
-              color="teal"
               onClick={() => {
                 setAreaValue(
                   "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown."
@@ -67,8 +65,6 @@ export default function AdvancedSetup(props: {
             </Button>
           ) : null}
           <Button
-            radius={0}
-            color="teal"
             onClick={() => {
               updateWorkspace({ ...workspace, instructions: areaValue });
             }}

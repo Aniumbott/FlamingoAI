@@ -48,12 +48,7 @@ export default function SortMenu(props: {
           <ActionIcon
             size="sm"
             variant="subtle"
-            aria-label="Sort"
-            color="#9CA3AF"
-            style={{
-              "--ai-hover-color": "white",
-              "--ai-hover": "#6bcb99",
-            }}
+            color="grey"
             onClick={(event) => {
               event.stopPropagation();
               // Add any additional logic for the ActionIcon click here
@@ -98,10 +93,18 @@ const MenuButton = (props: {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
-          : { color: "0F172A", variant: "transparent" })}
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
+          : { color: "#000000", variant: "transparent" })}
         {...(props.properties.id === props.sort
-          ? { color: "teal", variant: "filled", fz: "xl" }
+          ? {
+              color: "var(----mantine-primary-color-filled)",
+              variant: "filled",
+              fz: "xl",
+            }
           : null)}
         justify="flex-start"
         styles={{

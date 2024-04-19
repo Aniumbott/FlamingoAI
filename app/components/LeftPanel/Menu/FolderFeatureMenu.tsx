@@ -79,11 +79,9 @@ export default function FolderFeatureMenu(props: {
           <ActionIcon
             size="25px"
             variant="subtle"
-            aria-label=""
-            color="#9CA3AF"
-            // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
-            style={{
-              "--ai-hover-color": "white",
+            color="grey"
+            onClick={(event) => {
+              event.stopPropagation();
             }}
           >
             <IconDots size={15} stroke={1.5} />
@@ -188,8 +186,12 @@ const MenuButton = (props: {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
-          : { color: "0F172A", variant: "transparent" })}
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
+          : { color: "00000000", variant: "transparent" })}
         justify="flex-start"
         styles={{
           root: {

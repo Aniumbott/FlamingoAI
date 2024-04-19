@@ -161,14 +161,12 @@ export default function ForkChatModal(props: {
         </Text>
         <Switch
           label="Include Comemnts"
-          color="teal"
           mt="1.5rem"
           defaultChecked={isCommentsIncluded}
           onChange={(e) => setIsCommentsIncluded(e.currentTarget.checked)}
         />
         <div className="w-full flex flex-row justify-end mt-8">
           <Button
-            color="teal"
             w="5rem"
             mr="md"
             onClick={() => {

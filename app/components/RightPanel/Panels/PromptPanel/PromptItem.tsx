@@ -50,12 +50,21 @@ export default function PromptItem(props: {
           <Group>
             {item.scope === "system" ? (
               hovered ? (
-                <IconPlayerPlay size={20} color="#34D399" />
+                <IconPlayerPlay
+                  size={20}
+                  color="var(--mantine-primary-color-filled)"
+                />
               ) : (
-                <IconBulbFilled size={20} style={{ color: "#34D399" }} />
+                <IconBulbFilled
+                  size={20}
+                  style={{ color: "var(--mantine-primary-color-filled)" }}
+                />
               )
             ) : hovered ? (
-              <IconPlayerPlay size={20} color="#34D399" />
+              <IconPlayerPlay
+                size={20}
+                color="var(--mantine-primary-color-filled)"
+              />
             ) : (
               <IconBulbFilled size={20} />
             )}
