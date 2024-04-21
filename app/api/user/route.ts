@@ -1,34 +1,57 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import User from "@/app/models/User";
 import { dbConnect } from "@/app/lib/db";
-import User from "../../models/User";
-import { NextResponse } from "next/server";
+import { WebhookEvent } from "@clerk/nextjs/server";
+import { headers } from "next/headers";
+import { Webhook } from "svix";
 
-// POST request handler
-export async function POST(req: any, res: NextApiResponse) {
-  try {
-    const body = await req.json();
-    await dbConnect();
-    const post = await User.create({
-      name: body.name,
-      email: body.email,
-      clerk_user_id: body.clerk_user_id,
-      photo_url: body.photo_url,
-    });
-    return NextResponse.json({ post }, { status: 200 });
-  } catch (error) {
-    console.log("error at POST in User route", error);
-    return NextResponse.error();
+const webhookSecret = process.env.CLERK_USER_WEBHOOK_SECRET || ``;
+
+export async function POST(request: Request) {
+  const payload = await validateRequest(request);
+  await dbConnect();
+  let user;
+  switch (payload.type) {
+    case "user.created":
+      user = await User.create(getUserDataFromEvent(payload));
+      // console.log(`Successfully created user with _id: ${user._id}`);
+      break;
+    case "user.updated":
+      user = await User.findByIdAndUpdate(
+        payload.data.id,
+        getUserDataFromEvent(payload),
+        {
+          new: true,
+        }
+      );
+      // console.log(`Successfully updated user with _id: ${user?._id}`);
+      break;
+    case "user.deleted":
+      user = await User.findByIdAndDelete(payload.data.id);
+      // console.log(`Successfully deleted user with _id: ${payload.data.id}`);
+      break;
   }
+  return Response.json({ message: "Received" });
 }
 
-// GET request handler
-export async function GET(req: any, res: NextApiResponse) {
-  try {
-    await dbConnect();
-    const Users = await User.find();
-    return NextResponse.json(Users, { status: 200 });
-  } catch (error) {
-    console.log("error in GET in User route", error);
-    return NextResponse.json("Internal Server Error", { status: 500 });
-  }
+// Essential Functions
+async function validateRequest(request: Request) {
+  const payloadString = await request.text();
+  const headerPayload = headers();
+
+  const svixHeaders = {
+    "svix-id": headerPayload.get("svix-id")!,
+    "svix-timestamp": headerPayload.get("svix-timestamp")!,
+    "svix-signature": headerPayload.get("svix-signature")!,
+  };
+  const wh = new Webhook(webhookSecret);
+  return wh.verify(payloadString, svixHeaders) as WebhookEvent;
+}
+
+function getUserDataFromEvent(evt: any) {
+  return {
+    _id: evt.data.id,
+    name: evt.data.first_name + " " + evt.data.last_name,
+    email: evt.data.email_addresses[0].email_address,
+    imageUrl: evt.data.profile_image_url,
+  };
 }

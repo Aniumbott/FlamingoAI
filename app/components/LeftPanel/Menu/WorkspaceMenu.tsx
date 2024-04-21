@@ -20,6 +20,7 @@ import {
 // Components
 import Workspace from "../Modals/WorkspaceSettings/WorkspaceSettings";
 import { usePathname, useRouter } from "next/navigation";
+import { Protect } from "@clerk/nextjs";
 
 type MenuButtonProps = {
   properties: {
@@ -66,9 +67,11 @@ const WorkspaceMenu = (props: { workspace: any }) => {
           </Menu.Target>
         </Tooltip>
         <Menu.Dropdown>
-          <Menu.Item onClick={() => setOpenWorkspaceModal(true)}>
-            <MenuButton properties={WorkspaceMenuData[0]} />
-          </Menu.Item>
+          <Protect role="org:admin">
+            <Menu.Item onClick={() => setOpenWorkspaceModal(true)}>
+              <MenuButton properties={WorkspaceMenuData[0]} />
+            </Menu.Item>
+          </Protect>
           <Menu.Item
             onClick={() => {
               router.replace(

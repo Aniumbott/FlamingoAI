@@ -37,38 +37,47 @@ async function getCustomer() {
   }
 }
 
-async function createSubscription() {
-  try {
-    console.log('creating')
-    const data = await fetch("/api/payment/subscription", {
-      method: "POST",
-      body: JSON.stringify({
-        customerId: "cus_PwKirdR28may7r",
-        priceId: "price_1P6RMSSEu7527fI69AjpXVxM",
-      }),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+// async function createSubscription() {
+//   try {
+//     console.log("creating subscription");
+//     const data = await fetch("/api/payment/subscription", {
+//       method: "POST",
+//       body: JSON.stringify({
+//         customerId: "cus_PwKirdR28may7r",
+//         priceId: "",
+//       }),
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     });
 
-    const res = await data.json();
-    console.log("subscription", res);
-    return res;
-  } catch (error) {
-    console.log(error);
-    return error;
-  }
-}
+//     const res = await data.json();
+//     console.log("subscription", res);
+//     return res;
+//   } catch (error) {
+//     console.log(error);
+//     return error;
+//   }
+// }
 
-async function createCheckoutSession(){
+async function createCheckoutSession(
+  priceId: string,
+  quantity: string,
+  customerId: string
+) {
   try {
-    console.log('creating checkout session')
+    console.log(
+      "creating checkout session for ",
+      customerId,
+      priceId,
+      quantity
+    );
     const data = await fetch("/api/payment/checkout", {
       method: "POST",
       body: JSON.stringify({
-        customerId: "cus_PwKirdR28may7r",
-        priceId: "price_1P6RMSSEu7527fI69AjpXVxM",
-        quantity: 10
+        customerId: customerId,
+        priceId: priceId,
+        quantity: parseInt(quantity),
       }),
       headers: {
         "Content-Type": "application/json",
@@ -82,9 +91,7 @@ async function createCheckoutSession(){
     console.log(error);
     return error;
   }
-
 }
-
 
 async function getSubscriptions() {
   try {
@@ -103,4 +110,32 @@ async function getSubscriptions() {
   }
 }
 
-export { createCustomer, getCustomer, createSubscription, getSubscriptions, createCheckoutSession };
+async function createPortalSession() {
+  try {
+    const data = await fetch("/api/payment/customerPortal", {
+      method: "POST",
+      body: JSON.stringify({
+        customerId: "cus_PwKirdR28may7r",
+      }),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    const res = await data.json();
+    console.log("portal session", res);
+    return res;
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+}
+
+export {
+  createCustomer,
+  getCustomer,
+  // createSubscription,
+  getSubscriptions,
+  createCheckoutSession,
+  createPortalSession,
+};

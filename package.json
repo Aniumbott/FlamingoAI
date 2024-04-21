@@ -43,6 +43,7 @@
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
     "stripe": "^15.2.0",
+    "svix": "^1.21.0",
     "validator": "^13.11.0"
   },
   "devDependencies": {

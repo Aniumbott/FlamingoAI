@@ -41,6 +41,7 @@ export default function RootLayout({
         </head>
         <body className={inter.className}>
           <MantineProvider
+            defaultColorScheme="dark"
             theme={{
               primaryColor: "teal",
             }}

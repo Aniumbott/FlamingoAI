@@ -42,7 +42,7 @@ import SortMenu from "../Menu/SortMenu";
 import style from "../LeftPanel.module.css";
 import { useAuth } from "@clerk/nextjs";
 import { socket } from "@/socket";
-import { createSubscription, getCustomer, getSubscriptions } from "@/app/controllers/payment";
+import { getCustomer, getSubscriptions } from "@/app/controllers/payment";
 
 const GeneralChats = (props: {
   members: any[];

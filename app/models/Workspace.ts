@@ -14,10 +14,9 @@ const workspaceSchema = new Mongoose.Schema(
     imageUrl: { type: String, required: false },
     allowPersonal: { type: Boolean, required: true },
     allowPublic: { type: Boolean, required: true },
-    apiKey: { type: String, required: false },
     assistants: [
       {
-        apiKey: { type: String, required: true },
+        apiKey: { type: String },
         assistantId: {
           type: Mongoose.Types.ObjectId,
           ref: "assistants",
@@ -32,7 +31,32 @@ const workspaceSchema = new Mongoose.Schema(
       },
     ],
     instructions: { type: String, required: false },
-    createdBy: { type: Mongoose.Types.ObjectId, ref: "users", required: true },
+    createdBy: { type: String, ref: "users", required: true },
+    customerId: { type: String, required: false },
+    subscription:
+      {
+        id: { type: String, required: false },
+        customer_id: { type: String, required: false },
+        product_id: { type: String, required: false },
+        status: {
+          type: String,
+          enum: [
+            "trialing",
+            "active",
+            "incomplete",
+            "incomplete_expired",
+            "past_due",
+            "canceled",
+            "unpaid",
+            "paused",
+          ],
+          required: false,
+        },
+        product_name: { type: String, required: false },
+        current_period_start: { type: Number, required: false },
+        current_period_ends: { type: Number, required: false },
+        quantity: { type: Number, required: false },
+      } || null,
   },
   {
     timestamps: true,
@@ -46,7 +70,6 @@ interface IWorkspace {
   imageUrl: string;
   allowPersonal: boolean;
   allowPublic: boolean;
-  apiKey: string;
   assistants: {
     apiKey: string;
     assistantId: Mongoose.Types.ObjectId;
@@ -54,7 +77,18 @@ interface IWorkspace {
     scope: string;
   }[];
   instructions: string;
-  createdBy: Mongoose.Types.ObjectId;
+  createdBy: string;
+  customerId: string;
+  subscription: {
+    id: string;
+    customer_id: string;
+    product_id: string;
+    status: string;
+    product_name: string;
+    current_period_start: number;
+    current_period_ends: number;
+    quantity: number;
+  } | null;
 }
 
 interface IWorkspaceDocument extends IWorkspace, Mongoose.Document {
@@ -66,3 +100,4 @@ const Workspace: IWorkspaceModel =
   Mongoose.models.workspaces ||
   Mongoose.model<IWorkspaceDocument>("workspaces", workspaceSchema);
 export default Workspace;
+export type { IWorkspaceDocument };

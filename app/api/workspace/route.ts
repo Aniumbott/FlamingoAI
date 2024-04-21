@@ -3,6 +3,13 @@ import type { NextApiResponse } from "next";
 import { dbConnect } from "@/app/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import Workspace from "@/app/models/Workspace";
+import { WebhookEvent } from "@clerk/nextjs/server";
+import { headers } from "next/headers";
+import { Webhook } from "svix";
+import { stripe } from "@/app/lib/stripe";
+import User from "@/app/models/User";
+
+const webhookSecret = process.env.CLERK_WORKSPACE_WEBHOOK_SECRET || ``;
 
 // GET request handler
 export async function GET(req: NextRequest, res: NextApiResponse) {
@@ -33,4 +40,100 @@ export async function PUT(req: any, res: NextApiResponse) {
     console.log("error at PUT in Workspace route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
+}
+
+// All POST requests are handled by the CLERK webhook
+export async function POST(request: Request) {
+  const payload = await validateRequest(request);
+  await dbConnect();
+  let workspace;
+  let customer;
+  let user;
+  switch (payload.type) {
+    case "organization.created":
+      workspace = await Workspace.create(getWorkspaceDataFromEvent(payload));
+      user = await User.findById(workspace.createdBy);
+      customer = await stripe.customers.create({
+        name: workspace.name,
+        email: user?.email,
+        metadata: {
+          workspaceId: workspace._id,
+          workspaceSlug: workspace.slug,
+        },
+      });
+      await Workspace.findByIdAndUpdate(workspace._id, {
+        customerId: customer.id,
+      });
+      console.log(`Successfully created workspace with _id: ${workspace._id}`);
+      break;
+    case "organization.updated":
+      workspace = await Workspace.findByIdAndUpdate(
+        payload.data.id,
+        getWorkspaceDataFromEvent(payload),
+        {
+          new: true,
+        }
+      );
+      customer = stripe.customers.update(workspace?.customerId || "", {
+        name: workspace?.name,
+        metadata: {
+          workspaceSlug: String(workspace?.slug),
+        },
+      });
+      console.log(`Successfully updated workspace with _id: ${workspace?._id}`);
+      break;
+    case "organization.deleted":
+      workspace = await Workspace.findByIdAndDelete(payload.data.id);
+      customer = await stripe.customers.del(workspace?.customerId || "");
+      console.log(
+        `Successfully deleted workspace with _id: ${payload.data.id}`
+      );
+      break;
+  }
+
+  // console.log(customer);
+
+  return Response.json({ message: "Received" });
+}
+
+// Essential Functions
+async function validateRequest(request: Request) {
+  const payloadString = await request.text();
+  const headerPayload = headers();
+
+  const svixHeaders = {
+    "svix-id": headerPayload.get("svix-id")!,
+    "svix-timestamp": headerPayload.get("svix-timestamp")!,
+    "svix-signature": headerPayload.get("svix-signature")!,
+  };
+  const wh = new Webhook(webhookSecret);
+  return wh.verify(payloadString, svixHeaders) as WebhookEvent;
+}
+
+function getWorkspaceDataFromEvent(evt: any) {
+  return {
+    _id: evt.data.id,
+    name: evt.data.name,
+    slug: evt.data.slug,
+    imageUrl: evt.data.image_url,
+    createdBy: evt.data.created_by,
+    allowPersonal: true,
+    allowPublic: true,
+    instructions:
+      "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.",
+    assistants: [
+      {
+        apiKey: "",
+        assistantId: "661a34b0bf589f58ba211c94",
+        model: "gpt-3.5-turbo",
+        scope: "public",
+      },
+      {
+        apiKey: "",
+        assistantId: "661a34b0bf589f58ba211c94",
+        model: "gpt-3.5-turbo",
+        scope: "private",
+      },
+    ],
+  };
 }

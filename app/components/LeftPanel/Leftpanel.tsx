@@ -88,9 +88,7 @@ const LeftPanel = () => {
           }}
         />
 
-        <Protect role="org:admin">
-          <WorkspaceMenu workspace={workspace} />
-        </Protect>
+        <WorkspaceMenu workspace={workspace} />
       </Group>
 
       <Group

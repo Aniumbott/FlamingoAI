@@ -28,6 +28,12 @@ const PromptSchema = new Mongoose.Schema(
       ref: "workspaces",
       required: true,
     },
+    variables: [
+      {
+        type: String,
+        required: false,
+      },
+    ],
   },
   {
     timestamps: true,
@@ -42,6 +48,7 @@ interface IPrompt {
   workspaceId: string;
   scope: string;
   parentFolder: Mongoose.Types.ObjectId | null;
+  variables: string[];
 }
 
 interface IPromptDocument extends IPrompt, Document {}
