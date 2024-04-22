@@ -82,6 +82,7 @@ const createPrompt = async (
     });
 
     const response = await data.json();
+    console.log("created prompt",response)
     if (scope === "public")
       socket.emit("updatePrompt", workspaceId, response.prompt);
     else socket.emit("updatePersonalPrompt", response.prompt);

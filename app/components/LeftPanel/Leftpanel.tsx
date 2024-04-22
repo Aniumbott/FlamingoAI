@@ -7,8 +7,13 @@ import {
   Divider,
   useMantineColorScheme,
   Tooltip,
+  Card,
+  Alert,
+  Text,
+  Box,
+  List,
 } from "@mantine/core";
-import { IconPlus } from "@tabler/icons-react";
+import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
 import {
   OrganizationSwitcher,
   Protect,
@@ -29,11 +34,14 @@ import FavouriteChats from "./ChatFilters/FavouriteChats";
 import ArchivedChats from "./ChatFilters/ArchivedChats";
 import { getWorkspace } from "@/app/controllers/workspace";
 import GeneralChats from "./ChatFilters/GeneralChats";
+import { usePathname, useRouter } from "next/navigation";
 
 const LeftPanel = () => {
   const { colorScheme } = useMantineColorScheme();
   const [filterMenu, setFilterMenu] = useState(0);
   const [members, setMembers] = useState<any>([]);
+  const router = useRouter();
+  const pathname = usePathname();
   const [workspace, setWorkspace] = useState<any>(null);
   const { organization } = useOrganization();
   const { userId, orgId } = useAuth();
@@ -76,17 +84,21 @@ const LeftPanel = () => {
   }, [workspace]);
 
   return (
-    <Stack h={"100%"} justify="flex-start" align="strech" mt={10}>
-      <Group justify="space-between" align="center" preventGrowOverflow={false}>
-        <OrganizationSwitcher
-          hidePersonal
-          afterCreateOrganizationUrl="/workspace/:slug"
-          afterSelectPersonalUrl="/user/:id"
-          afterSelectOrganizationUrl="/workspace/:slug"
-          appearance={{
-            baseTheme: colorScheme === "dark" ? dark : undefined,
-          }}
-        />
+    <Stack h={"100%"} justify="flex-start" align="strech" mt={10} w="100%">
+      <Group
+        justify="space-between"
+        align="center"
+        preventGrowOverflow={false}
+        gap={10}
+      >
+        <div className="grow">
+          <OrganizationSwitcher
+            hidePersonal
+            afterCreateOrganizationUrl="/workspace/:slug"
+            afterSelectPersonalUrl="/user/:id"
+            afterSelectOrganizationUrl="/workspace/:slug"
+          />
+        </div>
 
         <WorkspaceMenu workspace={workspace} />
       </Group>
@@ -174,6 +186,46 @@ const LeftPanel = () => {
       })()}
 
       <Divider orientation="horizontal" />
+      {workspace?.subscription == null ||
+      workspace?.subscription.status != "active" ? (
+        <Card
+          style={{
+            background: "var(--mantine-primary-color-light)",
+            border: "1px solid var(--mantine-primary-color-filled)",
+          }}
+        >
+          <Group justify="space-between">
+            <Group gap={"xs"}>
+              <IconInfoCircle size="20px" />
+              <Text size="md" fw={700}>
+                Upgrade
+              </Text>
+            </Group>
+            <Button
+              size="xs"
+              radius="sm"
+              variant="outline"
+              fullWidth={false}
+              onClick={() => {
+                router.push(
+                  pathname.split("/").slice(0, 3).join("/") + "/upgrade"
+                );
+              }}
+            >
+              Explore plans
+            </Button>
+          </Group>
+          <Text mt="sm" size="sm">
+            Get access to more features by subscribing one of our plans.
+          </Text>
+          {/* <List size="sm">
+            <List.Item>Invite more than 2 members.</List.Item>
+            <List.Item>
+              Access to more than one assistant services and many more...
+            </List.Item>
+          </List> */}
+        </Card>
+      ) : null}
     </Stack>
   );
 };

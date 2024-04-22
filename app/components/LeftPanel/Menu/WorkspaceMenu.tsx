@@ -14,6 +14,7 @@ import {
   IconBrandOpenai,
   IconBuilding,
   IconFileImport,
+  IconRocket,
   IconSettings,
 } from "@tabler/icons-react";
 
@@ -74,12 +75,21 @@ const WorkspaceMenu = (props: { workspace: any }) => {
           </Protect>
           <Menu.Item
             onClick={() => {
+              router.push(
+                pathname.split("/").slice(0, 3).join("/") + "/upgrade"
+              );
+            }}
+          >
+            <MenuButton properties={WorkspaceMenuData[1]} />
+          </Menu.Item>
+          <Menu.Item
+            onClick={() => {
               router.replace(
                 pathname.split("/").slice(0, 3).join("/") + "/import"
               );
             }}
           >
-            <MenuButton properties={WorkspaceMenuData[1]} />
+            <MenuButton properties={WorkspaceMenuData[2]} />
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>
@@ -134,6 +144,10 @@ const WorkspaceMenuData: any = [
   {
     title: "Workspace Settings",
     icon: <IconBuilding style={{ width: rem(14), height: rem(14) }} />,
+  },
+  {
+    title: "Upgrade",
+    icon: <IconRocket style={{ width: rem(14), height: rem(14) }} />,
   },
   {
     title: "Import from ChatGPT",

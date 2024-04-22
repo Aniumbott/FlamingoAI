@@ -175,7 +175,7 @@ export default function RightPanel(props: {
             </Tooltip>
           )}
           {rightOpened ? (
-            <Tooltip label="Colapse panel" position="left" fz="xs">
+            <Tooltip label="Collapse panel" position="left" fz="xs">
               <ActionIcon
                 style={buttonStyle(999)}
                 variant="subtle"

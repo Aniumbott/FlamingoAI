@@ -4,6 +4,9 @@ import { useEffect, useState } from "react";
 import ChatAuth from "./ChatAuth";
 import WorkspaceSetup from "./WorkspaceSetup";
 import AdvancedSetup from "./AdvancedSetup";
+import { createPortalSession } from "@/app/controllers/payment";
+import { useRouter } from "next/navigation";
+import { IconExternalLink } from "@tabler/icons-react";
 
 export default function WorkspaceSettings(props: {
   opened: boolean;
@@ -19,6 +22,7 @@ export default function WorkspaceSettings(props: {
   ];
 
   const [activeTab, setActiveTab] = useState("chatAuth");
+  const router = useRouter();
 
   return (
     <Modal
@@ -44,15 +48,28 @@ export default function WorkspaceSettings(props: {
               mt={10}
               key={tab.value}
               justify="start"
-              variant={activeTab === tab.value ? "filled" : "subtle"}
+              variant={activeTab === tab.value ? "outline" : "subtle"}
               onClick={() => {
                 setActiveTab(tab.value);
               }}
-              color="grey"
+              color={activeTab === tab.value ? "" : "grey"}
             >
               {tab.label}
             </Button>
           ))}
+          <Button
+            mt={10}
+            justify="start"
+            variant="subtle"
+            color="grey"
+            onClick={async () => {
+              const res = await createPortalSession(workspace.customerId);
+              window.open(res.portalSession.url, "_blank");
+            }}
+            rightSection={<IconExternalLink size="20px" />}
+          >
+            Billing
+          </Button>
         </div>
 
         {/* Right Container */}

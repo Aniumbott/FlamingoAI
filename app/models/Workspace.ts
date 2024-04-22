@@ -12,51 +12,73 @@ const workspaceSchema = new Mongoose.Schema(
     name: { type: String, required: true },
     slug: { type: String, required: true },
     imageUrl: { type: String, required: false },
-    allowPersonal: { type: Boolean, required: true },
-    allowPublic: { type: Boolean, required: true },
-    assistants: [
-      {
-        apiKey: { type: String },
-        assistantId: {
-          type: Mongoose.Types.ObjectId,
-          ref: "assistants",
-          required: true,
+    allowPersonal: { type: Boolean, default: true },
+    allowPublic: { type: Boolean, default: true },
+    assistants: {
+      type: [
+        {
+          apiKey: { type: String },
+          assistantId: {
+            type: Mongoose.Types.ObjectId,
+            ref: "assistants",
+            required: true,
+          },
+          model: { type: String, required: true },
+          scope: {
+            type: String,
+            enum: ["private", "public"],
+            required: true,
+          },
         },
-        model: { type: String, required: true },
-        scope: {
-          type: String,
-          enum: ["private", "public"],
-          required: true,
+      ],
+      default: [
+        {
+          apiKey: "",
+          assistantId: "661a34b0bf589f58ba211c94",
+          model: "gpt-3.5-turbo",
+          scope: "public",
         },
-      },
-    ],
-    instructions: { type: String, required: false },
+        {
+          apiKey: "",
+          assistantId: "661a34b0bf589f58ba211c94",
+          model: "gpt-3.5-turbo",
+          scope: "private",
+        },
+      ],
+    },
+
+    instructions: {
+      type: String,
+      default:
+        "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.",
+    },
     createdBy: { type: String, ref: "users", required: true },
-    customerId: { type: String, required: false },
-    subscription:
-      {
-        id: { type: String, required: false },
-        customer_id: { type: String, required: false },
-        product_id: { type: String, required: false },
-        status: {
-          type: String,
-          enum: [
-            "trialing",
-            "active",
-            "incomplete",
-            "incomplete_expired",
-            "past_due",
-            "canceled",
-            "unpaid",
-            "paused",
-          ],
-          required: false,
-        },
-        product_name: { type: String, required: false },
-        current_period_start: { type: Number, required: false },
-        current_period_ends: { type: Number, required: false },
-        quantity: { type: Number, required: false },
-      } || null,
+    customerId: { type: String, default: null },
+    subscription: {
+      type:
+        {
+          id: { type: String, required: false },
+          product_id: { type: String, required: false },
+          status: {
+            type: String,
+            enum: [
+              "trialing",
+              "active",
+              "incomplete",
+              "incomplete_expired",
+              "past_due",
+              "canceled",
+              "unpaid",
+              "paused",
+            ],
+            required: false,
+          },
+          current_period_start: { type: Number, required: false },
+          current_period_ends: { type: Number, required: false },
+          quantity: { type: Number, required: false },
+        } || null,
+      default: null,
+    },
   },
   {
     timestamps: true,
@@ -81,10 +103,8 @@ interface IWorkspace {
   customerId: string;
   subscription: {
     id: string;
-    customer_id: string;
     product_id: string;
     status: string;
-    product_name: string;
     current_period_start: number;
     current_period_ends: number;
     quantity: number;

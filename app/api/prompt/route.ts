@@ -55,14 +55,17 @@ export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const body = await req.json();
     await dbConnect();
+    const {variables , updatedText} = fetchVariables(body.content);
+    
     const prompt = await Prompt.create({
       name: body.name,
-      content: body.content,
+      content: updatedText,
       description: body.description,
       createdBy: body.createdBy,
       scope: body.scope,
       parentFolder: body.parentFolder,
       workspaceId: body.workspaceId,
+      variables,
     });
 
     // If parentFolder was provided, add the new chat ID to the parent folder's chats array
@@ -154,4 +157,36 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
     console.log("error at DELETE in Prompt route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
+}
+
+// function fetchVariables(text: string) {
+//   const variableRegex = /{{(.*?)}}/g;
+//   const variables = [];
+//   let match;
+
+//   while ((match = variableRegex.exec(text)) !== null) {
+//     variables.push(match[1]);
+//   }
+
+//   return variables;
+// }
+
+// function fetchVariables(text: string) {
+//   const variables = Array.from(text.matchAll(/\{\{(.*?)\}\}/g)).map((match) =>
+//     match[1].trim()
+//   );
+//   return variables;
+// }
+
+function fetchVariables(text: string) {
+    const variableRegex = /\{\{(.*?)\}\}/g;
+    let updatedText = text;
+
+    const variables = Array.from(text.matchAll(variableRegex)).map(match => {
+        const variable = match[1].trim();
+        updatedText = updatedText.replace(match[0], `{{${variable}}}`);
+        return variable;
+    });
+
+    return { variables, updatedText };
 }

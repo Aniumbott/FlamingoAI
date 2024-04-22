@@ -72,3 +72,7 @@ a {
   color: white;
   background: var(--mantine-primary-color-filled);
 }
+
+.cl-organizationSwitcher-root {
+  width: 100%;
+}

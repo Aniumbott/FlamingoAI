@@ -42,7 +42,6 @@ import SortMenu from "../Menu/SortMenu";
 import style from "../LeftPanel.module.css";
 import { useAuth } from "@clerk/nextjs";
 import { socket } from "@/socket";
-import { getCustomer, getSubscriptions } from "@/app/controllers/payment";
 
 const GeneralChats = (props: {
   members: any[];
@@ -51,6 +50,8 @@ const GeneralChats = (props: {
 }) => {
   const { members, allowPersonal, allowPublic } = props;
   const { userId, orgId } = useAuth();
+
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [publicChats, setPublicChats] = useState<IChatDocument[]>([]);
   const [privateChats, setPrivateChats] = useState<IChatDocument[]>([]);
   const [publicFolders, setPublicFolders] = useState<IChatFolderDocument[]>([]);
@@ -67,13 +68,6 @@ const GeneralChats = (props: {
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
-
-  useEffect(() => {
-    console.log("creating customer");
-    // createCustomer();
-    getCustomer();
-    getSubscriptions();
-  }, []);
 
   useEffect(() => {
     const fetchChats = async () => {
@@ -115,7 +109,11 @@ const GeneralChats = (props: {
     };
 
     const fetchChatsAndFolders = () => {
-      fetchChats().then(() => fetchFolders());
+      console.log("fetching chats and folders");
+      setIsLoading(true);
+      fetchChats()
+        .then(() => fetchFolders())
+        .then(() => setIsLoading(false));
     };
 
     fetchChatsAndFolders();
@@ -131,7 +129,7 @@ const GeneralChats = (props: {
       console.log("turning off socket at generatChats");
       socket.off("refreshChats");
     };
-  }, []);
+  }, [orgId]);
 
   const allFilteredChats = allPopulatedChats?.filter(
     (chat) =>
@@ -218,6 +216,7 @@ const GeneralChats = (props: {
         className={style.parent}
         classNames={{ chevron: style.chevron }}
         chevron={<IconCaretRightFilled className={style.icon} />}
+        defaultValue={"SHARED"}
       >
         <Accordion.Item value={"SHARED"} key={"SHARED"}>
           <Accordion.Control>
@@ -235,7 +234,9 @@ const GeneralChats = (props: {
           </Accordion.Control>
           <AccordionPanel>
             <ScrollArea.Autosize mah="50vh" scrollbarSize={10} offsetScrollbars>
-              {publicFolders.length > 0 || publicChats.length > 0 ? (
+              {isLoading ? (
+                <Loader type="dots" w={"100%"} />
+              ) : publicFolders.length > 0 || publicChats.length > 0 ? (
                 <>
                   {publicFolders?.map((folder, key) => (
                     <Accordion
@@ -266,7 +267,9 @@ const GeneralChats = (props: {
                   ))}
                 </>
               ) : (
-                <Loader type="dots" w={"100%"} />
+                <Text style={{ textAlign: "center" }} c="dimmed" size="xs">
+                  No shared chats or folders
+                </Text>
               )}
             </ScrollArea.Autosize>
           </AccordionPanel>
@@ -292,7 +295,9 @@ const GeneralChats = (props: {
                 scrollbarSize={10}
                 offsetScrollbars
               >
-                {privateFolders.length > 0 || privateChats.length > 0 ? (
+                {isLoading ? (
+                  <Loader type="dots" w={"100%"} />
+                ) : privateFolders.length > 0 || privateChats.length > 0 ? (
                   <>
                     {privateFolders?.map((folder, key) => (
                       <Accordion
@@ -325,7 +330,9 @@ const GeneralChats = (props: {
                     ))}
                   </>
                 ) : (
-                  <Loader type="dots" w={"100%"} />
+                  <Text style={{ textAlign: "center" }} c="dimmed" size="xs">
+                    No personal chats or folders
+                  </Text>
                 )}
               </ScrollArea.Autosize>
             </AccordionPanel>

@@ -14,6 +14,7 @@ import {
 import CheckoutForm from "./components/CheckoutForm";
 import {
   ActionIcon,
+  Loader,
   Badge,
   Box,
   Button,
@@ -31,7 +32,10 @@ import {
   BackgroundImage,
   CloseButton,
 } from "@mantine/core";
-import { createCheckoutSession } from "../../../controllers/payment";
+import {
+  createCheckoutSession,
+  createPortalSession,
+} from "../../../controllers/payment";
 import {
   IconCheck,
   IconChevronDown,
@@ -63,7 +67,7 @@ declare global {
   }
 }
 
-export default function App() {
+export default function Upgrade() {
   const [clientSecret, setClientSecret] = useState(null);
   const [opened, setOpened] = useState(false);
 
@@ -77,15 +81,29 @@ export default function App() {
     const collectWorkspace = async () => {
       const res = await getWorkspace(organization?.id || "");
       setWorkspace(res.workspace);
+      console.log("workspace", res.workspace);
     };
     collectWorkspace();
   }, [organization?.id]);
 
+  // useEffect(() => {
+  //   createCheckoutSession(
+  //     process.env.NEXT_PUBLIC_MAX_PRICE || "",
+  //     String(maxQuantity),
+  //     workspace?.customerId || ""
+  //   ).then((res) => setClientSecret(res.session.client_secret));
+  // }, []);
+
+  // useEffect(() => {
+  //   if (workspace?.customerId) {
+  //     console.log("customer id", workspace.customerId);
+  //   }
+  // }, [workspace?.customerId]);
+
   useEffect(() => {
-    if (workspace?.customerId) {
-      console.log("customer id", workspace.customerId);
-    }
-  }, [workspace?.customerId]);
+    console.log(process.env.NEXT_PUBLIC_PRO_PLAN);
+    console.log(process.env.NEXT_PUBLIC_PRO_PRICE);
+  });
 
   return (
     <div className="w-full flex flex-col gap-10 p-10">
@@ -96,7 +114,14 @@ export default function App() {
             {organization?.name || "Workspace"}
           </span>
         </Title>
-        <Button variant="default">Back to Dashboard</Button>
+        <Button
+          variant="default"
+          onClick={() => {
+            window.history.back();
+          }}
+        >
+          Back to Workspace
+        </Button>
       </Group>
 
       <Modal
@@ -128,7 +153,7 @@ export default function App() {
           </div>
         ) : (
           <div className="h-[50vh] flex justify-center items-center">
-            loading again .....{" "}
+            <Loader type="dots" w={"100%"} />
           </div>
         )}
       </Modal>
@@ -142,11 +167,26 @@ export default function App() {
           shadow="lg"
           withBorder
           style={{
-            outline: !workspace?.subscription
+            border: !workspace?.subscription
               ? "1px solid var(--mantine-primary-color-filled)"
-              : "none",
+              : "",
           }}
         >
+          {!workspace?.subscription ? (
+            <Badge
+              color="teal"
+              variant="light"
+              size="lg"
+              style={{
+                position: "absolute",
+                top: "0.5rem",
+                right: "0.5rem",
+              }}
+            >
+              active
+            </Badge>
+          ) : null}
+
           <Stack gap={10} align="center" justify="center">
             <Title order={3}>Free</Title>
             <div className="w-full">
@@ -214,12 +254,29 @@ export default function App() {
           shadow="lg"
           withBorder
           style={{
-            outline:
-              workspace?.subscription?.product_name.toLocaleLowerCase() == "pro"
+            border:
+              workspace?.subscription?.product_id ==
+              process.env.NEXT_PUBLIC_PRO_PLAN
                 ? "1px solid var(--mantine-primary-color-filled)"
-                : "none",
+                : "",
           }}
         >
+          {workspace?.subscription?.product_id ==
+          process.env.NEXT_PUBLIC_PRO_PLAN ? (
+            <Badge
+              color="teal"
+              variant="light"
+              size="lg"
+              style={{
+                position: "absolute",
+                top: "0.5rem",
+                right: "0.5rem",
+              }}
+            >
+              active
+            </Badge>
+          ) : null}
+
           <div className="h-full flex flex-col justify-between">
             <Stack gap={10} align="center" justify="center">
               <Title order={3}>Pro</Title>
@@ -269,9 +326,19 @@ export default function App() {
                 </HoverCard>
               </Group>
             </Stack>
-            {workspace?.subscription?.product_name.toLocaleLowerCase() ==
-            "pro" ? (
-              <Button fullWidth mt="xs" variant="outline">
+            {workspace?.subscription?.product_id ==
+            process.env.NEXT_PUBLIC_PRO_PLAN ? (
+              <Button
+                fullWidth
+                mt="xs"
+                variant="outline"
+                onClick={async () => {
+                  const res = await createPortalSession(
+                    workspace?.customerId || ""
+                  );
+                  window.open(res.portalSession.url, "_blank");
+                }}
+              >
                 Manage
               </Button>
             ) : (
@@ -286,13 +353,24 @@ export default function App() {
                 <Button
                   fullWidth
                   mt="xs"
-                  onClick={() => {
-                    setOpened(true);
-                    createCheckoutSession(
-                      "price_1P6RMSSEu7527fI69AjpXVxM",
-                      String(proQuantity),
-                      workspace?.customerId || ""
-                    ).then((res) => setClientSecret(res.session.client_secret));
+                  variant="filled"
+                  onClick={async () => {
+                    if (workspace?.subscription) {
+                      const res = await createPortalSession(
+                        workspace.customerId
+                      );
+                      window.open(res.portalSession.url, "_blank");
+                    } else {
+                      setOpened(true);
+                      createCheckoutSession(
+                        process.env.NEXT_PUBLIC_PRO_PRICE || "",
+                        String(proQuantity),
+                        workspace?.customerId || "",
+                        workspace?.slug || ""
+                      ).then((res) =>
+                        setClientSecret(res.session.client_secret)
+                      );
+                    }
                   }}
                 >
                   Upgrade
@@ -310,12 +388,28 @@ export default function App() {
           shadow="lg"
           withBorder
           style={{
-            outline:
-              workspace?.subscription?.product_name.toLocaleLowerCase() == "max"
+            border:
+              workspace?.subscription?.product_id ==
+              process.env.NEXT_PUBLIC_MAX_PLAN
                 ? "1px solid var(--mantine-primary-color-filled)"
-                : "none",
+                : "",
           }}
         >
+          {workspace?.subscription?.product_id ==
+          process.env.NEXT_PUBLIC_MAX_PLAN ? (
+            <Badge
+              color="teal"
+              variant="light"
+              size="lg"
+              style={{
+                position: "absolute",
+                top: "0.5rem",
+                right: "0.5rem",
+              }}
+            >
+              active
+            </Badge>
+          ) : null}
           <div className="h-full flex flex-col justify-between">
             <Stack gap={10} align="center" justify="center">
               <Title order={3}>Max</Title>
@@ -375,9 +469,19 @@ export default function App() {
                 </HoverCard>
               </Group>
             </Stack>
-            {workspace?.subscription?.product_name.toLocaleLowerCase() ==
-            "max" ? (
-              <Button fullWidth mt="xs" variant="outline">
+            {workspace?.subscription?.product_id ==
+            process.env.NEXT_PUBLIC_MAX_PLAN ? (
+              <Button
+                fullWidth
+                mt="xs"
+                variant="outline"
+                onClick={async () => {
+                  const res = await createPortalSession(
+                    workspace?.customerId || ""
+                  );
+                  window.open(res.portalSession.url, "_blank");
+                }}
+              >
                 Manage
               </Button>
             ) : (
@@ -392,13 +496,24 @@ export default function App() {
                 <Button
                   fullWidth
                   mt="xs"
-                  onClick={() => {
-                    setOpened(true);
-                    createCheckoutSession(
-                      "price_1P7ukaSEu7527fI6NHzykqSY",
-                      String(maxQuantity),
-                      workspace?.customerId || ""
-                    ).then((res) => setClientSecret(res.session.client_secret));
+                  variant="filled"
+                  onClick={async () => {
+                    if (workspace?.subscription) {
+                      const res = await createPortalSession(
+                        workspace.customerId
+                      );
+                      window.open(res.portalSession.url, "_blank");
+                    } else {
+                      setOpened(true);
+                      createCheckoutSession(
+                        process.env.NEXT_PUBLIC_MAX_PRICE || "",
+                        String(maxQuantity),
+                        workspace?.customerId || "",
+                        workspace?.slug || ""
+                      ).then((res) =>
+                        setClientSecret(res.session.client_secret)
+                      );
+                    }
                   }}
                 >
                   Upgrade
@@ -409,19 +524,7 @@ export default function App() {
         </Card>
 
         {/* Enterprise */}
-        <Card
-          mih={500}
-          radius="md"
-          w={330}
-          shadow="lg"
-          withBorder
-          style={{
-            outline:
-              workspace?.subscription?.product_name.toLocaleLowerCase() == "max"
-                ? "1px solid var(--mantine-primary-color-filled)"
-                : "none",
-          }}
-        >
+        <Card mih={500} radius="md" w={330} shadow="lg" withBorder>
           <div className="h-full flex flex-col justify-between">
             <Stack gap={10} align="center">
               <Title order={3}>Enterprise</Title>
@@ -466,6 +569,7 @@ const QunatityInput = (props: {
   return (
     <Group justify="space-between">
       <ActionIcon
+        variant="light"
         size="lg"
         onClick={() => {
           setQuantity(Math.max(10, (quantity as number) - 10));
@@ -473,19 +577,21 @@ const QunatityInput = (props: {
       >
         <IconMinus size="20px" />
       </ActionIcon>
-      <NumberInput
-        ta="center"
-        hideControls
-        variant="filled"
-        onChange={setQuantity}
-        value={quantity}
-        min={1}
-        max={500}
-        step={10}
-        className="input"
-      />
+      <div className="grow">
+        <Text
+          bg="var(--mantine-color-default-border)"
+          p="8px"
+          style={{ borderRadius: "4px" }}
+          size="sm"
+          w="100%"
+          ta="center"
+        >
+          {quantity}
+        </Text>
+      </div>
       <ActionIcon
         size="lg"
+        variant="light"
         onClick={() => {
           setQuantity(Math.min(500, (quantity as number) + 10));
         }}
@@ -495,3 +601,6 @@ const QunatityInput = (props: {
     </Group>
   );
 };
+
+/*button on homepage to redirect to upgrade page
+feature protection using roles*/

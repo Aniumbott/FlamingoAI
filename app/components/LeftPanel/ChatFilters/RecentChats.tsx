@@ -6,7 +6,7 @@ import { getAllChats } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import ChatItem from "../Items/ChatItem";
 import { useAuth } from "@clerk/nextjs";
-import { ScrollArea, Loader } from "@mantine/core";
+import { ScrollArea, Loader, Text } from "@mantine/core";
 import { socket } from "@/socket";
 
 const RecentChats = (props: {
@@ -36,23 +36,29 @@ const RecentChats = (props: {
     };
   }, []);
 
-  const [recentChats, setRecentChats] = useState<IChatDocument[]>([]);
+  const [recentChats, setRecentChats] = useState<IChatDocument[] | null>(null);
 
   return (
     <div>
       <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
-        {recentChats.length > 0 ? (
-          recentChats.map((chat, key) => {
-            return (
-              <ChatItem
-                item={chat}
-                key={key}
-                members={members}
-                allowPersonal={allowPersonal}
-                allowPublic={allowPublic}
-              />
-            );
-          })
+        {recentChats ? (
+          recentChats.length === 0 ? (
+            <Text style={{ textAlign: "center" }} c="dimmed" size="xs">
+              No recent chats
+            </Text>
+          ) : (
+            recentChats.map((chat, key) => {
+              return (
+                <ChatItem
+                  item={chat}
+                  key={key}
+                  members={members}
+                  allowPersonal={allowPersonal}
+                  allowPublic={allowPublic}
+                />
+              );
+            })
+          )
         ) : (
           <Loader type="dots" w={"100%"} />
         )}

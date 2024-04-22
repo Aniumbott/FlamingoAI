@@ -33,7 +33,7 @@ import LeftPanel from "../../components/LeftPanel/Leftpanel";
 import ChatWindow from "../../components/ChatWindow/ChatWindow";
 import { createChat } from "@/app/controllers/chat";
 
-const Workspace = () => {
+export default function Workspace() {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
   const [rightOpened, { toggle: toggleRight }] = useDisclosure(true);
   const [currentChatId, setCurrentChatId] = useState("");
@@ -139,7 +139,7 @@ const Workspace = () => {
               <Title order={3} ml={5}>
                 TeamGPT
               </Title>
-              <Tooltip label="Colapse panel" fz="xs" position="right">
+              <Tooltip label="Collapse panel" fz="xs" position="right">
                 <ActionIcon
                   variant="subtle"
                   color="grey"
@@ -240,6 +240,4 @@ const Workspace = () => {
       </ClerkLoaded>
     </>
   );
-};
-
-export default Workspace;
+}

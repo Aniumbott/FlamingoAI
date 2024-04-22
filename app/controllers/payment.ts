@@ -20,57 +20,19 @@ async function createCustomer() {
   }
 }
 
-async function getCustomer() {
-  try {
-    const data = await fetch("/api/payment/customer", {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const response = await data.json();
-    console.log("list customers", response.customers.data);
-    return response;
-  } catch (err) {
-    console.error(err);
-    return err;
-  }
-}
-
-// async function createSubscription() {
-//   try {
-//     console.log("creating subscription");
-//     const data = await fetch("/api/payment/subscription", {
-//       method: "POST",
-//       body: JSON.stringify({
-//         customerId: "cus_PwKirdR28may7r",
-//         priceId: "",
-//       }),
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//     });
-
-//     const res = await data.json();
-//     console.log("subscription", res);
-//     return res;
-//   } catch (error) {
-//     console.log(error);
-//     return error;
-//   }
-// }
-
 async function createCheckoutSession(
   priceId: string,
   quantity: string,
-  customerId: string
+  customerId: string,
+  slug: string
 ) {
   try {
     console.log(
       "creating checkout session for ",
       customerId,
       priceId,
-      quantity
+      quantity,
+      slug
     );
     const data = await fetch("/api/payment/checkout", {
       method: "POST",
@@ -78,6 +40,7 @@ async function createCheckoutSession(
         customerId: customerId,
         priceId: priceId,
         quantity: parseInt(quantity),
+        slug: slug,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -93,29 +56,12 @@ async function createCheckoutSession(
   }
 }
 
-async function getSubscriptions() {
-  try {
-    const data = await fetch(`/api/payment/subscription`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-    const response = await data.json();
-    console.log("subscription details", response.subscriptions.data);
-    return response;
-  } catch (err) {
-    console.error(err);
-    return err;
-  }
-}
-
-async function createPortalSession() {
+async function createPortalSession(customerId: String) {
   try {
     const data = await fetch("/api/payment/customerPortal", {
       method: "POST",
       body: JSON.stringify({
-        customerId: "cus_PwKirdR28may7r",
+        customerId: customerId,
       }),
       headers: {
         "Content-Type": "application/json",
@@ -131,11 +77,26 @@ async function createPortalSession() {
   }
 }
 
+async function getCheckoutSession(sessionId: string) {
+  try {
+    const data = await fetch(`/api/payment/checkout?sessionId=${sessionId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    const response = await data.json();
+    console.log("checkout session details", response);
+    return response;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+}
+
 export {
   createCustomer,
-  getCustomer,
-  // createSubscription,
-  getSubscriptions,
   createCheckoutSession,
   createPortalSession,
+  getCheckoutSession,
 };

@@ -51,6 +51,7 @@ import ForkChatModal from "./Modals/ForkChatModal";
 import { getAllPrompts } from "@/app/controllers/prompt";
 import { IPromptDocument } from "@/app/models/Prompt";
 import PromptModal from "@/app/components/RightPanel/Modals/PromptModal";
+import PromptVariableModal from "@/app/components/RightPanel/Modals/PromptVariableModal";
 import ShareChatModal from "@/app/components/ChatWindow/Modals/ShareChatModal";
 import ErrorPage from "./ErrorPage/ErrorPage";
 import SettingsModal from "./Modals/SettingsModal";
@@ -251,15 +252,29 @@ export default function ChatWindow(props: {
           user?.id || ""
         );
       };
+
       getCurrentChat().then((res) => {
         setChat(res.chats?.[0]);
         setLoading(false);
       });
+
       getAllPrompts(organization?.id || "", user?.id || "").then((res) => {
         setPrompts(res.prompts);
       });
     }
   }, [currentChatId]);
+
+  useEffect(() => {
+    socket.on("refreshPrompts", () => {
+      getAllPrompts(organization?.id || "", user?.id || "").then((res) => {
+        setPrompts(res.prompts);
+      });
+    });
+
+    return () => {
+      socket.off("refreshPrompts");
+    };
+  }, []);
 
   function tillLastUserMessage(messages: any[]) {
     let lastUserMessageIndex = 0;
@@ -272,6 +287,11 @@ export default function ChatWindow(props: {
     return messages.slice(0, lastUserMessageIndex + 1);
   }
 
+  const [promptVariables, setPromptVariables] = useState<string[]>([]);
+  const [promptContent, setPromptContent] = useState("");
+  const [newMessageInput, setNewMessageInput] = useState(messageInput);
+
+  const [promptVariablesOpened, setPromptVariablesOpened] = useState(false);
   const [promptOpened, setPromptOpened] = useState(false);
   const [newPrompt, setnewPrompt] = useState<IPromptDocument | null>(null);
   const [messageContent, setMessageContent] = useState("");
@@ -371,6 +391,16 @@ export default function ChatWindow(props: {
                 setModalItem={setnewPrompt}
                 parentFolder={null}
                 messageContent={messageContent}
+              />
+            )}
+            {promptVariablesOpened && (
+              <PromptVariableModal
+                opened={promptVariablesOpened}
+                setOpened={setPromptVariablesOpened}
+                variables={promptVariables}
+                promptContent={promptContent}
+                setMessageInput={setMessageInput}
+                newMessageInput={newMessageInput}
               />
             )}
           </div>
@@ -752,8 +782,17 @@ export default function ChatWindow(props: {
                                   newMessageInput.lastIndexOf("/")
                                 );
                               }
-                              setMessageInput(newMessageInput + prompt.content);
-                              setSearchTerm("");
+                              if (prompt.variables.length > 0) {
+                                setNewMessageInput(newMessageInput);
+                                setPromptContent(prompt.content);
+                                setPromptVariables(prompt.variables);
+                                setPromptVariablesOpened(true);
+                              } else {
+                                setMessageInput(
+                                  newMessageInput + prompt.content
+                                );
+                                setSearchTerm("");
+                              }
                             }}
                           >
                             <Text c={"white"}>{prompt.name}</Text>

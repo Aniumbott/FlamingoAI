@@ -8,6 +8,7 @@ import { headers } from "next/headers";
 import { Webhook } from "svix";
 import { stripe } from "@/app/lib/stripe";
 import User from "@/app/models/User";
+import { subscribe } from "diagnostics_channel";
 
 const webhookSecret = process.env.CLERK_WORKSPACE_WEBHOOK_SECRET || ``;
 
@@ -117,23 +118,5 @@ function getWorkspaceDataFromEvent(evt: any) {
     slug: evt.data.slug,
     imageUrl: evt.data.image_url,
     createdBy: evt.data.created_by,
-    allowPersonal: true,
-    allowPublic: true,
-    instructions:
-      "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown.",
-    assistants: [
-      {
-        apiKey: "",
-        assistantId: "661a34b0bf589f58ba211c94",
-        model: "gpt-3.5-turbo",
-        scope: "public",
-      },
-      {
-        apiKey: "",
-        assistantId: "661a34b0bf589f58ba211c94",
-        model: "gpt-3.5-turbo",
-        scope: "private",
-      },
-    ],
   };
 }

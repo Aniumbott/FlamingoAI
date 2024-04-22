@@ -57,7 +57,6 @@ const PeopleChats = (props: {
 
     return () => {
       console.log("unmounting people chats");
-
       socket.off("refreshChats");
     };
   }, []);
@@ -70,8 +69,8 @@ const PeopleChats = (props: {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <ScrollArea h="50vh" scrollbarSize={3} pb={"10"}>
-        {filteredMembers.length > 0 && (
+      <ScrollArea h="45vh" scrollbarSize={3} pb={"10"}>
+        {filteredMembers.length > 0 ? (
           <Accordion
             chevronPosition="left"
             className={style.parent}
@@ -79,21 +78,25 @@ const PeopleChats = (props: {
             chevron={<IconCaretRightFilled className={style.icon} />}
             variant="default"
           >
-            {allChats.length > 0 ? (
-              filteredMembers.map((user: any) => (
-                <UserAccordionItem
-                  user={user}
-                  allChats={allChats}
-                  members={members}
-                  key={user.userId}
-                  allowPersonal={allowPersonal}
-                  allowPublic={allowPublic}
-                />
-              ))
-            ) : (
-              <Loader type="dots" w={"100%"} />
-            )}
+            {/* {allChats.length > 0 ? ( */}
+            {filteredMembers.map((user: any) => (
+              <UserAccordionItem
+                user={user}
+                allChats={allChats}
+                members={members}
+                key={user.userId}
+                allowPersonal={allowPersonal}
+                allowPublic={allowPublic}
+              />
+            ))}
+            {/* ) : (
+              <Text style={{ textAlign: "center" }} c="dimmed" size="xs">
+                No people chats
+              </Text>
+            )} */}
           </Accordion>
+        ) : (
+          <Loader type="dots" w={"100%"} />
         )}
       </ScrollArea>
     </Stack>

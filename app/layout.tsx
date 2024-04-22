@@ -12,6 +12,7 @@ import "@mantine/charts/styles.css";
 import "@mantine/notifications/styles.css";
 // Componets
 import "./globals.css";
+import NewClerkProvider from "./NewClerkProvider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,32 +27,24 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider
-      appearance={{
-        variables: {
-          colorPrimary: "#4f976b",
-        },
-      }}
-    >
-      {/* <StoreProvider> */}
-      <html lang="en">
-        <head>
-          <ColorSchemeScript />
-          <title>Team GPT PRO !!!</title>
-        </head>
-        <body className={inter.className}>
-          <MantineProvider
-            defaultColorScheme="dark"
-            theme={{
-              primaryColor: "teal",
-            }}
-          >
+    <html lang="en">
+      <head>
+        <ColorSchemeScript />
+        <title>Team GPT PRO !!!</title>
+      </head>
+      <body className={inter.className}>
+        <MantineProvider
+          defaultColorScheme="dark"
+          theme={{
+            primaryColor: "teal",
+          }}
+        >
+          <NewClerkProvider>
             <Notifications />
             {children}
-          </MantineProvider>
-        </body>
-      </html>
-      {/* </StoreProvider> */}
-    </ClerkProvider>
+          </NewClerkProvider>
+        </MantineProvider>
+      </body>
+    </html>
   );
 }
