@@ -26,6 +26,7 @@ async function getIndependentChats(
     );
 
     const response = await data.json();
+    console.log("controller", response);
     return response;
   } catch (err) {
     console.error(err);

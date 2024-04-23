@@ -28,6 +28,8 @@ export default function ChatItem(props: {
   let actionIconVisible = hovered || menuOpen;
   const [openMoveModal, setOpenMoveModal] = useState(false);
   const { userId, orgId } = useAuth();
+  const [participants, setParticipants] = useState<any[]>([]);
+
   useEffect(() => {
     actionIconVisible = hovered || menuOpen;
   }, [hovered, menuOpen]);
@@ -35,6 +37,12 @@ export default function ChatItem(props: {
   function isActive(pathname: string, id: string) {
     return pathname.split("/")[3] === id;
   }
+
+  useEffect(() => {
+    setParticipants(
+      members.filter((member) => item.participants.includes(member.userId))
+    );
+  }, [item.participants, members]);
 
   return (
     <>
@@ -47,7 +55,7 @@ export default function ChatItem(props: {
         }}
       >
         <div ref={ref} className="flex flex-row justify-between w-full">
-          <Group>
+          <div className="flex flex-row items-center grow">
             {item.favourites.includes(userId || "") ? (
               <IconStarFilled
                 style={{
@@ -72,6 +80,7 @@ export default function ChatItem(props: {
 
             {rename ? (
               <TextInput
+                ml="sm"
                 autoFocus
                 variant="filled"
                 placeholder="Rename"
@@ -91,19 +100,23 @@ export default function ChatItem(props: {
                 }}
               />
             ) : (
-              <Text
-                size="sm"
-                style={{
-                  marginLeft: "0.1rem",
-                  color: isActive(pathname, item._id)
-                    ? "var(--mantine-primary-color-filled)"
-                    : "",
-                }}
-              >
-                {item.name}
-              </Text>
+              <div className="grow max-w-[180px]">
+                <Text
+                  ml="sm"
+                  truncate="end"
+                  size="sm"
+                  style={{
+                    marginLeft: "0.1rem",
+                    color: isActive(pathname, item._id)
+                      ? "var(--mantine-primary-color-filled)"
+                      : "",
+                  }}
+                >
+                  {item.name}
+                </Text>
+              </div>
             )}
-          </Group>
+          </div>
           {!rename ? (
             actionIconVisible ? (
               <ChatFeatureMenu
@@ -115,13 +128,23 @@ export default function ChatItem(props: {
                 setMoveModal={setOpenMoveModal}
               />
             ) : (
-              <Avatar.Group
-              // {...(hovered ? { opacity: "0" } : { opacity: "1" })}
-              >
-                {members.map((member, key) =>
-                  item.participants.includes(member.userId) ? (
+              <Avatar.Group>
+                {participants.length <= 2 ? (
+                  participants.map((member, key) => (
                     <Avatar key={key} size="25px" src={member.imageUrl} />
-                  ) : null
+                  ))
+                ) : (
+                  <>
+                    <Avatar
+                      size="25px"
+                      src={participants[participants.length - 1].imageUrl}
+                    />
+                    <Avatar
+                      size="25px"
+                      src={participants[participants.length - 2].imageUrl}
+                    />
+                    <Avatar size="25px">+{participants.length - 2}</Avatar>
+                  </>
                 )}
               </Avatar.Group>
             )

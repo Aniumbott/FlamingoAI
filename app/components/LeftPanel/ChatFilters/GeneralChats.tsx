@@ -71,61 +71,72 @@ const GeneralChats = (props: {
   });
 
   useEffect(() => {
-    const fetchChats = async () => {
-      try {
-        setPublicChats(
-          (await getIndependentChats("public", userId || "", orgId || "")).chats
-        );
-        setPrivateChats(
-          (await getIndependentChats("private", userId || "", orgId || ""))
-            .chats
-        );
-      } catch (error) {
-        console.error("Failed to fetch chats:", error);
-      }
-    };
+    if (orgId) {
+      const fetchChats = async () => {
+        try {
+          setPublicChats(
+            (await getIndependentChats("public", userId || "", orgId || ""))
+              .chats
+          );
 
-    const fetchFolders = async () => {
-      try {
-        setPublicFolders(
-          (await getChatFolders("public", userId || "", orgId || "")).chatFolder
-        );
-        setPrivateFolders(
-          (await getChatFolders("private", userId || "", orgId || ""))
-            .chatFolder
-        );
-      } catch (error) {
-        console.error("Failed to fetch folders:", error);
-      }
-    };
+          setPrivateChats(
+            (await getIndependentChats("private", userId || "", orgId || ""))
+              .chats
+          );
+        } catch (error) {
+          console.error("Failed to fetch chats:", error);
+        }
+      };
 
-    const fetchAllPopulatedChats = async () => {
-      try {
-        setAllPopulatedChats(
-          (await getAllPopulatedChats(userId || "", orgId || "")).chats
-        );
-      } catch (error) {
-        console.error("Failed to fetch all populated chats:", error);
-      }
-    };
+      const fetchFolders = async () => {
+        try {
+          setPublicFolders(
+            (await getChatFolders("public", userId || "", orgId || ""))
+              .chatFolder
+          );
+          setPrivateFolders(
+            (await getChatFolders("private", userId || "", orgId || ""))
+              .chatFolder
+          );
+        } catch (error) {
+          console.error("Failed to fetch folders:", error);
+        }
+      };
 
-    const fetchChatsAndFolders = () => {
-      console.log("fetching chats and folders");
+      const fetchAllPopulatedChats = async () => {
+        try {
+          setAllPopulatedChats(
+            (await getAllPopulatedChats(userId || "", orgId || "")).chats
+          );
+        } catch (error) {
+          console.error("Failed to fetch all populated chats:", error);
+        }
+      };
+
+      const fetchChatsAndFolders = async () => {
+        console.log("fetching chats and folders");
+        await fetchChats().then(() => fetchFolders());
+      };
+
       setIsLoading(true);
-      fetchChats()
-        .then(() => fetchFolders())
-        .then(() => setIsLoading(false));
-    };
-
-    fetchChatsAndFolders();
-    fetchAllPopulatedChats();
-
-    socket.on("refreshChats", () => {
-      console.log("refreshchats fetching chats and folder");
-      fetchChatsAndFolders();
+      fetchChatsAndFolders().then(() => {
+        setIsLoading(false);
+        console.log(
+          "data",
+          privateChats,
+          publicChats,
+          privateFolders,
+          publicFolders
+        );
+      });
       fetchAllPopulatedChats();
-    });
 
+      socket.on("refreshChats", () => {
+        console.log("refreshchats fetching chats and folder");
+        fetchChatsAndFolders();
+        fetchAllPopulatedChats();
+      });
+    }
     return () => {
       console.log("turning off socket at generatChats");
       socket.off("refreshChats");
