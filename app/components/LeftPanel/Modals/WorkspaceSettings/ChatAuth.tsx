@@ -30,7 +30,7 @@ export default function ChatAuth(props: {
   const [update, setUpdate] = useState<boolean>(false);
   const [assistants, setAssistants] = useState<any>([]);
   const [selectAssistant, setSelectAssistants] = useState<string | null>();
-  const [scope, setScope] = useState("private");
+  const [scope, setScope] = useState("public");
   const [apiKey, setApiKey] = useState("");
   const [model, setModel] = useState("gpt-3.5-turbo");
 
@@ -41,10 +41,12 @@ export default function ChatAuth(props: {
       setAssistants(res.assistants);
     };
     collectAssistants();
+    // console.log("workspace", workspace);
 
     if (workspace?.assistants.length > 0) {
       // console.log(workspace.assistants[0]);
       setSelectAssistants(workspace.assistants[0].assistantId);
+      // console.log("assistantID", workspace.assistants[0].assistantId);
       setScope(workspace.assistants[0].scope);
     }
   }, []);
@@ -98,12 +100,13 @@ export default function ChatAuth(props: {
             disabled={update}
             data={[
               {
-                label: "Personal",
-                value: "private",
-              },
-              {
                 label: "Workspace",
                 value: "public",
+              },
+
+              {
+                label: "Personal",
+                value: "private",
               },
             ]}
             defaultValue={scope}
@@ -174,6 +177,8 @@ export default function ChatAuth(props: {
                     ),
                     key,
                   ],
+                }).then(() => {
+                  window.location.reload();
                 });
                 setUpdate(false);
               }}
@@ -185,7 +190,7 @@ export default function ChatAuth(props: {
 
         <Select
           allowDeselect={false}
-          description="Default OpenAI Model"
+          description="Default Assistant Model"
           data={assistants.find((a: any) => a._id == selectAssistant)?.models}
           value={model}
           onChange={(value) => {
@@ -250,13 +255,16 @@ export default function ChatAuth(props: {
                       updateWorkspace({
                         ...workspace,
                         assistants: [
-                          ...workspace.assistants.filter(
-                            (key: any) =>
-                              !(
-                                key.assistantId == selectAssistant &&
-                                key.scope == scope
-                              )
-                          ),
+                          ...workspace.assistants.map((key: any) => {
+                            if (
+                              key.assistantId == selectAssistant &&
+                              key.scope == scope
+                            ) {
+                              key.apiKey = "";
+                              return key;
+                            }
+                            return key;
+                          }),
                         ],
                       });
                     }

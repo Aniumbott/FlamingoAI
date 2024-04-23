@@ -27,6 +27,7 @@ import {
 import { createChat } from "@/app/controllers/chat";
 
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function FolderFeatureMenu(props: {
   folder: IChatFolderDocument;
@@ -49,6 +50,8 @@ export default function FolderFeatureMenu(props: {
     "#FF5656",
     "#F875B4",
   ]; // Add more colors if needed
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <Menu
@@ -107,7 +110,11 @@ export default function FolderFeatureMenu(props: {
               props.userId,
               props.workspaceId,
               props.members
-            )
+            ).then((res: any) => {
+              router.push(
+                pathname.split("/").slice(0, 3).join("/") + "/" + res.chat._id
+              );
+            })
           }
           disabled={
             props.scope === "public" ? !props.allowPublic : !props.allowPersonal

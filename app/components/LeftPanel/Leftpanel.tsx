@@ -25,7 +25,6 @@ import {
 import WorkspaceMenu from "./Menu/WorkspaceMenu";
 import ChatMenu from "./Menu/ChatMenu";
 import FilterMenuComponent from "./Menu/FilterMenu";
-import { dark } from "@clerk/themes";
 import { createChat } from "../../controllers/chat";
 import PeopleChats from "./ChatFilters/PeopleChats";
 import RecentChats from "./ChatFilters/RecentChats";
@@ -36,7 +35,7 @@ import { getWorkspace } from "@/app/controllers/workspace";
 import GeneralChats from "./ChatFilters/GeneralChats";
 import { usePathname, useRouter } from "next/navigation";
 
-const LeftPanel = () => {
+export default function LeftPanel() {
   const { colorScheme } = useMantineColorScheme();
   const [filterMenu, setFilterMenu] = useState(0);
   const [members, setMembers] = useState<any>([]);
@@ -124,7 +123,19 @@ const LeftPanel = () => {
                 borderRadius: "5px 0 0 5px ",
               }}
               onClick={() =>
-                createPublicChat(userId || "", orgId || "", members)
+                createChat(
+                  "public",
+                  null,
+                  userId || "",
+                  orgId || "",
+                  members
+                ).then((res: any) => {
+                  router.push(
+                    pathname.split("/").slice(0, 3).join("/") +
+                      "/" +
+                      res.chat._id
+                  );
+                })
               }
             >
               <IconPlus size={15} />
@@ -228,18 +239,4 @@ const LeftPanel = () => {
       ) : null}
     </Stack>
   );
-};
-
-const createPublicChat = async (
-  userId: string,
-  workspaceId: string,
-  members: any
-) => {
-  // console.log("creating a chat");
-  socket.emit("hello", "world");
-  // console.log("emmiting");
-  const res = await createChat("public", null, userId, workspaceId, members);
-  // console.log("res", res);
-};
-
-export default LeftPanel;
+}

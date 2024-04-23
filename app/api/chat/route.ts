@@ -286,7 +286,6 @@ export async function POST(req: any, res: NextApiResponse) {
       );
     } else {
       const workspace = await Workspace.findById(body.workspaceId);
-
       chat = await Chat.create({
         name: body.name,
         createdBy: body.createdBy,
@@ -304,7 +303,7 @@ export async function POST(req: any, res: NextApiResponse) {
           : workspace?.assistants.find(
               (assistant) =>
                 (assistant.scope == "private" && body.scope == "private") ||
-                (assistant.scope == "pbulic" && body.scope != "private")
+                (assistant.scope == "public" && body.scope != "private")
             ),
       });
 

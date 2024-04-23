@@ -42,6 +42,7 @@ import SortMenu from "../Menu/SortMenu";
 import style from "../LeftPanel.module.css";
 import { useAuth } from "@clerk/nextjs";
 import { socket } from "@/socket";
+import { usePathname, useRouter } from "next/navigation";
 
 const GeneralChats = (props: {
   members: any[];
@@ -354,6 +355,9 @@ const AccordianLabel = (props: {
   allowPublic: boolean;
   allowPersonal: boolean;
 }) => {
+  const router = useRouter();
+  const pathname = usePathname();
+
   return (
     <Group wrap="nowrap" justify="space-between">
       <Text size="sm" fw={600}>
@@ -398,7 +402,11 @@ const AccordianLabel = (props: {
                 props.userId,
                 props.workspaceId,
                 props.members
-              );
+              ).then((res: any) => {
+                router.push(
+                  pathname.split("/").slice(0, 3).join("/") + "/" + res.chat._id
+                );
+              });
               // Add any additional logic for the ActionIcon click here
             }}
             disabled={

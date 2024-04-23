@@ -562,10 +562,3 @@ async function ImportChat(
 
   return res.chat;
 }
-
-/*  scope: Scope,
-  parentFolder: Mongoose.Types.ObjectId | null,
-  createdBy: string,
-  workspaceId: string,
-  members: any[],
-  name: string = "New Chat"*/

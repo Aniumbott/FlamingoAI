@@ -28,6 +28,7 @@ import { createChatFolder, updateChatFolders } from "@/app/controllers/folders";
 import { createChat } from "@/app/controllers/chat";
 import style from "../LeftPanel.module.css";
 import MoveChats from "../Modals/MoveItems/MoveItems";
+import { usePathname, useRouter } from "next/navigation";
 
 export const newFolder = async (
   scope: "public" | "private",
@@ -150,6 +151,8 @@ const FolderLabel = (props: {
   const [menuOpen, setMenuOpen] = useState(false);
   let actionIconVisible = props.isHovered || menuOpen;
   const [rename, setRename] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   useEffect(() => {
     actionIconVisible = props.isHovered || menuOpen;
@@ -243,7 +246,13 @@ const FolderLabel = (props: {
                   props.userId,
                   props.workspaceId,
                   props.members
-                );
+                ).then((res: any) => {
+                  router.push(
+                    pathname.split("/").slice(0, 3).join("/") +
+                      "/" +
+                      res.chat._id
+                  );
+                });
               }}
               disabled={
                 props.scope === "public"

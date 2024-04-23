@@ -25,6 +25,7 @@ import { useHover } from "@mantine/hooks";
 import { deleteChat, updateChat } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
 import { useAuth } from "@clerk/nextjs";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function ChatFeatureMenu(props: {
   chat: IChatDocument;
@@ -35,6 +36,8 @@ export default function ChatFeatureMenu(props: {
   setMoveModal: (value: boolean) => void;
 }) {
   const { userId, orgId } = useAuth();
+  const router = useRouter();
+  const pathname = usePathname();
   return (
     <>
       <Menu
@@ -107,9 +110,15 @@ export default function ChatFeatureMenu(props: {
               </Menu.Item>
               <Menu.Item
                 onClick={() => {
-                  deleteChat(props.chat).then((res) => {
-                    console.log(res);
-                  });
+                  deleteChat(props.chat)
+                    .then((res) => {
+                      console.log(res);
+                    })
+                    .then(() => {
+                      if (pathname.split("/")[3] == props.chat._id) {
+                        router.push(pathname.split("/").slice(0, 3).join("/"));
+                      }
+                    });
                 }}
               >
                 <MenuButton properties={MenuData[7]} />

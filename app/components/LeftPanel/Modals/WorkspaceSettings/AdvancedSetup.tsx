@@ -24,7 +24,7 @@ export default function AdvancedSetup(props: {
   const [areaValue, setAreaValue] = useState("");
 
   useEffect(() => {
-    setAreaValue(workspace.instructions);
+    setAreaValue(workspace?.instructions);
   }, [workspace]);
 
   return (

@@ -14,6 +14,7 @@ import {
 import { createChat } from "@/app/controllers/chat";
 import { createChatFolder } from "@/app/controllers/folders";
 import { useAuth } from "@clerk/nextjs";
+import { usePathname, useRouter } from "next/navigation";
 type MenuData = {
   title: string;
   description: string;
@@ -36,6 +37,8 @@ const ChatMenu = (props: {
 }) => {
   const { orgId, userId } = useAuth();
   const { allowPublic, allowPersonal } = props;
+  const router = useRouter();
+  const pathname = usePathname();
   return (
     <Menu
       position="top-start"
@@ -76,7 +79,17 @@ const ChatMenu = (props: {
         {allowPublic && (
           <Menu.Item
             onClick={() =>
-              createPublicChat(userId as string, orgId as string, props.members)
+              createChat(
+                "public",
+                null,
+                userId as string,
+                orgId as string,
+                props.members
+              ).then((res: any) => {
+                router.push(
+                  pathname.split("/").slice(0, 3).join("/") + "/" + res.chat._id
+                );
+              })
             }
           >
             <MenuButton properties={MenuData[0]} />
@@ -85,11 +98,17 @@ const ChatMenu = (props: {
         {allowPersonal && (
           <Menu.Item
             onClick={() =>
-              createPrivateChat(
+              createChat(
+                "private",
+                null,
                 userId as string,
                 orgId as string,
                 props.members
-              )
+              ).then((res: any) => {
+                router.push(
+                  pathname.split("/").slice(0, 3).join("/") + "/" + res.chat._id
+                );
+              })
             }
           >
             <MenuButton properties={MenuData[1]} />
@@ -119,26 +138,6 @@ const ChatMenu = (props: {
       </Menu.Dropdown>
     </Menu>
   );
-};
-
-const createPublicChat = async (
-  userId: string,
-  orgId: string,
-  members: any[]
-) => {
-  // console.log("creating public chat");
-  const res = await createChat("public", null, userId, orgId, members);
-  // console.log("res", res);
-};
-
-const createPrivateChat = async (
-  userId: string,
-  orgId: string,
-  members: any[]
-) => {
-  // console.log("creating private chat");
-  const res = await createChat("private", null, userId, orgId, members);
-  console.log("res", res.chat);
 };
 
 const createPublicFolder = async (userId: string, orgId: string) => {

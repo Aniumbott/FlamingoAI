@@ -14,7 +14,6 @@ export function MentionParser(text: string) {
   const replacedText = reactStringReplace(text, thisMatch, (match, i, name) => (
     <Text
       key={i}
-      c="white"
       px={2}
       mx={3}
       style={{

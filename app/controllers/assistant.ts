@@ -25,12 +25,11 @@ async function getAssistantResponse(
     notifications.show({
       icon: createElement(IconX),
       color: "red",
-      message: "Invalid API key.",
-      autoClose: 5000,
+      title: "Missing or invalid API key.",
+      message: "Kindly update in workspace settings.",
       withCloseButton: true,
       withBorder: true,
       loading: false,
-      styles: { description: { fontWeight: "bold" } },
     });
     return null;
   }

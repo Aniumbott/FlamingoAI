@@ -210,15 +210,13 @@ export default function Workspace() {
                         mt={20}
                         size="lg"
                         onClick={() => {
-                          const req = createChat(
+                          createChat(
                             "public",
                             null,
                             userId || "",
                             orgId || "",
                             orgMembers
-                          );
-
-                          req.then((res) => {
+                          ).then((res) => {
                             router.push(
                               pathname?.split("/").slice(0, 3).join("/") +
                                 "/" +

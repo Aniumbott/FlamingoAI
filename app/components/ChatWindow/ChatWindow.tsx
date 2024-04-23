@@ -55,6 +55,7 @@ import PromptVariableModal from "@/app/components/RightPanel/Modals/PromptVariab
 import ShareChatModal from "@/app/components/ChatWindow/Modals/ShareChatModal";
 import ErrorPage from "./ErrorPage/ErrorPage";
 import SettingsModal from "./Modals/SettingsModal";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function ChatWindow(props: {
   currentChatId: String;
@@ -298,6 +299,8 @@ export default function ChatWindow(props: {
   const [processing, setProcessing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isForkModalOpen, setIsForkModalOpen] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <>
@@ -557,7 +560,6 @@ export default function ChatWindow(props: {
                 gap={25}
                 justify="space-between"
                 w={"80%"}
-                c={"white"}
                 bg={
                   colorScheme === "dark"
                     ? "var(--mantine-color-gray-8)"
@@ -584,9 +586,17 @@ export default function ChatWindow(props: {
                   <Button
                     variant="default"
                     onClick={() => {
-                      deleteChat(chat).then((res) => {
-                        console.log(res);
-                      });
+                      deleteChat(chat)
+                        .then((res) => {
+                          console.log(res);
+                        })
+                        .then(() => {
+                          if (pathname.split("/")[3] == chat._id) {
+                            router.push(
+                              pathname.split("/").slice(0, 3).join("/")
+                            );
+                          }
+                        });
                     }}
                   >
                     Delete
@@ -795,7 +805,7 @@ export default function ChatWindow(props: {
                               }
                             }}
                           >
-                            <Text c={"white"}>{prompt.name}</Text>
+                            <Text>{prompt.name}</Text>
                           </Combobox.Option>
                         ))
                       ) : (
