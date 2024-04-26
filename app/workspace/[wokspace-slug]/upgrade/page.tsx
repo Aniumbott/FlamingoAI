@@ -167,12 +167,13 @@ export default function Upgrade() {
           shadow="lg"
           withBorder
           style={{
-            border: !workspace?.subscription
-              ? "1px solid var(--mantine-primary-color-filled)"
-              : "",
+            border:
+              workspace && !workspace?.subscription
+                ? "1px solid var(--mantine-primary-color-filled)"
+                : "",
           }}
         >
-          {!workspace?.subscription ? (
+          {workspace && !workspace?.subscription ? (
             <Badge
               color="teal"
               variant="light"
