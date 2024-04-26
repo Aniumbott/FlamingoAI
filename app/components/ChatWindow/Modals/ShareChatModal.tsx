@@ -27,8 +27,9 @@ const ShareChatModal = (props: {
   chat: IChatDocument;
   setChat: (value: IChatDocument) => void;
   members: any[];
+  organizationName: string;
 }) => {
-  const { opened, setOpened, chat, setChat, members } = props;
+  const { opened, setOpened, chat, setChat, members, organizationName } = props;
   return (
     <Modal
       opened={opened}
@@ -82,7 +83,7 @@ const ShareChatModal = (props: {
               <IconBuilding size={24} />
             </ThemeIcon>
             <Stack gap={3} style={{ flexGrow: 1 }}>
-              <Title order={4}>Aniket Workspace</Title>
+              <Title order={4}>{organizationName}</Title>
               <Text size="sm" c="grey">
                 Teammates{" "}
                 {chat?.scope == "private"

@@ -169,11 +169,6 @@ function CommentItem(props: { comment: any; participants: any[] }) {
               <div className="flex flex-col w-full mt-1">
                 {isEdit ? (
                   <div className="w-full flex flex-row items-center mt-3">
-                    {/* <TextInput
-                      w="100%"
-                      defaultValue={comment.content}
-                      onChange={(e) => setCommentText(e.currentTarget.value)}
-                    /> */}
                     <MentionInput
                       commentText={commentText}
                       setCommentText={setCommentText}

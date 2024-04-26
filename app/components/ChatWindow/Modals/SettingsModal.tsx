@@ -18,8 +18,12 @@ const SettingsModal = (props: {
 }) => {
   const { opened, setOpened, chat, setChat } = props;
   const [areaValue, setAreaValue] = useState("");
+  const [model, setModel] = useState("");
   useEffect(() => {
-    setAreaValue(chat?.instructions);
+    if (chat) {
+      setModel(chat?.assistant?.model);
+      setAreaValue(chat?.instructions);
+    }
   }, [chat]);
   return (
     <Modal
@@ -38,49 +42,50 @@ const SettingsModal = (props: {
           allowDeselect={false}
           description="Assistant Model"
           data={chat?.assistant?.assistantId?.models}
-          value={chat?.assistant?.model}
+          value={model}
           onChange={(e) => {
-            updateChat(chat?._id, {
-              assistant: {
-                assistantId: chat?.assistant?.assistantId,
-                model: e,
-              },
-            });
+            setModel(e || "");
           }}
         />
-        <Stack gap={10}>
-          <Textarea
-            label="Instructions (Chat wide)"
-            value={areaValue}
-            onChange={(event) => setAreaValue(event.currentTarget.value)}
-          />
-          <Group justify="space-between">
-            {areaValue.length == 0 ? (
-              <Button
-                size="md"
-                variant="outline"
-                onClick={() => {
-                  setAreaValue(
-                    chat?.instructions || "No instructions exist in Chat"
-                  );
-                }}
-              >
-                Reset
-              </Button>
-            ) : null}
+        {/* <Stack gap={10}> */}
+        <Textarea
+          label="Instructions (Chat wide)"
+          value={areaValue}
+          onChange={(event) => setAreaValue(event.currentTarget.value)}
+        />
 
+        {/* </Stack> */}
+        <Group justify="flex-end">
+          {model != chat?.assistant?.model ||
+          areaValue != chat?.instructions ? (
             <Button
               size="md"
+              variant="outline"
               onClick={() => {
-                updateChat(chat?._id, {
-                  instructions: areaValue,
-                });
+                setModel(chat?.assistant?.model);
+                setAreaValue(chat?.instructions);
               }}
             >
-              Save
+              Reset
             </Button>
-          </Group>
-        </Stack>
+          ) : null}
+          <Button
+            size="md"
+            onClick={() => {
+              updateChat(chat._id, {
+                assistant: {
+                  assistantId: chat.assistant.assistantId._id,
+                  model: model,
+                },
+                instructions: areaValue,
+              }).then(() => {
+                setOpened(false);
+              });
+            }}
+          >
+            Submit
+          </Button>
+        </Group>
       </Stack>
     </Modal>
   );

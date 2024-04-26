@@ -226,7 +226,7 @@ export default function Workspace() {
                         }}
                         leftSection={<IconPlus />}
                       >
-                        Share a Chat
+                        Start a Chat
                       </Button>
                     </Container>
                   </Stack>

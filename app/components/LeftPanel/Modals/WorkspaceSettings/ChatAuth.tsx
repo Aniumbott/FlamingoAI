@@ -120,13 +120,14 @@ export default function ChatAuth(props: {
 
         {update ||
         (selectAssistant &&
+          scope &&
           workspace &&
-          (!workspace?.assistants.some(
+          (!workspace.assistants.some(
             (assistant: any) =>
               assistant.assistantId == selectAssistant &&
               assistant.scope == scope
           ) ||
-            workspace?.assistants.find(
+            workspace?.assistants.some(
               (assistant: any) =>
                 assistant.assistantId == selectAssistant &&
                 assistant.scope == scope &&
@@ -138,7 +139,7 @@ export default function ChatAuth(props: {
                 w="100%"
                 label="Input your OpenAI API key"
                 placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                defaultValue={
+                value={
                   workspace?.assistants.find(
                     (key: any) =>
                       key.assistantId == selectAssistant && key.scope == scope

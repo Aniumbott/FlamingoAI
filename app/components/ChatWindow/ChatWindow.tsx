@@ -370,6 +370,7 @@ export default function ChatWindow(props: {
             </Group>
             {shareChatOpened && (
               <ShareChatModal
+                organizationName={organization?.name || ""}
                 opened={shareChatOpened}
                 setOpened={setShareChatOpened}
                 chat={chat}
