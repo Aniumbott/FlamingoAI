@@ -139,12 +139,7 @@ export default function ChatAuth(props: {
                 w="100%"
                 label="Input your OpenAI API key"
                 placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                value={
-                  workspace?.assistants.find(
-                    (key: any) =>
-                      key.assistantId == selectAssistant && key.scope == scope
-                  )?.apiKey || ""
-                }
+                value={apiKey}
                 onChange={(event) => setApiKey(event.currentTarget.value)}
                 required
               />
