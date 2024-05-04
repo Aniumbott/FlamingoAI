@@ -38,9 +38,9 @@ import { usePathname, useRouter } from "next/navigation";
 export default function LeftPanel() {
   const { colorScheme } = useMantineColorScheme();
   const [filterMenu, setFilterMenu] = useState(0);
-  const [members, setMembers] = useState<any>([]);
   const router = useRouter();
   const pathname = usePathname();
+  const [members, setMembers] = useState<any>([]);
   const [workspace, setWorkspace] = useState<any>(null);
   const { organization } = useOrganization();
   const { userId, orgId } = useAuth();
@@ -229,12 +229,6 @@ export default function LeftPanel() {
           <Text mt="sm" size="sm">
             Get access to more features by subscribing one of our plans.
           </Text>
-          {/* <List size="sm">
-            <List.Item>Invite more than 2 members.</List.Item>
-            <List.Item>
-              Access to more than one assistant services and many more...
-            </List.Item>
-          </List> */}
         </Card>
       ) : null}
     </Stack>

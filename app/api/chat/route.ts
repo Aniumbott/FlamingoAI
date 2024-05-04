@@ -7,6 +7,7 @@ import ChatFolder from "@/app/models/ChatFolder";
 import Message from "@/app/models/Message";
 import Comment from "@/app/models/Comment";
 import Workspace from "@/app/models/Workspace";
+import { get_encoding } from "tiktoken";
 
 // GET Request handler
 export async function GET(req: NextRequest, res: NextResponse) {
@@ -130,6 +131,28 @@ export async function GET(req: NextRequest, res: NextResponse) {
             },
           })
           .sort({ updatedAt: -1 });
+        break;
+
+      case "reportData":
+        const encoding = get_encoding("cl100k_base");
+
+        const chatsData: any = await Chat.find({
+          workspaceId: workspaceId,
+        })
+          .populate({
+            path: "messages",
+          })
+          .sort({ updatedAt: -1 });
+
+        chats = chatsData.map((chat: any) => {
+          chat.messages = chat.messages.map((message: any) => {
+            message.content = encoding.encode(message.content).length;
+            return message;
+          });
+          return chat;
+        });
+
+        encoding.free();
         break;
 
       default: // Indipendent populated chat

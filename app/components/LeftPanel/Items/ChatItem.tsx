@@ -130,19 +130,40 @@ export default function ChatItem(props: {
             ) : (
               <Avatar.Group>
                 {participants.length <= 2 ? (
-                  participants.map((member, key) => (
-                    <Avatar key={key} size="25px" src={member.imageUrl} />
-                  ))
+                  participants.map((member, key) =>
+                    member.hasImage ? (
+                      <Avatar key={key} size="25px" src={member.imageUrl} />
+                    ) : (
+                      <Avatar key={key} size="25px">
+                        {member.firstName[0] + member.lastName[0]}
+                      </Avatar>
+                    )
+                  )
                 ) : (
                   <>
-                    <Avatar
-                      size="25px"
-                      src={participants[participants.length - 1].imageUrl}
-                    />
-                    <Avatar
-                      size="25px"
-                      src={participants[participants.length - 2].imageUrl}
-                    />
+                    {participants[participants.length - 1].hasImage ? (
+                      <Avatar
+                        size="25px"
+                        src={participants[participants.length - 1].imageUrl}
+                      />
+                    ) : (
+                      <Avatar size="25px">
+                        {participants[participants.length - 1].firstName[0] +
+                          participants[participants.length - 1].lastName[0]}
+                      </Avatar>
+                    )}
+
+                    {participants[participants.length - 2].hasImage ? (
+                      <Avatar
+                        size="25px"
+                        src={participants[participants.length - 2].imageUrl}
+                      />
+                    ) : (
+                      <Avatar size="25px">
+                        {participants[participants.length - 2].firstName[0] +
+                          participants[participants.length - 2].lastName[0]}
+                      </Avatar>
+                    )}
                     <Avatar size="25px">+{participants.length - 2}</Avatar>
                   </>
                 )}

@@ -46,6 +46,7 @@ export default function ChatAuth(props: {
     if (workspace?.assistants.length > 0) {
       // console.log(workspace.assistants[0]);
       setSelectAssistants(workspace.assistants[0].assistantId);
+      setApiKey(workspace.assistants[0].apiKey);
       // console.log("assistantID", workspace.assistants[0].assistantId);
       setScope(workspace.assistants[0].scope);
     }
@@ -120,7 +121,6 @@ export default function ChatAuth(props: {
 
         {update ||
         (selectAssistant &&
-          scope &&
           workspace &&
           (!workspace.assistants.some(
             (assistant: any) =>
@@ -164,14 +164,14 @@ export default function ChatAuth(props: {
                 updateWorkspace({
                   ...workspace,
                   assistants: [
-                    ...workspace.assistants.filter(
-                      (key: any) =>
-                        !(
-                          key.assistantId == selectAssistant &&
-                          key.scope == scope
-                        )
-                    ),
-                    key,
+                    ...workspace.assistants.map((assistant: any) => {
+                      if (
+                        assistant.assistantId == selectAssistant &&
+                        assistant.scope == scope
+                      )
+                        return key;
+                      return assistant;
+                    }),
                   ],
                 }).then(() => {
                   window.location.reload();
@@ -197,11 +197,14 @@ export default function ChatAuth(props: {
             updateWorkspace({
               ...workspace,
               assistants: [
-                ...workspace.assistants.filter(
-                  (key: any) =>
-                    !(key.assistantId == selectAssistant && key.scope == scope)
-                ),
-                key,
+                ...workspace.assistants.map((assistant: any) => {
+                  if (
+                    assistant.assistantId == selectAssistant &&
+                    assistant.scope == scope
+                  )
+                    return key;
+                  return assistant;
+                }),
               ],
             });
             setModel(value || "gpt-3.5-turbo");

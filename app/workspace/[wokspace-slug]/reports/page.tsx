@@ -10,64 +10,36 @@ import {
   Group,
   Tooltip,
   Button,
+  ActionIcon,
+  Popover,
+  Loader,
+  Stack,
 } from "@mantine/core";
 import { BarChart } from "@mantine/charts";
-import { IconClock, IconInfoCircle } from "@tabler/icons-react";
-import { useState } from "react";
-import Link from "next/link";
+import { IconCalendar, IconClock, IconInfoCircle } from "@tabler/icons-react";
+import { useEffect, useState } from "react";
+import { getChatsReportData } from "@/app/controllers/chat";
+import { getAssistants } from "@/app/controllers/assistant";
+import { DatePicker } from "@mantine/dates";
+import { getWrokSpaceTokens } from "@/app/controllers/tokenLog";
+import ActiveUsers from "@/app/components/Reports/ActiveUsers";
+import LongestChats from "@/app/components/Reports/LongestChats";
+import TokenDistribution from "@/app/components/Reports/TokenDistribution";
+import { set } from "mongoose";
+
 export default function Reports() {
   const { organization } = useOrganization();
-  const [selected, setSelected] = useState("Today");
-  const [activeUsers, setActiveUsers] = useState([
-    {
-      month: "Jan",
-      users: 10,
-    },
-    {
-      month: "Feb",
-      users: 20,
-    },
-    {
-      month: "Mar",
-      users: 30,
-    },
-    {
-      month: "Apr",
-      users: 40,
-    },
-    {
-      month: "May",
-      users: 50,
-    },
-    {
-      month: "Jun",
-      users: 60,
-    },
-    {
-      month: "Jul",
-      users: 70,
-    },
-    {
-      month: "Aug",
-      users: 80,
-    },
-    {
-      month: "Sep",
-      users: 90,
-    },
-    {
-      month: "Oct",
-      users: 100,
-    },
-    {
-      month: "Nov",
-      users: 110,
-    },
-    {
-      month: "Dec",
-      users: 120,
-    },
+  const [isLoading, setIsLoading] = useState(true);
+  const [filter, setFilter] = useState("All time");
+  const [chats, setChats] = useState([]);
+  const [filteredChats, setFilteredChats] = useState([]);
+  const [dateRange, setDateRange] = useState<[Date | null, Date | null]>([
+    null,
+    null,
   ]);
+  const [tokenLogs, setTokenLogs] = useState<any>([]);
+  const [members, setMembers] = useState<any[]>([]);
+  const [assistants, setAssistants] = useState([]); // [TODO: add type
   const [chatEfficiency, setChatEfficiency] = useState([
     {
       name: "Aniket Rana",
@@ -82,244 +54,268 @@ export default function Reports() {
       inefficient: 30,
     },
   ]);
-  const [longestChats, setLongestChats] = useState([
-    {
-      id: "1",
-      name: "new chat",
-      tokens: 100,
-      model: "GPT-3",
-      contextWindow: 100,
-      ratio: "0.3%",
-      messages: 10,
-      participants: 3,
-      createdDate: "2021-10-10",
-    },
-    {
-      id: "2",
-      name: "new chat 2",
-      tokens: 100,
-      model: "GPT-3",
-      contextWindow: 100,
-      ratio: "0.3%",
-      messages: 10,
-      participants: 3,
-      createdDate: "2021-10-10",
-    },
-    {
-      id: "3",
-      name: "new chat 3",
-      tokens: 100,
-      model: "GPT-3",
-      contextWindow: 100,
-      ratio: "0.3%",
-      messages: 10,
-      participants: 3,
-      createdDate: "2021-10-10",
-    },
-    {
-      id: "4",
-      name: "new chat 4",
-      tokens: 100,
-      model: "GPT-3",
-      contextWindow: 100,
-      ratio: "0.3%",
-      messages: 10,
-      participants: 3,
-      createdDate: "2021-10-10",
-    },
-    {
-      id: "5",
-      name: "new chat 5",
-      tokens: 100,
-      model: "GPT-3",
-      contextWindow: 100,
-      ratio: "0.3%",
-      messages: 10,
-      participants: 3,
-      createdDate: "2021-10-10",
-    },
-    {
-      id: "6",
-      name: "new chat 6",
-      tokens: 100,
-      model: "GPT-3",
-      contextWindow: 100,
-      ratio: "0.3%",
-      messages: 10,
-      participants: 3,
-      createdDate: "2021-10-10",
-    },
-    {
-      id: "7",
-      name: "new chat 7",
-      tokens: 100,
-      model: "GPT-3",
-      contextWindow: 100,
-      ratio: "0.3%",
-      messages: 10,
-      participants: 3,
-      createdDate: "2021-10-10",
-    },
-    {
-      id: "8",
-      name: "new chat 8",
-      tokens: 100,
-      model: "GPT-3",
-      contextWindow: 100,
-      ratio: "0.3%",
-      messages: 10,
-      participants: 3,
-      createdDate: "2021-10-10",
-    },
-  ]);
-  const [tocketnDistribution, setTokenDistribution] = useState([
-    {
-      week: "Week 1",
-      input: 100,
-      output: 50,
-    },
-    {
-      week: "Week 2",
-      input: 200,
-      output: 150,
-    },
-    {
-      week: "Week 3",
-      input: 100,
-      output: 30,
-    },
-    {
-      week: "Week 4",
-      input: 160,
-      output: 50,
-    },
-    {
-      week: "Week 5",
-      input: 300,
-      output: 150,
-    },
-    {
-      week: "Week 6",
-      input: 200,
-      output: 180,
-    },
-    {
-      week: "Week 7",
-      input: 180,
-      output: 60,
-    },
-    {
-      week: "Week 8",
-      input: 140,
-      output: 80,
-    },
-  ]);
-  const [tokenUsageByUser, setTokenUsageByUser] = useState([
-    {
-      name: "Aniket Rana",
-      tockens: 350,
-    },
-    {
-      name: "Aniket Rana",
-      tockens: 540,
-    },
-  ]);
-  const [userEngagement, setUserEngagement] = useState([
-    {
-      name: "Aniket Rana",
-      chats: 10,
-      messages: 100,
-    },
-    {
-      name: "Aniket Rana",
-      chats: 10,
-      messages: 100,
-    },
-  ]);
-  return (
-    <Paper my="3rem" mx="8vw">
-      <Group justify="space-between" align="start">
-        <div>
-          <Title order={1}>TeamGPT</Title>
-          <Title mt="1rem" order={2}>
-            Usage Reports for {organization?.name}
-          </Title>
-        </div>
-        <Button
-          onClick={() => {
-            // go back
-            window.history.back();
-          }}
-        >
-          Go to Dashboard
-        </Button>
-      </Group>
 
-      <div className="flex flex-col mt-5">
-        <div className="flex flex-row ">
-          <div
-            className="flex flex-col"
-            style={{
-              marginRight: "1rem",
-            }}
-          >
-            <Select
-              defaultValue={selected}
-              onChange={(value) => setSelected(value || "Today")}
-              data={[
-                "Today",
-                "7 days",
-                "30 days",
-                "60 days",
-                "90 days",
-                "Privious Week",
-                "Previous Month",
-                "All time",
-                "Custom",
-              ]}
-              leftSection={<IconClock />}
-            ></Select>
-            <Paper
-              withBorder
-              h="100%"
-              w="15rem"
-              mt="1rem"
-              p="2rem"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-around",
-                alignItems: "center",
-              }}
-            >
-              <Title order={5} ta="center">
-                Total Number of Chats
-              </Title>
-              <Title>15</Title>
-            </Paper>
-            <Paper
-              withBorder
-              h="100%"
-              w="15rem"
-              mt="1rem"
-              p="2rem"
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                justifyContent: "space-around",
-                alignItems: "center",
-              }}
-            >
-              <Title order={5} ta="center">
-                Total Number of Messages Sent
-              </Title>
-              <Title>15</Title>
-            </Paper>
+  useEffect(() => {
+    if (organization?.id) {
+      const collectData = async () => {
+        const data = await getChatsReportData(organization.id);
+        setChats(data.chats);
+      };
+      const collectAssistants = async () => {
+        const data = await getAssistants();
+        setAssistants(data.assistants);
+      };
+      const collectTokenLogs = async () => {
+        const data = await getWrokSpaceTokens(organization.id);
+        setTokenLogs(data.tokenLogs);
+      };
+
+      setIsLoading(true);
+      collectData().then(() =>
+        collectAssistants().then(() =>
+          collectTokenLogs().then(() => setIsLoading(false))
+        )
+      );
+      if (filter == "All time") {
+        setDateRange([new Date(organization?.createdAt), new Date()]);
+      }
+    }
+  }, [organization?.id]);
+
+  useEffect(() => {
+    const getmembers = async () => {
+      const userList =
+        (await organization?.getMemberships())?.map((member: any) => {
+          return { ...member.publicUserData, role: member.role };
+        }) ?? [];
+      setMembers(userList);
+    };
+    getmembers();
+  }, [organization?.membersCount]);
+
+  useEffect(() => {
+    if (dateRange[0] && dateRange[1]) {
+      if (
+        dateRange[0] == organization?.createdAt &&
+        dateRange[1].toLocaleDateString() == new Date().toLocaleDateString()
+      ) {
+        {
+          setFilteredChats(chats);
+        }
+      } else {
+        setFilteredChats(
+          chats.filter((chat: any) => {
+            const chatDate = new Date(chat.updatedAt);
+            chatDate.setHours(0, 0, 0, 0);
+            if (dateRange[0] && dateRange[1]) {
+              if (dateRange[0].toDateString() === dateRange[1].toDateString()) {
+                return chatDate.toDateString() === dateRange[0].toDateString();
+              } else {
+                return chatDate >= dateRange[0] && chatDate <= dateRange[1];
+              }
+            }
+            return true;
+          })
+        );
+      }
+    }
+  }, [chats, dateRange]);
+
+  useEffect(() => {
+    switch (filter) {
+      case "Today":
+        setDateRange([new Date(), new Date()]);
+        break;
+      case "7 days":
+        setDateRange([
+          new Date(new Date().setDate(new Date().getDate() - 6)),
+          new Date(),
+        ]);
+        break;
+
+      case "30 days":
+        setDateRange([
+          new Date(new Date().setDate(new Date().getDate() - 30)),
+          new Date(),
+        ]);
+        break;
+
+      case "60 days":
+        setDateRange([
+          new Date(new Date().setDate(new Date().getDate() - 60)),
+          new Date(),
+        ]);
+        break;
+
+      case "90 days":
+        setDateRange([
+          new Date(new Date().setDate(new Date().getDate() - 90)),
+          new Date(),
+        ]);
+        break;
+
+      case "Previous Week":
+        setDateRange([
+          new Date(
+            new Date().setDate(new Date().getDate() - new Date().getDay() - 6)
+          ),
+          new Date(
+            new Date().setDate(new Date().getDate() - new Date().getDay())
+          ),
+        ]);
+        break;
+
+      case "Previous Month":
+        setDateRange([
+          new Date(new Date().getFullYear(), new Date().getMonth() - 1, 1),
+          new Date(new Date().getFullYear(), new Date().getMonth(), 0),
+        ]);
+        break;
+
+      case "All time":
+        setDateRange([
+          new Date(organization?.createdAt || Date.now()),
+          new Date(),
+        ]);
+        break;
+    }
+  }, [filter]);
+  function getTotalMessages(chats: any[]) {
+    let totalMessages = 0;
+    chats.forEach((chat: any) => {
+      // totalMessages += chat.messages.length;
+      chat.messages.forEach((message: any) => {
+        if ((message.type = "user")) totalMessages++;
+        // totalMessages++;
+      });
+    });
+    return totalMessages;
+  }
+
+  return (
+    <>
+      {isLoading ? (
+        <Stack gap={20} justify="center" align="center" w="100%" h="100vh">
+          <div className="flex flex-row items-center justify-center">
+            <Title order={3} mr="md">
+              Generating reports for your organization.
+            </Title>
+            <Loader size="md" />
           </div>
-          <div className="h-full w-full">
+        </Stack>
+      ) : (
+        <Paper my="3rem" mx="8vw">
+          <Group justify="space-between" align="start">
+            <div>
+              <Title order={1}>TeamGPT</Title>
+              <Title mt="1rem" order={2}>
+                Usage Reports for{" "}
+                {`${organization?.name} from ${
+                  dateRange[0]?.toLocaleDateString() || "start"
+                } till ${dateRange[1]?.toLocaleDateString() || "date"}.`}
+              </Title>
+            </div>
+            <Button
+              variant="default"
+              onClick={() => {
+                // go back
+                window.history.back();
+              }}
+            >
+              Go to Dashboard
+            </Button>
+          </Group>
+
+          <div className="flex flex-col mt-5">
+            <div className="flex flex-row ">
+              <div
+                className="flex flex-col"
+                style={{
+                  marginRight: "1rem",
+                }}
+              >
+                <Group wrap="nowrap">
+                  <Select
+                    allowDeselect={false}
+                    defaultValue={filter}
+                    onChange={(value) => {
+                      setFilter(value || "Today");
+                    }}
+                    data={[
+                      "Today",
+                      "7 days",
+                      "30 days",
+                      "60 days",
+                      "90 days",
+                      "Previous Week",
+                      "Previous Month",
+                      "All time",
+                      "Custom",
+                    ]}
+                    leftSection={<IconClock />}
+                  ></Select>
+                  {filter == "Custom" ? (
+                    <Popover>
+                      <Popover.Target>
+                        <ActionIcon variant="default" size="lg">
+                          <IconCalendar width="20px" height="20px" />
+                        </ActionIcon>
+                      </Popover.Target>
+                      <Popover.Dropdown>
+                        <DatePicker
+                          type="range"
+                          allowSingleDateInRange
+                          value={dateRange || new Date()}
+                          onChange={setDateRange}
+                        />
+                      </Popover.Dropdown>
+                    </Popover>
+                  ) : null}
+                </Group>
+                <Paper
+                  withBorder
+                  h="100%"
+                  w="100%"
+                  mt="1rem"
+                  p="2rem"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                  }}
+                >
+                  <Title order={5} ta="center">
+                    Total Number of Chats
+                  </Title>
+                  <Title>{filteredChats.length}</Title>
+                </Paper>
+                <Paper
+                  withBorder
+                  h="100%"
+                  w="100%"
+                  mt="1rem"
+                  p="2rem"
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-around",
+                    alignItems: "center",
+                  }}
+                >
+                  <Title order={5} ta="center">
+                    Total Number of Messages Sent
+                  </Title>
+                  <Title>{getTotalMessages(filteredChats)}</Title>
+                </Paper>
+              </div>
+              <div className="h-full w-full">
+                <ActiveUsers dateRange={dateRange} tokenLogs={tokenLogs} />
+              </div>
+            </div>
             <Paper
               withBorder
-              h="100%"
+              mt="1rem"
               w="100%"
               p="2rem"
               style={{
@@ -328,292 +324,183 @@ export default function Reports() {
                 alignItems: "space-between",
               }}
             >
-              <div className="mb-5">
-                <Title order={3}>Active Users</Title>
-                <Text size="sm">
-                  See how many people are active — meaning, they sent a message
-                  in a chat.
-                </Text>
-              </div>
+              <Title order={3}>Chat Efficiency by User</Title>
+              <Text mt="1rem" size="sm">
+                See how well users chat with the AI models. Each message a user
+                sends is marked as high, moderate, or low efficiency based on
+                how many tokens it uses. Sending messages in shorter chats is
+                preferred as the message will include less context from previous
+                messages and the chat will be more cost-effective and focused.
+              </Text>
               <BarChart
-                h={300}
-                data={activeUsers}
-                dataKey="month"
-                yAxisLabel="Users"
-                tickLine="y"
+                type="stacked"
+                dataKey="name"
+                h={80 * chatEfficiency.length}
+                mt="2rem"
+                xAxisLabel="Ammount (%)"
+                data={chatEfficiency}
+                orientation="vertical"
+                barProps={{}}
                 series={[
                   {
-                    name: "users",
+                    name: "efficient",
+                    color: "var(--mantine-primary-color-filled)",
+                  },
+                  { name: "moderate", color: "yellow" },
+                  { name: "inefficient", color: "red" },
+                ]}
+              ></BarChart>
+            </Paper>
+            <LongestChats
+              filteredChats={filteredChats}
+              tokenLogs={tokenLogs}
+              assistants={assistants}
+              members={members}
+            />
+            <TokenDistribution dateRange={dateRange} tokenLogs={tokenLogs} />
+            <Paper
+              withBorder
+              mt="1rem"
+              h="auto"
+              w="100%"
+              p="2rem"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "space-between",
+              }}
+            >
+              <Title order={3}>Token usage by user</Title>
+              <Text mt="1rem" size="sm">
+                See token consumption for each user to understand their GPT
+                activity. Cross check with their tokens per message ratio to
+                assess their efficiency and adoption. Champion users are the
+                ones with most tokens and lowest tokens per message figure.
+              </Text>
+              <BarChart
+                orientation="vertical"
+                h={80 * members.length}
+                xAxisLabel="Tokens"
+                mt="2rem"
+                dataKey="name"
+                data={members
+                  .map((member: any) => {
+                    return {
+                      name: member.firstName + " " + member.lastName,
+                      tokens: tokenLogs
+                        .filter((tokenLog: any) => {
+                          return tokenLog.createdBy == member.userId;
+                        })
+                        .reduce((acc: number, tokenLog: any) => {
+                          return (
+                            acc +
+                            Number(tokenLog.inputTokens) +
+                            Number(tokenLog.outputTokens)
+                          );
+                        }, 0),
+                    };
+                  })
+                  .sort((a, b) => b.tokens - a.tokens)}
+                series={[
+                  {
+                    name: "tokens",
                     color: "var(--mantine-primary-color-filled)",
                   },
                 ]}
               />
             </Paper>
+            <Paper
+              withBorder
+              mt="1rem"
+              h="auto"
+              w="100%"
+              p="2rem"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "space-between",
+              }}
+            >
+              <Title order={3}>User engagement</Title>
+              <Text mt="1rem" size="sm">
+                See the engagement of your team - chats created and messages
+                sent.
+              </Text>
+              <Table mt="1rem" verticalSpacing={10}>
+                <Table.Thead>
+                  <Table.Tr>
+                    <Table.Th>User</Table.Th>
+                    <Table.Th>Chats</Table.Th>
+                    <Table.Th>Messages</Table.Th>
+                  </Table.Tr>
+                </Table.Thead>
+                <Table.Tbody>
+                  {members.map((member: any) => {
+                    return (
+                      <Table.Tr key={member.userId}>
+                        <Table.Td>
+                          <Group>
+                            {member?.hasImage ? (
+                              <Avatar
+                                size="md"
+                                radius="sm"
+                                src={member?.imageUrl}
+                                mt={5}
+                              />
+                            ) : (
+                              <Avatar size="md" radius="sm" mt={5}>
+                                {member?.firstName + member?.lastName}
+                              </Avatar>
+                            )}
+                            <Text>
+                              {member.firstName + " " + member.lastName}
+                            </Text>
+                          </Group>
+                        </Table.Td>
+                        <Table.Td>
+                          {
+                            filteredChats.filter((chat: any) =>
+                              chat.participants.includes(member.userId)
+                            ).length
+                          }
+                        </Table.Td>
+                        <Table.Td>
+                          {filteredChats
+                            .filter((chat: any) =>
+                              chat.participants.includes(member.userId)
+                            )
+                            .reduce((acc: number, chat: any) => {
+                              return acc + chat.messages.length;
+                            }, 0)}
+                        </Table.Td>
+                      </Table.Tr>
+                    );
+                  })}
+                </Table.Tbody>
+              </Table>
+            </Paper>
+            <Paper
+              mt="1rem"
+              h="auto"
+              w="100%"
+              p="1rem"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "space-between",
+              }}
+            >
+              <Title order={5}>A quick note about reports:</Title>
+              <Text mt="1rem" size="sm">
+                Some people do work which requires and benefits from long chats.
+                Others complete a lot of quick one-prompt tasks. This data is
+                best used for understanding your whole workspace&apos;s use of
+                Team-GPT, not evaluating an individual&apos;s performance.
+              </Text>
+            </Paper>
           </div>
-        </div>
-        <Paper
-          withBorder
-          mt="1rem"
-          w="100%"
-          p="2rem"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "space-between",
-          }}
-        >
-          <Title order={3}>Chat Efficiency by User</Title>
-          <Text mt="1rem" size="sm">
-            See how well users chat with the AI models. Each message a user
-            sends is marked as high, moderate, or low efficiency based on how
-            many tokens it uses. Sending messages in shorter chats is preferred
-            as the message will include less context from previous messages and
-            the chat will be more cost-effective and focused.
-          </Text>
-          <BarChart
-            type="stacked"
-            dataKey="name"
-            h={80 * chatEfficiency.length}
-            mt="2rem"
-            xAxisLabel="Ammount (%)"
-            data={chatEfficiency}
-            orientation="vertical"
-            barProps={{}}
-            series={[
-              {
-                name: "efficient",
-                color: "var(--mantine-primary-color-filled)",
-              },
-              { name: "moderate", color: "yellow" },
-              { name: "inefficient", color: "red" },
-            ]}
-          ></BarChart>
         </Paper>
-        <Paper
-          withBorder
-          mt="1rem"
-          h="auto"
-          w="100%"
-          p="2rem"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "space-between",
-          }}
-        >
-          <Title order={3}>The longest chats in your workspace</Title>
-          <Text mt="1rem" size="sm">
-            See the longest chats in your workspace — each new message in a long
-            chat uses an increasing amount of tokens. To optimise usage costs
-            and maintain AI focus, consider splitting longer chats into smaller
-            ones or starting fresh.
-          </Text>
-          <Table mt="1rem" verticalSpacing={20}>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Chat Name</Table.Th>
-                <Table.Th>
-                  <Group justify="start">
-                    Tockens
-                    <Tooltip
-                      withArrow
-                      multiline
-                      w={400}
-                      label="The total number of tokens utilised in the chat; the chat length, in tokens."
-                      fz="xs"
-                    >
-                      <IconInfoCircle size="14px" />
-                    </Tooltip>
-                  </Group>
-                </Table.Th>
-                <Table.Th>
-                  <Group justify="start">
-                    Model
-                    <Tooltip
-                      withArrow
-                      multiline
-                      w={400}
-                      label="The GPT model the chat is using. If chats started with one model, but then switched, the latest model is shown here."
-                      fz="xs"
-                    >
-                      <IconInfoCircle size="14px" />
-                    </Tooltip>
-                  </Group>
-                </Table.Th>
-                <Table.Th>
-                  <Group justify="start">
-                    Context <br /> Window
-                    <Tooltip
-                      withArrow
-                      multiline
-                      w={400}
-                      label="The number of tokens the model can maintain as context when processing a request. When the conversation exceeds the context window, older messages are dropped from the context."
-                      fz="xs"
-                    >
-                      <IconInfoCircle size="14px" />
-                    </Tooltip>
-                  </Group>
-                </Table.Th>
-                <Table.Th>
-                  <Group justify="start">
-                    Ratio
-                    <Tooltip
-                      withArrow
-                      multiline
-                      w={400}
-                      label="The proportion of the model's total context window that is currently being utilized by the chat. Values over 100% indicate that earliest information is dropped from the context."
-                      fz="xs"
-                    >
-                      <IconInfoCircle size="14px" />
-                    </Tooltip>
-                  </Group>
-                </Table.Th>
-                <Table.Th>Messages</Table.Th>
-                <Table.Th>Participants</Table.Th>
-                <Table.Th>Date created</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {longestChats.map((chat) => (
-                <Table.Tr key={chat.id}>
-                  <Table.Td>{chat.name}</Table.Td>
-                  <Table.Td>{chat.tokens}</Table.Td>
-                  <Table.Td>{chat.model}</Table.Td>
-                  <Table.Td>{chat.contextWindow}</Table.Td>
-                  <Table.Td>{chat.ratio}</Table.Td>
-                  <Table.Td>{chat.messages}</Table.Td>
-                  <Table.Td>{chat.participants}</Table.Td>
-                  <Table.Td>{chat.createdDate}</Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </Paper>
-        <Paper
-          withBorder
-          mt="1rem"
-          h="auto"
-          w="100%"
-          p="2rem"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "space-between",
-          }}
-        >
-          <Title order={3}>Token Distribution Overview</Title>
-          <Text mt="1rem" size="sm">
-            See the token usage breakdown by type. Input tokens are almost
-            always more than output tokens, because each new message sent in the
-            chat contains the previous messages as context. Tokens can be
-            converted to cost. See your cost in OpenAI.
-          </Text>
-          <BarChart
-            type="stacked"
-            dataKey="week"
-            h={300}
-            mt="2rem"
-            xAxisLabel="Ammount"
-            data={tocketnDistribution}
-            barProps={{}}
-            series={[
-              { name: "input", color: "var(--mantine-primary-color-filled)" },
-              { name: "output", color: "yellow" },
-            ]}
-          ></BarChart>
-        </Paper>
-        <Paper
-          withBorder
-          mt="1rem"
-          h="auto"
-          w="100%"
-          p="2rem"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "space-between",
-          }}
-        >
-          <Title order={3}>Token usage by user</Title>
-          <Text mt="1rem" size="sm">
-            See token consumption for each user to understand their GPT
-            activity. Cross check with their tokens per message ratio to assess
-            their efficiency and adoption. Champion users are the ones with most
-            tokens and lowest tokens per message figure.
-          </Text>
-          <BarChart
-            dataKey="name"
-            h={80 * chatEfficiency.length}
-            mt="2rem"
-            xAxisLabel="Ammount (%)"
-            data={tokenUsageByUser}
-            orientation="vertical"
-            barProps={{}}
-            series={[
-              { name: "tockens", color: "var(--mantine-primary-color-filled)" },
-            ]}
-          ></BarChart>
-        </Paper>
-        <Paper
-          withBorder
-          mt="1rem"
-          h="auto"
-          w="100%"
-          p="2rem"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "space-between",
-          }}
-        >
-          <Title order={3}>User engagement</Title>
-          <Text mt="1rem" size="sm">
-            See the engagement of your team - chats created and messages sent.
-          </Text>
-          <Table mt="1rem" verticalSpacing={10}>
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>User</Table.Th>
-                <Table.Th>Chats</Table.Th>
-                <Table.Th>Messages</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {userEngagement.map((user) => (
-                <Table.Tr key={user.name}>
-                  <Table.Td>
-                    <Group>
-                      <Avatar alt="user" radius="xl" />
-                      <Text>{user.name}</Text>
-                    </Group>
-                  </Table.Td>
-                  <Table.Td>{user.chats}</Table.Td>
-                  <Table.Td>{user.messages}</Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </Paper>
-        <Paper
-          mt="1rem"
-          h="auto"
-          w="100%"
-          p="1rem"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "space-between",
-          }}
-        >
-          <Title order={5}>A quick note about reports:</Title>
-          <Text mt="1rem" size="sm">
-            Some people do work which requires and benefits from long chats.
-            Others complete a lot of quick one-prompt tasks. This data is best
-            used for understanding your whole workspace&apos;s use of Team-GPT,
-            not evaluating an individual&apos;s performance.
-          </Text>
-        </Paper>
-      </div>
-    </Paper>
+      )}
+    </>
   );
 }

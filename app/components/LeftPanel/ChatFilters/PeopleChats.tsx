@@ -69,7 +69,7 @@ const PeopleChats = (props: {
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
-      <ScrollArea h="45vh" scrollbarSize={3} pb={"10"}>
+      <ScrollArea mah="calc(100vh - 380px)" scrollbarSize={3} pb={"10"}>
         {filteredMembers.length > 0 ? (
           <Accordion
             chevronPosition="left"

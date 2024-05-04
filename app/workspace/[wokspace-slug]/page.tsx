@@ -11,6 +11,9 @@ import {
   Text,
   Loader,
   Tooltip,
+  Card,
+  Paper,
+  ScrollArea,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
@@ -32,6 +35,8 @@ import RightPanel from "../../components/RightPanel/RightPanel";
 import LeftPanel from "../../components/LeftPanel/Leftpanel";
 import ChatWindow from "../../components/ChatWindow/ChatWindow";
 import { createChat } from "@/app/controllers/chat";
+import { getWorkspace } from "@/app/controllers/workspace";
+import RecentChats from "../../components/LeftPanel/ChatFilters/RecentChats";
 
 export default function Workspace() {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
@@ -43,12 +48,29 @@ export default function Workspace() {
   const pathname = usePathname();
 
   const [orgMembers, setOrgMembers] = useState<any>([]);
+  const [workspace, setWorkspace] = useState<any>(null);
+  const isAdmin =
+    orgMembers?.find((member: any) => member.userId === userId)?.role ===
+    "org:admin";
+  const allowPublic = isAdmin || workspace?.allowPublic;
+  const allowPersonal = isAdmin || workspace?.allowPersonal;
+
+  useEffect(() => {
+    if (organization?.id) {
+      const fetchWorkspace = async () => {
+        const res = await getWorkspace(organization.id);
+        setWorkspace(res.workspace);
+      };
+      fetchWorkspace();
+    }
+  }, [organization?.id]);
+
   useEffect(() => {
     const fetchOrgMembers = async () => {
       const res =
-        (await organization?.getMemberships())?.map(
-          (member: any) => member.publicUserData
-        ) || [];
+        (await organization?.getMemberships())?.map((member: any) => {
+          return { ...member.publicUserData, role: member.role };
+        }) ?? [];
       setOrgMembers(res);
     };
     fetchOrgMembers();
@@ -64,35 +86,6 @@ export default function Workspace() {
   }, [orgId]);
 
   useEffect(() => {
-    if (socket.connected) {
-      console.log("socket already connected");
-    }
-
-    socket.on("hello", (value) => {
-      console.log(value, "socket listeners");
-    });
-    socket.on("connect", () => {
-      console.log("socket connected");
-    });
-    socket.on("disconnect", () => {
-      console.log("socket disconnected");
-    });
-    socket.on("newMessage", (message) => {
-      console.log("newMessage", message);
-    });
-
-    return () => {
-      socket.off("connect");
-      socket.off("disconnect");
-    };
-  }, []);
-
-  useEffect(() => {
-    // console.log("slug", organization?.slug);
-    // if (pathname?.split("/")[2] != organization?.slug) {
-    //   // notFound();
-    //}
-
     if (currentChatId != "") socket.emit("leaveChatRoom", currentChatId);
     setCurrentChatId(pathname?.split("/")[3] || "");
   }, [pathname]);
@@ -194,7 +187,7 @@ export default function Workspace() {
                 marginLeft: "-15px",
               }}
             >
-              <div className="grow">
+              <div className="flex flex-col grow">
                 {pathname?.split("/")[3] ? (
                   <ChatWindow
                     currentChatId={currentChatId}
@@ -202,7 +195,7 @@ export default function Workspace() {
                     toggleLeft={toggleLeft}
                   />
                 ) : (
-                  <Stack>
+                  <Stack align="center">
                     <Container mt={150}>
                       <Text>What do you want to do ?</Text>
                       <Button
@@ -229,6 +222,29 @@ export default function Workspace() {
                         Start a Chat
                       </Button>
                     </Container>
+                    <Paper
+                      withBorder
+                      radius="md"
+                      p="xl"
+                      mt="md"
+                      mr="md"
+                      style={{
+                        display: "flex",
+                        flexDirection: "column",
+                        width: "90%",
+                        maxWidth: "40rem",
+                        maxHeight: "30rem",
+                      }}
+                    >
+                      <Title order={4} mb="md">
+                        Everyone&apos;s Recent Chats
+                      </Title>
+                      <RecentChats
+                        members={orgMembers}
+                        allowPublic={allowPublic}
+                        allowPersonal={allowPersonal}
+                      />
+                    </Paper>
                   </Stack>
                 )}
               </div>

@@ -245,7 +245,11 @@ const GeneralChats = (props: {
             />
           </Accordion.Control>
           <AccordionPanel>
-            <ScrollArea.Autosize mah="50vh" scrollbarSize={10} offsetScrollbars>
+            <ScrollArea.Autosize
+              mah="calc(100vh - 475px)"
+              scrollbarSize={10}
+              offsetScrollbars
+            >
               {isLoading ? (
                 <Loader type="dots" w={"100%"} />
               ) : publicFolders.length > 0 || publicChats.length > 0 ? (

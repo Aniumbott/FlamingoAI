@@ -55,7 +55,7 @@ const ArchivedChats = (props: {
 
   return (
     <div className="flex flex-col justify-between h-fit w-full">
-      <ScrollArea h="45vh" scrollbarSize={3} offsetScrollbars>
+      <ScrollArea mah="calc(100vh - 380px)" scrollbarSize={3} offsetScrollbars>
         {archivedChats ? (
           archivedChats.length > 0 ? (
             archivedChats.map((chat, key) => {

@@ -39,31 +39,29 @@ const RecentChats = (props: {
   const [recentChats, setRecentChats] = useState<IChatDocument[] | null>(null);
 
   return (
-    <div>
-      <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
-        {recentChats ? (
-          recentChats.length === 0 ? (
-            <Text style={{ textAlign: "center" }} c="dimmed" size="xs">
-              No recent chats
-            </Text>
-          ) : (
-            recentChats.map((chat, key) => {
-              return (
-                <ChatItem
-                  item={chat}
-                  key={key}
-                  members={members}
-                  allowPersonal={allowPersonal}
-                  allowPublic={allowPublic}
-                />
-              );
-            })
-          )
+    <ScrollArea mah="calc(100vh - 330px)" scrollbarSize={10} offsetScrollbars>
+      {recentChats ? (
+        recentChats.length === 0 ? (
+          <Text style={{ textAlign: "center" }} c="dimmed" size="xs">
+            No recent chats
+          </Text>
         ) : (
-          <Loader type="dots" w={"100%"} />
-        )}
-      </ScrollArea>
-    </div>
+          recentChats.map((chat, key) => {
+            return (
+              <ChatItem
+                item={chat}
+                key={key}
+                members={members}
+                allowPersonal={allowPersonal}
+                allowPublic={allowPublic}
+              />
+            );
+          })
+        )
+      ) : (
+        <Loader type="dots" w={"100%"} />
+      )}
+    </ScrollArea>
   );
 };
 

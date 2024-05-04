@@ -43,7 +43,7 @@ const FavouriteChats = (props: {
 
   return (
     <div>
-      <ScrollArea h="50vh" scrollbarSize={10} offsetScrollbars>
+      <ScrollArea mah="calc(100vh - 330px)" scrollbarSize={10} offsetScrollbars>
         {favouriteChats ? (
           favouriteChats.length === 0 ? (
             <Text style={{ textAlign: "center" }} c="dimmed" size="xs">

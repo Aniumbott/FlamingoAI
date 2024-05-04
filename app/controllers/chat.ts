@@ -93,6 +93,26 @@ async function getAllPopulatedChats(createdBy: string, workspaceId: string) {
   }
 }
 
+// Function to get chats report data
+async function getChatsReportData(workspaceId: String) {
+  try {
+    const data = await fetch(
+      `/api/chat/?workspaceId=${workspaceId}&action=reportData`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    const response = await data.json();
+    return response;
+  } catch (err) {
+    console.error(err);
+    return err;
+  }
+}
+
 // Funtion to get single populated Chat
 async function getChat(id: String, workspaceId: String, createdBy: string) {
   try {
@@ -309,6 +329,7 @@ export {
   getArchivedChats,
   getAllChats,
   getAllPopulatedChats,
+  getChatsReportData,
   getChat,
   createChatFork,
   createChat,

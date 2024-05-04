@@ -8,7 +8,6 @@ import { headers } from "next/headers";
 import { Webhook } from "svix";
 import { stripe } from "@/app/lib/stripe";
 import User from "@/app/models/User";
-import { subscribe } from "diagnostics_channel";
 
 const webhookSecret = process.env.CLERK_WORKSPACE_WEBHOOK_SECRET || ``;
 
@@ -85,7 +84,6 @@ export async function POST(request: Request) {
       break;
     case "organization.deleted":
       workspace = await Workspace.findByIdAndDelete(payload.data.id);
-      customer = await stripe.customers.del(workspace?.customerId || "");
       console.log(
         `Successfully deleted workspace with _id: ${payload.data.id}`
       );

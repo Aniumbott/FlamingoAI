@@ -15,6 +15,7 @@ const AssistantSchema = new Mongoose.Schema(
       {
         label: { type: String, required: true },
         value: { type: String, required: true },
+        contextWindow: { type: Number, required: false },
       },
     ],
   },
@@ -28,6 +29,7 @@ interface IAssistant {
   models: {
     label: string;
     value: string;
+    contextWindow: number;
   }[];
 }
 
