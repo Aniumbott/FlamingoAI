@@ -17,7 +17,7 @@ import {
   IconFolderPlus,
   IconPlus,
 } from "@tabler/icons-react";
-import { ModalControls } from "./PromptPanel";
+import { ModalControls } from "./PromptsPanel";
 
 // Components
 import style from "../../RightPanel.module.css";

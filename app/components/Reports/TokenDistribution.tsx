@@ -158,6 +158,10 @@ export default function TokenDistribution(props: {
       )
     );
   }, [dateRange, tokenLogs]);
+
+  useEffect(() => {
+    console.log(tokenDistribution);
+  }, [tokenDistribution]);
   return (
     <Paper
       withBorder

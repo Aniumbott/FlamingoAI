@@ -56,7 +56,7 @@ export default function Reports() {
   ]);
 
   useEffect(() => {
-    if (organization?.id) {
+    if (organization) {
       const collectData = async () => {
         const data = await getChatsReportData(organization.id);
         setChats(data.chats);
@@ -105,13 +105,18 @@ export default function Reports() {
       } else {
         setFilteredChats(
           chats.filter((chat: any) => {
-            const chatDate = new Date(chat.updatedAt);
+            const chatDate = new Date(chat.createdAt);
             chatDate.setHours(0, 0, 0, 0);
             if (dateRange[0] && dateRange[1]) {
               if (dateRange[0].toDateString() === dateRange[1].toDateString()) {
                 return chatDate.toDateString() === dateRange[0].toDateString();
               } else {
-                return chatDate >= dateRange[0] && chatDate <= dateRange[1];
+                return (
+                  chatDate >= dateRange[0] &&
+                  (chatDate <= dateRange[1] ||
+                    chatDate.toLocaleDateString() ==
+                      dateRange[1].toLocaleDateString())
+                );
               }
             }
             return true;
@@ -181,15 +186,9 @@ export default function Reports() {
     }
   }, [filter]);
   function getTotalMessages(chats: any[]) {
-    let totalMessages = 0;
-    chats.forEach((chat: any) => {
-      // totalMessages += chat.messages.length;
-      chat.messages.forEach((message: any) => {
-        if ((message.type = "user")) totalMessages++;
-        // totalMessages++;
-      });
-    });
-    return totalMessages;
+    return chats.reduce((total: number, chat: any) => {
+      return total + chat.messages.filter((m: any) => m.type === "user").length;
+    }, 0);
   }
 
   return (
@@ -218,11 +217,10 @@ export default function Reports() {
             <Button
               variant="default"
               onClick={() => {
-                // go back
                 window.history.back();
               }}
             >
-              Go to Dashboard
+              Go to Workspace
             </Button>
           </Group>
 
@@ -286,7 +284,7 @@ export default function Reports() {
                   }}
                 >
                   <Title order={5} ta="center">
-                    Total Number of Chats
+                    Total number of Chats
                   </Title>
                   <Title>{filteredChats.length}</Title>
                 </Paper>
@@ -304,7 +302,7 @@ export default function Reports() {
                   }}
                 >
                   <Title order={5} ta="center">
-                    Total Number of Messages Sent
+                    Total number of Messages Sent
                   </Title>
                   <Title>{getTotalMessages(filteredChats)}</Title>
                 </Paper>
@@ -389,7 +387,17 @@ export default function Reports() {
                       name: member.firstName + " " + member.lastName,
                       tokens: tokenLogs
                         .filter((tokenLog: any) => {
-                          return tokenLog.createdBy == member.userId;
+                          return (
+                            dateRange[0] &&
+                            dateRange[1] &&
+                            new Date(tokenLog.createdAt) >= dateRange[0] &&
+                            (new Date(tokenLog.createdAt) <= dateRange[1] ||
+                              new Date(
+                                tokenLog.createdAt
+                              ).toLocaleDateString() ==
+                                dateRange[1].toLocaleDateString()) &&
+                            tokenLog.createdBy == member.userId
+                          );
                         })
                         .reduce((acc: number, tokenLog: any) => {
                           return (

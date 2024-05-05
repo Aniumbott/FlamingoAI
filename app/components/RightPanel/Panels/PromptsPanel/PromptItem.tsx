@@ -17,7 +17,7 @@ import style from "../../RightPanel.module.css";
 import { useAuth } from "@clerk/nextjs";
 import { IPromptDocument } from "@/app/models/Prompt";
 import PromptFeatureMenu from "../../Menu/PromptFeatureMenu";
-import { ModalControls } from "./PromptPanel";
+import { ModalControls } from "./PromptsPanel";
 import MovePromptItems from "../../Modals/MoveItems/MovePromptItems";
 
 export default function PromptItem(props: {

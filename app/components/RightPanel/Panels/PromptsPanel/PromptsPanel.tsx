@@ -51,7 +51,7 @@ export type ModalControls = {
   setOpenModal: (value: boolean) => void;
 };
 
-export default function PromptPanel(props: { toggleRight: () => void }) {
+export default function PromptsPanel(props: { toggleRight: () => void }) {
   const { toggleRight } = props;
   const [systemPrompt, setSystemPrompt] = useState<IPromptDocument[]>([]);
   const [publicPrompt, setPublicPrompt] = useState<IPromptDocument[]>([]);

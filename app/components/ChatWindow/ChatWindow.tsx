@@ -25,11 +25,13 @@ import {
   Select,
   Tooltip,
   HoverCard,
+  Card,
 } from "@mantine/core";
 import {
   IconBuilding,
   IconInfoCircle,
   IconLayoutSidebarLeftExpand,
+  IconRefresh,
   IconSend,
 } from "@tabler/icons-react";
 import { useOrganization, useUser } from "@clerk/nextjs";
@@ -614,19 +616,12 @@ export default function ChatWindow(props: {
                     : "var(--mantine-color-gray-0)",
               }}
             >
-              <Text
-                p={20}
-                bg={
-                  colorScheme === "dark"
-                    ? "var(--mantine-color-gray-8)"
-                    : "var(--mantine-color-gray-4)"
-                }
-                w={"80%"}
-                ta={"center"}
-                style={{ borderRadius: "10px" }}
-              >
-                You can only view this chat. Ask the owner to grant you access.
-              </Text>
+              <Card w="80%" my="lg" radius="md" withBorder>
+                <Text ta="center" my="sm">
+                  You can only view this chat. Ask the owner to grant you
+                  access.
+                </Text>
+              </Card>
             </div>
           ) : (
             <Stack
@@ -642,10 +637,12 @@ export default function ChatWindow(props: {
               {chat?.messages?.length &&
               chat.messages.some((message: any) => message.type === "user") ? (
                 <Button
+                  mt="md"
                   variant="outline"
                   fw={300}
-                  w={"fit-content"}
+                  size="md"
                   disabled={processing}
+                  leftSection={<IconRefresh size="20px" />}
                   onClick={() => {
                     setProcessing(true);
                     let contexWindow = tillLastUserMessage(chat.messages);
@@ -673,7 +670,7 @@ export default function ChatWindow(props: {
                 position="top"
               >
                 <div
-                  className="w-full h-fit py-2 pb-4 flex justify-center items-center"
+                  className="w-full h-fit flex justify-center items-center"
                   style={{
                     background:
                       colorScheme == "dark"
@@ -688,7 +685,9 @@ export default function ChatWindow(props: {
                       variant="default"
                       size="lg"
                       radius="0"
-                      w="75%"
+                      my="md"
+                      w="66%"
+                      miw="300px"
                       placeholder="Type a message or type '/' to select a prompt"
                       value={messageInput}
                       disabled={processing}
@@ -776,8 +775,6 @@ export default function ChatWindow(props: {
 
                 <Combobox.Dropdown>
                   <Combobox.Options>
-                    {/* <Text>Select Prompts</Text>
-            <Divider /> */}
                     <ScrollArea.Autosize mah={200} type="scroll">
                       {filteredPrompts?.length > 0 ? (
                         filteredPrompts.map((prompt) => (

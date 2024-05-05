@@ -19,7 +19,7 @@ import { useHover } from "@mantine/hooks";
 import { useAuth } from "@clerk/nextjs";
 import { IPromptDocument } from "@/app/models/Prompt";
 import { createPrompt, deletePrompt } from "@/app/controllers/prompt";
-import { ModalControls } from "../Panels/PromptPanel/PromptPanel";
+import { ModalControls } from "../Panels/PromptsPanel/PromptsPanel";
 
 export default function PromptFeatureMenu(props: {
   prompt: IPromptDocument;

@@ -26,7 +26,7 @@ import {
   deletePromptFolder,
   updatePromptFolder,
 } from "@/app/controllers/promptFolder";
-import { ModalControls } from "../Panels/PromptPanel/PromptPanel";
+import { ModalControls } from "../Panels/PromptsPanel/PromptsPanel";
 
 export default function PromptFolderFeatureMenu(props: {
   folder: IPromptFolderDocument;
