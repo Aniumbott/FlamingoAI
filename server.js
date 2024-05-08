@@ -11,22 +11,40 @@ const handler = app.getRequestHandler();
 
 app.prepare().then(() => {
   const httpServer = createServer(handler);
-
   const io = new Server(httpServer);
+  const rooms = new Map();
 
   io.on("connection", (socket) => {
     console.log("a user connected");
 
     // Event listeners
     // Basic
-    socket.on("joinChatRoom", (roomId) => {
+    socket.on("joinChatRoom", (roomId, userId) => {
       socket.join(roomId);
       console.log(`User with ID: ${socket.id} joined Chat: ${roomId}`);
+      // Remove user from all other rooms
+      if(!rooms.has(roomId)) {
+        rooms.set(roomId, new Set());
+      }
+      rooms.forEach((users, id) => {
+        if (id !== roomId) {
+          users.delete(userId);
+          io.to(id).emit("onlineUsers", Array.from(rooms.get(id)));
+        }
+        else{
+          users.add(userId);
+        }
+      });
+      const users = Array.from(rooms.get(roomId));
+      io.to(roomId).emit("onlineUsers", users);
     });
 
-    socket.on("leaveChatRoom", (roomId) => {
+    socket.on("leaveChatRoom", (roomId, userId) => {
       socket.leave(roomId);
       console.log(`User with ID: ${socket.id} left Chat: ${roomId}`);
+      rooms.get(roomId).delete(userId);
+      const users = Array.from(rooms.get(roomId));
+      io.to(roomId).emit("onlineUsers", users);
     });
 
     socket.on("joinWorkspaceRoom", (roomId) => {
@@ -68,7 +86,7 @@ app.prepare().then(() => {
     // Chat and ChatFolders
     socket.on("updateChat", (roomId, item) => {
       console.log(
-        `User with ID: ${socket.id} created chat: ${item} in room: ${roomId}`
+        `User with ID: ${socket.id} updated chat: ${item} in room: ${roomId}`
       );
       io.to(roomId).emit("refreshChats");
       io.to(roomId).emit("refreshChatWindow");
@@ -76,7 +94,7 @@ app.prepare().then(() => {
     
     socket.on("updatePersonalChat", (item) => {
       console.log(
-        `User with ID: ${socket.id} created private chat: ${item} to user: ${socket.id}`
+        `User with ID: ${socket.id} updated private chat: ${item} to user: ${socket.id}`
       );
       io.to(socket.id).emit("refreshChats");
       io.to(socket.id).emit("refreshChatWindow");

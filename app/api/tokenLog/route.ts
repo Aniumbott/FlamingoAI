@@ -28,9 +28,6 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
-
-    console.log("body at POST in TokenLog route: ", body);
-
     const tokenLog = await TokenLog.create({
       inputTokens: body.inputTokens,
       outputTokens: body.outputTokens,
@@ -38,9 +35,6 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
       chatId: body.chatId,
       workspaceId: body.workspaceId,
     });
-
-    console.log("tokenLog at POST in TokenLog route: ", tokenLog);
-
     return NextResponse.json({ tokenLog }, { status: 201 });
   } catch (error: any) {
     console.log("error at POST in TokenLog route: ", error);

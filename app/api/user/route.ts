@@ -13,7 +13,6 @@ export async function POST(request: Request) {
   switch (payload.type) {
     case "user.created":
       user = await User.create(getUserDataFromEvent(payload));
-      // console.log(`Successfully created user with _id: ${user._id}`);
       break;
     case "user.updated":
       user = await User.findByIdAndUpdate(
@@ -23,11 +22,9 @@ export async function POST(request: Request) {
           new: true,
         }
       );
-      // console.log(`Successfully updated user with _id: ${user?._id}`);
       break;
     case "user.deleted":
       user = await User.findByIdAndDelete(payload.data.id);
-      // console.log(`Successfully deleted user with _id: ${payload.data.id}`);
       break;
   }
   return Response.json({ message: "Received" });

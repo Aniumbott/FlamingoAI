@@ -64,6 +64,7 @@ const PromptModal = (props: {
         setDescription("");
         setContent("");
       }}
+      centered
       padding={0}
       size={"80%"}
       withCloseButton={false}

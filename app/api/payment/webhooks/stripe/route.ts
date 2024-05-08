@@ -1,11 +1,7 @@
-import { NextApiRequest, NextApiResponse } from "next";
 import Stripe from "stripe";
 import { stripe } from "@/app/lib/stripe";
-import { stat } from "fs";
-import { error } from "console";
-import { NextRequest, NextResponse } from "next/server";
-import { headers } from "next/headers";
-import { sign } from "crypto";
+import { NextResponse } from "next/server";
+
 import Workspace, { IWorkspaceDocument } from "@/app/models/Workspace";
 
 export async function POST(req: any, res: NextResponse) {
@@ -39,7 +35,6 @@ export async function POST(req: any, res: NextResponse) {
       console.log("Subscription was created!");
       break;
     case "customer.subscription.updated":
-      // status: req.status,
       workspace = await Workspace.findOneAndUpdate(
         {
           customerId: event.data.object.customer,
@@ -51,7 +46,6 @@ export async function POST(req: any, res: NextResponse) {
       console.log("Subscription was updated!");
       break;
     case "customer.subscription.deleted":
-      // workspace delete -> subscription delete\
       workspace = await Workspace.findOneAndUpdate(
         {
           customerId: event.data.object.customer,
@@ -67,8 +61,6 @@ export async function POST(req: any, res: NextResponse) {
     default:
       console.log(`Unhandled event type ${event.type}`);
   }
-
-  // Return a response to acknowledge receipt of the event
   return NextResponse.json({ received: true, status: 200 });
 }
 

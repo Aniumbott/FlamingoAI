@@ -59,8 +59,7 @@ const ShareChatModal = (props: {
                       fz="xs"
                     >
                       <ActionIcon
-                        color={copied ? "" : "grey"}
-                        variant="filled"
+                        variant={copied ? "filled" : "light"}
                         onClick={copy}
                         size={36}
                       >

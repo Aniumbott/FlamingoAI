@@ -77,8 +77,6 @@ export default function Workspace() {
   }, [organization?.membersCount]);
 
   useEffect(() => {
-    console.log("organization ID", orgId);
-
     socket.emit("joinWorkspaceRoom", orgId);
     return () => {
       socket.emit("leaveWorkspaceRoom", orgId);
@@ -86,7 +84,10 @@ export default function Workspace() {
   }, [orgId]);
 
   useEffect(() => {
-    if (currentChatId != "") socket.emit("leaveChatRoom", currentChatId);
+    if (currentChatId != pathname?.split("/")[3]) {
+      console.log("leaving", currentChatId);
+      socket.emit("leaveChatRoom", currentChatId, userId);
+    }
     setCurrentChatId(pathname?.split("/")[3] || "");
   }, [pathname]);
 
@@ -95,10 +96,6 @@ export default function Workspace() {
       notFound();
     }
   }, [organization]);
-
-  // useEffect(() => {
-  // console.log("orgId", orgId);
-  // }, [orgId]);
 
   return (
     <>

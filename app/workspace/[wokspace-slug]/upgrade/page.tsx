@@ -206,15 +206,9 @@ export default function Upgrade() {
               <List.Item mt={6}>No model training on data</List.Item>
               <List.Item mt={6}>No credit card required</List.Item>
             </List>
-            <Group
-              gap={5}
-              align="center"
-              c={"var(--mantine-color-gray-6)"}
-              w="100%"
-              mt={10}
-            >
+            <Group gap={5} align="center" c="dimmed" w="100%" mt={10}>
               <IconPlus size={20} />
-              <Text>AI usage costs</Text>
+              <Text fw={700}>AI usage costs</Text>
               <HoverCard width={300} shadow="md">
                 <HoverCard.Target>
                   <IconInfoCircle size={15} />
@@ -303,14 +297,9 @@ export default function Upgrade() {
                   per month / per 10 seats
                 </Text>
               </div>
-              <Group
-                gap={5}
-                align="center"
-                c={"var(--mantine-color-gray-6)"}
-                w="100%"
-              >
+              <Group gap={5} align="center" c="dimmed" w="100%">
                 <IconPlus size={20} />
-                <Text>AI usage costs</Text>
+                <Text fw={700}>AI usage costs</Text>
                 <HoverCard width={300} shadow="md">
                   <HoverCard.Target>
                     <IconInfoCircle size={15} />
@@ -446,14 +435,9 @@ export default function Upgrade() {
                   per month / per 10 seats
                 </Text>
               </div>
-              <Group
-                gap={5}
-                align="center"
-                c={"var(--mantine-color-gray-6)"}
-                w="100%"
-              >
+              <Group gap={5} align="center" c="dimmed" w="100%">
                 <IconPlus size={20} />
-                <Text>AI usage costs</Text>
+                <Text fw={700}>AI usage costs</Text>
                 <HoverCard width={300} shadow="md">
                   <HoverCard.Target>
                     <IconInfoCircle size={15} />

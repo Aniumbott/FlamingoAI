@@ -33,6 +33,8 @@ import {
   IconLayoutSidebarLeftExpand,
   IconRefresh,
   IconSend,
+  IconSettings,
+  IconShare,
 } from "@tabler/icons-react";
 import { useOrganization, useUser } from "@clerk/nextjs";
 
@@ -57,6 +59,7 @@ import ShareChatModal from "@/app/components/ChatWindow/Modals/ShareChatModal";
 import ErrorPage from "./ErrorPage/ErrorPage";
 import SettingsModal from "./Modals/SettingsModal";
 import { usePathname, useRouter } from "next/navigation";
+import OnlineUsers from "./OnlineUsers";
 
 export default function ChatWindow(props: {
   currentChatId: String;
@@ -66,6 +69,11 @@ export default function ChatWindow(props: {
   const { currentChatId, leftOpened, toggleLeft } = props;
   const { organization } = useOrganization();
   const { user } = useUser();
+  const { colorScheme } = useMantineColorScheme();
+  const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
+    HTMLDivElement,
+    HTMLDivElement
+  >();
   const [chat, setChat] = useState<any>({
     name: "",
     messages: [],
@@ -73,19 +81,14 @@ export default function ChatWindow(props: {
     workspaceId: "",
     _id: "",
   });
-  const { colorScheme } = useMantineColorScheme();
   const [participants, setParticipants] = useState<any>([]);
   const [messageInput, setMessageInput] = useState("");
   const [forkMessage, setForkMessage] = useState<any>(null);
-  const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
-    HTMLDivElement,
-    HTMLDivElement
-  >();
   const [prompts, setPrompts] = useState<IPromptDocument[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
   const combobox = useCombobox({
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const filteredPrompts = prompts?.filter((prompt) => {
     return prompt.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
@@ -246,7 +249,7 @@ export default function ChatWindow(props: {
     setMessageInput("");
 
     if (currentChatId != "") {
-      socket.emit("joinChatRoom", currentChatId);
+      socket.emit("joinChatRoom", currentChatId, user?.id || "");
       const getCurrentChat = async () => {
         return await getChat(
           currentChatId,
@@ -334,7 +337,7 @@ export default function ChatWindow(props: {
               </div>
             ) : null}
             <Group justify="space-between" px={"md"} w={"100%"}>
-              <Group>
+              <Group gap="sm">
                 <HoverCard width={280} position="bottom-start" withArrow>
                   <HoverCard.Target>
                     <IconInfoCircle size={20} />
@@ -350,23 +353,30 @@ export default function ChatWindow(props: {
                   {chat?.name}
                 </Text>
               </Group>
-              <Group gap={0}>
-                <Button
-                  variant="default"
-                  // color="default"
-                  onClick={() => setShareChatOpened(true)}
-                  mx={5}
-                >
-                  Share
-                </Button>
-                <Button
-                  variant="default"
-                  // color="default"
-                  onClick={() => setSettingsOpen(true)}
-                  mx={5}
-                >
-                  Settings
-                </Button>
+              <Group gap="sm" p={3}>
+                <OnlineUsers
+                  participants={participants}
+                  chatId={currentChatId}
+                />
+
+                <Tooltip label="Share chat" fz="sm">
+                  <ActionIcon
+                    variant="subtle"
+                    color="grey"
+                    onClick={() => setShareChatOpened(true)}
+                  >
+                    <IconShare size={20} />
+                  </ActionIcon>
+                </Tooltip>
+                <Tooltip label="Chat settings" fz="sm">
+                  <ActionIcon
+                    variant="subtle"
+                    color="grey"
+                    onClick={() => setSettingsOpen(true)}
+                  >
+                    <IconSettings size={20} />
+                  </ActionIcon>
+                </Tooltip>
               </Group>
             </Group>
             {shareChatOpened && (
@@ -550,7 +560,6 @@ export default function ChatWindow(props: {
 
           {chat?.archived ? (
             <div
-              className="w-full h-fit py-2 pb-4 flex justify-center items-center"
               style={{
                 background:
                   colorScheme == "dark"
@@ -558,57 +567,46 @@ export default function ChatWindow(props: {
                     : "var(--mantine-color-gray-0)",
               }}
             >
-              <Group
-                gap={25}
-                justify="space-between"
-                w={"80%"}
-                bg={
-                  colorScheme === "dark"
-                    ? "var(--mantine-color-gray-8)"
-                    : "var(--mantine-color-gray-4)"
-                }
-                p={10}
-              >
-                <Text ta={"center"} style={{ flexGrow: 1 }}>
-                  This chat has been archived.
-                </Text>
-                <Group gap={15}>
-                  <Button
-                    variant="default"
-                    onClick={() => {
-                      updateChat(chat?._id, {
-                        archived: false,
-                      }).then((res) => {
-                        console.log(res);
-                      });
-                    }}
-                  >
-                    Restore
-                  </Button>
-                  <Button
-                    variant="default"
-                    onClick={() => {
-                      deleteChat(chat)
-                        .then((res) => {
+              <Card w="80%" my="lg" mx="10%" radius="md" withBorder>
+                <Group justify="space-between" px="md" my="sm">
+                  <Text>This chat has been archived.</Text>
+                  <Group gap={15}>
+                    <Button
+                      variant="default"
+                      onClick={() => {
+                        updateChat(chat?._id, {
+                          archived: false,
+                        }).then((res) => {
                           console.log(res);
-                        })
-                        .then(() => {
-                          if (pathname.split("/")[3] == chat._id) {
-                            router.push(
-                              pathname.split("/").slice(0, 3).join("/")
-                            );
-                          }
                         });
-                    }}
-                  >
-                    Delete
-                  </Button>
+                      }}
+                    >
+                      Restore
+                    </Button>
+                    <Button
+                      variant="default"
+                      onClick={() => {
+                        deleteChat(chat)
+                          .then((res) => {
+                            console.log(res);
+                          })
+                          .then(() => {
+                            if (pathname.split("/")[3] == chat._id) {
+                              router.push(
+                                pathname.split("/").slice(0, 3).join("/")
+                              );
+                            }
+                          });
+                      }}
+                    >
+                      Delete
+                    </Button>
+                  </Group>
                 </Group>
-              </Group>
+              </Card>
             </div>
           ) : isViewOnly(chat) ? (
             <div
-              className="w-full h-fit py-2 pb-4 flex justify-center items-center"
               style={{
                 background:
                   colorScheme == "dark"
@@ -616,7 +614,7 @@ export default function ChatWindow(props: {
                     : "var(--mantine-color-gray-0)",
               }}
             >
-              <Card w="80%" my="lg" radius="md" withBorder>
+              <Card w="80%" my="lg" mx="10%" radius="md" withBorder>
                 <Text ta="center" my="sm">
                   You can only view this chat. Ask the owner to grant you
                   access.
