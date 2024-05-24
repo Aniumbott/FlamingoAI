@@ -86,4 +86,4 @@ const Chat: IChatModel =
   Mongoose.models.chats || Mongoose.model<IChatDocument>("chats", ChatSchema);
 
 export default Chat;
-export type { IChatDocument };
+export type { IChatDocument, IChatModel };

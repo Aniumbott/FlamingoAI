@@ -61,4 +61,4 @@ const Message: IMessageModel =
   Mongoose.model<IMessageDocument>("messages", MessageSchema);
 
 export default Message;
-export type { IMessageDocument };
+export type { IMessageDocument, IMessageModel };

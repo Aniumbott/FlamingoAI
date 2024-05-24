@@ -2,10 +2,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import type { NextApiResponse } from "next";
 import { dbConnect } from "@/app/lib/db";
-import Chat from "@/app/models/Chat";
+import Chat, { IChatModel } from "@/app/models/Chat";
 import ChatFolder from "@/app/models/ChatFolder";
-import Message from "@/app/models/Message";
-import Comment from "@/app/models/Comment";
+import Message, { IMessageModel } from "@/app/models/Message";
+import Comment, { ICommentModel } from "@/app/models/Comment";
 import Workspace from "@/app/models/Workspace";
 import { get_encoding } from "tiktoken";
 
@@ -421,27 +421,7 @@ export async function DELETE(req: any, res: NextApiResponse) {
     await dbConnect();
     const body = await req.json();
 
-    const chat = await Chat.findById(body.id).populate({
-      path: "messages",
-      populate: {
-        path: "comments",
-        populate: {
-          path: "replies",
-        },
-      },
-    });
-
-    chat?.messages.forEach(async (message: any) => {
-      message.comments.forEach(async (comment: any) => {
-        comment.replies.forEach(async (reply: any) => {
-          await Comment.findByIdAndDelete(reply._id);
-        });
-        await Comment.findByIdAndDelete(comment._id);
-      });
-      await Message.findByIdAndDelete(message._id);
-    });
-
-    await Chat.findByIdAndDelete(body.id);
+    await deleteChatbyId(body.id, Chat, Message, Comment);
 
     return NextResponse.json(
       { message: "Chat deleted successfully" },
@@ -451,4 +431,33 @@ export async function DELETE(req: any, res: NextApiResponse) {
     console.log("error at DELETE in Chat route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
+}
+
+export async function deleteChatbyId(
+  chatId: string,
+  Chat: IChatModel,
+  Message: IMessageModel,
+  Comment: ICommentModel
+) {
+  const chat = await Chat.findById(chatId).populate({
+    path: "messages",
+    populate: {
+      path: "comments",
+      populate: {
+        path: "replies",
+      },
+    },
+  });
+
+  chat?.messages.forEach(async (message: any) => {
+    message.comments.forEach(async (comment: any) => {
+      comment.replies.forEach(async (reply: any) => {
+        await Comment.findByIdAndDelete(reply._id);
+      });
+      await Comment.findByIdAndDelete(comment._id);
+    });
+    await Message.findByIdAndDelete(message._id);
+  });
+
+  await Chat.findByIdAndDelete(chatId);
 }

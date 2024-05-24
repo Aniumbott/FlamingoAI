@@ -3,11 +3,15 @@ import type { NextApiResponse } from "next";
 import { dbConnect } from "@/app/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import Workspace from "@/app/models/Workspace";
+import Chat from "@/app/models/Chat";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { headers } from "next/headers";
 import { Webhook } from "svix";
 import { stripe } from "@/app/lib/stripe";
 import User from "@/app/models/User";
+import { deleteChatbyId } from "../chat/route";
+import Message from "@/app/models/Message";
+import Comment from "@/app/models/Comment";
 
 const webhookSecret = process.env.CLERK_WORKSPACE_WEBHOOK_SECRET || ``;
 
@@ -83,6 +87,10 @@ export async function POST(request: Request) {
       console.log(`Successfully updated workspace with _id: ${workspace?._id}`);
       break;
     case "organization.deleted":
+      const chats = Chat.find({ workspaceId: payload.data.id });
+      (await chats).forEach(async (chat) => {
+        await deleteChatbyId(chat._id, Chat, Message, Comment);
+      });
       workspace = await Workspace.findByIdAndDelete(payload.data.id);
       console.log(
         `Successfully deleted workspace with _id: ${payload.data.id}`

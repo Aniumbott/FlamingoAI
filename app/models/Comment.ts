@@ -66,4 +66,4 @@ const Comment: ICommentModel =
   Mongoose.model<ICommentDocument>("comments", CommentsSchema);
 
 export default Comment;
-export type { ICommentDocument };
+export type { ICommentDocument, ICommentModel };
