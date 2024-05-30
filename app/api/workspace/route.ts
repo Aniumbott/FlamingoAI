@@ -12,6 +12,7 @@ import User from "@/app/models/User";
 import { deleteChatbyId } from "../chat/route";
 import Message from "@/app/models/Message";
 import Comment from "@/app/models/Comment";
+import ImageGen from "@/app/models/ImageGen";
 
 const webhookSecret = process.env.CLERK_WORKSPACE_WEBHOOK_SECRET || ``;
 
@@ -91,6 +92,7 @@ export async function POST(request: Request) {
       (await chats).forEach(async (chat) => {
         await deleteChatbyId(chat._id, Chat, Message, Comment);
       });
+      await ImageGen.find({ workspaceId: payload.data.id }).deleteMany();
       workspace = await Workspace.findByIdAndDelete(payload.data.id);
       console.log(
         `Successfully deleted workspace with _id: ${payload.data.id}`

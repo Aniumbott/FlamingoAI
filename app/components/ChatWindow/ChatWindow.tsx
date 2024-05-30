@@ -692,7 +692,7 @@ export default function ChatWindow(props: {
                       onChange={(e) => {
                         setMessageInput(e.currentTarget.value);
 
-                        if (e.currentTarget.value.includes("/")) {
+                        if (e.currentTarget.value.endsWith("/")) {
                           setSearchTerm(
                             e.currentTarget.value.split("/").pop() ?? ""
                           );

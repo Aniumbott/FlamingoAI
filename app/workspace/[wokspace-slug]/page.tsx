@@ -37,11 +37,13 @@ import ChatWindow from "../../components/ChatWindow/ChatWindow";
 import { createChat } from "@/app/controllers/chat";
 import { getWorkspace } from "@/app/controllers/workspace";
 import RecentChats from "../../components/LeftPanel/ChatFilters/RecentChats";
+import ImageGenWindow from "@/app/components/ImageGenWindow/ImageGenWindow";
 
 export default function Workspace() {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
   const [rightOpened, { toggle: toggleRight }] = useDisclosure(true);
   const [currentChatId, setCurrentChatId] = useState("");
+  const [currentImageGenId, setCurrentImageGenId] = useState("");
   const { orgId, userId } = useAuth();
   const { organization } = useOrganization();
   const router = useRouter();
@@ -89,6 +91,7 @@ export default function Workspace() {
       socket.emit("leaveChatRoom", currentChatId, userId);
     }
     setCurrentChatId(pathname?.split("/")[3] || "");
+    setCurrentImageGenId(pathname?.split("/")[4] || "");
   }, [pathname]);
 
   useEffect(() => {
@@ -157,7 +160,8 @@ export default function Workspace() {
               overflowY: "hidden",
             }}
           >
-            {!leftOpened && !pathname.split("/")[3] ? (
+            {!leftOpened &&
+            (!pathname.split("/")[3] || pathname.split("/")[3] == "gallery") ? (
               <div className="absolute top-3 flex flex-row items-center justify-between">
                 <Title order={4} mr={10}>
                   TeamGPT
@@ -186,11 +190,15 @@ export default function Workspace() {
             >
               <div className="flex flex-col grow">
                 {pathname?.split("/")[3] ? (
-                  <ChatWindow
-                    currentChatId={currentChatId}
-                    leftOpened={leftOpened}
-                    toggleLeft={toggleLeft}
-                  />
+                  pathname?.split("/")[3] == "gallery" ? (
+                    <ImageGenWindow imageGenId={currentImageGenId} />
+                  ) : (
+                    <ChatWindow
+                      currentChatId={currentChatId}
+                      leftOpened={leftOpened}
+                      toggleLeft={toggleLeft}
+                    />
+                  )
                 ) : (
                   <Stack align="center">
                     <Container mt={150}>

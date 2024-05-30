@@ -161,6 +161,20 @@ app.prepare().then(() => {
       );
       io.to(socket.id).emit("refreshPrompts", prompt);
     });
+
+    socket.on("createImageGen", (roomId, prompt) =>{
+      console.log(
+        `User with ID: ${socket.id} created image: ${prompt} in room: ${roomId}`
+      );
+      io.to(roomId).emit("refreshImageGens", prompt);
+    })
+
+    socket.on("deleteImageGen", (roomId, prompt) =>{
+      console.log(
+        `User with ID: ${socket.id} deleted image: ${prompt} in room: ${roomId}`
+      );
+      io.to(roomId).emit("refreshImageGens", prompt);
+    })
   });
 
   httpServer

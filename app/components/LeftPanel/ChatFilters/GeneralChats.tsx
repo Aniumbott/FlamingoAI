@@ -17,10 +17,18 @@ import {
   Checkbox,
   Tooltip,
   Button,
+  Container,
+  Image,
+  BackgroundImage,
+  Card,
+  Box,
+  Flex,
+  Avatar,
 } from "@mantine/core";
 import {
   IconCaretRightFilled,
   IconFolderPlus,
+  IconPhotoPlus,
   IconPlus,
   IconSearch,
   IconSettings,
@@ -43,6 +51,10 @@ import style from "../LeftPanel.module.css";
 import { useAuth } from "@clerk/nextjs";
 import { socket } from "@/socket";
 import { usePathname, useRouter } from "next/navigation";
+import { useHover } from "@mantine/hooks";
+import { IImageGenDocument } from "@/app/models/ImageGen";
+import { getImageGens } from "@/app/controllers/imageGen";
+import { CldImage } from "next-cloudinary";
 
 const GeneralChats = (props: {
   members: any[];
@@ -51,7 +63,7 @@ const GeneralChats = (props: {
 }) => {
   const { members, allowPersonal, allowPublic } = props;
   const { userId, orgId } = useAuth();
-
+  const pathname = usePathname();
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [publicChats, setPublicChats] = useState<IChatDocument[]>([]);
   const [privateChats, setPrivateChats] = useState<IChatDocument[]>([]);
@@ -62,6 +74,7 @@ const GeneralChats = (props: {
   const [allPopulatedChats, setAllPopulatedChats] = useState<IChatDocument[]>(
     []
   );
+  const [imageGens, setImageGens] = useState<IImageGenDocument[]>([]);
   const [searchContent, setSearchContent] = useState<boolean>(false);
   const [sort, setSort] = useState<string>("New");
 
@@ -118,16 +131,27 @@ const GeneralChats = (props: {
         await fetchChats().then(() => fetchFolders());
       };
 
+      const fetchImageGens = async () => {
+        try {
+          setImageGens((await getImageGens(orgId || "")).imageGens);
+        } catch (error) {
+          console.error("Failed to fetch image gens:", error);
+        }
+      };
+
       setIsLoading(true);
       fetchChatsAndFolders().then(() => {
-        setIsLoading(false);
-        console.log(
-          "data",
-          privateChats,
-          publicChats,
-          privateFolders,
-          publicFolders
-        );
+        fetchImageGens().then(() => {
+          setIsLoading(false);
+          console.log(
+            "data",
+            privateChats,
+            publicChats,
+            privateFolders,
+            publicFolders,
+            imageGens
+          );
+        });
       });
       fetchAllPopulatedChats();
 
@@ -136,10 +160,16 @@ const GeneralChats = (props: {
         fetchChatsAndFolders();
         fetchAllPopulatedChats();
       });
+
+      socket.on("refreshImageGens", () => {
+        console.log("refreshImageGens fetching image gens");
+        fetchImageGens();
+      });
     }
     return () => {
       console.log("turning off socket at generatChats");
       socket.off("refreshChats");
+      socket.off("refreshImageGens");
     };
   }, [orgId]);
 
@@ -232,7 +262,7 @@ const GeneralChats = (props: {
       >
         <Accordion.Item value={"SHARED"} key={"SHARED"}>
           <Accordion.Control>
-            <AccordianLabel
+            <AccordionLabel
               title={"SHARED"}
               scope="public"
               userId={userId || ""}
@@ -293,7 +323,7 @@ const GeneralChats = (props: {
         {allowPersonal && (
           <Accordion.Item value={"PERSONAL"} key={"PERSONAL"}>
             <AccordionControl>
-              <AccordianLabel
+              <AccordionLabel
                 title={"PERSONAL"}
                 scope="private"
                 userId={userId || ""}
@@ -354,12 +384,48 @@ const GeneralChats = (props: {
             </AccordionPanel>
           </Accordion.Item>
         )}
+        <Accordion.Item value={"GENERATED-IMAGES"} key={"GENERATED-IMAGES"}>
+          <Accordion.Control>
+            <AccordionLabelImage />
+          </Accordion.Control>
+          <AccordionPanel>
+            <ScrollArea.Autosize mah="50vh" scrollbarSize={10} offsetScrollbars>
+              <Flex wrap="wrap" gap="md" p="5">
+                <ActionIcon
+                  h="70"
+                  w="70"
+                  variant="default"
+                  onClick={() => {
+                    window.history.pushState(
+                      {},
+                      "",
+                      pathname.split("/").slice(0, 3).join("/") + "/gallery"
+                    );
+                  }}
+                >
+                  <IconPhotoPlus size="35" />
+                </ActionIcon>
+                {imageGens.map((imageGen) => (
+                  <ImageCard
+                    key={imageGen._id}
+                    imageGen={imageGen}
+                    createdBy={
+                      members.filter(
+                        (member) => member.userId == imageGen.createdBy
+                      )[0]
+                    }
+                  />
+                ))}
+              </Flex>
+            </ScrollArea.Autosize>
+          </AccordionPanel>
+        </Accordion.Item>
       </Accordion>
     </Stack>
   );
 };
 
-const AccordianLabel = (props: {
+const AccordionLabel = (props: {
   title: string;
   scope: "private" | "public";
   userId: string;
@@ -435,6 +501,88 @@ const AccordianLabel = (props: {
         </Tooltip>
       </Group>
     </Group>
+  );
+};
+
+const AccordionLabelImage = (props: {}) => {
+  return (
+    <Group wrap="nowrap" justify="space-between">
+      <Text size="sm" fw={600}>
+        GENERATED IMAGES
+      </Text>
+      <ActionIcon
+        size="sm"
+        variant="subtle"
+        color="grey"
+        onClick={(event) => {
+          event.stopPropagation();
+        }}
+      >
+        <IconPlus size={"1rem"} />
+      </ActionIcon>
+    </Group>
+  );
+};
+
+const ImageCard = (props: { imageGen: IImageGenDocument; createdBy: any }) => {
+  const { hovered, ref } = useHover();
+  const pathname = usePathname();
+  const { imageGen, createdBy } = props;
+  console.log("createdBy", createdBy);
+  return (
+    <Card
+      h="70"
+      w="70"
+      p="0"
+      key="i"
+      ref={ref}
+      style={{
+        outline:
+          hovered || pathname.split("/")[4] === imageGen._id
+            ? "2px solid var(--mantine-primary-color-filled)"
+            : "none",
+        outlineOffset: "3px",
+      }}
+      onClick={() => {
+        window.history.pushState(
+          {},
+          "",
+          pathname.split("/").slice(0, 3).join("/") + `/gallery/${imageGen._id}`
+        );
+      }}
+    >
+      {/* <Avatar size="sm" radius="sm" pos="absolute" bottom="0" right="0" /> */}
+      {createdBy?.hasImage ? (
+        <Avatar
+          size="sm"
+          radius="sm"
+          pos="absolute"
+          bottom="0"
+          right="0"
+          src={createdBy?.imageUrl}
+        />
+      ) : (
+        <Avatar size="sm" radius="sm" pos="absolute" bottom="0" right="0">
+          {createdBy?.firstName + createdBy?.lastName}
+        </Avatar>
+      )}
+
+      <Flex align={"center"} justify={"center"}>
+        <CldImage
+          src={
+            imageGen?._id ||
+            "https://images.unsplash.com/photo-1667835949430-a2516cc93d27"
+          } // Use this sample image or upload your own via the Media Explorer
+          width="70"
+          height="70"
+          crop={{
+            type: "auto",
+            source: true,
+          }}
+          alt="Generated Image"
+        />
+      </Flex>
+    </Card>
   );
 };
 
