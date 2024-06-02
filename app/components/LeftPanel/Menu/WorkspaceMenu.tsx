@@ -72,16 +72,16 @@ const WorkspaceMenu = (props: { workspace: any }) => {
             <Menu.Item onClick={() => setOpenWorkspaceModal(true)}>
               <MenuButton properties={WorkspaceMenuData[0]} />
             </Menu.Item>
+            <Menu.Item
+              onClick={() => {
+                router.push(
+                  pathname.split("/").slice(0, 3).join("/") + "/upgrade"
+                );
+              }}
+            >
+              <MenuButton properties={WorkspaceMenuData[1]} />
+            </Menu.Item>
           </Protect>
-          <Menu.Item
-            onClick={() => {
-              router.push(
-                pathname.split("/").slice(0, 3).join("/") + "/upgrade"
-              );
-            }}
-          >
-            <MenuButton properties={WorkspaceMenuData[1]} />
-          </Menu.Item>
           <Menu.Item
             onClick={() => {
               router.replace(

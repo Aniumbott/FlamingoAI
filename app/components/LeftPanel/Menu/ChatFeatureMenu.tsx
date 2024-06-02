@@ -65,7 +65,14 @@ export default function ChatFeatureMenu(props: {
       >
         <Tooltip label="Menu" fz="xs">
           <Menu.Target>
-            <ActionIcon size="25px" variant="subtle" color="grey">
+            <ActionIcon
+              size="25px"
+              variant="subtle"
+              color="grey"
+              onClick={(event) => {
+                event.stopPropagation();
+              }}
+            >
               <IconDots size={15} stroke={1.5} />
             </ActionIcon>
           </Menu.Target>
