@@ -54,7 +54,7 @@ const ArchivedChats = (props: {
   const [autoDelete, setAutoDelete] = useState<string>("Never");
 
   return (
-    <div className="flex flex-col justify-between h-fit w-full">
+    <div className="flex flex-col justify-between h-full w-full">
       <ScrollArea mah="calc(100vh - 380px)" scrollbarSize={3} offsetScrollbars>
         {archivedChats ? (
           archivedChats.length > 0 ? (

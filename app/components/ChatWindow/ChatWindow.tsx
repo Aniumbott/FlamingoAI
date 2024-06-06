@@ -686,6 +686,7 @@ export default function ChatWindow(props: {
                       my="md"
                       w="66%"
                       miw="300px"
+                      autoFocus={true}
                       placeholder="Type a message or type '/' to select a prompt"
                       value={messageInput}
                       disabled={processing}

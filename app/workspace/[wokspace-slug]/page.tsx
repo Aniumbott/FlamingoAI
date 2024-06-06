@@ -188,7 +188,7 @@ export default function Workspace() {
                 marginLeft: "-15px",
               }}
             >
-              <div className="flex flex-col grow">
+              <div className="flex flex-col grow justify-center">
                 {pathname?.split("/")[3] ? (
                   pathname?.split("/")[3] == "gallery" ? (
                     <ImageGenWindow imageGenId={currentImageGenId} />
@@ -200,8 +200,8 @@ export default function Workspace() {
                     />
                   )
                 ) : (
-                  <Stack align="center">
-                    <Container mt={150}>
+                  <Stack align="center" justify="space-between">
+                    <Container >
                       <Text>What do you want to do ?</Text>
                       <Button
                         radius="md"
