@@ -137,7 +137,7 @@ const FaqSimple = () => {
               key.
             </p>
             <p>
-              After signing into Team-GPT, go to the “Set API key” menu. From
+              After signing into Team-GPT, go to the &quot;Set API key&quot; menu. From
               there, you can enter your API key in the appropriate field and
               save the changes. This will connect your OpenAI API key to
               Team-GPT, allowing you to use the platform.
@@ -237,7 +237,7 @@ const HowItWorks = () => {
           src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
         />
         <Text className=" text-center" fz="lg">
-          2. Add your OpenAI API key. Don't have one? Get yours here.
+          2. Add your OpenAI API key. Don&apos;t have one? Get yours here.
         </Text>
       </Stack>
       <Stack gap={"lg"} align="center" justify="center">
@@ -317,7 +317,7 @@ const Card1 = () => {
             />
             <Stack w={"70%"} gap={"xs"} align={"start"} justify={"center"}>
               <Title order={4}>
-                "Perfect for team organisation, transparency & collaboration."
+              &quot;Perfect for team organisation, transparency & collaboration.&quot;
               </Title>
               <Text>George Wilson</Text>
             </Stack>
@@ -360,9 +360,9 @@ const Card2 = () => {
             />
             <Stack w={"70%"} gap={"xs"} align={"start"} justify={"center"}>
               <Title order={4}>
-                "I purchased Team-GPT and so far, love it! The interface is
+              &quot;I purchased Team-GPT and so far, love it! The interface is
                 incredibly user-friendly, making it easy for me to generate
-                high-quality content quickly."
+                high-quality content quickly.&quot;
               </Title>
               <Text>Lori N Project Manager</Text>
             </Stack>
@@ -379,7 +379,7 @@ const Card2 = () => {
           <Text>Learn by example.</Text>
           <Text>
             Never start from scratch with our tried-and-tested conversation
-            starters.{" "}
+            starters.
           </Text>
           <Text>
             Explore how your own team is engaging with ChatGPT to expedite your
