@@ -27,11 +27,12 @@ import {
   updatePromptFolder,
 } from "@/app/controllers/promptFolder";
 import { ModalControls } from "../Panels/PromptsPanel/PromptsPanel";
+import { Protect } from "@clerk/nextjs";
 
 export default function PromptFolderFeatureMenu(props: {
   folder: IPromptFolderDocument;
   scope: "public" | "private" | "system";
-  workspaceId: string;
+  orgId: string;
   userId: string;
   open: boolean;
   setOpen: (value: boolean) => void;
@@ -77,7 +78,7 @@ export default function PromptFolderFeatureMenu(props: {
           <ActionIcon
             size="25px"
             variant="subtle"
-            aria-label=""
+            aria-label="Dots"
             color="#9CA3AF"
             // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
             style={{
@@ -117,7 +118,7 @@ export default function PromptFolderFeatureMenu(props: {
               props.scope,
               props.folder._id,
               props.userId,
-              props.workspaceId
+              props.orgId
             )
           }
         >
@@ -153,13 +154,15 @@ export default function PromptFolderFeatureMenu(props: {
             ))}
           </div>
         </Menu.Item>
-        <Menu.Item
-          onClick={() => {
-            deletePromptFolder(props.folder).then((res) => {});
-          }}
-        >
-          <MenuButton properties={MenuData[4]} />
-        </Menu.Item>
+        <Protect role="org:admin">
+          <Menu.Item
+            onClick={() => {
+              deletePromptFolder(props.folder).then((res) => {});
+            }}
+          >
+            <MenuButton properties={MenuData[4]} />
+          </Menu.Item>
+        </Protect>
       </Menu.Dropdown>
     </Menu>
   );

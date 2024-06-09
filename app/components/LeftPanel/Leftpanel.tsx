@@ -157,6 +157,7 @@ export default function LeftPanel() {
                 members={members}
                 allowPublic={allowPublic}
                 allowPersonal={allowPersonal}
+                productId={workspace?.subscription?.product_id || ""}
               />
             );
           case 1:

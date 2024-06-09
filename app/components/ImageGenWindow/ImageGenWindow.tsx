@@ -12,10 +12,14 @@ import {
   Title,
   Image,
   ScrollArea,
+  Highlight,
+  Card,
+  Button,
 } from "@mantine/core";
 import {
   IconBadgeHd,
   IconDownload,
+  IconInfoCircle,
   IconRectangle,
   IconRectangleVertical,
   IconRefresh,
@@ -35,14 +39,18 @@ import { useAuth, useOrganization } from "@clerk/nextjs";
 import { getCldImageUrl } from "next-cloudinary";
 import { IImageGenDocument } from "@/app/models/ImageGen";
 
-export default function ImageGenWindow(props: { imageGenId: string }) {
-  const imageGenId = props.imageGenId;
+export default function ImageGenWindow(props: {
+  imageGenId: string;
+  productId: string;
+}) {
+  const { imageGenId, productId } = props;
   const [imageDescription, setImageDescription] = useState("");
   const [resolution, setResolution] = useState("1024x1024");
   const [isHD, setIsHD] = useState(false);
   const [imageGen, setImageGen] = useState<IImageGenDocument>();
   const [isGenerating, setIsGenerating] = useState(false);
   const [participants, setParticipants] = useState<any>([]);
+  const [isAllowed, setIsAllowed] = useState(false);
   const { userId, orgId } = useAuth();
   const { organization } = useOrganization();
   const pathname = usePathname();
@@ -52,6 +60,17 @@ export default function ImageGenWindow(props: { imageGenId: string }) {
     link.href = `https://res.cloudinary.com/team-gpt/image/upload/fl_attachment/${imageGen?._id}.png`;
     link.click();
   };
+
+  useEffect(() => {
+    const user = participants.find(
+      (participant: any) => participant.userId === userId
+    );
+    if (user) {
+      setIsAllowed(
+        user?.id === imageGen?.createdBy || user.role === "org:admin"
+      );
+    }
+  }, [participants, imageGen]);
 
   useEffect(() => {
     getImageGen(imageGenId).then((res) => {
@@ -67,15 +86,15 @@ export default function ImageGenWindow(props: { imageGenId: string }) {
   useEffect(() => {
     const fetchParticipants = async () => {
       const res =
-        (await organization?.getMemberships())?.map(
-          (member: any) => member.publicUserData
-        ) || [];
+        (await organization?.getMemberships())?.map((member: any) => {
+          return { ...member.publicUserData, role: member.role };
+        }) ?? [];
       setParticipants(res);
     };
     fetchParticipants();
   }, [organization?.membersCount]);
 
-  return (
+  return productId === process.env.NEXT_PUBLIC_MAX_PLAN ? (
     <ScrollArea mt="3rem" mah={"100vh"} scrollbarSize={0}>
       <Stack my={imageGenId ? "8rem" : "20rem"} w={"50rem"} mx="auto">
         <Container w="100%" p="0">
@@ -259,22 +278,24 @@ export default function ImageGenWindow(props: { imageGenId: string }) {
                     <IconDownload size={20} />
                   </ActionIcon>
                 </Group>
-                <ActionIcon
-                  color="red"
-                  variant="light"
-                  disabled={isGenerating}
-                  onClick={() => {
-                    deleteImageGen(imageGenId, orgId || "").then(() => {
-                      window.history.pushState(
-                        {},
-                        "",
-                        pathname.split("/").slice(0, 3).join("/") + `/gallery`
-                      );
-                    });
-                  }}
-                >
-                  <IconTrash size={20} />
-                </ActionIcon>
+                {isAllowed && (
+                  <ActionIcon
+                    color="red"
+                    variant="light"
+                    disabled={isGenerating}
+                    onClick={() => {
+                      deleteImageGen(imageGenId, orgId || "").then(() => {
+                        window.history.pushState(
+                          {},
+                          "",
+                          pathname.split("/").slice(0, 3).join("/") + `/gallery`
+                        );
+                      });
+                    }}
+                  >
+                    <IconTrash size={20} />
+                  </ActionIcon>
+                )}
               </Group>
               <Container mt="xl" p="0">
                 <Title order={4}>Prompt:</Title>
@@ -285,5 +306,26 @@ export default function ImageGenWindow(props: { imageGenId: string }) {
         ) : null}
       </Stack>
     </ScrollArea>
+  ) : (
+    <Stack align="center" justify="center">
+      <Card withBorder radius="md" p="lg">
+        <Group gap={"xs"}>
+          <IconInfoCircle size="24px" />
+          <Title order={3}>Upgrade required !!!</Title>
+        </Group>
+        <Text size="md" c="dimmed" mt="md">
+          Image generation feature is availabe for workspaces with{" "}
+          <span
+            style={{
+              fontWeight: 700,
+              color: "var(--mantine-primary-color-filled)",
+            }}
+          >
+            MAX
+          </span>{" "}
+          plan only.
+        </Text>
+      </Card>
+    </Stack>
   );
 }

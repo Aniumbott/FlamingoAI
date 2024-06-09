@@ -60,7 +60,7 @@ export default function PromptFeatureMenu(props: {
             <ActionIcon
               size="25px"
               variant="subtle"
-              aria-label=""
+              aria-label="Dots"
               color="#9CA3AF"
               // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
               style={{

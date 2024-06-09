@@ -136,7 +136,7 @@ export default function Workspace() {
                 <ActionIcon
                   variant="subtle"
                   color="grey"
-                  aria-label="Settings"
+                  aria-label="Expand panel"
                   onClick={toggleLeft}
                 >
                   <IconLayoutSidebarRightExpand
@@ -170,7 +170,7 @@ export default function Workspace() {
                   <ActionIcon
                     variant="subtle"
                     color="grey"
-                    aria-label="Settings"
+                    aria-label="Expand panel"
                     onClick={toggleLeft}
                   >
                     <IconLayoutSidebarLeftExpand
@@ -191,7 +191,10 @@ export default function Workspace() {
               <div className="flex flex-col grow justify-center">
                 {pathname?.split("/")[3] ? (
                   pathname?.split("/")[3] == "gallery" ? (
-                    <ImageGenWindow imageGenId={currentImageGenId} />
+                    <ImageGenWindow
+                      imageGenId={currentImageGenId}
+                      productId={workspace?.subscription?.product_id || ""}
+                    />
                   ) : (
                     <ChatWindow
                       currentChatId={currentChatId}
@@ -201,7 +204,7 @@ export default function Workspace() {
                   )
                 ) : (
                   <Stack align="center" justify="space-between">
-                    <Container >
+                    <Container>
                       <Text>What do you want to do ?</Text>
                       <Button
                         radius="md"

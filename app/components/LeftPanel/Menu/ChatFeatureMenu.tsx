@@ -24,8 +24,9 @@ import {
 import { useHover } from "@mantine/hooks";
 import { deleteChat, updateChat } from "@/app/controllers/chat";
 import { IChatDocument } from "@/app/models/Chat";
-import { useAuth } from "@clerk/nextjs";
+import { Protect, useAuth } from "@clerk/nextjs";
 import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function ChatFeatureMenu(props: {
   chat: IChatDocument;
@@ -35,9 +36,19 @@ export default function ChatFeatureMenu(props: {
   setRename: (value: boolean) => void;
   setMoveModal: (value: boolean) => void;
 }) {
+  const { chat, members, open, setOpen, setRename, setMoveModal } = props;
   const { userId, orgId } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
+  const [isAllowed, setIsAllowed] = useState(false);
+
+  useEffect(() => {
+    const user = members.find((member) => member.userId == userId);
+    if (user) {
+      setIsAllowed(user.userId == chat.createdBy || user.role == "org:admin");
+    }
+  }, [members]);
+
   return (
     <>
       <Menu
@@ -60,8 +71,8 @@ export default function ChatFeatureMenu(props: {
             padding: "0px",
           },
         }}
-        opened={props.open}
-        onChange={props.setOpen}
+        opened={open}
+        onChange={setOpen}
       >
         <Tooltip label="Menu" fz="xs">
           <Menu.Target>
@@ -82,11 +93,11 @@ export default function ChatFeatureMenu(props: {
           <Menu.Label>
             <Stack gap={5}>
               <Text fw={"500"} fz={"sm"} c={"#000000"}>
-                {props.chat.name}
+                {chat.name}
               </Text>
               <Avatar.Group>
-                {props.members.map((member, key) =>
-                  props.chat.participants.includes(member.userId) ? (
+                {members.map((member, key) =>
+                  chat.participants.includes(member.userId) ? (
                     <Avatar
                       radius={"md"}
                       key={key}
@@ -102,11 +113,12 @@ export default function ChatFeatureMenu(props: {
             </Stack>
           </Menu.Label>
           <Divider color={"#d8dce0"} my={2} />
-          {props.chat.archived ? (
+          {chat.archived ? (
             <>
               <Menu.Item
+                disabled={!isAllowed}
                 onClick={() => {
-                  updateChat(props.chat._id, {
+                  updateChat(chat._id, {
                     archived: false,
                   }).then((res) => {
                     console.log(res);
@@ -116,13 +128,14 @@ export default function ChatFeatureMenu(props: {
                 <MenuButton properties={MenuData[6]} />
               </Menu.Item>
               <Menu.Item
+                disabled={!isAllowed}
                 onClick={() => {
-                  deleteChat(props.chat)
+                  deleteChat(chat)
                     .then((res) => {
                       console.log(res);
                     })
                     .then(() => {
-                      if (pathname.split("/")[3] == props.chat._id) {
+                      if (pathname.split("/")[3] == chat._id) {
                         router.push(pathname.split("/").slice(0, 3).join("/"));
                       }
                     });
@@ -133,16 +146,18 @@ export default function ChatFeatureMenu(props: {
             </>
           ) : (
             <>
-              <Menu.Item onClick={() => props.setRename(true)}>
-                <MenuButton properties={MenuData[0]} />
-              </Menu.Item>
+              {isAllowed ? (
+                <Menu.Item onClick={() => setRename(true)}>
+                  <MenuButton properties={MenuData[0]} />
+                </Menu.Item>
+              ) : null}
               <Menu.Item>
                 <MenuButton properties={MenuData[1]} />
               </Menu.Item>
-              {userId && props.chat.favourites?.includes(userId) ? (
+              {userId && chat.favourites?.includes(userId) ? (
                 <Menu.Item
                   onClick={() => {
-                    updateChat(props.chat._id, {
+                    updateChat(chat._id, {
                       $pull: { favourites: userId || "" },
                     }).then((res) => {
                       console.log(res);
@@ -154,7 +169,7 @@ export default function ChatFeatureMenu(props: {
               ) : (
                 <Menu.Item
                   onClick={() => {
-                    updateChat(props.chat._id, {
+                    updateChat(chat._id, {
                       $push: { favourites: userId || "" },
                     }).then((res) => {
                       console.log(res);
@@ -164,20 +179,22 @@ export default function ChatFeatureMenu(props: {
                   <MenuButton properties={MenuData[2]} />
                 </Menu.Item>
               )}
-              <Menu.Item onClick={() => props.setMoveModal(true)}>
+              <Menu.Item onClick={() => setMoveModal(true)}>
                 <MenuButton properties={MenuData[3]} />
               </Menu.Item>
-              <Menu.Item
-                onClick={() => {
-                  updateChat(props.chat._id, {
-                    archived: true,
-                  }).then((res) => {
-                    console.log(res);
-                  });
-                }}
-              >
-                <MenuButton properties={MenuData[4]} />
-              </Menu.Item>
+              {isAllowed ? (
+                <Menu.Item
+                  onClick={() => {
+                    updateChat(chat._id, {
+                      archived: true,
+                    }).then((res) => {
+                      console.log(res);
+                    });
+                  }}
+                >
+                  <MenuButton properties={MenuData[4]} />
+                </Menu.Item>
+              ) : null}
             </>
           )}
         </Menu.Dropdown>

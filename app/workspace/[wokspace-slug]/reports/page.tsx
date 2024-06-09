@@ -1,5 +1,5 @@
 "use client";
-import { useOrganization } from "@clerk/nextjs";
+import { Protect, useOrganization } from "@clerk/nextjs";
 import {
   Paper,
   Title,
@@ -14,6 +14,7 @@ import {
   Popover,
   Loader,
   Stack,
+  Card,
 } from "@mantine/core";
 import { BarChart } from "@mantine/charts";
 import { IconCalendar, IconClock, IconInfoCircle } from "@tabler/icons-react";
@@ -192,7 +193,41 @@ export default function Reports() {
   }
 
   return (
-    <>
+    <Protect
+      role="org:admin"
+      fallback={
+        <div className="h-screen w-screen flex flex-col items-center justify-center">
+          <Card withBorder radius="md" p="lg">
+            <Group justify="space-between">
+              <Group gap={"xs"}>
+                <IconInfoCircle size="24px" />
+                <Title order={3}>No access !!!</Title>
+              </Group>
+              <Button
+                variant="default"
+                onClick={() => {
+                  window.history.back();
+                }}
+              >
+                Back to Workspace
+              </Button>
+            </Group>
+            <Text size="md" c="dimmed" mt="md">
+              Reports are only accessible for user with{" "}
+              <span
+                style={{
+                  fontWeight: 700,
+                  color: "var(--mantine-primary-color-filled)",
+                }}
+              >
+                Admin
+              </span>{" "}
+              role in the workspace.
+            </Text>
+          </Card>
+        </div>
+      }
+    >
       {isLoading ? (
         <Stack gap={20} justify="center" align="center" w="100%" h="100vh">
           <div className="flex flex-row items-center justify-center">
@@ -509,6 +544,6 @@ export default function Reports() {
           </div>
         </Paper>
       )}
-    </>
+    </Protect>
   );
 }

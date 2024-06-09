@@ -28,6 +28,7 @@ import { createChat } from "@/app/controllers/chat";
 
 import { IChatFolderDocument } from "@/app/models/ChatFolder";
 import { useRouter, usePathname } from "next/navigation";
+import { Protect } from "@clerk/nextjs";
 
 export default function FolderFeatureMenu(props: {
   folder: IChatFolderDocument;
@@ -169,15 +170,17 @@ export default function FolderFeatureMenu(props: {
             ))}
           </div>
         </Menu.Item>
-        <Menu.Item
-          onClick={() => {
-            deleteChatFolders(props.folder).then((res) => {
-              console.log(res);
-            });
-          }}
-        >
-          <MenuButton properties={MenuData[4]} />
-        </Menu.Item>
+        <Protect role="org:admin">
+          <Menu.Item
+            onClick={() => {
+              deleteChatFolders(props.folder).then((res) => {
+                console.log(res);
+              });
+            }}
+          >
+            <MenuButton properties={MenuData[4]} />
+          </Menu.Item>
+        </Protect>
       </Menu.Dropdown>
     </Menu>
   );

@@ -133,7 +133,7 @@ export async function DELETE(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
-    await deleteFolderAndContents(body.id);
+    await deleteFolder(body.id);
     return NextResponse.json(
       { message: "Chat Folder deleted successfully" },
       { status: 200 }
@@ -145,29 +145,25 @@ export async function DELETE(req: any, res: NextApiResponse) {
 }
 
 // Helper functions
-async function deleteFolderAndContents(folderId: string) {
+async function deleteFolder(folderId: string) {
   const folder = await ChatFolder.findById(folderId);
 
   if (folder) {
-    // Delete all chats in folder.chats
+    // Remove parents of chats in folder.chats
     for (const chatId of folder.chats) {
-      const chat = await Chat.findById(chatId);
-      if (chat) {
-        // Delete all messages in chat.messages
-        for (const messageId of chat.messages) {
-          await Message.findByIdAndDelete(messageId);
-        }
-        // Delete the chat
-        await Chat.findByIdAndDelete(chatId);
-      }
+      const chat = await Chat.findByIdAndUpdate(chatId, {
+        // set parent to null
+        parentFolder: null,
+      });
     }
 
-    // Recursively delete all subfolders
+    // Recursively for all subfolders
     for (const subFolderId of folder.subFolders) {
-      await deleteFolderAndContents(subFolderId._id);
+      await ChatFolder.findByIdAndUpdate(subFolderId._id, {
+        parentFolder: null,
+      });
     }
-
-    // Delete the folder
+    // For the folder
     await ChatFolder.findByIdAndDelete(folderId);
   }
 }

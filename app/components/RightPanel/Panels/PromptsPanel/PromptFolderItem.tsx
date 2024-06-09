@@ -31,11 +31,11 @@ import MovePromptItems from "../../Modals/MoveItems/MovePromptItems";
 export default function PromptFolderItem(props: {
   folder: IPromptFolderDocument;
   scope: "public" | "private" | "system";
-  userId: string;
-  workspaceId: string;
+  user: any;
+  orgId: string;
   modalControls: ModalControls;
 }) {
-  const { folder, scope, userId, workspaceId } = props;
+  const { folder, scope, user, orgId, modalControls } = props;
   const [isOpened, setIsOpened] = useState(false);
   const { ref, hovered } = useHover();
   const [openMoveModal, setOpenMoveModal] = useState(false);
@@ -50,10 +50,10 @@ export default function PromptFolderItem(props: {
               scope={scope}
               isHovered={hovered}
               isOpened={isOpened}
-              userId={userId}
-              workspaceId={workspaceId}
+              userId={user?.id || ""}
+              orgId={orgId}
               setMoveModal={setOpenMoveModal}
-              modalControls={props.modalControls}
+              modalControls={modalControls}
             />
           </Accordion.Control>
         </div>
@@ -70,9 +70,9 @@ export default function PromptFolderItem(props: {
                   <PromptFolderItem
                     folder={subFolder as IPromptFolderDocument}
                     scope={scope}
-                    userId={props.userId}
-                    workspaceId={props.workspaceId}
-                    modalControls={props.modalControls}
+                    user={user}
+                    orgId={orgId}
+                    modalControls={modalControls}
                   />
                 </Accordion>
               </div>
@@ -82,7 +82,9 @@ export default function PromptFolderItem(props: {
               <div key={index}>
                 <PromptItem
                   item={prompt as IPromptDocument}
-                  modalControls={props.modalControls}
+                  modalControls={modalControls}
+                  user={user}
+                  orgId={orgId}
                 />
               </div>
             ))}
@@ -105,28 +107,36 @@ const FolderLabel = (props: {
   isOpened: boolean;
   isHovered: boolean;
   userId: string;
-  workspaceId: string;
+  orgId: string;
   setMoveModal: (value: boolean) => void;
   modalControls: ModalControls;
 }) => {
+  const {
+    folder,
+    scope,
+    isOpened,
+    isHovered,
+    userId,
+    orgId,
+    setMoveModal,
+    modalControls,
+  } = props;
   const [menuOpen, setMenuOpen] = useState(false);
-  let actionIconVisible =
-    (props.isHovered || menuOpen) && props.folder.scope !== "system";
+  let actionIconVisible = (isHovered || menuOpen) && folder.scope !== "system";
   const [rename, setRename] = useState(false);
 
   useEffect(() => {
-    actionIconVisible =
-      (props.isHovered || menuOpen) && props.folder.scope !== "system";
-  }, [props.isHovered, menuOpen]);
+    actionIconVisible = (isHovered || menuOpen) && folder.scope !== "system";
+  }, [isHovered, menuOpen]);
   return (
     <Group wrap="nowrap" justify="space-between" preventGrowOverflow={false}>
       <Group wrap="nowrap" gap={2} align="center">
-        {props.isOpened ? (
+        {isOpened ? (
           <IconFolderOpen
             style={{
               width: "1rem",
               height: "1rem",
-              color: props.folder.folderColor || "#FFE066",
+              color: folder.folderColor || "#FFE066",
             }}
           />
         ) : (
@@ -134,7 +144,7 @@ const FolderLabel = (props: {
             style={{
               width: "1rem",
               height: "1rem",
-              color: props.folder.folderColor || "#FFE066",
+              color: folder.folderColor || "#FFE066",
             }}
           />
         )}
@@ -150,7 +160,7 @@ const FolderLabel = (props: {
             onKeyDown={(event) => {
               event.stopPropagation();
               if (event.key === "Enter") {
-                updatePromptFolder(props.folder._id, {
+                updatePromptFolder(folder._id, {
                   name: event.currentTarget.value,
                 }).then((res) => {
                   setRename(false);
@@ -163,7 +173,7 @@ const FolderLabel = (props: {
           />
         ) : (
           <Text size="sm" style={{ marginLeft: "0.1rem" }}>
-            {props.folder.name}
+            {folder.name}
           </Text>
         )}
       </Group>
@@ -176,12 +186,12 @@ const FolderLabel = (props: {
               color="grey"
               onClick={(event) => {
                 event.stopPropagation();
-                props.modalControls.setModalItem(null);
-                props.modalControls.setModalScope(
-                  props.scope === "public" ? "public" : "private"
+                modalControls.setModalItem(null);
+                modalControls.setModalScope(
+                  scope === "public" ? "public" : "private"
                 );
-                props.modalControls.setModalParentFolder(props.folder._id);
-                props.modalControls.setOpenModal(true);
+                modalControls.setModalParentFolder(folder._id);
+                modalControls.setOpenModal(true);
               }}
             >
               <IconPlus size={"1rem"} />
@@ -197,15 +207,15 @@ const FolderLabel = (props: {
             }}
           >
             <PromptFolderFeatureMenu
-              folder={props.folder}
-              scope={props.scope}
-              workspaceId={props.workspaceId}
-              userId={props.userId}
+              folder={folder}
+              scope={scope}
+              orgId={orgId}
+              userId={userId}
               open={menuOpen}
               setOpen={setMenuOpen}
               setRename={setRename}
-              setMoveModal={props.setMoveModal}
-              modalControls={props.modalControls}
+              setMoveModal={setMoveModal}
+              modalControls={modalControls}
             />
           </ActionIcon>
         </Group>

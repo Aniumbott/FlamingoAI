@@ -60,8 +60,9 @@ const GeneralChats = (props: {
   members: any[];
   allowPublic: boolean;
   allowPersonal: boolean;
+  productId: string;
 }) => {
-  const { members, allowPersonal, allowPublic } = props;
+  const { members, allowPersonal, allowPublic, productId } = props;
   const { userId, orgId } = useAuth();
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -384,42 +385,48 @@ const GeneralChats = (props: {
             </AccordionPanel>
           </Accordion.Item>
         )}
-        <Accordion.Item value={"GENERATED-IMAGES"} key={"GENERATED-IMAGES"}>
-          <Accordion.Control>
-            <AccordionLabelImage />
-          </Accordion.Control>
-          <AccordionPanel>
-            <ScrollArea.Autosize mah="50vh" scrollbarSize={10} offsetScrollbars>
-              <Flex wrap="wrap" gap="md" p="5">
-                <ActionIcon
-                  h="70"
-                  w="70"
-                  variant="default"
-                  onClick={() => {
-                    window.history.pushState(
-                      {},
-                      "",
-                      pathname.split("/").slice(0, 3).join("/") + "/gallery"
-                    );
-                  }}
-                >
-                  <IconPhotoPlus size="35" />
-                </ActionIcon>
-                {imageGens.map((imageGen) => (
-                  <ImageCard
-                    key={imageGen._id}
-                    imageGen={imageGen}
-                    createdBy={
-                      members.filter(
-                        (member) => member.userId == imageGen.createdBy
-                      )[0]
-                    }
-                  />
-                ))}
-              </Flex>
-            </ScrollArea.Autosize>
-          </AccordionPanel>
-        </Accordion.Item>
+        {productId === process.env.NEXT_PUBLIC_MAX_PLAN && (
+          <Accordion.Item value={"GENERATED-IMAGES"} key={"GENERATED-IMAGES"}>
+            <Accordion.Control>
+              <AccordionLabelImage />
+            </Accordion.Control>
+            <AccordionPanel>
+              <ScrollArea.Autosize
+                mah="50vh"
+                scrollbarSize={10}
+                offsetScrollbars
+              >
+                <Flex wrap="wrap" gap="md" p="5">
+                  <ActionIcon
+                    h="70"
+                    w="70"
+                    variant="default"
+                    onClick={() => {
+                      window.history.pushState(
+                        {},
+                        "",
+                        pathname.split("/").slice(0, 3).join("/") + "/gallery"
+                      );
+                    }}
+                  >
+                    <IconPhotoPlus size="35" />
+                  </ActionIcon>
+                  {imageGens.map((imageGen) => (
+                    <ImageCard
+                      key={imageGen._id}
+                      imageGen={imageGen}
+                      createdBy={
+                        members.filter(
+                          (member) => member.userId == imageGen.createdBy
+                        )[0]
+                      }
+                    />
+                  ))}
+                </Flex>
+              </ScrollArea.Autosize>
+            </AccordionPanel>
+          </Accordion.Item>
+        )}
       </Accordion>
     </Stack>
   );
@@ -528,7 +535,7 @@ const ImageCard = (props: { imageGen: IImageGenDocument; createdBy: any }) => {
   const { hovered, ref } = useHover();
   const pathname = usePathname();
   const { imageGen, createdBy } = props;
-  console.log("createdBy", createdBy);
+  // console.log("createdBy", createdBy);
   return (
     <Card
       h="70"

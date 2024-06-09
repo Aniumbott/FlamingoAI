@@ -28,7 +28,7 @@ import {
 
 // Components
 import style from "../../RightPanel.module.css";
-import { UserButton, useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { IPromptDocument } from "@/app/models/Prompt";
 import { getPrompts } from "@/app/controllers/prompt";
 import SortMenu from "../../../LeftPanel/Menu/SortMenu";
@@ -63,6 +63,7 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
     []
   );
   const { userId, orgId } = useAuth();
+  const { user } = useUser();
   const [systemSort, setSystemSort] = useState<string>("New");
   const [publicSort, setPublicSort] = useState<string>("New");
   const [privateSort, setPrivateSort] = useState<string>("New");
@@ -256,6 +257,8 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
                           item={prompt}
                           key={key}
                           modalControls={modalControls}
+                          user={user}
+                          orgId={orgId || ""}
                         />
                       ))}
                     </>
@@ -268,6 +271,8 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
                           item={prompt}
                           key={key}
                           modalControls={modalControls}
+                          user={user}
+                          orgId={orgId || ""}
                         />
                       ))}
                     </>
@@ -280,6 +285,8 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
                           item={prompt}
                           key={key}
                           modalControls={modalControls}
+                          user={user}
+                          orgId={orgId || ""}
                         />
                       ))}
                     </>
@@ -323,8 +330,8 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
                     <PromptFolderItem
                       folder={folder}
                       scope="system"
-                      workspaceId={orgId || ""}
-                      userId={userId || ""}
+                      orgId={orgId || ""}
+                      user={user}
                       modalControls={modalControls}
                     />
                   </Accordion>
@@ -334,6 +341,8 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
                     item={prompt}
                     key={key}
                     modalControls={modalControls}
+                    user={user}
+                    orgId={orgId || ""}
                   />
                 ))}
               </ScrollArea.Autosize>
@@ -387,8 +396,8 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
                     <PromptFolderItem
                       folder={folder}
                       scope="public"
-                      workspaceId={orgId || ""}
-                      userId={userId || ""}
+                      orgId={orgId || ""}
+                      user={user}
                       modalControls={modalControls}
                     />
                   </Accordion>
@@ -398,6 +407,8 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
                     item={prompt}
                     key={key}
                     modalControls={modalControls}
+                    user={user}
+                    orgId={orgId || ""}
                   />
                 ))}
               </ScrollArea.Autosize>
@@ -451,8 +462,8 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
                     <PromptFolderItem
                       folder={folder}
                       scope="private"
-                      workspaceId={orgId || ""}
-                      userId={userId || ""}
+                      orgId={orgId || ""}
+                      user={user}
                       modalControls={modalControls}
                     />
                   </Accordion>
@@ -462,6 +473,8 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
                     item={prompt}
                     key={key}
                     modalControls={modalControls}
+                    user={user}
+                    orgId={orgId || ""}
                   />
                 ))}
               </ScrollArea.Autosize>

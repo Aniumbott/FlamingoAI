@@ -36,7 +36,13 @@ import {
   IconSettings,
   IconShare,
 } from "@tabler/icons-react";
-import { useOrganization, useUser } from "@clerk/nextjs";
+import {
+  Protect,
+  auth,
+  useAuth,
+  useOrganization,
+  useUser,
+} from "@clerk/nextjs";
 
 // Components
 import MessageItem from "./Items/MessageItem/MessageItem";
@@ -68,7 +74,7 @@ export default function ChatWindow(props: {
 }) {
   const { currentChatId, leftOpened, toggleLeft } = props;
   const { organization } = useOrganization();
-  const { user } = useUser();
+  const { userId } = useAuth();
   const { colorScheme } = useMantineColorScheme();
   const { scrollIntoView, targetRef, scrollableRef } = useScrollIntoView<
     HTMLDivElement,
@@ -95,19 +101,20 @@ export default function ChatWindow(props: {
 
   const [shareChatOpened, setShareChatOpened] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [isAllowed, setIsAllowed] = useState(false);
 
   function isViewOnly(chat: any) {
     const ans =
-      (chat?.createdBy !== user?.id &&
-        chat?.memberAccess?.find((m: any) => m.userId === user?.id)?.access ===
+      (chat?.createdBy !== userId &&
+        chat?.memberAccess?.find((m: any) => m.userId === userId)?.access ===
           "view") ||
-      (chat?.createdBy !== user?.id &&
+      (chat?.createdBy !== userId &&
         chat?.scope === "viewOnly" &&
-        chat?.memberAccess?.find((m: any) => m.userId === user?.id)?.access !==
+        chat?.memberAccess?.find((m: any) => m.userId === userId)?.access !==
           "edit") ||
-      (chat?.createdBy !== user?.id &&
+      (chat?.createdBy !== userId &&
         chat?.scope === "public" &&
-        chat?.memberAccess?.find((m: any) => m.userId === user?.id)?.access ===
+        chat?.memberAccess?.find((m: any) => m.userId === userId)?.access ===
           "viewOnly");
     return ans;
   }
@@ -116,7 +123,7 @@ export default function ChatWindow(props: {
     // console.log("chat", chat);
     socket.on("refreshChatWindow", () => {
       console.log("refreshing chat");
-      getChat(currentChatId, organization?.id || "", user?.id || "").then(
+      getChat(currentChatId, organization?.id || "", userId || "").then(
         (res) => {
           setChat(res.chats?.[0]);
         }
@@ -237,24 +244,37 @@ export default function ChatWindow(props: {
   useEffect(() => {
     const fetchParticipants = async () => {
       const res =
-        (await organization?.getMemberships())?.map(
-          (member: any) => member.publicUserData
-        ) || [];
+        (await organization?.getMemberships())?.map((member: any) => {
+          return { ...member.publicUserData, role: member.role };
+        }) ?? [];
       setParticipants(res);
     };
     fetchParticipants();
   }, [organization?.membersCount]);
 
   useEffect(() => {
+    if (participants) {
+      const user = participants.find(
+        (participant: any) => participant.userId == userId
+      );
+      if (user) {
+        setIsAllowed(
+          user.userId == chat?.createdBy || user.role == "org:admin"
+        );
+      }
+    }
+  }, [participants, chat]);
+
+  useEffect(() => {
     setMessageInput("");
 
     if (currentChatId != "") {
-      socket.emit("joinChatRoom", currentChatId, user?.id || "");
+      socket.emit("joinChatRoom", currentChatId, userId || "");
       const getCurrentChat = async () => {
         return await getChat(
           currentChatId,
           organization?.id || "",
-          user?.id || ""
+          userId || ""
         );
       };
 
@@ -263,7 +283,7 @@ export default function ChatWindow(props: {
         setLoading(false);
       });
 
-      getAllPrompts(organization?.id || "", user?.id || "").then((res) => {
+      getAllPrompts(organization?.id || "", userId || "").then((res) => {
         setPrompts(res.prompts);
       });
     }
@@ -271,7 +291,7 @@ export default function ChatWindow(props: {
 
   useEffect(() => {
     socket.on("refreshPrompts", () => {
-      getAllPrompts(organization?.id || "", user?.id || "").then((res) => {
+      getAllPrompts(organization?.id || "", userId || "").then((res) => {
         setPrompts(res.prompts);
       });
     });
@@ -325,7 +345,7 @@ export default function ChatWindow(props: {
                   <ActionIcon
                     variant="subtle"
                     color="grey"
-                    aria-label="Settings"
+                    aria-label="Expand panel"
                     onClick={toggleLeft}
                   >
                     <IconLayoutSidebarLeftExpand
@@ -368,15 +388,17 @@ export default function ChatWindow(props: {
                     <IconShare size={20} />
                   </ActionIcon>
                 </Tooltip>
-                <Tooltip label="Chat settings" fz="sm">
-                  <ActionIcon
-                    variant="subtle"
-                    color="grey"
-                    onClick={() => setSettingsOpen(true)}
-                  >
-                    <IconSettings size={20} />
-                  </ActionIcon>
-                </Tooltip>
+                {isAllowed ? (
+                  <Tooltip label="Chat settings" fz="sm">
+                    <ActionIcon
+                      variant="subtle"
+                      color="grey"
+                      onClick={() => setSettingsOpen(true)}
+                    >
+                      <IconSettings size={20} />
+                    </ActionIcon>
+                  </Tooltip>
+                ) : null}
               </Group>
             </Group>
             {shareChatOpened && (
@@ -387,6 +409,7 @@ export default function ChatWindow(props: {
                 chat={chat}
                 setChat={setChat}
                 members={participants}
+                userId={userId || ""}
               />
             )}
             {settingsOpen && (
@@ -449,6 +472,7 @@ export default function ChatWindow(props: {
                   }}
                 >
                   <SegmentedControl
+                    disabled={!isAllowed}
                     value={chat?.scope}
                     onChange={(value) => {
                       if (chat.parentFolder) {
@@ -498,6 +522,7 @@ export default function ChatWindow(props: {
                     ]}
                   />
                   <Select
+                    disabled={!isAllowed}
                     allowDeselect={false}
                     description="Assistant Model"
                     data={chat?.assistant?.assistantId?.models}
@@ -531,6 +556,8 @@ export default function ChatWindow(props: {
                     <MessageItem
                       message={message}
                       participants={participants}
+                      userId={userId || ""}
+                      orgId={organization?.id || ""}
                       instructions={chat.instructions}
                       assistant={{
                         ...chat.assistant,
@@ -572,6 +599,7 @@ export default function ChatWindow(props: {
                   <Text>This chat has been archived.</Text>
                   <Group gap={15}>
                     <Button
+                      disabled={!isAllowed}
                       variant="default"
                       onClick={() => {
                         updateChat(chat?._id, {
@@ -584,6 +612,7 @@ export default function ChatWindow(props: {
                       Restore
                     </Button>
                     <Button
+                      disabled={!isAllowed}
                       variant="default"
                       onClick={() => {
                         deleteChat(chat)
@@ -711,7 +740,7 @@ export default function ChatWindow(props: {
                         ) {
                           setProcessing(true);
                           createMessage(
-                            user?.id || "",
+                            userId || "",
                             messageInput,
                             "user",
                             currentChatId
@@ -744,7 +773,7 @@ export default function ChatWindow(props: {
                         if (messageInput != "") {
                           setProcessing(true);
                           createMessage(
-                            user?.id || "",
+                            userId || "",
                             messageInput,
                             "user",
                             currentChatId

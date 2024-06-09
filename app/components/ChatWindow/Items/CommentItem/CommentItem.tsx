@@ -22,7 +22,6 @@ import {
 } from "@tabler/icons-react";
 import { useHover } from "@mantine/hooks";
 import { useEffect, useState } from "react";
-import { useUser } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 
 // Components
@@ -34,9 +33,12 @@ import {
 import ReplyItem from "../ReplyItem";
 import MentionInput, { MentionParser } from "./MentionInput";
 
-function CommentItem(props: { comment: any; participants: any[] }) {
-  const { comment, participants } = props;
-  const { user } = useUser();
+function CommentItem(props: {
+  comment: any;
+  participants: any[];
+  userId: string;
+}) {
+  const { comment, participants, userId } = props;
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
@@ -44,6 +46,7 @@ function CommentItem(props: { comment: any; participants: any[] }) {
   const [commentText, setCommentText] = useState(comment.content.toString());
   const [replyContent, setReplyContent] = useState("");
   const [createdBy, setCreatedBy] = useState<any>(null);
+  const [isAllowed, setIsAllowed] = useState(false);
 
   useEffect(() => {
     setChatId(pathname?.split("/")[3] || "");
@@ -54,6 +57,17 @@ function CommentItem(props: { comment: any; participants: any[] }) {
       return participant.userId === comment.createdBy;
     });
     setCreatedBy(getCreatedBy);
+  }, [participants]);
+
+  useEffect(() => {
+    const user = participants.find((participant) => {
+      return participant.userId === userId;
+    });
+    if (user) {
+      setIsAllowed(
+        user.userId == comment.createdBy || user.role == "org:admin"
+      );
+    }
   }, [participants]);
 
   return (
@@ -115,52 +129,53 @@ function CommentItem(props: { comment: any; participants: any[] }) {
                   />
                 </ActionIcon>
               </Tooltip>
-
-              <Menu
-                position="bottom-end"
-                width={100}
-                styles={{
-                  dropdown: {
-                    backgroundColor: "#ffffff",
-                  },
-                  item: {
-                    backgroundColor: "#ffffff",
-                    color: "#000000",
-                    hover: {
-                      backgroundColor: "#000000",
+              {isAllowed && (
+                <Menu
+                  position="bottom-end"
+                  width={100}
+                  styles={{
+                    dropdown: {
+                      backgroundColor: "#ffffff",
                     },
-                    height: "auto",
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "flex-start",
-                    padding: "0px",
-                  },
-                }}
-              >
-                <Tooltip label="Menu" fz="xs">
-                  <Menu.Target>
-                    <ActionIcon color="grey" variant="subtle">
-                      <IconDots style={{ width: rem(16) }} />
-                    </ActionIcon>
-                  </Menu.Target>
-                </Tooltip>
-                <Menu.Dropdown>
-                  <Menu.Item
-                    onClick={() => {
-                      setIsEdit(!isEdit);
-                    }}
-                  >
-                    <MenuButton properties={CommentMenuData[0]} />
-                  </Menu.Item>
-                  <Menu.Item
-                    onClick={() => {
-                      deleteComment(chatId, comment);
-                    }}
-                  >
-                    <MenuButton properties={CommentMenuData[1]} />
-                  </Menu.Item>
-                </Menu.Dropdown>
-              </Menu>
+                    item: {
+                      backgroundColor: "#ffffff",
+                      color: "#000000",
+                      hover: {
+                        backgroundColor: "#000000",
+                      },
+                      height: "auto",
+                      display: "flex",
+                      flexDirection: "row",
+                      justifyContent: "flex-start",
+                      padding: "0px",
+                    },
+                  }}
+                >
+                  <Tooltip label="Menu" fz="xs">
+                    <Menu.Target>
+                      <ActionIcon color="grey" variant="subtle">
+                        <IconDots style={{ width: rem(16) }} />
+                      </ActionIcon>
+                    </Menu.Target>
+                  </Tooltip>
+                  <Menu.Dropdown>
+                    <Menu.Item
+                      onClick={() => {
+                        setIsEdit(!isEdit);
+                      }}
+                    >
+                      <MenuButton properties={CommentMenuData[0]} />
+                    </Menu.Item>
+                    <Menu.Item
+                      onClick={() => {
+                        deleteComment(chatId, comment);
+                      }}
+                    >
+                      <MenuButton properties={CommentMenuData[1]} />
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              )}
             </div>
           </div>
 
@@ -233,7 +248,7 @@ function CommentItem(props: { comment: any; participants: any[] }) {
                     mr="1rem"
                     onClick={(e) =>
                       createComment(
-                        user?.id || "",
+                        userId,
                         replyContent,
                         comment.messageId,
                         chatId,

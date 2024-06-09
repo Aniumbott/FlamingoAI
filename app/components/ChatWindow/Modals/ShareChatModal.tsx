@@ -20,6 +20,7 @@ import {
 import { IconBuilding, IconCheck, IconCopy } from "@tabler/icons-react";
 import { IChatDocument } from "../../../models/Chat";
 import { updateChatAccess } from "../../../controllers/chat";
+import { useEffect, useState } from "react";
 
 const ShareChatModal = (props: {
   opened: boolean;
@@ -28,8 +29,24 @@ const ShareChatModal = (props: {
   setChat: (value: IChatDocument) => void;
   members: any[];
   organizationName: string;
+  userId: string;
 }) => {
-  const { opened, setOpened, chat, setChat, members, organizationName } = props;
+  const {
+    opened,
+    setOpened,
+    chat,
+    setChat,
+    members,
+    organizationName,
+    userId,
+  } = props;
+  const [isAllowed, setIsAllowed] = useState(false);
+  useEffect(() => {
+    const user = members.find((member) => member.userId == userId);
+    if (user) {
+      setIsAllowed(user.userId == chat.createdBy || user.role == "org:admin");
+    }
+  }, [members]);
   return (
     <Modal
       opened={opened}
@@ -94,6 +111,7 @@ const ShareChatModal = (props: {
             </Stack>
           </Group>
           <SegmentedControl
+            disabled={!isAllowed}
             value={chat?.scope}
             onChange={(value) => {
               if (chat.parentFolder) {
@@ -144,7 +162,12 @@ const ShareChatModal = (props: {
           />
         </Group>
         <Divider />
-        <MembersTable members={members} chat={chat} setChat={setChat} />
+        <MembersTable
+          members={members}
+          chat={chat}
+          setChat={setChat}
+          isAllowed={isAllowed}
+        />
       </Stack>
     </Modal>
   );
@@ -154,20 +177,9 @@ const MembersTable = (props: {
   members: any[];
   chat: IChatDocument;
   setChat: (value: IChatDocument) => void;
+  isAllowed: boolean;
 }) => {
-  const { members, chat, setChat } = props;
-  // const { organization } = useOrganization();
-  // const [MembersData, setMembersData] = useState<any>([]);
-  // useEffect(() => {
-  //   const fetchParticipants = async () => {
-  //     const res =
-  //       (await organization?.getMemberships())?.map(
-  //         (member: any) => member.publicUserData
-  //       ) || [];
-  //     setMembersData(res);
-  //   };
-  //   fetchParticipants();
-  // }, [organization?.membersCount]);
+  const { members, chat, setChat, isAllowed } = props;
 
   return (
     <ScrollArea.Autosize mah={"35vh"} offsetScrollbars={true}>
@@ -190,6 +202,7 @@ const MembersTable = (props: {
               {/* <Table.Td>{member.dateJoined}</Table.Td> */}
               <Table.Td>
                 <NativeSelect
+                  disabled={!isAllowed}
                   value={
                     chat?.memberAccess?.find((m) => m.userId === member.userId)
                       ?.access

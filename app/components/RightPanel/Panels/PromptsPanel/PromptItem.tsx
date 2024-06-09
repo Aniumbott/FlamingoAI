@@ -14,7 +14,6 @@ import {
 
 // Compoonents
 import style from "../../RightPanel.module.css";
-import { useAuth } from "@clerk/nextjs";
 import { IPromptDocument } from "@/app/models/Prompt";
 import PromptFeatureMenu from "../../Menu/PromptFeatureMenu";
 import { ModalControls } from "./PromptsPanel";
@@ -23,16 +22,26 @@ import MovePromptItems from "../../Modals/MoveItems/MovePromptItems";
 export default function PromptItem(props: {
   item: IPromptDocument;
   modalControls: ModalControls;
+  user: any;
+  orgId: string;
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { item } = props;
+  const { item, user, orgId } = props;
   const { hovered, ref } = useHover();
   const [menuOpen, setMenuOpen] = useState(false);
   const [rename, setRename] = useState(false);
   let actionIconVisible = (hovered || menuOpen) && item.scope !== "system";
   const [openMoveModal, setOpenMoveModal] = useState(false);
-  const { userId, orgId } = useAuth();
+  const [isAllowed, setIsAllowed] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      const role = user.organizationMemberships.find(
+        (org: any) => org.organization.id === orgId
+      )?.role;
+      setIsAllowed(role === "org:admin" || user?.id === item.createdBy);
+    }
+  }, [user]);
+
   useEffect(() => {
     actionIconVisible = hovered || menuOpen;
   }, [hovered, menuOpen]);
@@ -96,11 +105,11 @@ export default function PromptItem(props: {
             )}
           </Group>
           {!rename ? (
-            actionIconVisible ? (
+            actionIconVisible && isAllowed ? (
               <ActionIcon
                 size="20px"
                 variant="subtle"
-                aria-label=""
+                aria-label="Dots"
                 color="#9CA3AF"
                 // {...(hovered ? { opacity: "1" } : { opacity: "0" })}
                 style={{

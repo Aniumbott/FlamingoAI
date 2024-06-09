@@ -42,6 +42,8 @@ function getDate(date: string) {
 function MessageItem(props: {
   message: any;
   participants: any[];
+  userId: string;
+  orgId: string;
   instructions: string;
   assistant: any;
   setPromptOpened: (value: boolean) => void;
@@ -52,6 +54,8 @@ function MessageItem(props: {
   const {
     message,
     participants,
+    userId,
+    orgId,
     instructions,
     assistant,
     setPromptOpened,
@@ -65,24 +69,32 @@ function MessageItem(props: {
   const [isEdit, setIsEdit] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [commentInput, setCommentInput] = useState("");
-  const { user } = useUser();
   const [createdBy, setCreatedBy] = useState<any>(null);
-  const { organization } = useOrganization();
+  const [isAllowed, setIsAllowed] = useState(false);
 
   useEffect(() => {
     const getCreatedBy = participants.find((participant) => {
       return participant.userId === message.createdBy;
     });
-    setCreatedBy(getCreatedBy);
+    if (getCreatedBy) {
+      setCreatedBy(getCreatedBy);
+    }
+  }, [participants]);
+
+  useEffect(() => {
+    const user = participants.find(
+      (participant) => participant.userId === userId
+    );
+    if (user) {
+      setIsAllowed(
+        user.userId === message.createdBy || user.role === "org:admin"
+      );
+    }
   }, [participants]);
 
   useEffect(() => {
     setMessageText(message.content);
   }, [message]);
-
-  // useEffect(() => {
-  //   console.log(messageText);
-  // }, [messageText]);
 
   return (
     <Box ref={ref}>
@@ -158,16 +170,18 @@ function MessageItem(props: {
                 {hovered && !isEdit ? (
                   message.type === "user" ? (
                     <>
-                      <Tooltip label="Edit" fz="xs">
-                        <ActionIcon
-                          color="grey"
-                          variant="subtle"
-                          display={isEdit ? "none" : "block"}
-                          onClick={() => setIsEdit(!isEdit)}
-                        >
-                          <IconEdit style={{ width: rem(16) }} />
-                        </ActionIcon>
-                      </Tooltip>
+                      {createdBy?.userId === userId ? (
+                        <Tooltip label="Edit" fz="xs">
+                          <ActionIcon
+                            color="grey"
+                            variant="subtle"
+                            display={isEdit ? "none" : "block"}
+                            onClick={() => setIsEdit(!isEdit)}
+                          >
+                            <IconEdit style={{ width: rem(16) }} />
+                          </ActionIcon>
+                        </Tooltip>
+                      ) : null}
 
                       <Tooltip label="Save prompt" fz="xs">
                         <ActionIcon color="grey" variant="subtle">
@@ -180,17 +194,19 @@ function MessageItem(props: {
                           />
                         </ActionIcon>
                       </Tooltip>
-                      <Tooltip label="Delete" fz="xs">
-                        <ActionIcon
-                          color="grey"
-                          variant="subtle"
-                          onClick={() => {
-                            deleteMessage(message);
-                          }}
-                        >
-                          <IconTrash style={{ width: rem(16) }} />
-                        </ActionIcon>
-                      </Tooltip>
+                      {isAllowed ? (
+                        <Tooltip label="Delete" fz="xs">
+                          <ActionIcon
+                            color="grey"
+                            variant="subtle"
+                            onClick={() => {
+                              deleteMessage(message);
+                            }}
+                          >
+                            <IconTrash style={{ width: rem(16) }} />
+                          </ActionIcon>
+                        </Tooltip>
+                      ) : null}
                     </>
                   ) : (
                     <Tooltip label="Delete" fz="xs">
@@ -241,7 +257,7 @@ function MessageItem(props: {
                               [],
                               msg,
                               instructions,
-                              organization?.id || "",
+                              orgId || "",
                               assistant
                             );
                           })
@@ -314,6 +330,7 @@ function MessageItem(props: {
                         key={id}
                         comment={comment}
                         participants={participants}
+                        userId={userId}
                       />
                     );
                   })}
@@ -330,7 +347,7 @@ function MessageItem(props: {
                         mr="1rem"
                         onClick={() => {
                           createComment(
-                            String(user?.id),
+                            String(userId),
                             commentInput,
                             message._id,
                             message.chatId,

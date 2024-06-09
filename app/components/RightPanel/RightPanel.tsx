@@ -22,7 +22,7 @@ import {
 
 // Components
 import style from "./RightPanel.module.css";
-import { UserButton } from "@clerk/nextjs";
+import { Protect, UserButton } from "@clerk/nextjs";
 import PromptsPanel from "./Panels/PromptsPanel/PromptsPanel";
 import CommentsPanel from "./Panels/CommentsPanel";
 import ReportsPanel from "./Panels/ReportsPanel";
@@ -71,7 +71,7 @@ export default function RightPanel(props: {
               <ActionIcon
                 style={buttonStyle(0)}
                 variant={active == 0 ? "light" : "subtle"}
-                aria-label="Settings"
+                aria-label="Categories"
                 radius={0}
                 color={active == 0 ? "" : "light"}
                 onClick={() => {
@@ -86,30 +86,32 @@ export default function RightPanel(props: {
               </ActionIcon>
             </Tooltip>
 
-            <Tooltip label="Reports" position="left" fz="xs">
-              <ActionIcon
-                style={buttonStyle(1)}
-                variant={active == 1 ? "light" : "subtle"}
-                aria-label="Settings"
-                radius={0}
-                color={active == 1 ? "" : "light"}
-                onClick={() => {
-                  !rightOpened ? toggleRight() : "";
-                  setActive(1);
-                }}
-              >
-                <IconTrendingUp
-                  style={{ width: "70%", height: "70%" }}
-                  stroke={1.5}
-                />
-              </ActionIcon>
-            </Tooltip>
+            <Protect role="org:admin">
+              <Tooltip label="Reports" position="left" fz="xs">
+                <ActionIcon
+                  style={buttonStyle(1)}
+                  variant={active == 1 ? "light" : "subtle"}
+                  aria-label="Trending Up"
+                  radius={0}
+                  color={active == 1 ? "" : "light"}
+                  onClick={() => {
+                    !rightOpened ? toggleRight() : "";
+                    setActive(1);
+                  }}
+                >
+                  <IconTrendingUp
+                    style={{ width: "70%", height: "70%" }}
+                    stroke={1.5}
+                  />
+                </ActionIcon>
+              </Tooltip>
+            </Protect>
 
             <Tooltip label="Comments" position="left" fz="xs">
               <ActionIcon
                 style={buttonStyle(2)}
                 variant={active == 2 ? "light" : "subtle"}
-                aria-label="Settings"
+                aria-label="Messages"
                 radius={0}
                 color={active == 2 ? "" : "light"}
                 onClick={() => {
@@ -128,7 +130,7 @@ export default function RightPanel(props: {
               <ActionIcon
                 style={buttonStyle(3)}
                 variant={active == 3 ? "light" : "subtle"}
-                aria-label="Settings"
+                aria-label="Help"
                 radius={0}
                 color={active == 3 ? "" : "light"}
                 onClick={() => {
@@ -150,7 +152,7 @@ export default function RightPanel(props: {
               <ActionIcon
                 style={buttonStyle(999)}
                 variant="subtle"
-                aria-label="Settings"
+                aria-label="Sun"
                 radius={0}
                 color="light"
                 onClick={() => setColorScheme("light")}
@@ -163,7 +165,7 @@ export default function RightPanel(props: {
               <ActionIcon
                 style={buttonStyle(999)}
                 variant="subtle"
-                aria-label="Settings"
+                aria-label="Moon"
                 radius={0}
                 color="light"
                 onClick={() => setColorScheme("dark")}
@@ -180,7 +182,7 @@ export default function RightPanel(props: {
               <ActionIcon
                 style={buttonStyle(999)}
                 variant="subtle"
-                aria-label="Settings"
+                aria-label="Expand panel"
                 radius={0}
                 color="light"
                 onClick={() => {
@@ -199,7 +201,7 @@ export default function RightPanel(props: {
               <ActionIcon
                 style={buttonStyle(999)}
                 variant="subtle"
-                aria-label="Settings"
+                aria-label="Expand panel"
                 radius={0}
                 color="light"
                 onClick={() => {

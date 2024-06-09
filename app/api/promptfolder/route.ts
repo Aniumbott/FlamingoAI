@@ -137,7 +137,7 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
     await dbConnect();
     const body = await req.json();
     // const chatFolder = await ChatFolder.findByIdAndDelete(body.id);
-    await deleteFolderAndContents(body.id);
+    await deleteFolder(body.id);
     return NextResponse.json(
       { message: "Prompt Folder deleted successfully" },
       { status: 200 }
@@ -191,17 +191,21 @@ async function updateScope(folderId: any, newScope: any) {
   }
 }
 
-async function deleteFolderAndContents(folderId: string) {
+async function deleteFolder(folderId: string) {
   const folder = await PromptFolder.findById(folderId);
 
   if (folder) {
     // Delete all prompts in folder.prompts
     for (const promptId of folder.prompts) {
-      await Prompt.findByIdAndDelete(promptId);
+      await Prompt.findByIdAndUpdate(promptId, {
+        parentFolder: null,
+      });
     }
     // Recursively delete all subfolders
     for (const subFolderId of folder.subFolders) {
-      await deleteFolderAndContents(subFolderId._id);
+      await PromptFolder.findByIdAndUpdate(subFolderId._id, {
+        parentFolder: null,
+      });
     }
     // Delete the folder
     await PromptFolder.findByIdAndDelete(folderId);

@@ -3,6 +3,7 @@ import { stripe } from "@/app/lib/stripe";
 import { NextResponse } from "next/server";
 
 import Workspace, { IWorkspaceDocument } from "@/app/models/Workspace";
+import { clerkClient } from "@clerk/nextjs";
 
 export async function POST(req: any, res: NextResponse) {
   const body = await req.text();
@@ -19,6 +20,7 @@ export async function POST(req: any, res: NextResponse) {
   }
 
   let workspace: IWorkspaceDocument | null;
+  let response: any;
 
   // Handle the event
   switch (event.type) {
@@ -31,6 +33,16 @@ export async function POST(req: any, res: NextResponse) {
           subscription: getSubscriptionDataFromEvent(event),
         }
       );
+      // console.log(workspace);
+
+      response = await clerkClient.organizations.updateOrganization(
+        workspace?._id || "",
+        {
+          maxAllowedMemberships: workspace?.subscription?.quantity || 2,
+        }
+      );
+
+      // console.log(response);
 
       console.log("Subscription was created!");
       break;
@@ -43,6 +55,16 @@ export async function POST(req: any, res: NextResponse) {
           subscription: getSubscriptionDataFromEvent(event),
         }
       );
+
+      response = await clerkClient.organizations.updateOrganization(
+        workspace?._id || "",
+        {
+          maxAllowedMemberships: workspace?.subscription?.quantity || 2,
+        }
+      );
+
+      // console.log(response);
+
       console.log("Subscription was updated!");
       break;
     case "customer.subscription.deleted":
@@ -54,6 +76,18 @@ export async function POST(req: any, res: NextResponse) {
           subscription: null,
         }
       );
+
+      // console.log(workspace);
+
+      response = await clerkClient.organizations.updateOrganization(
+        workspace?._id || "",
+        {
+          maxAllowedMemberships: 2,
+        }
+      );
+
+      // console.log(response);
+
       console.log("Subscription was deleted!");
       break;
 
