@@ -189,6 +189,7 @@ export default function CommentsPanel(props: { toggleRight: () => void }) {
               isMentions ? (
                 haveMentioned(comment, user?.id || "") ? (
                   <CommentItem
+                    userId={user?.id || ""}
                     key={i}
                     comment={comment}
                     participants={participants}
@@ -196,6 +197,7 @@ export default function CommentsPanel(props: { toggleRight: () => void }) {
                 ) : null
               ) : (
                 <CommentItem
+                  userId={user?.id || ""}
                   key={i}
                   comment={comment}
                   participants={participants}
