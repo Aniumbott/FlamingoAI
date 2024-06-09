@@ -388,7 +388,7 @@ const GeneralChats = (props: {
         {productId === process.env.NEXT_PUBLIC_MAX_PLAN && (
           <Accordion.Item value={"GENERATED-IMAGES"} key={"GENERATED-IMAGES"}>
             <Accordion.Control>
-              <AccordionLabelImage />
+              <AccordionLabelImage pathname={pathname} />
             </Accordion.Control>
             <AccordionPanel>
               <ScrollArea.Autosize
@@ -511,7 +511,8 @@ const AccordionLabel = (props: {
   );
 };
 
-const AccordionLabelImage = (props: {}) => {
+const AccordionLabelImage = (props: { pathname: string }) => {
+  const { pathname } = props;
   return (
     <Group wrap="nowrap" justify="space-between">
       <Text size="sm" fw={600}>
@@ -523,6 +524,11 @@ const AccordionLabelImage = (props: {}) => {
         color="grey"
         onClick={(event) => {
           event.stopPropagation();
+          window.history.pushState(
+            {},
+            "",
+            pathname.split("/").slice(0, 3).join("/") + "/gallery"
+          );
         }}
       >
         <IconPlus size={"1rem"} />

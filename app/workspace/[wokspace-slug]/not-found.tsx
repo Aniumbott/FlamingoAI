@@ -8,6 +8,6 @@ import { useEffect } from "react";
 export default function NotFound() {
   const router = useRouter();
   useEffect(() => {
-    router.push("/");
+    router.push("/workspace/");
   }, []);
 }

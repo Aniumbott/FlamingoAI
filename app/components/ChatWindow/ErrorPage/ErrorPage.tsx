@@ -27,7 +27,7 @@ export default function ErrorPage() {
             <Button
               size="md"
               onClick={() => {
-                router.push("/");
+                router.push("/workspace/");
               }}
             >
               Take me back to home page

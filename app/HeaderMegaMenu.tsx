@@ -7,7 +7,6 @@ import {
   Text,
   SimpleGrid,
   ThemeIcon,
-  Anchor,
   Divider,
   Center,
   Box,
@@ -17,21 +16,14 @@ import {
   ScrollArea,
   rem,
   useMantineTheme,
+  Anchor,
 } from "@mantine/core";
 // import { MantineLogo } from '@mantinex/mantine-logo';
 import { useDisclosure } from "@mantine/hooks";
-import {
-  IconNotification,
-  IconCode,
-  IconBook,
-  IconChartPie3,
-  IconFingerprint,
-  IconCoin,
-  IconChevronDown,
-} from "@tabler/icons-react";
 import classes from "./HeaderMegaMenu.module.css";
 
-export default function HeaderMegaMenu() {
+export default function HeaderMegaMenu(props: { active: number }) {
+  const { active } = props;
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
 
@@ -45,15 +37,27 @@ export default function HeaderMegaMenu() {
           </Text>
 
           <Group h="100%" gap={0} visibleFrom="sm">
-            <a href="#" className={classes.link}>
+            <Anchor
+              c={active == 0 ? "var(--mantine-primary-color-filled)" : ""}
+              href="/"
+              className={classes.link}
+            >
               Home
-            </a>
-            <a href="#" className={classes.link}>
+            </Anchor>
+            <Anchor
+              c={active == 1 ? "var(--mantine-primary-color-filled)" : ""}
+              href="/pricing"
+              className={classes.link}
+            >
               Pricing
-            </a>
-            <a href="#" className={classes.link}>
+            </Anchor>
+            <Anchor
+              c={active == 2 ? "var(--mantine-primary-color-filled)" : ""}
+              href="#"
+              className={classes.link}
+            >
               Contact Us
-            </a>
+            </Anchor>
           </Group>
 
           <Group visibleFrom="sm">
@@ -81,15 +85,27 @@ export default function HeaderMegaMenu() {
         <ScrollArea h={`calc(100vh - ${rem(80)})`} mx="-md">
           <Divider my="sm" />
 
-          <a href="#" className={classes.link}>
+          <Anchor
+            c={active == 0 ? "var(--mantine-primary-color-filled)" : ""}
+            href="/"
+            className={classes.link}
+          >
             Home
-          </a>
-          <a href="#" className={classes.link}>
-            Learn
-          </a>
-          <a href="#" className={classes.link}>
-            Academy
-          </a>
+          </Anchor>
+          <Anchor
+            c={active == 1 ? "var(--mantine-primary-color-filled)" : ""}
+            href="/pricing"
+            className={classes.link}
+          >
+            Pricing
+          </Anchor>
+          <Anchor
+            c={active == 2 ? "var(--mantine-primary-color-filled)" : ""}
+            href="#"
+            className={classes.link}
+          >
+            Contact Us
+          </Anchor>
 
           <Divider my="sm" />
 
