@@ -315,7 +315,6 @@ export default function ChatWindow(props: {
   const [promptVariables, setPromptVariables] = useState<string[]>([]);
   const [promptContent, setPromptContent] = useState("");
   const [newMessageInput, setNewMessageInput] = useState(messageInput);
-
   const [promptVariablesOpened, setPromptVariablesOpened] = useState(false);
   const [promptOpened, setPromptOpened] = useState(false);
   const [newPrompt, setnewPrompt] = useState<IPromptDocument | null>(null);
@@ -417,7 +416,6 @@ export default function ChatWindow(props: {
                 opened={settingsOpen}
                 setOpened={setSettingsOpen}
                 chat={chat}
-                setChat={setChat}
               />
             )}
             {promptOpened && (

@@ -14,9 +14,8 @@ const SettingsModal = (props: {
   opened: boolean;
   setOpened: (value: boolean) => void;
   chat: any;
-  setChat: (value: any) => void;
 }) => {
-  const { opened, setOpened, chat, setChat } = props;
+  const { opened, setOpened, chat } = props;
   const [areaValue, setAreaValue] = useState("");
   const [model, setModel] = useState("");
   useEffect(() => {

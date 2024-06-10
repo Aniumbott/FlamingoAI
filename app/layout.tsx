@@ -8,6 +8,7 @@ import "@mantine/core/styles.css";
 import "@mantine/charts/styles.css";
 import "@mantine/notifications/styles.css";
 import "@mantine/dates/styles.css";
+import "@mantine/tiptap/styles.css";
 // Componets
 import "./globals.css";
 import NewClerkProvider from "./NewClerkProvider";

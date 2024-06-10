@@ -400,7 +400,7 @@ const GeneralChats = (props: {
                   <ActionIcon
                     h="70"
                     w="70"
-                    variant="default"
+                    variant="light"
                     onClick={() => {
                       window.history.pushState(
                         {},

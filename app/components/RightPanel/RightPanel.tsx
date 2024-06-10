@@ -64,7 +64,7 @@ export default function RightPanel(props: {
       >
         <div>
           <div className="w-full flex justify-center items-center mt-3">
-            <UserButton />
+            <UserButton afterSignOutUrl="/" />
           </div>
           <div style={{ marginTop: "8rem" }}>
             <Tooltip label="Prompts" position="left" fz="xs">

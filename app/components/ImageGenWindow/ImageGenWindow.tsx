@@ -54,7 +54,15 @@ export default function ImageGenWindow(props: {
   const [imageDescription, setImageDescription] = useState("");
   const [resolution, setResolution] = useState("1024x1024");
   const [isHD, setIsHD] = useState(false);
-  const [imageGen, setImageGen] = useState<IImageGenDocument>();
+  const [imageGen, setImageGen] = useState<IImageGenDocument>({
+    createdBy: "",
+    prompt: "",
+    resolution: "",
+    isHD: false,
+    workspaceId: "",
+    modelName: "",
+    createdAt: new Date(),
+  } as IImageGenDocument);
   const [isGenerating, setIsGenerating] = useState(false);
   const [imagePath, setImagePath] = useState<string | StaticImageData>("");
   const [participants, setParticipants] = useState<any>([]);
@@ -143,33 +151,39 @@ export default function ImageGenWindow(props: {
                   <IconBadgeHd size={20} />
                 </ActionIcon>
                 <Divider orientation="vertical" />
-                <ActionIcon
-                  variant={resolution == "1024x1024" ? "filled" : "default"}
-                  aria-label="1024x1024"
-                  onClick={() => {
-                    setResolution("1024x1024");
-                  }}
-                >
-                  <IconSquare size={20} />
-                </ActionIcon>
-                <ActionIcon
-                  variant={resolution == "1792x1024" ? "filled" : "default"}
-                  aria-label="1792x1024"
-                  onClick={() => {
-                    setResolution("1792x1024");
-                  }}
-                >
-                  <IconRectangle size={20} />
-                </ActionIcon>
-                <ActionIcon
-                  variant={resolution == "1024x1792" ? "filled" : "default"}
-                  aria-label="1024x1792"
-                  onClick={() => {
-                    setResolution("1024x1792");
-                  }}
-                >
-                  <IconRectangleVertical size={20} />
-                </ActionIcon>
+                <Tooltip label="1024x1024" fz="xs">
+                  <ActionIcon
+                    variant={resolution == "1024x1024" ? "filled" : "default"}
+                    aria-label="1024x1024"
+                    onClick={() => {
+                      setResolution("1024x1024");
+                    }}
+                  >
+                    <IconSquare size={20} />
+                  </ActionIcon>
+                </Tooltip>
+                <Tooltip label="1792x1024" fz="xs">
+                  <ActionIcon
+                    variant={resolution == "1792x1024" ? "filled" : "default"}
+                    aria-label="1792x1024"
+                    onClick={() => {
+                      setResolution("1792x1024");
+                    }}
+                  >
+                    <IconRectangle size={20} />
+                  </ActionIcon>
+                </Tooltip>
+                <Tooltip label="1024x1792" fz="xs">
+                  <ActionIcon
+                    variant={resolution == "1024x1792" ? "filled" : "default"}
+                    aria-label="1024x1792"
+                    onClick={() => {
+                      setResolution("1024x1792");
+                    }}
+                  >
+                    <IconRectangleVertical size={20} />
+                  </ActionIcon>
+                </Tooltip>
               </Group>
             </Group>
             <Textarea
@@ -184,34 +198,36 @@ export default function ImageGenWindow(props: {
               value={imageDescription}
               disabled={isGenerating}
               rightSection={
-                <ActionIcon
-                  variant="default"
-                  disabled={isGenerating}
-                  onClick={() => {
-                    setIsGenerating(true);
-                    generateImage(
-                      userId || "",
-                      imageDescription,
-                      resolution,
-                      isHD,
-                      orgId || "",
-                      "dall-e-3"
-                    ).then((res) => {
-                      if (res.imageGen) {
-                        window.history.pushState(
-                          {},
-                          "",
-                          pathname.split("/").slice(0, 3).join("/") +
-                            `/gallery/${res.imageGen._id}`
-                        );
-                        setImageGen(res.imageGen);
-                        setIsGenerating(false);
-                      }
-                    });
-                  }}
-                >
-                  <IconSend size={20} />
-                </ActionIcon>
+                <Tooltip label="Generate Image" fz="xs">
+                  <ActionIcon
+                    variant="default"
+                    disabled={isGenerating}
+                    onClick={() => {
+                      setIsGenerating(true);
+                      generateImage(
+                        userId || "",
+                        imageDescription,
+                        resolution,
+                        isHD,
+                        orgId || "",
+                        "dall-e-3"
+                      ).then((res) => {
+                        if (res.imageGen) {
+                          window.history.pushState(
+                            {},
+                            "",
+                            pathname.split("/").slice(0, 3).join("/") +
+                              `/gallery/${res.imageGen._id}`
+                          );
+                          setImageGen(res.imageGen);
+                          setIsGenerating(false);
+                        }
+                      });
+                    }}
+                  >
+                    <IconSend size={20} />
+                  </ActionIcon>
+                </Tooltip>
               }
               onChange={(e) => {
                 setImageDescription(e.currentTarget.value);

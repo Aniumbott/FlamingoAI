@@ -38,6 +38,7 @@ import { createChat } from "@/app/controllers/chat";
 import { getWorkspace } from "@/app/controllers/workspace";
 import RecentChats from "../../components/LeftPanel/ChatFilters/RecentChats";
 import ImageGenWindow from "@/app/components/ImageGenWindow/ImageGenWindow";
+import PageWindow from "@/app/components/PageWindow/PageWindow";
 
 export default function Workspace() {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
@@ -90,7 +91,12 @@ export default function Workspace() {
       console.log("leaving", currentChatId);
       socket.emit("leaveChatRoom", currentChatId, userId);
     }
-    setCurrentChatId(pathname?.split("/")[3] || "");
+    if (
+      pathname?.split("/")[3] != "gallery" &&
+      pathname?.split("/")[3] != "page"
+    ) {
+      setCurrentChatId(pathname?.split("/")[3] || "");
+    }
     setCurrentImageGenId(pathname?.split("/")[4] || "");
   }, [pathname]);
 
@@ -185,7 +191,7 @@ export default function Workspace() {
             <div
               className="h-[100vh] w-full flex flex-col"
               style={{
-                marginLeft: "-15px",
+                marginLeft: "-24px",
               }}
             >
               <div className="flex flex-col grow justify-center">
@@ -195,6 +201,8 @@ export default function Workspace() {
                       imageGenId={currentImageGenId}
                       productId={workspace?.subscription?.product_id || ""}
                     />
+                  ) : pathname?.split("/")[3] == "page" ? (
+                    <PageWindow />
                   ) : (
                     <ChatWindow
                       currentChatId={currentChatId}

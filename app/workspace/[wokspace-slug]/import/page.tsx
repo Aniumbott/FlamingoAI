@@ -201,6 +201,7 @@ export default function ImportPage() {
         </div>
         <div>
           <UserButton
+            afterSignOutUrl="/"
             appearance={{
               baseTheme: colorScheme === "dark" ? dark : undefined,
             }}

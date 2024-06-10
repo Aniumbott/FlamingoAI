@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import HeaderMegaMenu from ".././HeaderMegaMenu";
+import HeaderMegaMenu from "../components/LandingPage/HeaderMegaMenu";
 import {
   Accordion,
   Avatar,
@@ -22,7 +22,7 @@ import {
   Slider,
 } from "@mantine/core";
 import { IconArrowRight, IconCheck } from "@tabler/icons-react";
-import { FooterLinks } from ".././FooterLinks";
+import { FooterLinks } from "../components/LandingPage/FooterLinks";
 
 export default function Home() {
   const [isMonthly, setIsMonthly] = useState(false);
@@ -30,7 +30,7 @@ export default function Home() {
   const [maxValue, setMaxValue] = useState(10);
   return (
     <Box>
-      <HeaderMegaMenu active={1} />
+      {/* <HeaderMegaMenu active={1} /> */}
       <Stack mx={"10%"} gap={"xl"} align={"center"} justify={"center"}>
         <Title order={1}>Small price to pay for great collaboration</Title>
         <Text mb="xl">30-day money back guarantee</Text>

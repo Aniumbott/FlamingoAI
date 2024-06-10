@@ -98,15 +98,16 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
     return results;
   };
 
-  const filteredSystemPrompt = systemPrompt?.filter((prompt) =>
-    prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredSystemPrompts =
+    systemPrompt?.filter((prompt) =>
+      prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
+    ) || [];
   const filteredSystemFolderPrompts = searchPromptsInFolders(
     systemFolder,
     searchTerm
   );
   const combinedSystemPrompts = [
-    ...filteredSystemPrompt,
+    ...filteredSystemPrompts,
     ...filteredSystemFolderPrompts,
   ];
 
