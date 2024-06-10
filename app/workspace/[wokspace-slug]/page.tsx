@@ -38,7 +38,7 @@ import { createChat } from "@/app/controllers/chat";
 import { getWorkspace } from "@/app/controllers/workspace";
 import RecentChats from "../../components/LeftPanel/ChatFilters/RecentChats";
 import ImageGenWindow from "@/app/components/ImageGenWindow/ImageGenWindow";
-import PageWindow from "@/app/components/PageWindow/PageWindow";
+// import PageWindow from "@/app/components/PageWindow/PageWindow";
 
 export default function Workspace() {
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
@@ -201,9 +201,11 @@ export default function Workspace() {
                       imageGenId={currentImageGenId}
                       productId={workspace?.subscription?.product_id || ""}
                     />
-                  ) : pathname?.split("/")[3] == "page" ? (
-                    <PageWindow />
-                  ) : (
+                  ) 
+                  // : pathname?.split("/")[3] == "page" ? (
+                  //   // <PageWindow />
+                  // ) 
+                  : (
                     <ChatWindow
                       currentChatId={currentChatId}
                       leftOpened={leftOpened}
