@@ -41,7 +41,7 @@ export default function MentionInput(props: {
   const style = {
     control: {
       backgroundColor:
-        colorScheme == "dark" ? "var(--mantine-color-dark-6)" : "white",
+        colorScheme == "dark" ? "var(--mantine-color-dark-7)" : "white",
       fontSize: 14,
       height: "100%",
       fontWeight: "normal",
@@ -61,12 +61,8 @@ export default function MentionInput(props: {
         borderColor:
           colorScheme == "dark"
             ? "var(--mantine-color-dark-4)"
-            : "var(--mantine-color-dark-1)",
+            : "var(--mantine-color-gray-3)",
         borderRadius: 4,
-        // focus
-        "&focused": {
-          borderColor: "var(--mantine-primary-color-filled)",
-        },
       },
     },
 

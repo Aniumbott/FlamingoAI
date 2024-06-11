@@ -21,6 +21,7 @@ import { IconBuilding, IconCheck, IconCopy } from "@tabler/icons-react";
 import { IChatDocument } from "../../../models/Chat";
 import { updateChatAccess } from "../../../controllers/chat";
 import { useEffect, useState } from "react";
+import { useMediaQuery } from "@mantine/hooks";
 
 const ShareChatModal = (props: {
   opened: boolean;
@@ -41,6 +42,7 @@ const ShareChatModal = (props: {
     userId,
   } = props;
   const [isAllowed, setIsAllowed] = useState(false);
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
   useEffect(() => {
     const user = members.find((member) => member.userId == userId);
     if (user) {
@@ -93,7 +95,7 @@ const ShareChatModal = (props: {
             />
           </Group>
         </Stack>
-        <Group gap={50}>
+        <Group gap={isMobile ? "md" : 50}>
           <Group gap={10}>
             <ThemeIcon variant="filled" size="40px">
               <IconBuilding size={24} />
@@ -112,6 +114,7 @@ const ShareChatModal = (props: {
           </Group>
           <SegmentedControl
             disabled={!isAllowed}
+            orientation={isMobile ? "vertical" : "horizontal"}
             value={chat?.scope}
             onChange={(value) => {
               if (chat.parentFolder) {
@@ -167,6 +170,7 @@ const ShareChatModal = (props: {
           chat={chat}
           setChat={setChat}
           isAllowed={isAllowed}
+          isMobile={isMobile}
         />
       </Stack>
     </Modal>
@@ -178,8 +182,9 @@ const MembersTable = (props: {
   chat: IChatDocument;
   setChat: (value: IChatDocument) => void;
   isAllowed: boolean;
+  isMobile?: boolean;
 }) => {
-  const { members, chat, setChat, isAllowed } = props;
+  const { members, chat, setChat, isAllowed, isMobile } = props;
 
   return (
     <ScrollArea.Autosize mah={"35vh"} offsetScrollbars={true}>
@@ -191,7 +196,7 @@ const MembersTable = (props: {
       >
         <Table.Thead>
           <Table.Tr>
-            <Table.Th w={"70%"}>MEMBERS</Table.Th>
+            <Table.Th w={isMobile ? "50%" : "70%"}>MEMBERS</Table.Th>
             <Table.Th>ACCESS</Table.Th>
           </Table.Tr>
         </Table.Thead>
@@ -199,9 +204,9 @@ const MembersTable = (props: {
           {members.map((member: any, index: number) => (
             <Table.Tr key={index}>
               <Table.Td>{User(member)}</Table.Td>
-              {/* <Table.Td>{member.dateJoined}</Table.Td> */}
               <Table.Td>
                 <NativeSelect
+                  miw="120px"
                   disabled={!isAllowed}
                   value={
                     chat?.memberAccess?.find((m) => m.userId === member.userId)
@@ -257,8 +262,8 @@ const User = (member: any) => (
       color="var(--mantine-primary-color-filled)"
       radius="sm"
     ></Avatar>
-    <Stack gap={1}>
-      <Text fw={600} size="sm">
+    <Stack gap={1} w="calc(min(40vw, 70%))">
+      <Text fw={600} size="sm" truncate="end">
         {member?.firstName + " " + member?.lastName}
       </Text>
       <Text size="sm" truncate>

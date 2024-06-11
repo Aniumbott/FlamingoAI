@@ -27,6 +27,7 @@ import ActiveUsers from "@/app/components/Reports/ActiveUsers";
 import LongestChats from "@/app/components/Reports/LongestChats";
 import TokenDistribution from "@/app/components/Reports/TokenDistribution";
 import { set } from "mongoose";
+import { useMediaQuery } from "@mantine/hooks";
 
 export default function Reports() {
   const { organization } = useOrganization();
@@ -55,6 +56,7 @@ export default function Reports() {
       inefficient: 30,
     },
   ]);
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
 
   useEffect(() => {
     if (organization) {
@@ -192,11 +194,11 @@ export default function Reports() {
     }, 0);
   }
 
-  return (
+  return !isMobile ? (
     <Protect
       role="org:admin"
       fallback={
-        <div className="h-screen w-screen flex flex-col items-center justify-center">
+        <div className="h-screen w-screen flex flex-col items-center justify-center p-5">
           <Card withBorder radius="md" p="lg">
             <Group justify="space-between">
               <Group gap={"xs"}>
@@ -545,5 +547,36 @@ export default function Reports() {
         </Paper>
       )}
     </Protect>
+  ) : (
+    <div className="h-screen w-screen flex flex-col items-center justify-center p-5">
+      <Card withBorder radius="md" p="lg">
+        <Group justify="space-between">
+          <Group gap={"xs"}>
+            <IconInfoCircle size="24px" />
+            <Title order={3}>Insufficient screen size !!!</Title>
+          </Group>
+          <Button
+            variant="default"
+            onClick={() => {
+              window.history.back();
+            }}
+          >
+            Back to Workspace
+          </Button>
+        </Group>
+        <Text size="md" c="dimmed" mt="md">
+          Reports are only visible on{" "}
+          <span
+            style={{
+              fontWeight: 700,
+              color: "var(--mantine-primary-color-filled)",
+            }}
+          >
+            landscape displays
+          </span>
+          . Kindly change the orientation of the device if possible.
+        </Text>
+      </Card>
+    </div>
   );
 }

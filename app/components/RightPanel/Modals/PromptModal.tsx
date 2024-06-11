@@ -13,6 +13,7 @@ import {
   Textarea,
   Title,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { IconInfoCircle } from "@tabler/icons-react";
 import * as Mongoose from "mongoose";
 import React, { useState } from "react";
@@ -35,6 +36,7 @@ const PromptModal = (props: {
     parentFolder,
     messageContent,
   } = props;
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
   const [name, setName] = useState(modalItem ? modalItem.name : "");
   const [description, setDescription] = useState(
     modalItem ? modalItem.description : ""
@@ -66,7 +68,7 @@ const PromptModal = (props: {
       }}
       centered
       padding={0}
-      size={"80%"}
+      size={isMobile ? "" : "80%"}
       withCloseButton={false}
     >
       <FocusTrap.InitialFocus />

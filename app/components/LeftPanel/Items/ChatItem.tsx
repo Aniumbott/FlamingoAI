@@ -2,7 +2,6 @@
 import { useHover } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import Mongoose from "mongoose";
 import { Avatar, Group, Text, ActionIcon, TextInput } from "@mantine/core";
 import { IconAlignJustified, IconStarFilled } from "@tabler/icons-react";
 

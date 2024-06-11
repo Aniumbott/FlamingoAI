@@ -164,7 +164,6 @@ export default function Upgrade() {
           h={590}
           radius="md"
           w={330}
-          shadow="lg"
           withBorder
           style={{
             border:

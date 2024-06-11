@@ -33,6 +33,7 @@ import {
 import MoveFolderAccordian from "./MoveFolderAccordian";
 import { updatePrompt } from "@/app/controllers/prompt";
 import { IPromptDocument } from "@/app/models/Prompt";
+import { useMediaQuery } from "@mantine/hooks";
 
 const MovePromptItems = (props: {
   opened: boolean;
@@ -55,6 +56,8 @@ const MovePromptItems = (props: {
     { id: "null", name: "public" },
   ]);
 
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
+
   const fetchFolders = async () => {
     try {
       setPublicFolders(
@@ -69,15 +72,6 @@ const MovePromptItems = (props: {
       console.error("Failed to fetch folders:", error);
     }
   };
-
-  // useEffect(() => {
-  //   console.log(
-  //     "publicFolder ",
-  //     publicFolders,
-  //     "privateFolder ",
-  //     privateFolders
-  //   );
-  // }, [publicFolders, privateFolders]);
 
   const handleBreadcrumb = (value: string | null) => {
     if (value === null) {
@@ -127,7 +121,7 @@ const MovePromptItems = (props: {
       opened={opened}
       onClose={() => setOpened(false)}
       padding={0}
-      size={"80%"}
+      size={isMobile ? "" : "80%"}
       withCloseButton={false}
     >
       <Stack gap={"sm"} p={"sm"}>

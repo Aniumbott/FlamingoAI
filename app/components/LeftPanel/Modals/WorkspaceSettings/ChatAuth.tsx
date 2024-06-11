@@ -20,6 +20,7 @@ import {
 } from "@tabler/icons-react";
 import { getAssistants } from "@/app/controllers/assistant";
 import { updateWorkspace } from "@/app/controllers/workspace";
+import { useMediaQuery } from "@mantine/hooks";
 
 export default function ChatAuth(props: {
   activeTab: string;
@@ -33,6 +34,7 @@ export default function ChatAuth(props: {
   const [scope, setScope] = useState("public");
   const [apiKey, setApiKey] = useState("");
   const [model, setModel] = useState("gpt-3.5-turbo");
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
 
   useEffect(() => {
     const collectAssistants = async () => {
@@ -85,7 +87,11 @@ export default function ChatAuth(props: {
         <Text size="xs" c="dimmed">
           Specify workspace authentification method.
         </Text>
-        <div className="flex flex-row justify-between items-center mt-5">
+        <div
+          className={`flex justify-between items-center mt-5 ${
+            isMobile ? "flex-col gap-5" : "flex-row"
+          }`}
+        >
           <Select
             disabled={update}
             allowDeselect={false}

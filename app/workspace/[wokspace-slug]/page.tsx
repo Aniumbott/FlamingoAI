@@ -14,8 +14,11 @@ import {
   Card,
   Paper,
   ScrollArea,
+  useMantineColorScheme,
+  Box,
+  em,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import {
   IconLayoutSidebarLeftExpand,
   IconLayoutSidebarRightExpand,
@@ -41,15 +44,16 @@ import ImageGenWindow from "@/app/components/ImageGenWindow/ImageGenWindow";
 // import PageWindow from "@/app/components/PageWindow/PageWindow";
 
 export default function Workspace() {
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
   const [leftOpened, { toggle: toggleLeft }] = useDisclosure(true);
   const [rightOpened, { toggle: toggleRight }] = useDisclosure(true);
+  const { colorScheme } = useMantineColorScheme();
   const [currentChatId, setCurrentChatId] = useState("");
   const [currentImageGenId, setCurrentImageGenId] = useState("");
   const { orgId, userId } = useAuth();
   const { organization } = useOrganization();
   const router = useRouter();
   const pathname = usePathname();
-
   const [orgMembers, setOrgMembers] = useState<any>([]);
   const [workspace, setWorkspace] = useState<any>(null);
   const isAdmin =
@@ -57,6 +61,12 @@ export default function Workspace() {
     "org:admin";
   const allowPublic = isAdmin || workspace?.allowPublic;
   const allowPersonal = isAdmin || workspace?.allowPersonal;
+
+  useEffect(() => {
+    if (isMobile) {
+      toggleRight();
+    }
+  }, [isMobile]);
 
   useEffect(() => {
     if (organization?.id) {
@@ -123,7 +133,7 @@ export default function Workspace() {
         <AppShell
           navbar={{
             width: 300,
-            breakpoint: "sm",
+            breakpoint: 500,
             collapsed: { desktop: !leftOpened, mobile: !leftOpened },
           }}
           aside={{
@@ -133,7 +143,17 @@ export default function Workspace() {
           }}
           padding="md"
         >
-          <AppShell.Navbar p="0.5rem" style={{ margin: 0 }}>
+          <AppShell.Navbar
+            p="0.5rem"
+            style={{
+              margin: 0,
+              background:
+                colorScheme === "dark"
+                  ? "var(--mantine-color-dark-8)"
+                  : "var(--mantine-color-gray-1)",
+              borderRight: "0px",
+            }}
+          >
             <div className="flex justify-between my-2">
               <Title order={3} ml={5}>
                 TeamGPT
@@ -155,43 +175,99 @@ export default function Workspace() {
 
             <LeftPanel />
           </AppShell.Navbar>
-          <AppShell.Aside>
+          <AppShell.Aside
+            style={{
+              background:
+                colorScheme === "dark"
+                  ? "var(--mantine-color-dark-8)"
+                  : "var(--mantine-color-gray-1)",
+            }}
+          >
             <RightPanel rightOpened={rightOpened} toggleRight={toggleRight} />
           </AppShell.Aside>
           <AppShell.Main
+            {...(isMobile
+              ? {
+                  p: "0",
+                }
+              : { py: "0" })}
             style={{
-              paddingTop: 0,
               position: "relative",
               paddingBottom: "0rem",
               overflowY: "hidden",
+              background:
+                colorScheme === "dark"
+                  ? "var(--mantine-color-dark-7)"
+                  : "var(--mantine-color-gray-0)",
             }}
           >
             {!leftOpened &&
             (!pathname.split("/")[3] || pathname.split("/")[3] == "gallery") ? (
-              <div className="absolute top-3 flex flex-row items-center justify-between">
-                <Title order={4} mr={10}>
-                  TeamGPT
-                </Title>
-                <Tooltip label="Expand panel" fz="xs" position="right">
-                  <ActionIcon
-                    variant="subtle"
-                    color="grey"
-                    aria-label="Expand panel"
-                    onClick={toggleLeft}
-                  >
-                    <IconLayoutSidebarLeftExpand
-                      style={{ width: "90%", height: "90%" }}
-                      stroke={1.5}
-                    />
-                  </ActionIcon>
-                </Tooltip>
-              </div>
+              <>
+                <Box
+                  visibleFrom="sm"
+                  className="absolute top-3 flex flex-row items-center justify-between z-50"
+                >
+                  <Title order={4} mr={10}>
+                    TeamGPT
+                  </Title>
+                  <Tooltip label="Expand panel" fz="xs" position="right">
+                    <ActionIcon
+                      variant="subtle"
+                      color="grey"
+                      aria-label="Expand panel"
+                      onClick={toggleLeft}
+                    >
+                      <IconLayoutSidebarLeftExpand
+                        style={{ width: "90%", height: "90%" }}
+                        stroke={1.5}
+                      />
+                    </ActionIcon>
+                  </Tooltip>
+                </Box>
+                <Box
+                  hiddenFrom="sm"
+                  py="xs"
+                  px="md"
+                  className="absolute top-0 w-full flex flex-row justify-between"
+                >
+                  <Tooltip label="Expand panel" fz="xs" position="right">
+                    <ActionIcon
+                      variant="subtle"
+                      color="grey"
+                      aria-label="Expand panel"
+                      onClick={toggleLeft}
+                    >
+                      <IconLayoutSidebarLeftExpand
+                        style={{ width: "90%", height: "90%" }}
+                        stroke={1.5}
+                      />
+                    </ActionIcon>
+                  </Tooltip>
+                  <Title order={4} mr={10}>
+                    TeamGPT
+                  </Title>
+                  <Tooltip label="Expand panel" fz="xs" position="right">
+                    <ActionIcon
+                      variant="subtle"
+                      color="grey"
+                      aria-label="Expand panel"
+                      onClick={toggleRight}
+                    >
+                      <IconLayoutSidebarRightExpand
+                        style={{ width: "90%", height: "90%" }}
+                        stroke={1.5}
+                      />
+                    </ActionIcon>
+                  </Tooltip>
+                </Box>
+              </>
             ) : null}
 
             <div
               className="h-[100vh] w-full flex flex-col"
               style={{
-                marginLeft: "-24px",
+                marginLeft: !isMobile ? "-24px" : "",
               }}
             >
               <div className="flex flex-col grow justify-center">
@@ -210,6 +286,7 @@ export default function Workspace() {
                       currentChatId={currentChatId}
                       leftOpened={leftOpened}
                       toggleLeft={toggleLeft}
+                      toggleRight={toggleRight}
                     />
                   )
                 ) : (
@@ -240,12 +317,9 @@ export default function Workspace() {
                         Start a Chat
                       </Button>
                     </Container>
-                    <Paper
-                      withBorder
+                    <Card
                       radius="md"
                       p="xl"
-                      mt="md"
-                      mr="md"
                       style={{
                         display: "flex",
                         flexDirection: "column",
@@ -255,14 +329,14 @@ export default function Workspace() {
                       }}
                     >
                       <Title order={4} mb="md">
-                        Everyone&apos;s Recent Chats
+                        Everyone&apos; Recent Chats
                       </Title>
                       <RecentChats
                         members={orgMembers}
                         allowPublic={allowPublic}
                         allowPersonal={allowPersonal}
                       />
-                    </Paper>
+                    </Card>
                   </Stack>
                 )}
               </div>

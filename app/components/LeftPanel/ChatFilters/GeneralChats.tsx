@@ -398,9 +398,9 @@ const GeneralChats = (props: {
               >
                 <Flex wrap="wrap" gap="md" p="5">
                   <ActionIcon
+                    variant="default"
                     h="70"
                     w="70"
-                    variant="light"
                     onClick={() => {
                       window.history.pushState(
                         {},

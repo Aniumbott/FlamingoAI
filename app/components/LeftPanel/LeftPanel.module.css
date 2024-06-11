@@ -25,6 +25,6 @@
   display: flex;
   &:hover {
     cursor: pointer;
-    background: #ffffff0a;
+    background: var(--mantine-primary-color-light);
   }
 }

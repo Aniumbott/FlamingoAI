@@ -136,7 +136,7 @@ export default function CommentsPanel(props: { toggleRight: () => void }) {
       <Divider my="md" />
       <div className="flex flex-row justify-between">
         <Select
-          variant="filled"
+          // variant="filled"
           w="48%"
           radius="md"
           value={filter}

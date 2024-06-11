@@ -24,6 +24,7 @@ import { IChatDocument } from "@/app/models/Chat";
 import * as Mongoose from "mongoose";
 import { socket } from "@/socket";
 import { updateChat } from "@/app/controllers/chat";
+import { useMediaQuery } from "@mantine/hooks";
 
 const MoveItems = (props: {
   opened: boolean;
@@ -45,6 +46,8 @@ const MoveItems = (props: {
   const [breadcrumb, setBreadcrumb] = useState([
     { id: "null", name: "public" },
   ]);
+
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
 
   const fetchFolders = async () => {
     try {
@@ -108,7 +111,7 @@ const MoveItems = (props: {
       opened={opened}
       onClose={() => setOpened(false)}
       padding={0}
-      size={"80%"}
+      size={isMobile ? "" : "80%"}
       withCloseButton={false}
     >
       <Stack gap={"sm"} p={"sm"}>

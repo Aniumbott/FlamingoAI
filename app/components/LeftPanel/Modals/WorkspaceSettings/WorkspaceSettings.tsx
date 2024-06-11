@@ -1,4 +1,4 @@
-import { Button, Modal, rem, Paper } from "@mantine/core";
+import { Button, Modal, rem, Paper, Text, Title } from "@mantine/core";
 
 import { useEffect, useState } from "react";
 import ChatAuth from "./ChatAuth";
@@ -7,6 +7,7 @@ import AdvancedSetup from "./AdvancedSetup";
 import { createPortalSession } from "@/app/controllers/payment";
 import { useRouter } from "next/navigation";
 import { IconExternalLink } from "@tabler/icons-react";
+import { useMediaQuery } from "@mantine/hooks";
 
 export default function WorkspaceSettings(props: {
   opened: boolean;
@@ -14,6 +15,7 @@ export default function WorkspaceSettings(props: {
   workspace: any;
 }) {
   const { opened, setOpened, workspace } = props;
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
 
   const tabs = [
     { value: "chatAuth", label: "Chat Authentication" },
@@ -33,18 +35,26 @@ export default function WorkspaceSettings(props: {
       padding={0}
       withCloseButton={false}
     >
-      <div className="flex flex-row">
+      <div className={`flex ${isMobile ? "flex-col" : "flex-row"}`}>
         {/* Left Container */}
         <div
-          className="px-1 py-2 flex flex-col"
+          className={`"px-1 py-2 flex ${isMobile ? "flex-row" : "flex-col"}`}
           style={{
-            height: "700px",
-            width: "28%",
-            borderRight: "1px solid var(--mantine-color-default-border)",
+            height: isMobile ? "auto" : "700px",
+            width: isMobile ? "90%" : "28%",
+            margin: "auto",
+            borderRight: !isMobile
+              ? "1px solid var(--mantine-color-default-border)"
+              : "none",
+            borderBottom: isMobile
+              ? "1px solid var(--mantine-color-default-border)"
+              : "none",
           }}
         >
           {tabs.map((tab) => (
             <Button
+              size={isMobile ? "compact-xs" : "sm"}
+              maw={isMobile ? "100%" : "700px"}
               mt={10}
               key={tab.value}
               justify="start"
@@ -54,10 +64,13 @@ export default function WorkspaceSettings(props: {
               }}
               color={activeTab === tab.value ? "" : "grey"}
             >
-              {tab.label}
+              <Text fw={700} size={isMobile ? "xs" : "sm"} truncate>
+                {tab.label}
+              </Text>
             </Button>
           ))}
           <Button
+            size={isMobile ? "compact-xs" : "sm"}
             mt={10}
             justify="start"
             variant="subtle"
@@ -66,7 +79,9 @@ export default function WorkspaceSettings(props: {
               const res = await createPortalSession(workspace.customerId);
               window.open(res.portalSession.url, "_blank");
             }}
-            rightSection={<IconExternalLink size="20px" />}
+            rightSection={
+              <IconExternalLink size={isMobile ? "15px" : "20px"} />
+            }
           >
             Billing
           </Button>

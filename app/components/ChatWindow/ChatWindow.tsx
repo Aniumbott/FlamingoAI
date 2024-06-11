@@ -31,6 +31,7 @@ import {
   IconBuilding,
   IconInfoCircle,
   IconLayoutSidebarLeftExpand,
+  IconLayoutSidebarRightExpand,
   IconRefresh,
   IconSend,
   IconSettings,
@@ -54,7 +55,7 @@ import {
   updateChatAccess,
 } from "@/app/controllers/chat";
 import { socket } from "@/socket";
-import { useScrollIntoView } from "@mantine/hooks";
+import { useMediaQuery, useScrollIntoView } from "@mantine/hooks";
 import { ICommentDocument } from "@/app/models/Comment";
 import ForkChatModal from "./Modals/ForkChatModal";
 import { getAllPrompts } from "@/app/controllers/prompt";
@@ -66,13 +67,15 @@ import ErrorPage from "./ErrorPage/ErrorPage";
 import SettingsModal from "./Modals/SettingsModal";
 import { usePathname, useRouter } from "next/navigation";
 import OnlineUsers from "./OnlineUsers";
+import MessageInput from "./MessageInput";
 
 export default function ChatWindow(props: {
-  currentChatId: String;
+  currentChatId: string;
   leftOpened: boolean;
   toggleLeft: () => void;
+  toggleRight: () => void;
 }) {
-  const { currentChatId, leftOpened, toggleLeft } = props;
+  const { currentChatId, leftOpened, toggleLeft, toggleRight } = props;
   const { organization } = useOrganization();
   const { userId } = useAuth();
   const { colorScheme } = useMantineColorScheme();
@@ -301,17 +304,6 @@ export default function ChatWindow(props: {
     };
   }, []);
 
-  function tillLastUserMessage(messages: any[]) {
-    let lastUserMessageIndex = 0;
-    for (let i = messages.length - 1; i >= 0; i--) {
-      if (messages[i].type === "user") {
-        lastUserMessageIndex = i;
-        break;
-      }
-    }
-    return messages.slice(0, lastUserMessageIndex + 1);
-  }
-
   const [promptVariables, setPromptVariables] = useState<string[]>([]);
   const [promptContent, setPromptContent] = useState("");
   const [newMessageInput, setNewMessageInput] = useState(messageInput);
@@ -324,6 +316,7 @@ export default function ChatWindow(props: {
   const [isForkModalOpen, setIsForkModalOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
 
   return (
     <>
@@ -334,9 +327,62 @@ export default function ChatWindow(props: {
       ) : (
         <Stack gap={0} h={"100%"} justify="space-between" w="100%" mr={20}>
           {/* <Group gap={30} justify="space-between" py={5} px={10}> */}
-          <div className="w-full flex flex-row justify-start p-1">
+          <Box
+            hiddenFrom="sm"
+            py="xs"
+            px="md"
+            className="w-full flex flex-row justify-between"
+            style={{
+              background:
+                colorScheme === "dark"
+                  ? "var(--mantine-color-dark-8)"
+                  : "var(--mantine-color-gray-1)",
+            }}
+          >
+            <Tooltip label="Expand panel" fz="xs" position="right">
+              <ActionIcon
+                variant="subtle"
+                color="grey"
+                aria-label="Expand panel"
+                onClick={toggleLeft}
+              >
+                <IconLayoutSidebarLeftExpand
+                  style={{ width: "90%", height: "90%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Tooltip>
+            <Title order={4} mr={10}>
+              TeamGPT
+            </Title>
+            <Tooltip label="Expand panel" fz="xs" position="right">
+              <ActionIcon
+                variant="subtle"
+                color="grey"
+                aria-label="Expand panel"
+                onClick={toggleRight}
+              >
+                <IconLayoutSidebarRightExpand
+                  style={{ width: "90%", height: "90%" }}
+                  stroke={1.5}
+                />
+              </ActionIcon>
+            </Tooltip>
+          </Box>
+          <div
+            className="w-full flex flex-row justify-start p-1"
+            style={{
+              background:
+                colorScheme === "dark"
+                  ? "var(--mantine-color-dark-8)"
+                  : "var(--mantine-color-gray-1)",
+            }}
+          >
             {!leftOpened ? (
-              <div className="flex flex-row items-center justify-between">
+              <Box
+                visibleFrom="sm"
+                className="flex flex-row items-center justify-between ml-2"
+              >
                 <Title order={4} mr={10}>
                   TeamGPT
                 </Title>
@@ -353,7 +399,7 @@ export default function ChatWindow(props: {
                     />
                   </ActionIcon>
                 </Tooltip>
-              </div>
+              </Box>
             ) : null}
             <Group justify="space-between" px={"md"} w={"100%"}>
               <Group gap="sm">
@@ -440,15 +486,26 @@ export default function ChatWindow(props: {
               />
             )}
           </div>
-          {/* </Group> */}
-          <Divider />
+
+          {/* <Divider /> */}
 
           <Paper
             h={"70vh"}
             w={"100%"}
+            pt="xs"
+            radius={0}
             style={{
+              alignItems: "center",
               overflowY: "scroll",
               flexGrow: "1",
+              margin: "0px 100px 0px 0px",
+              display: "flex",
+              flexDirection: "column",
+              alignContent: "center",
+              background:
+                colorScheme === "dark"
+                  ? "var(--mantine-color-dark-7)"
+                  : "var(--mantine-color-gray-0)",
             }}
             ref={scrollableRef}
           >
@@ -461,15 +518,9 @@ export default function ChatWindow(props: {
 
             {!chat?.messages?.length ? (
               <div className="w-full flex flex-col items-center justify-center pt-20">
-                <div
-                  className="p-5"
-                  style={{
-                    width: "500px",
-                    border: "1px solid var(--mantine-color-default-border)",
-                    borderRadius: "var(--mantine-radius-md)",
-                  }}
-                >
+                <Card w="calc(min(90vw,500px))" radius="md">
                   <SegmentedControl
+                    orientation={isMobile ? "vertical" : "horizontal"}
                     disabled={!isAllowed}
                     value={chat?.scope}
                     onChange={(value) => {
@@ -520,6 +571,7 @@ export default function ChatWindow(props: {
                     ]}
                   />
                   <Select
+                    // variant="light"
                     disabled={!isAllowed}
                     allowDeselect={false}
                     description="Assistant Model"
@@ -535,7 +587,7 @@ export default function ChatWindow(props: {
                     }}
                     mt={20}
                   />
-                </div>
+                </Card>
               </div>
             ) : null}
 
@@ -550,7 +602,10 @@ export default function ChatWindow(props: {
                   imageUrl: "",
                 };
                 return (
-                  <div key={message._id} className="mb-1">
+                  <div
+                    key={message._id}
+                    className="w-full mb-3 flex items-center justify-center max-w-[1300px]"
+                  >
                     <MessageItem
                       message={message}
                       participants={participants}
@@ -589,10 +644,10 @@ export default function ChatWindow(props: {
                 background:
                   colorScheme == "dark"
                     ? "var(--mantine-color-dark-8)"
-                    : "var(--mantine-color-gray-0)",
+                    : "var(--mantine-color-gray-1)",
               }}
             >
-              <Card w="80%" my="lg" mx="10%" radius="md" withBorder>
+              <Card w="80%" my="lg" mx="10%" radius="md">
                 <Group justify="space-between" px="md" my="sm">
                   <Text>This chat has been archived.</Text>
                   <Group gap={15}>
@@ -638,10 +693,10 @@ export default function ChatWindow(props: {
                 background:
                   colorScheme == "dark"
                     ? "var(--mantine-color-dark-8)"
-                    : "var(--mantine-color-gray-0)",
+                    : "var(--mantine-color-gray-1)",
               }}
             >
-              <Card w="80%" my="lg" mx="10%" radius="md" withBorder>
+              <Card w="80%" my="lg" mx="10%" radius="md">
                 <Text ta="center" my="sm">
                   You can only view this chat. Ask the owner to grant you
                   access.
@@ -649,196 +704,65 @@ export default function ChatWindow(props: {
               </Card>
             </div>
           ) : (
-            <Stack
-              align="center"
-              gap={3}
-              style={{
-                background:
-                  colorScheme == "dark"
-                    ? "var(--mantine-color-dark-8)"
-                    : "var(--mantine-color-gray-0)",
+            <Combobox
+              store={combobox}
+              onOptionSubmit={(val) => {
+                combobox.closeDropdown();
+                setSearchTerm("");
               }}
+              position="top"
             >
-              {chat?.messages?.length &&
-              chat.messages.some((message: any) => message.type === "user") ? (
-                <Button
-                  mt="md"
-                  variant="outline"
-                  fw={300}
-                  size="md"
-                  disabled={processing}
-                  leftSection={<IconRefresh size="20px" />}
-                  onClick={() => {
-                    setProcessing(true);
-                    let contexWindow = tillLastUserMessage(chat.messages);
-                    sendAssistantMessage(
-                      contexWindow.slice(0, -1),
-                      contexWindow[contexWindow.length - 1],
-                      chat.instructions,
-                      chat.workspaceId,
-                      {
-                        ...chat.assistant,
-                        scope: chat.scope == "private" ? "private" : "public",
-                      }
-                    );
-                  }}
-                >
-                  Regenerate
-                </Button>
-              ) : null}
-              <Combobox
-                store={combobox}
-                onOptionSubmit={(val) => {
-                  combobox.closeDropdown();
-                  setSearchTerm("");
-                }}
-                position="top"
-              >
-                <div
-                  className="w-full h-fit flex justify-center items-center"
-                  style={{
-                    background:
-                      colorScheme == "dark"
-                        ? "var(--mantine-color-dark-8)"
-                        : "var(--mantine-color-gray-0)",
-                  }}
-                >
-                  <Combobox.Target>
-                    <Textarea
-                      autosize
-                      maxRows={4}
-                      variant="default"
-                      size="lg"
-                      radius="0"
-                      my="md"
-                      w="66%"
-                      miw="300px"
-                      autoFocus={true}
-                      placeholder="Type a message or type '/' to select a prompt"
-                      value={messageInput}
-                      disabled={processing}
-                      onChange={(e) => {
-                        setMessageInput(e.currentTarget.value);
+              <Combobox.Target>
+                <Box>
+                  <MessageInput
+                    userId={userId || ""}
+                    currentChatId={currentChatId}
+                    chat={chat}
+                    processing={processing}
+                    setProcessing={setProcessing}
+                    setSearchTerm={setSearchTerm}
+                    combobox={combobox}
+                  />
+                </Box>
+              </Combobox.Target>
 
-                        if (e.currentTarget.value.endsWith("/")) {
-                          setSearchTerm(
-                            e.currentTarget.value.split("/").pop() ?? ""
-                          );
-                          combobox.openDropdown();
-                        } else {
-                          combobox.closeDropdown();
-                        }
-                      }}
-                      onKeyDown={(e) => {
-                        if (
-                          messageInput != "" &&
-                          e.key === "Enter" &&
-                          !e.shiftKey &&
-                          !messageInput.includes("/")
-                        ) {
-                          setProcessing(true);
-                          createMessage(
-                            userId || "",
-                            messageInput,
-                            "user",
-                            currentChatId
-                          ).then((res) => {
-                            sendAssistantMessage(
-                              chat.messages,
-                              res.message,
-                              chat.instructions,
-                              chat.workspaceId,
-                              {
-                                ...chat.assistant,
-                                scope:
-                                  chat.scope == "private"
-                                    ? "private"
-                                    : "public",
-                              }
-                            );
-                            setMessageInput("");
-                          });
-                        }
-                      }}
-                    />
-                  </Combobox.Target>
-                  <Tooltip label="Send message" fz="xs">
-                    <ActionIcon
-                      size="50"
-                      radius="0"
-                      disabled={processing}
-                      onClick={() => {
-                        if (messageInput != "") {
-                          setProcessing(true);
-                          createMessage(
-                            userId || "",
-                            messageInput,
-                            "user",
-                            currentChatId
-                          ).then((res) => {
-                            sendAssistantMessage(
-                              chat.messages,
-                              res.message,
-                              chat.instructions,
-                              chat.workspaceId,
-                              {
-                                ...chat.assistant,
-                                scope:
-                                  chat.scope == "private"
-                                    ? "private"
-                                    : "public",
-                              }
-                            );
-                            setMessageInput("");
-                          });
-                        }
-                      }}
-                    >
-                      <IconSend size="24" />
-                    </ActionIcon>
-                  </Tooltip>
-                </div>
-
-                <Combobox.Dropdown>
-                  <Combobox.Options>
-                    <ScrollArea.Autosize mah={200} type="scroll">
-                      {filteredPrompts?.length > 0 ? (
-                        filteredPrompts.map((prompt) => (
-                          <Combobox.Option
-                            key={prompt._id}
-                            value={prompt._id}
-                            onClick={() => {
-                              let newMessageInput = messageInput;
-                              if (newMessageInput.includes("/")) {
-                                newMessageInput = newMessageInput.substring(
-                                  0,
-                                  newMessageInput.lastIndexOf("/")
-                                );
-                              }
-                              if (prompt.variables.length > 0) {
-                                setNewMessageInput(newMessageInput);
-                                setPromptContent(prompt.content);
-                                setPromptVariables(prompt.variables);
-                                setPromptVariablesOpened(true);
-                              } else {
-                                setMessageInput(
-                                  newMessageInput + prompt.content
-                                );
-                                setSearchTerm("");
-                              }
-                            }}
-                          >
-                            <Text>{prompt.name}</Text>
-                          </Combobox.Option>
-                        ))
-                      ) : (
-                        <Combobox.Empty>No prompts found</Combobox.Empty>
-                      )}
-                    </ScrollArea.Autosize>
-                  </Combobox.Options>
-                </Combobox.Dropdown>
-              </Combobox>
-            </Stack>
+              <Combobox.Dropdown>
+                <Combobox.Options>
+                  <ScrollArea.Autosize mah={200} type="scroll">
+                    {filteredPrompts?.length > 0 ? (
+                      filteredPrompts.map((prompt) => (
+                        <Combobox.Option
+                          key={prompt._id}
+                          value={prompt._id}
+                          onClick={() => {
+                            let newMessageInput = messageInput;
+                            if (newMessageInput.includes("/")) {
+                              newMessageInput = newMessageInput.substring(
+                                0,
+                                newMessageInput.lastIndexOf("/")
+                              );
+                            }
+                            if (prompt.variables.length > 0) {
+                              setNewMessageInput(newMessageInput);
+                              setPromptContent(prompt.content);
+                              setPromptVariables(prompt.variables);
+                              setPromptVariablesOpened(true);
+                            } else {
+                              setMessageInput(newMessageInput + prompt.content);
+                              setSearchTerm("");
+                            }
+                          }}
+                        >
+                          <Text>{prompt.name}</Text>
+                        </Combobox.Option>
+                      ))
+                    ) : (
+                      <Combobox.Empty>No prompts found</Combobox.Empty>
+                    )}
+                  </ScrollArea.Autosize>
+                </Combobox.Options>
+              </Combobox.Dropdown>
+            </Combobox>
           )}
         </Stack>
       )}

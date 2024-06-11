@@ -71,7 +71,7 @@ function CommentItem(props: {
   }, [participants]);
 
   return (
-    <Paper withBorder w="100%" p="sm" mt="1rem">
+    <Paper withBorder w="100%" p="sm" mt="1rem" radius="md">
       <div className="flex flex-row ">
         {createdBy?.hasImage ? (
           <Avatar

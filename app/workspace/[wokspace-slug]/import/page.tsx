@@ -99,7 +99,15 @@ export default function ImportPage() {
           let messages: any = [];
           Object.keys(conversation.mapping).forEach((key) => {
             const message = conversation.mapping[key].message;
-            if (message && message.author.role != "system") {
+            if (
+              message &&
+              message.content &&
+              message.content.content_type == "text" &&
+              message.content.parts.length > 0 &&
+              message.content.parts[0].length > 0 &&
+              (message.author.role !== "system" ||
+                message.metadata.is_user_system_message)
+            ) {
               messages.push({
                 content: message.content.parts[0],
                 role: message.author.role,
@@ -208,159 +216,164 @@ export default function ImportPage() {
           />
         </div>
       </header>
-      <ScrollArea mah="95vh">
-        <Stack gap={10} mt="xl" maw="50rem" mx="auto">
-          <Card p="xl">
-            <Title order={4} ta="center" mb="md">
-              Import chats from OpenAI ChatGPT
-            </Title>
-            <List type="ordered" size="sm" mb="md">
-              <List.Item>
-                Login in <b>ChatGPT</b> at https://chat.openai.com/
-              </List.Item>
-              <List.Item>
-                Click on your name on the left and select <b>Settings</b>.
-              </List.Item>
-              <List.Item>
-                Click on <b>Data controls</b>.
-              </List.Item>
-              <List.Item>
-                Click on <b>Export</b> and confirm.
-              </List.Item>
-              <List.Item>
-                Look for email from OpenAI in your inbox called
-                <b>ChatGPT - Your data export is ready</b>
-              </List.Item>
-              <List.Item>
-                Click on the link <b>Download data export</b>
-              </List.Item>
-              <List.Item>Extract the archive contents</List.Item>
-              <List.Item>
-                Upload file called <b>conversations.json</b>
-              </List.Item>
-            </List>
-            <FileInput
-              clearable
-              m="md"
-              value={file}
-              onChange={setFile}
-              accept="application/json"
-              placeholder="Upload conversation.json"
-            />
-            {/* <Text mt="md" ta="center" size="xs">
+      <Stack
+        gap={10}
+        my="xl"
+        maw="50rem"
+        mx="auto"
+        style={{
+          overflowY: "scroll",
+        }}
+      >
+        <Card p="xl">
+          <Title order={4} ta="center" mb="md">
+            Import chats from OpenAI ChatGPT
+          </Title>
+          <List type="ordered" size="sm" mb="md">
+            <List.Item>
+              Login in <b>ChatGPT</b> at https://chat.openai.com/
+            </List.Item>
+            <List.Item>
+              Click on your name on the left and select <b>Settings</b>.
+            </List.Item>
+            <List.Item>
+              Click on <b>Data controls</b>.
+            </List.Item>
+            <List.Item>
+              Click on <b>Export</b> and confirm.
+            </List.Item>
+            <List.Item>
+              Look for email from OpenAI in your inbox called
+              <b>ChatGPT - Your data export is ready</b>
+            </List.Item>
+            <List.Item>
+              Click on the link <b>Download data export</b>
+            </List.Item>
+            <List.Item>Extract the archive contents</List.Item>
+            <List.Item>
+              Upload file called <b>conversations.json</b>
+            </List.Item>
+          </List>
+          <FileInput
+            clearable
+            m="md"
+            value={file}
+            onChange={setFile}
+            accept="application/json"
+            placeholder="Upload conversation.json"
+          />
+          {/* <Text mt="md" ta="center" size="xs">
             All chats will be imported as <b>personal</b>, not shared with the
             team.
           </Text> */}
-          </Card>
-          {file && (
-            <div className="w-full mt-10">
-              <div className="flex flex-row items-center justify-between">
-                <div>
-                  <Button
-                    size="xs"
-                    variant="subtle"
-                    radius="md"
-                    onClick={() => {
-                      setChats(
-                        chats.map((chat) => {
-                          return {
-                            ...chat,
-                            selected: true,
-                          };
-                        })
-                      );
-                    }}
-                  >
-                    Select all
-                  </Button>
-                  <Button
-                    size="xs"
-                    variant="subtle"
-                    color="red"
-                    radius="md"
-                    onClick={() => {
-                      setChats(
-                        chats.map((chat) => {
-                          return {
-                            ...chat,
-                            selected: false,
-                          };
-                        })
-                      );
-                    }}
-                  >
-                    Deselect all
-                  </Button>
-                </div>
+        </Card>
+        {file && (
+          <div className="w-full mt-10">
+            <div className="flex flex-row items-center justify-between">
+              <div>
                 <Button
                   size="xs"
-                  variant="filled"
+                  variant="subtle"
                   radius="md"
                   onClick={() => {
-                    let selectedChats = selected;
-                    selectedChats.forEach(async (chat) => {
-                      await ImportChat(
-                        chat,
-                        userId || "",
-                        organization?.id || "",
-                        members
-                      ).then((newChat) => {
-                        chat.chatId = newChat._id;
-                      });
-                      setChats(
-                        chats.map((c) => {
-                          const updatedChat = selectedChats.find(
-                            (chat) => chat.id === c.id
-                          );
-                          if (updatedChat) {
-                            return updatedChat;
-                          }
-                          return c;
-                        })
-                      );
-                    });
+                    setChats(
+                      chats.map((chat) => {
+                        return {
+                          ...chat,
+                          selected: true,
+                        };
+                      })
+                    );
                   }}
                 >
-                  Import Selected
+                  Select all
+                </Button>
+                <Button
+                  size="xs"
+                  variant="subtle"
+                  color="red"
+                  radius="md"
+                  onClick={() => {
+                    setChats(
+                      chats.map((chat) => {
+                        return {
+                          ...chat,
+                          selected: false,
+                        };
+                      })
+                    );
+                  }}
+                >
+                  Deselect all
                 </Button>
               </div>
-              <Card mt="md" p="md">
-                <div className="flex flex-row justify-between">
-                  <div className="flex flex-row mr-5  items-center">
-                    <Text size="xs" mr={5}>
-                      Import all as:
-                    </Text>
-                    <ScopeControll value={allScope} setValue={setAllScope} />
-                    <Text size="xs" mr={5}>
-                      Select Model:
-                    </Text>
-                    <Select
-                      allowDeselect={false}
-                      data={assistant?.models}
-                      value={model}
-                      onChange={(e) => setModel(e || "")}
-                    />
-                  </div>
-                  <div className="flex flex-row items-center">
-                    <Badge variant="light" radius="sm">
-                      {selected.length}/{chats.length} conversations are
-                      selected.
-                    </Badge>
-                  </div>
-                </div>
-                <ChatsTable
-                  chats={chats}
-                  setChats={setChats}
-                  pathname={pathname}
-                  organization={organization}
-                  userId={userId || ""}
-                  members={members}
-                />
-              </Card>
+              <Button
+                size="xs"
+                variant="filled"
+                radius="md"
+                onClick={() => {
+                  let selectedChats = selected;
+                  selectedChats.forEach(async (chat) => {
+                    await ImportChat(
+                      chat,
+                      userId || "",
+                      organization?.id || "",
+                      members
+                    ).then((newChat) => {
+                      chat.chatId = newChat._id;
+                    });
+                    setChats(
+                      chats.map((c) => {
+                        const updatedChat = selectedChats.find(
+                          (chat) => chat.id === c.id
+                        );
+                        if (updatedChat) {
+                          return updatedChat;
+                        }
+                        return c;
+                      })
+                    );
+                  });
+                }}
+              >
+                Import Selected
+              </Button>
             </div>
-          )}
-        </Stack>
-      </ScrollArea>
+            <Card mt="md" p="md">
+              <div className="flex flex-row justify-between">
+                <div className="flex flex-row mr-5  items-center">
+                  <Text size="xs" mr={5}>
+                    Import all as:
+                  </Text>
+                  <ScopeControll value={allScope} setValue={setAllScope} />
+                  <Text size="xs" mr={5}>
+                    Select Model:
+                  </Text>
+                  <Select
+                    allowDeselect={false}
+                    data={assistant?.models}
+                    value={model}
+                    onChange={(e) => setModel(e || "")}
+                  />
+                </div>
+                <div className="flex flex-row items-center">
+                  <Badge variant="light" radius="sm">
+                    {selected.length}/{chats.length} conversations are selected.
+                  </Badge>
+                </div>
+              </div>
+              <ChatsTable
+                chats={chats}
+                setChats={setChats}
+                pathname={pathname}
+                organization={organization}
+                userId={userId || ""}
+                members={members}
+              />
+            </Card>
+          </div>
+        )}
+      </Stack>
     </>
   );
 }

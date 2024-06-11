@@ -17,7 +17,7 @@ import {
   rem,
   useMantineColorScheme,
 } from "@mantine/core";
-import { useHover } from "@mantine/hooks";
+import { useHover, useMediaQuery } from "@mantine/hooks";
 import { IconSend, IconX } from "@tabler/icons-react";
 import {
   IconArrowFork,
@@ -70,6 +70,7 @@ function MessageItem(props: {
   const [showComments, setShowComments] = useState(false);
   const [commentInput, setCommentInput] = useState("");
   const [createdBy, setCreatedBy] = useState<any>(null);
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
   const [isAllowed, setIsAllowed] = useState(false);
 
   useEffect(() => {
@@ -97,17 +98,20 @@ function MessageItem(props: {
   }, [message]);
 
   return (
-    <Box ref={ref}>
+    <Box ref={ref} mx={!isMobile ? "md" : ""} w="100%">
       <div
-        className="w-full  py-10 flex justify-center items-start"
+        className={`w-full flex justify-center items-start ${
+          isMobile ? "py-5" : "py-10"
+        }`}
         style={{
           background:
-            colorScheme == "dark"
-              ? "var(--mantine-color-dark-8)"
-              : "var(--mantine-color-gray-0)",
+            colorScheme === "dark"
+              ? "var(--mantine-color-dark-6)"
+              : "var(--mantine-color-white)",
+          borderRadius: isMobile ? "0" : "var(--mantine-radius-md)",
         }}
       >
-        <div className="w-2/3 h-full min-w-96 flex flex-row ">
+        <div className="w-full h-full max-w-[1000px] px-5 flex flex-row overflow-y-scroll">
           <div className="flex flex-col ">
             {message.type === "user" ? (
               createdBy?.hasImage ? (
@@ -130,7 +134,7 @@ function MessageItem(props: {
                 />
               </Avatar>
             )}
-            {hovered && !isEdit ? (
+            {(hovered || isMobile) && !isEdit ? (
               <Tooltip label="Fork Chat" fz="xs" position="bottom">
                 <ActionIcon
                   color="grey"
@@ -146,7 +150,12 @@ function MessageItem(props: {
               </Tooltip>
             ) : null}
           </div>
-          <div className="w-full ml-10 flex flex-col   ">
+          <div
+            className="w-full flex flex-col"
+            style={{
+              marginLeft: "calc(min(5vw, 3rem))",
+            }}
+          >
             <div className="flex flex-row justify-between items-center min-h-8">
               <div className="flex flex-row items-center">
                 <Text size="md" fw={700}>
@@ -159,15 +168,10 @@ function MessageItem(props: {
                 <Text pl={10} size="xs">
                   {getDate(message.updatedAt.toString())}
                 </Text>
-                {/* {message.createdAt !== message.updatedAt ? (
-                  <Text pl={10} size="xs">
-                    (edited)
-                  </Text>
-                ) : null} */}
               </div>
 
               <div className="flex flex-row">
-                {hovered && !isEdit ? (
+                {(hovered || isMobile) && !isEdit ? (
                   message.type === "user" ? (
                     <>
                       {createdBy?.userId === userId ? (
@@ -230,7 +234,6 @@ function MessageItem(props: {
                   w="100%"
                   defaultValue={messageText}
                   onChange={(e) => {
-                    // console.log(e.currentTarget.value);
                     setMessageText(e.currentTarget.value);
                   }}
                 />

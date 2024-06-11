@@ -22,6 +22,9 @@ import {
   Slider,
   Switch,
   Anchor,
+  MantineProvider,
+  MantineThemeProvider,
+  useMantineColorScheme,
 } from "@mantine/core";
 import { IconArrowRight, IconCheck } from "@tabler/icons-react";
 import { FooterLinks } from "./components/LandingPage/FooterLinks";
@@ -40,6 +43,8 @@ import { useScrollIntoView } from "@mantine/hooks";
 export default function Home() {
   const [isMonthly, setIsMonthly] = useState(false);
   const [maxValue, setMaxValue] = useState(10);
+  const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const previousColorScheme = colorScheme;
   const { scrollIntoView, targetRef } = useScrollIntoView<HTMLDivElement>({
     offset: 10,
   });
@@ -47,6 +52,14 @@ export default function Home() {
   useEffect(() => {
     scrollIntoView();
   }, [target]);
+
+  // useEffect(() => {
+  //   setColorScheme("light");
+  //   return () => {
+  //     setColorScheme(previousColorScheme);
+  //   };
+  // }, []);
+
   return (
     <Box>
       <HeaderMegaMenu
