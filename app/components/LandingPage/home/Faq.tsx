@@ -4,12 +4,12 @@ import { IconArrowRight, IconCheck } from "@tabler/icons-react";
 
 const Faq = () => {
   return (
-    <Container w={"100%"} className="py-5 ">
+    <Container mt="10rem" w={"100%"} p="0" className="">
       <Title ta="center" order={1} mb={"xl"}>
         Frequently Asked Questions
       </Title>
 
-      <Accordion variant="separated" w={"70%"} mx={"auto"}>
+      <Accordion variant="separated" maw={"calc(min(100%, 700px))"} mx={"auto"}>
         <Accordion.Item
           className=" rounded-md mb-2 border border-gray-300"
           value="free-teamgpt"

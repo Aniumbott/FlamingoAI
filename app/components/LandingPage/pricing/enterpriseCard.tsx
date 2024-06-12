@@ -12,7 +12,14 @@ import {
 
 export default function EnterpriseCard() {
   return (
-    <Card mt={"xl"} radius="md" w={1050} shadow="lg" withBorder>
+    <Card
+      mt={"xl"}
+      radius="md"
+      my="md"
+      w="calc(min(95%,1050px))"
+      shadow="lg"
+      withBorder
+    >
       <Group justify="space-between">
         <Box maw={470}>
           <Title order={5} c="var(--mantine-primary-color-filled)">
@@ -44,7 +51,7 @@ export default function EnterpriseCard() {
           </Group>
         </Box>
         <Image
-          w="500"
+          maw="500"
           alt=""
           radius="md"
           src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"

@@ -11,54 +11,75 @@ import {
   ThemeIcon,
   Title,
   Anchor,
+  Avatar,
 } from "@mantine/core";
 import { IconArrowRight, IconCheck } from "@tabler/icons-react";
+import { useMediaQuery } from "@mantine/hooks";
 
 const ReportsCard = () => {
+  const isMobile = useMediaQuery("(max-width: 48em)");
   return (
-    <Stack gap={"md"} align={"start"} justify={"center"}>
+    <Stack my="5rem" gap={"md"} align={"start"} justify={"center"}>
       <Group
         preventGrowOverflow={true}
         grow={true}
         gap={"xl"}
         align={"strech"}
         justify={"space-between"}
+        style={{
+          flexDirection: isMobile ? "column-reverse" : "row",
+        }}
       >
-        <Stack gap={"xl"} align={"center"} justify={"center"}>
+        <Stack
+          maw={isMobile ? "100%" : ""}
+          gap={"xl"}
+          align={"center"}
+          justify={"center"}
+        >
           <Image
             radius="md"
             width="auto"
             fit="contain"
             alt=""
-            h={200}
+            w={isMobile ? "90vw" : 400}
             src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
           />
           <Group
             wrap="nowrap"
             gap={"xl"}
             align={"center"}
-            justify={"space-between"}
+            justify={isMobile ? "space-between" : " center"}
+            style={{
+              flexDirection: isMobile ? "column" : "row",
+            }}
           >
-            <Image
-              radius="md"
-              w={"30%"}
-              fit="contain"
-              src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
-              alt=""
-            />
+            <Avatar size="xl" radius={"md"}></Avatar>
             <Stack w={"70%"} gap={"xs"} align={"start"} justify={"center"}>
-              <Title order={4}>
+              <Title ta={isMobile ? "center" : "left"} order={4}>
                 &quot;Within an hour of activating it, I was able to get my team
                 using it and getting immediate value. I highly recommend
                 Team-GPT.&quot;
               </Title>
-              <Text>Derek, Small Business Owner</Text>
+              <Text w="100%" ta={isMobile ? "center" : "left"}>
+                Derek, Small Business Owner
+              </Text>
             </Stack>
           </Group>
         </Stack>
 
-        <Stack gap={"md"} align={"start"} justify={"center"}>
-          <Box fz={"lg"} className=" rounded-xl" fw={"600"} bg={"gray"} p={10}>
+        <Stack
+          maw={isMobile ? "100%" : ""}
+          gap={"md"}
+          align={"start"}
+          justify={"center"}
+        >
+          <Box
+            fz={"sm"}
+            className="rounded-md"
+            fw={"600"}
+            bg={"var(--mantine-color-gray-3)"}
+            p={10}
+          >
             Adoption Reports
           </Box>
           <Title order={1}>
@@ -86,7 +107,9 @@ const ReportsCard = () => {
             <ListItem>Adoption rate of the whole company</ListItem>
           </List>
           <Anchor href="/workspace">
-            <Button rightSection={<IconArrowRight />}>Start Free</Button>
+            <Button size="lg" radius={"md"} rightSection={<IconArrowRight />}>
+              Start Free
+            </Button>
           </Anchor>
         </Stack>
       </Group>

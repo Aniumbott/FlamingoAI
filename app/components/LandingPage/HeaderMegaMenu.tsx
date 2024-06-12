@@ -20,7 +20,7 @@ import {
   Title,
 } from "@mantine/core";
 // import { MantineLogo } from '@mantinex/mantine-logo';
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import classes from "./HeaderMegaMenu.module.css";
 import {
   OrganizationSwitcher,
@@ -39,6 +39,7 @@ export default function HeaderMegaMenu(props: {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const { isSignedIn } = useUser();
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
 
   return (
     <Box
@@ -46,7 +47,8 @@ export default function HeaderMegaMenu(props: {
         position: "fixed",
         width: "100vw",
         top: 0,
-        background: "var(--mantine-color-body)",
+        background: "var(--mantine-color-white)",
+        boxShadow: "var(--mantine-shadow-xl)",
         zIndex: 1000,
       }}
     >

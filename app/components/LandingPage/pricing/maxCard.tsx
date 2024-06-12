@@ -1,9 +1,12 @@
 import {
+  Badge,
   Button,
   Card,
+  Chip,
   Group,
   List,
   ListItem,
+  Pill,
   Slider,
   Text,
   Title,
@@ -16,9 +19,12 @@ export default function MaxCard(props: { isMonthly: boolean }) {
   const [maxValue, setMaxValue] = useState(10);
   return (
     <Card mih={530} radius="md" w={330} shadow="lg" withBorder>
-      <Title order={4} c="var(--mantine-primary-color-filled)">
-        MAX
-      </Title>
+      <Group justify="space-between">
+        <Title order={4} c="var(--mantine-primary-color-filled)">
+          MAX
+        </Title>
+        <Badge variant="light">Save 20% yearly</Badge>
+      </Group>
       <Title order={2} mt="md">
         Step up
       </Title>

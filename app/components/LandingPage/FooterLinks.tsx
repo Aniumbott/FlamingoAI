@@ -79,7 +79,9 @@ export function FooterLinks() {
           <Text size="xs" c="dimmed" className={classes.description}>
             Can you afford to skip on AI adoption?
           </Text>
-          <Button rightSection={<IconArrowRight />}>Start Free</Button>
+          <Button size="lg" radius={"md"} rightSection={<IconArrowRight />}>
+            Start Free
+          </Button>
         </div>
         <div className={classes.groups}>{groups}</div>
       </Container>

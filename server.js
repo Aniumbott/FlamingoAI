@@ -68,21 +68,6 @@ app.prepare().then(() => {
       console.log("user disconnected");
     });
 
-    // FOLDER
-    // socket.on("updateChatFolder", (roomId, folder) => {
-    //   console.log(
-    //     `User with ID: ${socket.id} created folder: ${folder} in room: ${roomId}`
-    //   );
-    //   io.to(roomId).emit("refreshChats", folder);
-    // });
-
-    // socket.on("updatePersonalChatFolder", (folder) => {
-    //   console.log(
-    //     `User with ID: ${socket.id} created private folder: ${folder} to user: ${socket.id}`
-    //   );
-    //   io.to(socket.id).emit("refreshChats", folder);
-    // });
-
     // Chat and ChatFolders
     socket.on("updateChat", (roomId, item) => {
       console.log(
