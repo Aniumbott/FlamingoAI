@@ -13,6 +13,7 @@ import {
   Image,
   Paper,
   Divider,
+  Anchor,
 } from "@mantine/core";
 import { IconArrowRight } from "@tabler/icons-react";
 import { FooterLinks } from "./components/LandingPage/FooterLinks";
@@ -109,14 +110,16 @@ export default function Home() {
               workspace.
             </div>
           </Text>
-          <Button
-            size="xl"
-            mt="3rem"
-            radius={"lg"}
-            rightSection={<IconArrowRight />}
-          >
-            Start Free{" "}
-          </Button>
+          <Anchor href="/workspace">
+            <Button
+              size="xl"
+              mt="3rem"
+              radius={"lg"}
+              rightSection={<IconArrowRight />}
+            >
+              Start Free{" "}
+            </Button>
+          </Anchor>
 
           <Text mt="5rem">
             {" "}
@@ -135,7 +138,7 @@ export default function Home() {
         </Paper>
         {/* -------------------------------------------------------------------------------------------- */}
 
-        <Title ta="center" mt="10rem" order={1}>
+        <Title ta="center" mt="5rem" order={1}>
           Companies that trust us
         </Title>
 
@@ -234,7 +237,7 @@ export default function Home() {
         </Paper>
 
         {/* -------------------------------------------------------------------------------------------- */}
-        <Title mt="10rem" order={1}>
+        <Title mt="5rem" order={1}>
           How it works?
         </Title>
         <HowItWorks />

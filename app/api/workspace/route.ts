@@ -56,6 +56,7 @@ export async function POST(request: Request) {
   let user;
   switch (payload.type) {
     case "organization.created":
+      console.log("organization.created tirggered.");
       workspace = await Workspace.create(getWorkspaceDataFromEvent(payload));
       user = await User.findById(workspace.createdBy);
       customer = await stripe.customers.create({
@@ -93,10 +94,17 @@ export async function POST(request: Request) {
         await deleteChatbyId(chat._id, Chat, Message, Comment);
       });
       await ImageGen.find({ workspaceId: payload.data.id }).deleteMany();
+
+      const org = await Workspace.findById(payload.data.id);
+
       workspace = await Workspace.findByIdAndDelete(payload.data.id);
       console.log(
         `Successfully deleted workspace with _id: ${payload.data.id}`
       );
+
+      customer = await stripe.customers.del(org?.customerId || "");
+      console.log(`Succesfully deleted customer: ${org?.customerId}`);
+
       break;
   }
 

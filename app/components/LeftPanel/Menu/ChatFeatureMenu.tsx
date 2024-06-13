@@ -9,6 +9,7 @@ import {
   Divider,
   ActionIcon,
   Tooltip,
+  CopyButton,
 } from "@mantine/core";
 import {
   IconDots,
@@ -152,7 +153,11 @@ export default function ChatFeatureMenu(props: {
                 </Menu.Item>
               ) : null}
               <Menu.Item>
-                <MenuButton properties={MenuData[1]} />
+                <CopyButton value="https://mantine.dev">
+                  {({ copied, copy }) => (
+                    <MenuButton properties={MenuData[1]} />
+                  )}
+                </CopyButton>
               </Menu.Item>
               {userId && chat.favourites?.includes(userId) ? (
                 <Menu.Item

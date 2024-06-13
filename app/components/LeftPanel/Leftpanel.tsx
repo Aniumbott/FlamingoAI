@@ -35,8 +35,8 @@ import { getWorkspace } from "@/app/controllers/workspace";
 import GeneralChats from "./ChatFilters/GeneralChats";
 import { usePathname, useRouter } from "next/navigation";
 
-export default function LeftPanel() {
-  const { colorScheme } = useMantineColorScheme();
+export default function LeftPanel(props: { toggleLeft: () => void }) {
+  const { toggleLeft } = props;
   const [filterMenu, setFilterMenu] = useState(0);
   const router = useRouter();
   const pathname = usePathname();
@@ -92,10 +92,12 @@ export default function LeftPanel() {
       >
         <div className="grow">
           <OrganizationSwitcher
+            // skipInvitationScreen={true}
             hidePersonal
-            afterCreateOrganizationUrl="/workspace/:slug"
-            afterSelectPersonalUrl="/user/:id"
-            afterSelectOrganizationUrl="/workspace/:slug"
+            createOrganizationMode="navigation"
+            afterLeaveOrganizationUrl="/workspace/"
+            afterCreateOrganizationUrl="/workspace/"
+            afterSelectOrganizationUrl="/workspace/"
           />
         </div>
 
@@ -154,6 +156,7 @@ export default function LeftPanel() {
           case 0:
             return (
               <GeneralChats
+                toggleLeft={toggleLeft}
                 members={members}
                 allowPublic={allowPublic}
                 allowPersonal={allowPersonal}
@@ -163,6 +166,7 @@ export default function LeftPanel() {
           case 1:
             return (
               <PeopleChats
+                toggleLeft={toggleLeft}
                 members={members}
                 allowPublic={allowPublic}
                 allowPersonal={allowPersonal}
@@ -171,6 +175,7 @@ export default function LeftPanel() {
           case 2:
             return (
               <RecentChats
+                toggleLeft={toggleLeft}
                 members={members}
                 allowPublic={allowPublic}
                 allowPersonal={allowPersonal}
@@ -179,6 +184,7 @@ export default function LeftPanel() {
           case 3:
             return (
               <FavouriteChats
+                toggleLeft={toggleLeft}
                 members={members}
                 allowPublic={allowPublic}
                 allowPersonal={allowPersonal}
@@ -187,6 +193,7 @@ export default function LeftPanel() {
           case 4:
             return (
               <ArchivedChats
+                toggleLeft={toggleLeft}
                 members={members}
                 allowPublic={allowPublic}
                 allowPersonal={allowPersonal}
@@ -197,40 +204,42 @@ export default function LeftPanel() {
         }
       })()}
 
-      <Divider orientation="horizontal" />
       {workspace?.subscription == null ||
       workspace?.subscription.status != "active" ? (
-        <Card
-          style={{
-            background: "var(--mantine-primary-color-light)",
-            border: "1px solid var(--mantine-primary-color-filled)",
-          }}
-        >
-          <Group justify="space-between">
-            <Group gap={"xs"}>
-              <IconInfoCircle size="20px" />
-              <Text size="md" fw={700}>
-                Upgrade
-              </Text>
+        <>
+          <Divider orientation="horizontal" />
+          <Card
+            style={{
+              background: "var(--mantine-primary-color-light)",
+              border: "1px solid var(--mantine-primary-color-filled)",
+            }}
+          >
+            <Group justify="space-between">
+              <Group gap={"xs"}>
+                <IconInfoCircle size="20px" />
+                <Text size="md" fw={700}>
+                  Upgrade
+                </Text>
+              </Group>
+              <Button
+                size="xs"
+                radius="sm"
+                variant="outline"
+                fullWidth={false}
+                onClick={() => {
+                  router.push(
+                    pathname.split("/").slice(0, 3).join("/") + "/upgrade"
+                  );
+                }}
+              >
+                Explore plans
+              </Button>
             </Group>
-            <Button
-              size="xs"
-              radius="sm"
-              variant="outline"
-              fullWidth={false}
-              onClick={() => {
-                router.push(
-                  pathname.split("/").slice(0, 3).join("/") + "/upgrade"
-                );
-              }}
-            >
-              Explore plans
-            </Button>
-          </Group>
-          <Text mt="sm" size="sm">
-            Get access to more features by subscribing one of our plans.
-          </Text>
-        </Card>
+            <Text mt="sm" size="sm">
+              Get access to more features by subscribing one of our plans.
+            </Text>
+          </Card>
+        </>
       ) : null}
     </Stack>
   );

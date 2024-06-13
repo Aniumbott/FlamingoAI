@@ -149,21 +149,30 @@ export default function HeaderMegaMenu(props: {
 
           <Anchor
             c={active == 0 ? "var(--mantine-primary-color-filled)" : ""}
-            href="/"
+            href="#home"
+            onClick={() => {
+              setTarget("home");
+            }}
             className={classes.link}
           >
             Home
           </Anchor>
           <Anchor
             c={active == 1 ? "var(--mantine-primary-color-filled)" : ""}
-            href="/pricing"
+            href="#pricing"
+            onClick={() => {
+              setTarget("pricing");
+            }}
             className={classes.link}
           >
             Pricing
           </Anchor>
           <Anchor
             c={active == 2 ? "var(--mantine-primary-color-filled)" : ""}
-            href="#"
+            href="#contact-us"
+            onClick={() => {
+              setTarget("contact-us");
+            }}
             className={classes.link}
           >
             Contact Us

@@ -18,7 +18,7 @@ import { useMediaQuery } from "@mantine/hooks";
 const FolderCard = () => {
   const isMobile = useMediaQuery("(max-width: 48em)");
   return (
-    <Stack mt="10rem" mb="5rem" gap={"md"} align={"start"} justify={"center"}>
+    <Stack mt="5rem" mb="5rem" gap={"md"} align={"start"} justify={"center"}>
       <Group
         preventGrowOverflow={true}
         grow={true}

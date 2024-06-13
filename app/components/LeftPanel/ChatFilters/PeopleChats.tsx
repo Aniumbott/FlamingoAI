@@ -26,6 +26,7 @@ import { socket } from "@/socket";
 import { sortItems } from "@/app/controllers/chat";
 
 const PeopleChats = (props: {
+  toggleLeft: () => void;
   members: any[];
   allowPublic: boolean;
   allowPersonal: boolean;
@@ -81,6 +82,7 @@ const PeopleChats = (props: {
             {/* {allChats.length > 0 ? ( */}
             {filteredMembers.map((user: any) => (
               <UserAccordionItem
+                toggleLeft={props.toggleLeft}
                 user={user}
                 allChats={allChats}
                 members={members}
@@ -104,13 +106,14 @@ const PeopleChats = (props: {
 };
 
 const UserAccordionItem = (props: {
+  toggleLeft: () => void;
   user: any;
   allChats: IChatDocument[];
   members: any[];
   allowPublic: boolean;
   allowPersonal: boolean;
 }) => {
-  const { user, allChats, members } = props;
+  const { toggleLeft, user, allChats, members } = props;
   const [sort, setSort] = useState<string>("New");
 
   const [sortedChats, setSortedChats] = useState<IChatDocument[]>([]);
@@ -139,6 +142,7 @@ const UserAccordionItem = (props: {
       <AccordionPanel>
         {sortedChats.map((chat: IChatDocument, key: any) => (
           <ChatItem
+            toggleLeft={toggleLeft}
             item={chat}
             key={key}
             members={members}

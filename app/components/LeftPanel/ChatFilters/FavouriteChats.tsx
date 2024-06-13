@@ -10,11 +10,12 @@ import { ScrollArea, Loader, Text } from "@mantine/core";
 import { socket } from "@/socket";
 
 const FavouriteChats = (props: {
+  toggleLeft: () => void;
   members: any[];
   allowPublic: boolean;
   allowPersonal: boolean;
 }) => {
-  const { members, allowPersonal, allowPublic } = props;
+  const { toggleLeft, members, allowPersonal, allowPublic } = props;
   const { userId, orgId } = useAuth();
   useEffect(() => {
     const fetchAllChats = async () => {
@@ -53,6 +54,7 @@ const FavouriteChats = (props: {
             favouriteChats.map((chat, key) => {
               return (
                 <ChatItem
+                  toggleLeft={toggleLeft}
                   item={chat}
                   key={key}
                   members={members}

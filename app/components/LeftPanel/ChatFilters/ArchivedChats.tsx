@@ -26,11 +26,12 @@ import { IconSortDescending } from "@tabler/icons-react";
 import { IconSortAscendingLetters } from "@tabler/icons-react";
 
 const ArchivedChats = (props: {
+  toggleLeft: () => void;
   members: any[];
   allowPublic: boolean;
   allowPersonal: boolean;
 }) => {
-  const { members, allowPersonal, allowPublic } = props;
+  const { toggleLeft, members, allowPersonal, allowPublic } = props;
   const { userId, orgId } = useAuth();
   useEffect(() => {
     const fetchAllChats = async () => {
@@ -61,6 +62,7 @@ const ArchivedChats = (props: {
             archivedChats.map((chat, key) => {
               return (
                 <ChatItem
+                  toggleLeft={toggleLeft}
                   item={chat}
                   key={key}
                   members={members}

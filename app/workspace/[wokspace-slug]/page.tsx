@@ -173,7 +173,7 @@ export default function Workspace() {
               </Tooltip>
             </div>
 
-            <LeftPanel />
+            <LeftPanel toggleLeft={toggleLeft} />
           </AppShell.Navbar>
           <AppShell.Aside
             style={{
@@ -277,11 +277,7 @@ export default function Workspace() {
                       imageGenId={currentImageGenId}
                       productId={workspace?.subscription?.product_id || ""}
                     />
-                  ) 
-                  // : pathname?.split("/")[3] == "page" ? (
-                  //   // <PageWindow />
-                  // ) 
-                  : (
+                  ) : (
                     <ChatWindow
                       currentChatId={currentChatId}
                       leftOpened={leftOpened}
@@ -332,6 +328,7 @@ export default function Workspace() {
                         Everyone&apos; Recent Chats
                       </Title>
                       <RecentChats
+                        toggleLeft={toggleLeft}
                         members={orgMembers}
                         allowPublic={allowPublic}
                         allowPersonal={allowPersonal}

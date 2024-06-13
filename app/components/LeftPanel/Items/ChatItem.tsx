@@ -1,5 +1,5 @@
 // Modules
-import { useHover } from "@mantine/hooks";
+import { useHover, useMediaQuery } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { Avatar, Group, Text, ActionIcon, TextInput } from "@mantine/core";
@@ -14,13 +14,14 @@ import MoveChats from "../Modals/MoveItems/MoveItems";
 import { useAuth } from "@clerk/nextjs";
 
 export default function ChatItem(props: {
+  toggleLeft: () => void;
   item: IChatDocument;
   members: any[];
   allowPublic: boolean;
   allowPersonal: boolean;
 }) {
   const pathname = usePathname();
-  const { item, members } = props;
+  const { item, members, toggleLeft } = props;
   const { hovered, ref } = useHover();
   const [menuOpen, setMenuOpen] = useState(false);
   const [rename, setRename] = useState(false);
@@ -28,6 +29,7 @@ export default function ChatItem(props: {
   const [openMoveModal, setOpenMoveModal] = useState(false);
   const { userId, orgId } = useAuth();
   const [participants, setParticipants] = useState<any[]>([]);
+  const isMobile = useMediaQuery("(max-width: 48em)");
 
   useEffect(() => {
     actionIconVisible = hovered || menuOpen;
@@ -51,6 +53,9 @@ export default function ChatItem(props: {
           const newUrl =
             pathname?.split("/").slice(0, 3).join("/") + "/" + item._id;
           window.history.pushState({}, "", newUrl);
+          if (isMobile) {
+            toggleLeft();
+          }
         }}
       >
         <div ref={ref} className="flex flex-row justify-between w-full">
@@ -117,7 +122,7 @@ export default function ChatItem(props: {
             )}
           </div>
           {!rename ? (
-            actionIconVisible ? (
+            actionIconVisible || isMobile ? (
               <ChatFeatureMenu
                 chat={item}
                 members={members}

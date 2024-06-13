@@ -57,12 +57,13 @@ import { getImageGens } from "@/app/controllers/imageGen";
 import { CldImage } from "next-cloudinary";
 
 const GeneralChats = (props: {
+  toggleLeft: () => void;
   members: any[];
   allowPublic: boolean;
   allowPersonal: boolean;
   productId: string;
 }) => {
-  const { members, allowPersonal, allowPublic, productId } = props;
+  const { toggleLeft, members, allowPersonal, allowPublic, productId } = props;
   const { userId, orgId } = useAuth();
   const pathname = usePathname();
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -239,6 +240,7 @@ const GeneralChats = (props: {
                     {allFilteredChats.map((chat, key) => (
                       <Combobox.Option key={key} value={chat._id}>
                         <ChatItem
+                          toggleLeft={toggleLeft}
                           item={chat}
                           members={members}
                           allowPublic={allowPublic}
@@ -293,6 +295,7 @@ const GeneralChats = (props: {
                       key={key}
                     >
                       <FolderItem
+                        toggleLeft={toggleLeft}
                         folder={folder}
                         scope={"public"}
                         members={members}
@@ -305,6 +308,7 @@ const GeneralChats = (props: {
                   ))}
                   {publicChats?.map((chat, key) => (
                     <ChatItem
+                      toggleLeft={toggleLeft}
                       item={chat}
                       key={key}
                       members={members}
@@ -356,6 +360,7 @@ const GeneralChats = (props: {
                         key={key}
                       >
                         <FolderItem
+                          toggleLeft={toggleLeft}
                           folder={folder}
                           scope={"private"}
                           members={members}
@@ -368,6 +373,7 @@ const GeneralChats = (props: {
                     ))}
                     {privateChats?.map((chat, key) => (
                       <ChatItem
+                        toggleLeft={toggleLeft}
                         item={chat}
                         key={key}
                         members={members}

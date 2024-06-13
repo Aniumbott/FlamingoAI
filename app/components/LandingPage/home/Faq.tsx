@@ -4,7 +4,7 @@ import { IconArrowRight, IconCheck } from "@tabler/icons-react";
 
 const Faq = () => {
   return (
-    <Container mt="10rem" w={"100%"} p="0" className="">
+    <Container mt="5rem" w={"100%"} p="0" className="">
       <Title ta="center" order={1} mb={"xl"}>
         Frequently Asked Questions
       </Title>

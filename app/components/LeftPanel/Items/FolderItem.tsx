@@ -47,6 +47,7 @@ export const newFolder = async (
 };
 
 export default function FolderItem(props: {
+  toggleLeft: () => void;
   folder: IChatFolderDocument;
   scope: "public" | "private";
   members: any[];
@@ -56,6 +57,7 @@ export default function FolderItem(props: {
   allowPersonal: boolean;
 }) {
   const {
+    toggleLeft,
     folder,
     scope,
     members,
@@ -99,6 +101,7 @@ export default function FolderItem(props: {
                   chevron={<IconCaretRightFilled className={style.icon} />}
                 >
                   <FolderItem
+                    toggleLeft={toggleLeft}
                     folder={subFolder as IChatFolderDocument}
                     scope={scope}
                     members={members}
@@ -114,6 +117,7 @@ export default function FolderItem(props: {
             folder.chats.map((chat, chatIndex) => (
               <div key={chatIndex}>
                 <ChatItem
+                  toggleLeft={toggleLeft}
                   item={chat as IChatDocument}
                   members={members}
                   allowPublic={allowPublic}

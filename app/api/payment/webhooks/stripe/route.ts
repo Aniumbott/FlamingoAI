@@ -8,6 +8,7 @@ import { clerkClient } from "@clerk/nextjs";
 export async function POST(req: any, res: NextResponse) {
   const body = await req.text();
   let event: Stripe.Event;
+  // console.log("");
 
   try {
     event = stripe.webhooks.constructEvent(
@@ -16,15 +17,18 @@ export async function POST(req: any, res: NextResponse) {
       process.env.STRIPE_WEBHOOK_SECRET || ""
     );
   } catch (err: any) {
+    console.log(err);
     return NextResponse.json(err.message);
   }
 
   let workspace: IWorkspaceDocument | null;
   let response: any;
+  // console.log("Event received: ", event);
 
   // Handle the event
   switch (event.type) {
     case "customer.subscription.created":
+      console.log("customer.subscription.created");
       workspace = await Workspace.findOneAndUpdate(
         {
           customerId: event.data.object.customer,
@@ -47,6 +51,7 @@ export async function POST(req: any, res: NextResponse) {
       console.log("Subscription was created!");
       break;
     case "customer.subscription.updated":
+      console.log("customer.subscription.updated");
       workspace = await Workspace.findOneAndUpdate(
         {
           customerId: event.data.object.customer,
@@ -55,6 +60,8 @@ export async function POST(req: any, res: NextResponse) {
           subscription: getSubscriptionDataFromEvent(event),
         }
       );
+
+      console.log(workspace?._id);
 
       response = await clerkClient.organizations.updateOrganization(
         workspace?._id || "",
@@ -79,13 +86,14 @@ export async function POST(req: any, res: NextResponse) {
 
       // console.log(workspace);
 
-      response = await clerkClient.organizations.updateOrganization(
-        workspace?._id || "",
-        {
-          maxAllowedMemberships: 2,
-        }
-      );
-
+      if (workspace?._id) {
+        response = await clerkClient.organizations.updateOrganization(
+          workspace._id,
+          {
+            maxAllowedMemberships: 2,
+          }
+        );
+      }
       // console.log(response);
 
       console.log("Subscription was deleted!");
