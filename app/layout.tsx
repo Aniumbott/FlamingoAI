@@ -13,6 +13,7 @@ import "@mantine/tiptap/styles.css";
 import "./globals.css";
 import NewClerkProvider from "./NewClerkProvider";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -33,17 +34,19 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body className={inter.className}>
-        <MantineProvider
-          defaultColorScheme="dark"
-          theme={{
-            primaryColor: "teal",
-          }}
-        >
-          <NewClerkProvider>
-            <Notifications />
-            {children}
-          </NewClerkProvider>
-        </MantineProvider>
+        <Suspense>
+          <MantineProvider
+            defaultColorScheme="dark"
+            theme={{
+              primaryColor: "teal",
+            }}
+          >
+            <NewClerkProvider>
+              <Notifications />
+              {children}
+            </NewClerkProvider>
+          </MantineProvider>
+        </Suspense>
       </body>
     </html>
   );

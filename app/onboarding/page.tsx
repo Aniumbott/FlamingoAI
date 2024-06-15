@@ -133,6 +133,7 @@ export default function Home() {
               mt="xl"
               required
               radius="md"
+              label="Enter your OpenAI API key here"
               placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
               defaultValue={apiKey}
               onChange={(e) => {
