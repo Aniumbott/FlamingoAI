@@ -133,7 +133,7 @@ async function sendAssistantMessage(
   ];
 
   getAssistantResponse(messagesContent, workspaceId, assistant)
-    .then((res) => {
+    .then((res: any) => {
       console.log("res at sendAssistantMessage", res);
       if (res) {
         createMessage(
@@ -145,7 +145,7 @@ async function sendAssistantMessage(
       }
       return res;
     })
-    .then((res) => {
+    .then((res: any) => {
       if (res) {
         createTokenLog(
           message.createdBy,

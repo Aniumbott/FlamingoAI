@@ -28,7 +28,7 @@ export async function POST(req: any, res: NextResponse) {
   // Handle the event
   switch (event.type) {
     case "customer.subscription.created":
-      console.log("customer.subscription.created");
+      // console.log("customer.subscription.created");
       workspace = await Workspace.findOneAndUpdate(
         {
           customerId: event.data.object.customer,
@@ -51,7 +51,7 @@ export async function POST(req: any, res: NextResponse) {
       console.log("Subscription was created!");
       break;
     case "customer.subscription.updated":
-      console.log("customer.subscription.updated");
+      // console.log("customer.subscription.updated");
       workspace = await Workspace.findOneAndUpdate(
         {
           customerId: event.data.object.customer,
@@ -61,7 +61,7 @@ export async function POST(req: any, res: NextResponse) {
         }
       );
 
-      console.log(workspace?._id);
+      // console.log(workspace?._id);
 
       response = await clerkClient.organizations.updateOrganization(
         workspace?._id || "",

@@ -21,7 +21,7 @@ const SettingsModal = (props: {
   useEffect(() => {
     if (chat) {
       setModel(chat?.assistant?.model);
-      setAreaValue(chat?.instructions);
+      setAreaValue(chat?.instructions || "");
     }
   }, [chat]);
   return (
@@ -50,7 +50,7 @@ const SettingsModal = (props: {
         <Textarea
           label="Instructions (Chat wide)"
           value={areaValue}
-          onChange={(event) => setAreaValue(event.currentTarget.value)}
+          onChange={(event) => setAreaValue(event.currentTarget.value || "")}
         />
 
         {/* </Stack> */}
@@ -62,7 +62,7 @@ const SettingsModal = (props: {
               variant="outline"
               onClick={() => {
                 setModel(chat?.assistant?.model);
-                setAreaValue(chat?.instructions);
+                setAreaValue(chat?.instructions || "");
               }}
             >
               Reset

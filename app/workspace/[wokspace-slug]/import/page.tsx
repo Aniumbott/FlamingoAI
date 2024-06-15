@@ -199,6 +199,7 @@ export default function ImportPage() {
           </Title>
           <OrganizationSwitcher
             hidePersonal
+            createOrganizationUrl="/onboarding/"
             afterCreateOrganizationUrl="/workspace/:slug"
             afterSelectPersonalUrl="/user/:id"
             afterSelectOrganizationUrl="/workspace/:slug"

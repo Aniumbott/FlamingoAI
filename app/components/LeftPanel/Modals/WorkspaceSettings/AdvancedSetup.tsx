@@ -21,10 +21,14 @@ export default function AdvancedSetup(props: {
   workspace: any;
 }) {
   const { activeTab, setActiveTab, workspace } = props;
-  const [areaValue, setAreaValue] = useState("");
+  const [areaValue, setAreaValue] = useState(
+    "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown."
+  );
 
   useEffect(() => {
-    setAreaValue(workspace?.instructions);
+    if (workspace?.instructions) {
+      setAreaValue(workspace?.instructions);
+    }
   }, [workspace]);
 
   return (
@@ -48,7 +52,7 @@ export default function AdvancedSetup(props: {
         <Textarea
           mt={10}
           value={areaValue}
-          onChange={(event) => setAreaValue(event.currentTarget.value)}
+          onChange={(event) => setAreaValue(event.currentTarget.value || "")}
           required
         />
         <Group mt={20} justify="space-between">

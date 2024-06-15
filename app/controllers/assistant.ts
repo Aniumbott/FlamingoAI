@@ -2,6 +2,11 @@
 import { notifications } from "@mantine/notifications";
 import { createElement } from "react";
 import { IconX } from "@tabler/icons-react";
+import {
+  showErrorNotification,
+  showLoadingNotification,
+  showSuccessNotification,
+} from "./notification";
 
 // Function to collec the assistant response
 async function getAssistantResponse(
@@ -50,4 +55,21 @@ async function getAssistants() {
   return response;
 }
 
-export { getAssistantResponse, getAssistants };
+// Test the OpenAI API
+async function isValidOpenAIKey(key: string) {
+  let isValid = false;
+  const notification = showLoadingNotification("Testing API key...");
+  await fetch("https://api.openai.com/v1/models", {
+    headers: {
+      Authorization: `Bearer ${key}`,
+    },
+  }).then((response) => (isValid = response.status === 200));
+  if (isValid) {
+    showSuccessNotification(notification, "API key is valid.");
+  } else {
+    showErrorNotification(notification, "API key is invalid.");
+  }
+  return isValid;
+}
+
+export { getAssistantResponse, getAssistants, isValidOpenAIKey };

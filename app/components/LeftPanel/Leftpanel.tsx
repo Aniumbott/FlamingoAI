@@ -92,8 +92,8 @@ export default function LeftPanel(props: { toggleLeft: () => void }) {
       >
         <div className="grow">
           <OrganizationSwitcher
-            // skipInvitationScreen={true}
             hidePersonal
+            createOrganizationUrl="/onboarding/"
             createOrganizationMode="navigation"
             afterLeaveOrganizationUrl="/workspace/"
             afterCreateOrganizationUrl="/workspace/"
