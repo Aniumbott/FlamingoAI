@@ -127,7 +127,7 @@ export default function MessageInput(props: {
                 chat.instructions,
                 chat.workspaceId,
                 {
-                  ...chat.assistasetPront,
+                  ...chat.assistant,
                   scope: chat.scope == "private" ? "private" : "public",
                 }
               );
@@ -161,6 +161,7 @@ export default function MessageInput(props: {
           onClick={() => {
             if (messageInput != "") {
               setProcessing(true);
+              console.log("chat assistant", chat.assistant);
               createMessage(
                 userId || "",
                 messageInput,
