@@ -138,7 +138,7 @@ export default function ChatItem(props: {
                     member.hasImage ? (
                       <Avatar key={key} size="25px" src={member.imageUrl} />
                     ) : (
-                      <Avatar key={key} size="25px">
+                      <Avatar key={key} size="25px" variant="white">
                         {member.firstName[0] + member.lastName[0]}
                       </Avatar>
                     )
@@ -151,7 +151,7 @@ export default function ChatItem(props: {
                         src={participants[participants.length - 1].imageUrl}
                       />
                     ) : (
-                      <Avatar size="25px">
+                      <Avatar size="25px" variant="white">
                         {participants[participants.length - 1].firstName[0] +
                           participants[participants.length - 1].lastName[0]}
                       </Avatar>
@@ -163,12 +163,14 @@ export default function ChatItem(props: {
                         src={participants[participants.length - 2].imageUrl}
                       />
                     ) : (
-                      <Avatar size="25px">
+                      <Avatar size="25px" variant="white">
                         {participants[participants.length - 2].firstName[0] +
                           participants[participants.length - 2].lastName[0]}
                       </Avatar>
                     )}
-                    <Avatar size="25px">+{participants.length - 2}</Avatar>
+                    <Avatar size="25px" variant="white">
+                      +{participants.length - 2}
+                    </Avatar>
                   </>
                 )}
               </Avatar.Group>

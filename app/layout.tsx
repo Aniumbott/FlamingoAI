@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html>
       <head>
         <ColorSchemeScript />
       </head>
@@ -38,7 +38,7 @@ export default function RootLayout({
           <MantineProvider
             defaultColorScheme="dark"
             theme={{
-              primaryColor: "teal",
+              primaryColor: "grape",
             }}
           >
             <NewClerkProvider>

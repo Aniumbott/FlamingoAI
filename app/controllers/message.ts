@@ -1,6 +1,7 @@
 import { socket } from "@/socket";
 import { getAssistantResponse } from "./assistant";
 import { createTokenLog } from "./tokenLog";
+import { getPageById } from "./pages";
 
 // Function to get messages
 async function getMessages(chatId: String) {
@@ -99,7 +100,7 @@ async function deleteMessage(body: any) {
 async function sendAssistantMessage(
   messages: any[],
   message: any,
-  instruction: string,
+  instruction: any,
   workspaceId: string,
   assistant: any // assistantId, scope, model
 ) {
@@ -124,15 +125,38 @@ async function sendAssistantMessage(
     };
   });
 
-  messagesContent = [
-    {
-      role: "system",
-      content: instruction,
-    },
-    ...messagesContent,
-  ];
+  if (instruction.type === "text") {
+    messagesContent = [
+      {
+        role: "system",
+        content: instruction.text,
+      },
+      ...messagesContent,
+    ];
+  } else {
+    let systemInstructions: string = "";
+    const getCurrentPage = async () => {
+      return await getPageById(instruction.pageId, workspaceId);
+    };
+    await getCurrentPage().then((res) => {
+      res?.pages?.[0].content.forEach((contentBlock: string) => {
+        systemInstructions = systemInstructions + "\n\n" + contentBlock;
+      });
+      // console.log("page at func", res?.pages?.[0]);
+      systemInstructions =
+        "Here provided the content of a markdown page in HTML format. Consider this content while answering." +
+        systemInstructions;
+      messagesContent = [
+        {
+          role: "system",
+          content: systemInstructions,
+        },
+        ...messagesContent,
+      ];
+    });
+  }
 
-  getAssistantResponse(messagesContent, workspaceId, assistant)
+  await getAssistantResponse(messagesContent, workspaceId, assistant)
     .then((res: any) => {
       console.log("res at sendAssistantMessage", res);
       if (res) {

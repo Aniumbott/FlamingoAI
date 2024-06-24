@@ -39,7 +39,7 @@ export default function OnlineUsers(props: {
                 member?.hasImage ? (
                   <Avatar key={key} size="sm" src={member.imageUrl} />
                 ) : (
-                  <Avatar key={key} size="sm">
+                  <Avatar key={key} size="sm" variant="white">
                     {member?.firstName[0] + member?.lastName[0]}
                   </Avatar>
                 )
@@ -48,18 +48,20 @@ export default function OnlineUsers(props: {
                   {member.hasImage ? (
                     <Avatar radius="sm" size="sm" src={member.imageUrl} />
                   ) : (
-                    <Avatar size="sm">
+                    <Avatar size="sm" variant="white">
                       {member.firstName[0] + member.lastName[0]}
                     </Avatar>
                   )}
                   {member.hasImage ? (
                     <Avatar radius="sm" size="sm" src={member.imageUrl} />
                   ) : (
-                    <Avatar size="sm">
+                    <Avatar size="sm" variant="white">
                       {member.firstName[0] + member.lastName[0]}
                     </Avatar>
                   )}
-                  <Avatar size="sm">+{onlineUsers.length - 2}</Avatar>
+                  <Avatar size="sm" variant="white">
+                    +{onlineUsers.length - 2}
+                  </Avatar>
                 </>
               )
             ) : null

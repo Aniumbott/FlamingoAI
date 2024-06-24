@@ -33,7 +33,7 @@ export default function Page() {
       <ClerkLoading>
         <div className="flex items-center justify-center gap-5 flex-row">
           <Title ta="center" order={3}>
-            Loading you organization list.
+            Loading your workspaces
           </Title>
           <Loader size="md" type="bars" />
         </div>

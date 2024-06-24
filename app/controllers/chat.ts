@@ -177,12 +177,17 @@ async function createChat(
   workspaceId: string,
   members: any[],
   name: string = "New Chat",
-  assistant: any = null
+  assistant: any = null,
+  instructions: {
+    type: string;
+    text: string;
+    pageId: Mongoose.Types.ObjectId | null;
+  } = { type: "text", text: "", pageId: null }
 ) {
   const notificationId = showLoadingNotification("Creating chat...");
   try {
-    const userId = members.map((member) => member.userId);
-    console.log(userId);
+    const userIds = members.map((member) => member.userId);
+    console.log(userIds);
     const data = await fetch("/api/chat", {
       method: "POST",
       body: JSON.stringify({
@@ -190,9 +195,10 @@ async function createChat(
         parentFolder,
         createdBy,
         workspaceId,
-        members: userId,
+        members: userIds,
         name,
         assistant,
+        instructions,
       }),
       headers: {
         "Content-Type": "application/json",

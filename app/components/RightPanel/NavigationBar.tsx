@@ -18,6 +18,7 @@ import {
 } from "@tabler/icons-react";
 import { Protect, UserButton } from "@clerk/nextjs";
 import { useMediaQuery } from "@mantine/hooks";
+import { usePathname } from "next/navigation";
 
 export default function NavigationBar(props: {
   active: number;
@@ -27,6 +28,7 @@ export default function NavigationBar(props: {
 }) {
   const { active, setActive, rightOpened, toggleRight } = props;
   const { colorScheme, setColorScheme } = useMantineColorScheme();
+  const pathname = usePathname();
   const isMobile = useMediaQuery(`(max-width: 48em)`);
   const ButtonProps = (ind: number) => {
     return {
@@ -85,38 +87,40 @@ export default function NavigationBar(props: {
         <div className="flex justify-center items-center">
           <UserButton afterSignOutUrl="/" />
         </div>
-        <div
-          className={`flex items-center justify-center ${
-            isMobile ? "flex-row" : "flex-col mt-[8rem]"
-          }`}
-          // style={{ marginTop: "8rem" }}
-        >
-          <Tooltip label="Prompts" position="left" fz="xs">
-            <ActionIcon {...ButtonProps(0)}>
-              <IconCategory size={20} />
-            </ActionIcon>
-          </Tooltip>
-
-          <Protect role="org:admin">
-            <Tooltip label="Reports" position="left" fz="xs">
-              <ActionIcon {...ButtonProps(1)}>
-                <IconTrendingUp size={20} />
+        {pathname.split("/")[3] != "page" && (
+          <div
+            className={`flex items-center justify-center ${
+              isMobile ? "flex-row" : "flex-col mt-[8rem]"
+            }`}
+            // style={{ marginTop: "8rem" }}
+          >
+            <Tooltip label="Prompts" position="left" fz="xs">
+              <ActionIcon {...ButtonProps(0)}>
+                <IconCategory size={20} />
               </ActionIcon>
             </Tooltip>
-          </Protect>
 
-          <Tooltip label="Comments" position="left" fz="xs">
-            <ActionIcon {...ButtonProps(2)}>
-              <IconMessages size={20} />
-            </ActionIcon>
-          </Tooltip>
+            <Protect role="org:admin">
+              <Tooltip label="Reports" position="left" fz="xs">
+                <ActionIcon {...ButtonProps(1)}>
+                  <IconTrendingUp size={20} />
+                </ActionIcon>
+              </Tooltip>
+            </Protect>
 
-          <Tooltip label="Help" position="left" fz="xs">
-            <ActionIcon {...ButtonProps(3)}>
-              <IconHelp size={20} />
-            </ActionIcon>
-          </Tooltip>
-        </div>
+            <Tooltip label="Comments" position="left" fz="xs">
+              <ActionIcon {...ButtonProps(2)}>
+                <IconMessages size={20} />
+              </ActionIcon>
+            </Tooltip>
+
+            <Tooltip label="Help" position="left" fz="xs">
+              <ActionIcon {...ButtonProps(3)}>
+                <IconHelp size={20} />
+              </ActionIcon>
+            </Tooltip>
+          </div>
+        )}
         <div
           className={`h-full flex justify-end items-end ${
             isMobile ? "flex-row" : "flex-col"
@@ -141,7 +145,7 @@ export default function NavigationBar(props: {
               </ActionIcon>
             </Tooltip>
           )}
-          {!isMobile ? (
+          {pathname.split("/")[3] != "page" && !isMobile ? (
             rightOpened ? (
               <Tooltip label="Collapse panel" position="left" fz="xs">
                 <ActionIcon {...ButtonProps(999)} onClick={() => toggleRight()}>

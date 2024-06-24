@@ -160,6 +160,27 @@ app.prepare().then(() => {
       );
       io.to(roomId).emit("refreshImageGens", prompt);
     })
+
+    socket.on("createPage", (roomId, page) => {
+      console.log(
+        `User with ID: ${socket.id} created page: ${page._id} in room: ${roomId}`
+      );
+      io.to(roomId).emit("refreshPages", page);
+    })
+
+    socket.on("deletePage", (roomId, page) => {
+      console.log(
+        `User with ID: ${socket.id} deleted page: ${page._id} in room: ${roomId}`
+      );
+      io.to(roomId).emit("refreshPages", page);
+    })
+
+    socket.on("updatePage", (roomId, page) => {
+      console.log(
+        `User with ID: ${socket.id} updated page: ${page._id} in room: ${roomId}`
+      );
+      io.to(roomId).emit("refreshPages", page);
+    })
   });
 
   httpServer

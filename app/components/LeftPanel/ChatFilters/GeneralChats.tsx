@@ -36,6 +36,7 @@ import {
 
 // Components
 import ChatItem from "../Items/ChatItem";
+import PageItem from "../Items/PageItem";
 import FolderItem, { newFolder } from "../Items/FolderItem";
 import {
   getIndependentChats,
@@ -55,6 +56,8 @@ import { useHover } from "@mantine/hooks";
 import { IImageGenDocument } from "@/app/models/ImageGen";
 import { getImageGens } from "@/app/controllers/imageGen";
 import { CldImage } from "next-cloudinary";
+import { IPageDocument } from "@/app/models/Page";
+import { getAllPages, createPage } from "@/app/controllers/pages";
 
 const GeneralChats = (props: {
   toggleLeft: () => void;
@@ -77,6 +80,7 @@ const GeneralChats = (props: {
     []
   );
   const [imageGens, setImageGens] = useState<IImageGenDocument[]>([]);
+  const [pages, setPages] = useState<IPageDocument[]>([]);
   const [searchContent, setSearchContent] = useState<boolean>(false);
   const [sort, setSort] = useState<string>("New");
 
@@ -141,18 +145,28 @@ const GeneralChats = (props: {
         }
       };
 
+      const fetchAllPages = async () => {
+        try {
+          setPages((await getAllPages(orgId || "")).pages);
+        } catch (error) {
+          console.error("Failed to fetch pages:", error);
+        }
+      };
+
       setIsLoading(true);
       fetchChatsAndFolders().then(() => {
         fetchImageGens().then(() => {
-          setIsLoading(false);
-          console.log(
-            "data",
-            privateChats,
-            publicChats,
-            privateFolders,
-            publicFolders,
-            imageGens
-          );
+          fetchAllPages().then(() => {
+            setIsLoading(false);
+            console.log(
+              "data",
+              privateChats,
+              publicChats,
+              privateFolders,
+              publicFolders,
+              imageGens
+            );
+          });
         });
       });
       fetchAllPopulatedChats();
@@ -167,11 +181,17 @@ const GeneralChats = (props: {
         console.log("refreshImageGens fetching image gens");
         fetchImageGens();
       });
+
+      socket.on("refreshPages", () => {
+        console.log("refreshPages fetching pages");
+        fetchAllPages();
+      });
     }
     return () => {
-      console.log("turning off socket at generatChats");
+      console.log("turning off socket at generalChats");
       socket.off("refreshChats");
       socket.off("refreshImageGens");
+      socket.off("refreshPages");
     };
   }, [orgId]);
 
@@ -278,11 +298,7 @@ const GeneralChats = (props: {
             />
           </Accordion.Control>
           <AccordionPanel>
-            <ScrollArea.Autosize
-              mah="calc(100vh - 475px)"
-              scrollbarSize={10}
-              offsetScrollbars
-            >
+            <ScrollArea.Autosize mah="40vh" scrollbarSize={10} offsetScrollbars>
               {isLoading ? (
                 <Loader type="dots" w={"100%"} />
               ) : publicFolders.length > 0 || publicChats.length > 0 ? (
@@ -342,7 +358,7 @@ const GeneralChats = (props: {
             </AccordionControl>
             <AccordionPanel>
               <ScrollArea.Autosize
-                mah="50vh"
+                mah="40vh"
                 scrollbarSize={10}
                 offsetScrollbars
               >
@@ -392,46 +408,87 @@ const GeneralChats = (props: {
           </Accordion.Item>
         )}
         {productId === process.env.NEXT_PUBLIC_MAX_PLAN && (
-          <Accordion.Item value={"GENERATED-IMAGES"} key={"GENERATED-IMAGES"}>
-            <Accordion.Control>
-              <AccordionLabelImage pathname={pathname} />
-            </Accordion.Control>
-            <AccordionPanel>
-              <ScrollArea.Autosize
-                mah="50vh"
-                scrollbarSize={10}
-                offsetScrollbars
-              >
-                <Flex wrap="wrap" gap="md" p="5">
-                  <ActionIcon
-                    variant="default"
-                    h="70"
-                    w="70"
-                    onClick={() => {
-                      window.history.pushState(
-                        {},
-                        "",
-                        pathname.split("/").slice(0, 3).join("/") + "/gallery"
-                      );
-                    }}
-                  >
-                    <IconPhotoPlus size="35" />
-                  </ActionIcon>
-                  {imageGens.map((imageGen) => (
-                    <ImageCard
-                      key={imageGen._id}
-                      imageGen={imageGen}
-                      createdBy={
-                        members.filter(
-                          (member) => member.userId == imageGen.createdBy
-                        )[0]
-                      }
-                    />
-                  ))}
-                </Flex>
-              </ScrollArea.Autosize>
-            </AccordionPanel>
-          </Accordion.Item>
+          <>
+            <Accordion.Item value={"GENERATED-IMAGES"} key={"GENERATED-IMAGES"}>
+              <Accordion.Control>
+                <AccordionLabelImage pathname={pathname} />
+              </Accordion.Control>
+              <AccordionPanel>
+                <ScrollArea.Autosize
+                  mah="30vh"
+                  scrollbarSize={10}
+                  offsetScrollbars
+                >
+                  <Flex wrap="wrap" gap="md" p="5">
+                    <ActionIcon
+                      variant="default"
+                      h="70"
+                      w="70"
+                      onClick={() => {
+                        window.history.pushState(
+                          {},
+                          "",
+                          pathname.split("/").slice(0, 3).join("/") + "/gallery"
+                        );
+                      }}
+                    >
+                      <IconPhotoPlus size="35" />
+                    </ActionIcon>
+                    {imageGens.map((imageGen) => (
+                      <ImageCard
+                        key={imageGen._id}
+                        imageGen={imageGen}
+                        createdBy={
+                          members.filter(
+                            (member) => member.userId == imageGen.createdBy
+                          )[0]
+                        }
+                      />
+                    ))}
+                  </Flex>
+                </ScrollArea.Autosize>
+              </AccordionPanel>
+            </Accordion.Item>
+            <Accordion.Item value={"PAGES"} key={"PAGES"}>
+              <AccordionControl>
+                <AccordianLabelPages
+                  pathname={pathname}
+                  workspaceId={orgId || ""}
+                  userId={userId || ""}
+                />
+              </AccordionControl>
+              <AccordionPanel>
+                <ScrollArea.Autosize
+                  mah="30vh"
+                  scrollbarSize={10}
+                  offsetScrollbars
+                >
+                  {isLoading ? (
+                    <Loader type="dots" w={"100%"} />
+                  ) : pages.length > 0 ? (
+                    <>
+                      {pages?.map((page, key) => (
+                        <Accordion
+                          chevronPosition="left"
+                          classNames={{ chevron: style.chevron }}
+                          chevron={
+                            <IconCaretRightFilled className={style.icon} />
+                          }
+                          key={key}
+                        >
+                          <PageItem page={page} />
+                        </Accordion>
+                      ))}
+                    </>
+                  ) : (
+                    <Text style={{ textAlign: "center" }} c="dimmed" size="xs">
+                      No Pages
+                    </Text>
+                  )}
+                </ScrollArea.Autosize>
+              </AccordionPanel>
+            </Accordion.Item>
+          </>
         )}
       </Accordion>
     </Stack>
@@ -535,6 +592,40 @@ const AccordionLabelImage = (props: { pathname: string }) => {
             "",
             pathname.split("/").slice(0, 3).join("/") + "/gallery"
           );
+        }}
+      >
+        <IconPlus size={"1rem"} />
+      </ActionIcon>
+    </Group>
+  );
+};
+
+const AccordianLabelPages = (props: {
+  workspaceId: string;
+  userId: string;
+  pathname: string;
+}) => {
+  const { workspaceId, userId, pathname } = props;
+  return (
+    <Group wrap="nowrap" justify="space-between">
+      <Text size="sm" fw={600}>
+        PAGES
+      </Text>
+      <ActionIcon
+        size="sm"
+        variant="subtle"
+        color="grey"
+        onClick={(e) => {
+          e.stopPropagation();
+          createPage(workspaceId, userId).then((res: any) => {
+            window.history.pushState(
+              {},
+              "",
+              pathname.split("/").slice(0, 3).join("/") +
+                "/page/" +
+                res.page._id
+            );
+          });
         }}
       >
         <IconPlus size={"1rem"} />

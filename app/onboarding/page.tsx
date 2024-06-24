@@ -66,7 +66,7 @@ export default function Home() {
     >
       <Paper
         pos="relative"
-        p="md"
+        p={isMobile ? "sm" : "md"}
         pt="3rem"
         mih="100vh"
         w="100%"
@@ -79,8 +79,14 @@ export default function Home() {
           justifyContent: "center",
         }}
       >
-        <Group pos="absolute" top="0" w="100%" p="xl" justify="space-between">
-          <Title order={isMobile ? 2 : 1}>TeamGPT</Title>
+        <Group
+          pos="absolute"
+          top="0"
+          w="100%"
+          p={isMobile ? "sm" : "xl"}
+          justify="space-between"
+        >
+          <Title order={isMobile ? 3 : 1}>TeamGPT</Title>
           <Group gap="0">
             {user && user.hasImage ? (
               <Avatar radius="sm" src={user.imageUrl} />
@@ -159,6 +165,7 @@ export default function Home() {
                     isValidOpenAIKey(apiKey).then((res) => {
                       if (res) {
                         getWorkspace(organization?.id || "").then((res) => {
+                          console.log(res);
                           updateWorkspace({
                             ...res.workspace,
                             assistants: [
@@ -252,17 +259,29 @@ export default function Home() {
         )}
         {active == 4 && (
           <Box
+            mt="5rem"
             style={{
               overflowY: "scroll",
             }}
           >
+            <Title order={isMobile ? 2 : 1} ta={"center"} mt="xl" mb="xl">
+              Successfully Created{" "}
+              <span
+                style={{
+                  color: "var(--mantine-primary-color-filled)",
+                }}
+              >
+                {organization?.name}
+              </span>
+              .
+            </Title>
             <Title order={3} mb="lg">
               Invite people into your Workspace.
             </Title>
             <OrganizationProfile />
             <Group mt="xl" justify="flex-end">
               <Anchor href={`/workspace/${organization?.slug}`}>
-                <Button size="md" radius="md">
+                <Button size="md" radius="md" mb="sm">
                   Go to your workspace
                 </Button>
               </Anchor>
@@ -286,7 +305,7 @@ export default function Home() {
         </Stepper>
       </Paper>
       <Box
-        display={isMobile ? "none" : "flex"}
+        display={isMobile || active == 4 ? "none" : "flex"}
         mih="100vh"
         w="100%"
         h="500"
@@ -355,7 +374,7 @@ export default function Home() {
             />
           </>
         )}
-        {active == 4 && (
+        {/* {active == 4 && (
           <>
             <Title ta="center" w="70%" size={"3rem"} mb="5rem">
               Successfully Created{" "}
@@ -377,7 +396,7 @@ export default function Home() {
               alt="Done"
             />
           </>
-        )}
+        )} */}
       </Box>
     </Group>
   );

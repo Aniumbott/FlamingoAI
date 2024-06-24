@@ -41,6 +41,7 @@ import { createChat } from "@/app/controllers/chat";
 import { getWorkspace } from "@/app/controllers/workspace";
 import RecentChats from "../../components/LeftPanel/ChatFilters/RecentChats";
 import ImageGenWindow from "@/app/components/ImageGenWindow/ImageGenWindow";
+import PageWindow from "@/app/components/PageWindow/PageWindow";
 // import PageWindow from "@/app/components/PageWindow/PageWindow";
 
 export default function Workspace() {
@@ -50,6 +51,7 @@ export default function Workspace() {
   const { colorScheme } = useMantineColorScheme();
   const [currentChatId, setCurrentChatId] = useState("");
   const [currentImageGenId, setCurrentImageGenId] = useState("");
+  const [currentPageId, setCurrentPageId] = useState("");
   const { orgId, userId } = useAuth();
   const { organization } = useOrganization();
   const router = useRouter();
@@ -97,17 +99,22 @@ export default function Workspace() {
   }, [orgId]);
 
   useEffect(() => {
-    if (currentChatId != pathname?.split("/")[3]) {
+    const pathVariables = pathname?.split("/");
+    if (
+      pathVariables[3] !== "gallery" &&
+      pathVariables[3] !== "page" &&
+      currentChatId != pathVariables[3]
+    ) {
       console.log("leaving", currentChatId);
       socket.emit("leaveChatRoom", currentChatId, userId);
     }
-    if (
-      pathname?.split("/")[3] != "gallery" &&
-      pathname?.split("/")[3] != "page"
-    ) {
-      setCurrentChatId(pathname?.split("/")[3] || "");
+    if (pathVariables[3] === "gallery") {
+      setCurrentImageGenId(pathVariables[4] || "");
+    } else if (pathVariables[3] === "page") {
+      setCurrentPageId(pathVariables[4] || "");
+    } else {
+      setCurrentChatId(pathVariables[3] || "");
     }
-    setCurrentImageGenId(pathname?.split("/")[4] || "");
   }, [pathname]);
 
   useEffect(() => {
@@ -139,7 +146,10 @@ export default function Workspace() {
           aside={{
             width: 330,
             breakpoint: "md",
-            collapsed: { desktop: !rightOpened, mobile: !rightOpened },
+            collapsed: {
+              desktop: !rightOpened || pathname.split("/")[3] == "page",
+              mobile: !rightOpened || pathname.split("/")[3] == "page",
+            },
           }}
           padding="md"
         >
@@ -276,6 +286,12 @@ export default function Workspace() {
                     <ImageGenWindow
                       imageGenId={currentImageGenId}
                       productId={workspace?.subscription?.product_id || ""}
+                    />
+                  ) : pathname?.split("/")[3] == "page" ? (
+                    <PageWindow
+                      leftOpened={leftOpened}
+                      toggleLeft={toggleLeft}
+                      currentPageId={currentPageId}
                     />
                   ) : (
                     <ChatWindow

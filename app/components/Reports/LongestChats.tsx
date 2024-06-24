@@ -33,7 +33,7 @@ export default function LongestChats(props: {
       ((chat.messages.reduce((sum: number, message: any) => {
         return sum + Number(message.content);
       }, 0) +
-        chat.instructions.length) /
+        chat.instructions.text.length) /
         getContexWIndow(chat.assistant.assistantId, chat.assistant.model)) *
       100;
 
@@ -57,7 +57,7 @@ export default function LongestChats(props: {
             member.hasImage ? (
               <Avatar radius="sm" key={key} size="sm" src={member.imageUrl} />
             ) : (
-              <Avatar radius="sm" key={key} size="sm">
+              <Avatar radius="sm" key={key} size="sm" variant="white">
                 {member.firstName[0] + member.lastName[0]}
               </Avatar>
             )
@@ -71,7 +71,7 @@ export default function LongestChats(props: {
                 src={participants[participants.length - 1].imageUrl}
               />
             ) : (
-              <Avatar radius="sm" size="sm">
+              <Avatar radius="sm" size="sm" variant="white">
                 {participants[participants.length - 1].firstName[0] +
                   participants[participants.length - 1].lastName[0]}
               </Avatar>
@@ -84,12 +84,12 @@ export default function LongestChats(props: {
                 src={participants[participants.length - 2].imageUrl}
               />
             ) : (
-              <Avatar radius="sm" size="sm">
+              <Avatar radius="sm" size="sm" variant="white">
                 {participants[participants.length - 2].firstName[0] +
                   participants[participants.length - 2].lastName[0]}
               </Avatar>
             )}
-            <Avatar radius="sm" size="sm">
+            <Avatar radius="sm" size="sm" variant="white">
               +{participants.length - 2}
             </Avatar>
           </>

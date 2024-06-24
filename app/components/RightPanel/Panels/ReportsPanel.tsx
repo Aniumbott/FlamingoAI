@@ -59,7 +59,6 @@ export default function ReportsPanel(props: { toggleRight: () => void }) {
         </Button>
 
         <Paper
-          withBorder
           w="100%"
           h="250"
           p="2rem"
@@ -84,7 +83,6 @@ export default function ReportsPanel(props: { toggleRight: () => void }) {
         </Paper>
 
         <Paper
-          withBorder
           w="100%"
           h="250"
           p="2rem"

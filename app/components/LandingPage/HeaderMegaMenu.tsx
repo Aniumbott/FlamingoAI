@@ -132,6 +132,7 @@ export default function HeaderMegaMenu(props: {
       </header>
 
       <Drawer
+        position="right"
         opened={drawerOpened}
         onClose={closeDrawer}
         size="100%"

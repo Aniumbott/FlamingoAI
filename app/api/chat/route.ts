@@ -320,7 +320,11 @@ export async function POST(req: any, res: NextApiResponse) {
           userId: memberId,
           access: "inherit",
         })),
-        instructions: workspace?.instructions,
+        instructions: {
+          type: body.instructions.type,
+          text: workspace?.instructions,
+          pageId: body.instructions.pageId,
+        },
         assistant: body.assistant
           ? body.assistant
           : workspace?.assistants.find(

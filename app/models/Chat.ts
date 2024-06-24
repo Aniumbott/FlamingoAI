@@ -8,6 +8,7 @@ require("./ChatFolder.ts");
 require("./Message.ts");
 require("./Workspace.ts");
 require("./Assistant.ts");
+require("./Page.ts");
 
 const ChatSchema = new Mongoose.Schema(
   {
@@ -42,7 +43,16 @@ const ChatSchema = new Mongoose.Schema(
         },
       },
     ],
-    instructions: { type: String, required: false },
+    instructions: {
+      type: {
+        type: String,
+        enum: ["text", "page"],
+        default: "text",
+        required: true,
+      },
+      text: { type: String, required: false },
+      pageId: { type: Mongoose.Types.ObjectId, default: null, required: false },
+    },
     assistant: {
       assistantId: {
         type: Mongoose.Types.ObjectId,
@@ -72,7 +82,11 @@ interface IChat {
     userId: string;
     access: string;
   }[];
-  instructions: string;
+  instructions: {
+    type: string;
+    text: string;
+    pageId: Mongoose.Types.ObjectId;
+  };
   assistant: {
     assistantId: Mongoose.Types.ObjectId;
     model: string;

@@ -44,7 +44,7 @@ function MessageItem(props: {
   participants: any[];
   userId: string;
   orgId: string;
-  instructions: string;
+  instructions: any;
   assistant: any;
   setPromptOpened: (value: boolean) => void;
   setPromptContent: (value: string) => void;
@@ -111,53 +111,83 @@ function MessageItem(props: {
           borderRadius: isMobile ? "0" : "var(--mantine-radius-md)",
         }}
       >
-        <div className="w-full h-full max-w-[1000px] px-5 flex flex-row overflow-y-scroll">
-          <div className="flex flex-col ">
-            {message.type === "user" ? (
-              createdBy?.hasImage ? (
-                <Avatar
-                  size="md"
-                  radius="sm"
-                  src={createdBy?.imageUrl}
-                  mt={5}
-                />
+        <div className="w-full h-full max-w-[1000px] gap-2.5 px-2.5 flex flex-row overflow-y-scroll">
+          {!isMobile && (
+            <div className="flex flex-col">
+              {message.type === "user" ? (
+                createdBy?.hasImage ? (
+                  <Avatar
+                    size="md"
+                    radius="sm"
+                    src={createdBy?.imageUrl}
+                    mt={5}
+                  />
+                ) : (
+                  <Avatar size="md" radius="sm" mt={5}>
+                    {createdBy?.firstName + createdBy?.lastName}
+                  </Avatar>
+                )
               ) : (
                 <Avatar size="md" radius="sm" mt={5}>
-                  {createdBy?.firstName + createdBy?.lastName}
+                  <IconRobotFace
+                    size="24px"
+                    color="var(--mantine-primary-color-3)"
+                  />
                 </Avatar>
-              )
-            ) : (
-              <Avatar size="md" radius="sm" mt={5}>
-                <IconRobotFace
-                  size="24px"
-                  color="var(--mantine-primary-color-3)"
-                />
-              </Avatar>
-            )}
-            {(hovered || isMobile) && !isEdit ? (
-              <Tooltip label="Fork Chat" fz="xs" position="bottom">
-                <ActionIcon
-                  color="grey"
-                  variant="subtle"
-                  mt="1rem"
-                  onClick={() => {
-                    setForkMessage(message);
-                    setIsForkModalOpen(true);
-                  }}
-                >
-                  <IconArrowFork style={{ width: rem(24), rotate: "180deg" }} />
-                </ActionIcon>
-              </Tooltip>
-            ) : null}
-          </div>
+              )}
+              {(hovered || isMobile) && !isEdit ? (
+                <Tooltip label="Fork Chat" fz="xs" position="bottom">
+                  <ActionIcon
+                    color="grey"
+                    variant="subtle"
+                    mt="1rem"
+                    onClick={() => {
+                      setForkMessage(message);
+                      setIsForkModalOpen(true);
+                    }}
+                  >
+                    <IconArrowFork
+                      style={{ width: rem(24), rotate: "180deg" }}
+                    />
+                  </ActionIcon>
+                </Tooltip>
+              ) : null}
+            </div>
+          )}
           <div
             className="w-full flex flex-col"
-            style={{
-              marginLeft: "calc(min(5vw, 3rem))",
-            }}
+            style={
+              {
+                // marginLeft: "calc(min(3vw, 2rem))",
+              }
+            }
           >
             <div className="flex flex-row justify-between items-center min-h-8">
               <div className="flex flex-row items-center">
+                {isMobile && (
+                  <div className="flex items-center justify-center gap-1 mr-2">
+                    {message.type === "user" ? (
+                      createdBy?.hasImage ? (
+                        <Avatar
+                          size="sm"
+                          radius="sm"
+                          src={createdBy?.imageUrl}
+                        />
+                      ) : (
+                        <Avatar size="sm" radius="sm">
+                          {createdBy?.firstName + createdBy?.lastName}
+                        </Avatar>
+                      )
+                    ) : (
+                      <Avatar size="sm" radius="sm">
+                        <IconRobotFace
+                          size="20px"
+                          color="var(--mantine-primary-color-3)"
+                        />
+                      </Avatar>
+                    )}
+                  </div>
+                )}
                 <Text size="md" fw={700}>
                   {message.type === "user"
                     ? `${createdBy?.firstName || ""} ${
@@ -170,7 +200,24 @@ function MessageItem(props: {
                 </Text>
               </div>
 
-              <div className="flex flex-row">
+              <div className="flex flex-row gap-[1px] items-center">
+                {isMobile && !isEdit ? (
+                  <Tooltip label="Fork Chat" fz="xs" position="bottom">
+                    <ActionIcon
+                      size={"sm"}
+                      color="grey"
+                      variant="subtle"
+                      onClick={() => {
+                        setForkMessage(message);
+                        setIsForkModalOpen(true);
+                      }}
+                    >
+                      <IconArrowFork
+                        style={{ width: rem(24), rotate: "180deg" }}
+                      />
+                    </ActionIcon>
+                  </Tooltip>
+                ) : null}
                 {(hovered || isMobile) && !isEdit ? (
                   message.type === "user" ? (
                     <>

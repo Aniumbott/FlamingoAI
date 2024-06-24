@@ -26,9 +26,11 @@ import {
   Tooltip,
   HoverCard,
   Card,
+  Container,
 } from "@mantine/core";
 import {
   IconBuilding,
+  IconExternalLink,
   IconInfoCircle,
   IconLayoutSidebarLeftExpand,
   IconLayoutSidebarRightExpand,
@@ -47,7 +49,7 @@ import {
 
 // Components
 import MessageItem from "./Items/MessageItem/MessageItem";
-import { sendAssistantMessage, createMessage } from "@/app/controllers/message";
+import { createMessage } from "@/app/controllers/message";
 import {
   deleteChat,
   getChat,
@@ -408,10 +410,57 @@ export default function ChatWindow(props: {
                     <IconInfoCircle size={20} />
                   </HoverCard.Target>
                   <HoverCard.Dropdown>
-                    <Text fw={700} c="dimmed" mb="xs">
-                      Instructions
-                    </Text>
-                    <Text size="sm">{chat.instructions}</Text>
+                    <Box
+                      mb="sm"
+                      style={{
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text fw={700} c="dimmed">
+                        Instructions
+                      </Text>
+                      {isAllowed ? (
+                        <Tooltip label="Chat settings" fz="sm">
+                          <ActionIcon
+                            variant="subtle"
+                            color="grey"
+                            onClick={() => setSettingsOpen(true)}
+                          >
+                            <IconSettings size={20} />
+                          </ActionIcon>
+                        </Tooltip>
+                      ) : null}
+                    </Box>
+                    {chat?.instructions?.type == "text" ? (
+                      <Text size="sm">{chat?.instructions?.text}</Text>
+                    ) : (
+                      <Container p={0} m={0}>
+                        <Text size="sm">
+                          This chat uses the following document as context when
+                          answering user prompts:
+                        </Text>
+                        <Button
+                          mt="sm"
+                          rightSection={<IconExternalLink size="20px" />}
+                          variant="light"
+                          size="sm"
+                          onClick={() => {
+                            window.history.pushState(
+                              {},
+                              "",
+                              pathname.split("/").slice(0, 3).join("/") +
+                                "/page/" +
+                                chat.instructions.pageId
+                            );
+                          }}
+                        >
+                          Page
+                        </Button>
+                      </Container>
+                    )}
                   </HoverCard.Dropdown>
                 </HoverCard>
                 <Text size="sm" ml={5} fw={500}>
@@ -492,7 +541,7 @@ export default function ChatWindow(props: {
           <Paper
             h={"70vh"}
             w={"100%"}
-            pt="xs"
+            {...(isMobile ? { p: "2px" } : { pt: "xs" })}
             radius={0}
             style={{
               alignItems: "center",

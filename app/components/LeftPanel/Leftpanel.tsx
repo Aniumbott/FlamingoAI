@@ -217,7 +217,11 @@ export default function LeftPanel(props: { toggleLeft: () => void }) {
             <Group justify="space-between">
               <Group gap={"xs"}>
                 <IconInfoCircle size="20px" />
-                <Text size="md" fw={700}>
+                <Text
+                  c="var(--mantine-primary-color-filled)"
+                  size="md"
+                  fw={700}
+                >
                   Upgrade
                 </Text>
               </Group>
