@@ -1,8 +1,10 @@
+// Modules
 import { Document, Model } from "mongoose";
 import * as Mongoose from "mongoose";
 
 const userSchema = new Mongoose.Schema(
   {
+    _id: { type: String, required: true },
     name: {
       type: String,
       required: true,
@@ -22,12 +24,15 @@ const userSchema = new Mongoose.Schema(
 );
 
 interface IUser {
+  _id: string;
   name: string;
   email: string;
   imageUrl: string;
 }
 
-interface IUserDocument extends IUser, Document {}
+interface IUserDocument extends IUser, Document {
+  _id: string;
+}
 interface IUserModel extends Model<IUserDocument> {}
 
 const User: IUserModel =

@@ -1,7 +1,35 @@
-import * as Mongoose from "mongoose";
-import { IMessageDocument } from "../models/Message";
+import { socket } from "@/socket";
+import { getAssistantResponse } from "./assistant";
+import { createTokenLog } from "./tokenLog";
+import { getPageById } from "./pages";
 
-async function sendMessage(
+// Function to get messages
+async function getMessages(chatId: String) {
+  const data = await fetch(`/api/message/?chatId=${chatId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+  const response = await data.json();
+  return response;
+}
+
+// Function to get a single message
+async function getMessage(id: String) {
+  const data = await fetch(`/api/message/?id=${id}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const response = await data.json();
+  return response;
+}
+
+// Function to create message
+async function createMessage(
   createdBy: String,
   content: String,
   type: String,
@@ -16,7 +44,175 @@ async function sendMessage(
   });
 
   const response = await data.json();
+  socket.emit("createMessage", chatId, response.message);
   return response;
 }
 
-export { sendMessage };
+// Function to update message
+async function updateMessage(id: String, body: any) {
+  const data = await fetch("/api/message", {
+    method: "PUT",
+    body: JSON.stringify({ id, ...body }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const response = await data.json();
+  console.log("response at update Message", response);
+  socket.emit("updateMessage", body.chatId, response.message);
+  return response;
+}
+
+// Function to update message content
+async function updateMessageContent(body: any) {
+  console.log("body at updateMessageContent", body);
+  // get all messages from chat
+  const data = await fetch("/api/message", {
+    method: "PUT",
+    body: JSON.stringify({ body, action: "deleteMany" }),
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+
+  const response = await data.json();
+  socket.emit("updateMessage", body.chatId, response.message);
+
+  return response;
+}
+
+// Function to delete message
+async function deleteMessage(body: any) {
+  const data = await fetch("/api/message", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  const response = await data.json();
+  socket.emit("deleteMessage", body.chatId, body);
+  return response;
+}
+
+// Function to send message to assistant
+async function sendAssistantMessage(
+  messages: any[],
+  message: any,
+  instruction: any,
+  workspaceId: string,
+  assistant: any // assistantId, scope, model
+) {
+  if (messages.length === 0) {
+    const getMessages = await fetch(`/api/message/?chatId=${message.chatId}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+
+    messages = (await getMessages.json()).messages;
+    messages = messages.filter((msg: any) => msg.createdAt < message.createdAt);
+  }
+
+  messages = [...messages, message];
+
+  let messagesContent = messages.map((msg: any) => {
+    return {
+      role: msg.type,
+      content: msg.content,
+    };
+  });
+
+  if (instruction.type === "text") {
+    messagesContent = [
+      {
+        role: "system",
+        content: instruction.text,
+      },
+      ...messagesContent,
+    ];
+  } else {
+    let systemInstructions: string = "";
+    const getCurrentPage = async () => {
+      return await getPageById(instruction.pageId, workspaceId);
+    };
+    await getCurrentPage().then((res) => {
+      res?.pages?.[0].content.forEach((contentBlock: string) => {
+        systemInstructions = systemInstructions + "\n\n" + contentBlock;
+      });
+      // console.log("page at func", res?.pages?.[0]);
+      systemInstructions =
+        "Here provided the content of a markdown page in HTML format. Consider this content while answering." +
+        systemInstructions;
+      messagesContent = [
+        {
+          role: "system",
+          content: systemInstructions,
+        },
+        ...messagesContent,
+      ];
+    });
+  }
+
+  await getAssistantResponse(messagesContent, workspaceId, assistant)
+    .then((res: any) => {
+      console.log("res at sendAssistantMessage", res);
+      if (res) {
+        createMessage(
+          message.createdBy,
+          res.gptRes.choices[0].message.content,
+          "assistant",
+          message.chatId
+        );
+      }
+      return res;
+    })
+    .then((res: any) => {
+      if (res) {
+        createTokenLog(
+          message.createdBy,
+          message.chatId,
+          workspaceId,
+          res.gptRes.usage.prompt_tokens.toString(),
+          res.gptRes.usage.completion_tokens.toString()
+        );
+      }
+    });
+}
+
+export {
+  getMessages,
+  getMessage,
+  createMessage,
+  updateMessage,
+  updateMessageContent,
+  deleteMessage,
+  sendAssistantMessage,
+};
+
+/*
+{
+  "choices": [
+    {
+      "finish_reason": "stop",
+      "index": 0,
+      "message": {
+        "content": "The 2020 World Series was played in Texas at Globe Life Field in Arlington.",
+        "role": "assistant"
+      },
+      "logprobs": null
+    }
+  ],
+  "created": 1677664795,
+  "id": "chatcmpl-7QyqpwdfhqwajicIEznoc6Q47XAyW",
+  "model": "gpt-3.5-turbo-0613",
+  "object": "chat.completion",
+  "usage": {
+    "completion_tokens": 17,
+    "prompt_tokens": 57,
+    "total_tokens": 74
+  }
+}
+*/

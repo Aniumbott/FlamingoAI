@@ -11,10 +11,10 @@ global.mongoose = {
   promise: null,
 };
 
+// Function to connect to the database
 export async function dbConnect() {
   try {
     if (global.mongoose && global.mongoose.conn) {
-      // console.log("Connected from previous");
       return global.mongoose.conn;
     } else {
       const conString = process.env.MONGODB_URI || "";
@@ -27,8 +27,6 @@ export async function dbConnect() {
         conn: await promise,
         promise,
       };
-
-      // console.log("Newly connected");
       return await promise;
     }
   } catch (error) {
@@ -37,6 +35,7 @@ export async function dbConnect() {
   }
 }
 
+// Function to disconnect from the database
 export const disconnect = () => {
   if (!global.mongoose.conn) {
     return;

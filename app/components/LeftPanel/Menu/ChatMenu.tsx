@@ -1,5 +1,5 @@
 // Modules
-import { Menu, Button, Stack, Text } from "@mantine/core";
+import { Menu, Button, Stack, Text, Tooltip } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import {
   IconChevronDown,
@@ -14,7 +14,7 @@ import {
 import { createChat } from "@/app/controllers/chat";
 import { createChatFolder } from "@/app/controllers/folders";
 import { useAuth } from "@clerk/nextjs";
-import { socket } from "@/socket";
+import { usePathname, useRouter } from "next/navigation";
 type MenuData = {
   title: string;
   description: string;
@@ -30,8 +30,15 @@ type MenuButtonProps = {
   };
 };
 
-const ChatMenu = () => {
+const ChatMenu = (props: {
+  members: any[];
+  allowPublic: boolean;
+  allowPersonal: boolean;
+}) => {
   const { orgId, userId } = useAuth();
+  const { allowPublic, allowPersonal } = props;
+  const router = useRouter();
+  const pathname = usePathname();
   return (
     <Menu
       position="top-start"
@@ -54,57 +61,83 @@ const ChatMenu = () => {
         },
       }}
     >
-      <Menu.Target>
-        <Button
-          color="#047857"
-          px={6}
-          radius="0"
-          style={{
-            borderRadius: " 0 5px 5px 0",
-          }}
-        >
-          <IconChevronDown size={15} />
-        </Button>
-      </Menu.Target>
+      <Tooltip label="Menu" fz="xs">
+        <Menu.Target>
+          <Button
+            px={6}
+            radius="0"
+            style={{
+              borderRadius: " 0 5px 5px 0",
+            }}
+          >
+            <IconChevronDown size={15} />
+          </Button>
+        </Menu.Target>
+      </Tooltip>
+
       <Menu.Dropdown>
-        <Menu.Item
-          onClick={() => createPublicChat(userId as string, orgId as string)}
-        >
-          <MenuButton properties={MenuData[0]} />
-        </Menu.Item>
-        <Menu.Item
-          onClick={() => createPrivateChat(userId as string, orgId as string)}
-        >
-          <MenuButton properties={MenuData[1]} />
-        </Menu.Item>
-        <Menu.Item
-          onClick={() => createPublicFolder(userId as string, orgId as string)}
-        >
-          <MenuButton properties={MenuData[2]} />
-        </Menu.Item>
-        <Menu.Item
-          onClick={() => createPrivateFolder(userId as string, orgId as string)}
-        >
-          <MenuButton properties={MenuData[3]} />
-        </Menu.Item>
-        <Menu.Item>
+        {allowPublic && (
+          <Menu.Item
+            onClick={() =>
+              createChat(
+                "public",
+                null,
+                userId as string,
+                orgId as string,
+                props.members
+              ).then((res: any) => {
+                router.push(
+                  pathname.split("/").slice(0, 3).join("/") + "/" + res.chat._id
+                );
+              })
+            }
+          >
+            <MenuButton properties={MenuData[0]} />
+          </Menu.Item>
+        )}
+        {allowPersonal && (
+          <Menu.Item
+            onClick={() =>
+              createChat(
+                "private",
+                null,
+                userId as string,
+                orgId as string,
+                props.members
+              ).then((res: any) => {
+                router.push(
+                  pathname.split("/").slice(0, 3).join("/") + "/" + res.chat._id
+                );
+              })
+            }
+          >
+            <MenuButton properties={MenuData[1]} />
+          </Menu.Item>
+        )}
+        {allowPublic && (
+          <Menu.Item
+            onClick={() =>
+              createPublicFolder(userId as string, orgId as string)
+            }
+          >
+            <MenuButton properties={MenuData[2]} />
+          </Menu.Item>
+        )}
+        {allowPersonal && (
+          <Menu.Item
+            onClick={() =>
+              createPrivateFolder(userId as string, orgId as string)
+            }
+          >
+            <MenuButton properties={MenuData[3]} />
+          </Menu.Item>
+        )}
+        {/* <Menu.Item>
           <MenuButton properties={MenuData[4]} />
-        </Menu.Item>
+        </Menu.Item> */}
       </Menu.Dropdown>
     </Menu>
   );
-};
-
-const createPublicChat = async (userId: string, orgId: string) => {
-  // console.log("creating public chat");
-  const res = await createChat("public", null, userId, orgId);
-  // console.log("res", res);
-};
-
-const createPrivateChat = async (userId: string, orgId: string) => {
-  // console.log("creating private chat");
-  const res = await createChat("private", null, userId, orgId);
-  console.log("res", res.chat);
 };
 
 const createPublicFolder = async (userId: string, orgId: string) => {
@@ -127,8 +160,12 @@ const MenuButton = (props: MenuButtonProps) => {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
-          : { color: "0F172A", variant: "transparent" })}
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
+          : { color: "00000000", variant: "transparent" })}
         justify="flex-start"
         styles={{
           root: {
