@@ -18,9 +18,9 @@ import { Suspense } from "react";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "TeamGPT",
+  title: "Flamingo.ai",
   description:
-    "Team-GPT is a team collaboration tool to communicate with different LLMs.",
+    "Flamingo.ai is a team collaboration tool to communicate with different LLMs.",
 };
 
 export default function RootLayout({

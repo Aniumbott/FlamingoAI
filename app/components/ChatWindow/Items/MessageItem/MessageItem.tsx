@@ -34,6 +34,7 @@ import CommentItem from "../CommentItem/CommentItem";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import MentionInput from "../CommentItem/MentionInput";
 import { MessageRender } from "./MessageRenderer";
+import { IAIModelDocument } from "@/app/models/AIModel";
 
 function getDate(date: string) {
   return new Date(date).toLocaleDateString();
@@ -45,7 +46,8 @@ function MessageItem(props: {
   userId: string;
   orgId: string;
   instructions: any;
-  assistant: any;
+  aiModel: IAIModelDocument;
+  scope: string;
   setPromptOpened: (value: boolean) => void;
   setPromptContent: (value: string) => void;
   setForkMessage: (value: any) => void;
@@ -57,7 +59,8 @@ function MessageItem(props: {
     userId,
     orgId,
     instructions,
-    assistant,
+    aiModel,
+    scope,
     setPromptOpened,
     setPromptContent,
     setForkMessage,
@@ -193,7 +196,7 @@ function MessageItem(props: {
                     ? `${createdBy?.firstName || ""} ${
                         createdBy?.lastName || ""
                       }`
-                    : "TeamGPT"}
+                    : "Flamingo.ai"}
                 </Text>
                 <Text pl={10} size="xs">
                   {getDate(message.updatedAt.toString())}
@@ -308,7 +311,8 @@ function MessageItem(props: {
                               msg,
                               instructions,
                               orgId || "",
-                              assistant
+                              aiModel,
+                              scope
                             );
                           })
                           .then(() => {

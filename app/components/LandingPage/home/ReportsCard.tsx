@@ -58,7 +58,7 @@ const ReportsCard = () => {
               <Title ta={isMobile ? "center" : "left"} order={4}>
                 &quot;Within an hour of activating it, I was able to get my team
                 using it and getting immediate value. I highly recommend
-                Team-GPT.&quot;
+                Flamingo.ai.&quot;
               </Title>
               <Text w="100%" ta={isMobile ? "center" : "left"}>
                 Derek, Small Business Owner
@@ -86,7 +86,7 @@ const ReportsCard = () => {
             Measure your AI adoption rate and ensure your team is talking to the
             AI
           </Title>
-          <Text>Team-GPT really wants you to add AI to your team.</Text>
+          <Text>Flamingo.ai really wants you to add AI to your team.</Text>
           <Text>
             Gain invaluable insights into your team&quot;s adoption rate and
             engagement level with ChatGPT.

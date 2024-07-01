@@ -13,11 +13,8 @@ import {
   Button,
   Card,
   Checkbox,
-  Chip,
   FileInput,
   List,
-  Paper,
-  ScrollArea,
   SegmentedControl,
   Select,
   Stack,
@@ -28,18 +25,13 @@ import {
 } from "@mantine/core";
 import { dark } from "@clerk/themes";
 import {
-  IconEdit,
   IconExternalLink,
   IconEye,
   IconFileImport,
-  IconGlobe,
-  IconJson,
   IconLock,
   IconWorld,
 } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import { set } from "mongoose";
-import { getAssistants } from "@/app/controllers/assistant";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { createChat } from "@/app/controllers/chat";
@@ -48,32 +40,36 @@ import {
   showLoadingNotification,
   showSuccessNotification,
 } from "@/app/controllers/notification";
+import { useListState } from "@mantine/hooks";
+import { IAIModelDocument } from "@/app/models/AIModel";
+import { constructSelectModels, getAIModels } from "@/app/controllers/aiModel";
+import { model } from "mongoose";
 
 export default function ImportPage() {
   const { colorScheme } = useMantineColorScheme();
   const [file, setFile] = useState<File | null>(null);
   const [chats, setChats] = useState<any[]>([]);
-  const [assistant, setAssistant] = useState<any>(null);
+  const [models, handleModels] = useListState<IAIModelDocument>([]);
+  const [model, setModel] = useState<IAIModelDocument | null>(null);
   const [allScope, setAllScope] = useState<string>("private");
-  const [model, setModel] = useState<string>("");
   const [selected, setSelected] = useState<any[]>([]);
   const pathname = usePathname();
   const router = useRouter();
-  const { userId } = useAuth();
+  const { userId, orgId } = useAuth();
   const { organization } = useOrganization();
   const [members, setMembers] = useState<any[]>([]);
-  const assistantId = "661a34b0bf589f58ba211c94";
 
   useEffect(() => {
-    const collectAssistant = async () => {
-      const res = await getAssistants();
-      // console.log(res);
-      setAssistant(
-        res.assistants.find((assistant: any) => assistant._id == assistantId)
-      );
+    const fetchModels = async () => {
+      const res = await getAIModels(orgId || "");
+      handleModels.setState(res.aiModels);
     };
-    collectAssistant();
+    fetchModels();
   }, []);
+
+  useEffect(() => {
+    setModel(models[0]);
+  }, [models]);
 
   useEffect(() => {
     if (file) {
@@ -90,10 +86,7 @@ export default function ImportPage() {
             createdAt: conversation.create_time,
             updatedAt: conversation.update_time,
             messages: [],
-            assistant: {
-              assistantId: assistantId,
-              model: model,
-            },
+            aiModel: model?._id,
           };
 
           let messages: any = [];
@@ -146,10 +139,7 @@ export default function ImportPage() {
       chats.map((chat) => {
         return {
           ...chat,
-          assistant: {
-            assistantId: assistantId,
-            model: model,
-          },
+          aiModel: model?._id,
         };
       })
     );
@@ -179,10 +169,6 @@ export default function ImportPage() {
   //   console.log(conversation);
   // }, [conversation]);
 
-  useEffect(() => {
-    setModel(assistant?.models[0].value);
-  }, [assistant]);
-
   return (
     <>
       <header
@@ -195,7 +181,7 @@ export default function ImportPage() {
       >
         <div className="h-full flex flex-row items-center">
           <Title order={3} mr="xl">
-            TeamGPT
+            Flamingo.ai
           </Title>
           <OrganizationSwitcher
             hidePersonal
@@ -319,7 +305,8 @@ export default function ImportPage() {
                       chat,
                       userId || "",
                       organization?.id || "",
-                      members
+                      members,
+                      model
                     ).then((newChat) => {
                       chat.chatId = newChat._id;
                     });
@@ -346,15 +333,17 @@ export default function ImportPage() {
                   <Text size="xs" mr={5}>
                     Import all as:
                   </Text>
-                  <ScopeControll value={allScope} setValue={setAllScope} />
+                  <ScopeControl value={allScope} setValue={setAllScope} />
                   <Text size="xs" mr={5}>
                     Select Model:
                   </Text>
                   <Select
                     allowDeselect={false}
-                    data={assistant?.models}
-                    value={model}
-                    onChange={(e) => setModel(e || "")}
+                    data={constructSelectModels(models)}
+                    value={model?._id}
+                    onChange={(e) => {
+                      setModel(models.find((m) => m._id == e) || null);
+                    }}
                   />
                 </div>
                 <div className="flex flex-row items-center">
@@ -370,6 +359,7 @@ export default function ImportPage() {
                 organization={organization}
                 userId={userId || ""}
                 members={members}
+                model={model}
               />
             </Card>
           </div>
@@ -379,7 +369,7 @@ export default function ImportPage() {
   );
 }
 
-const ScopeControll = (props: {
+const ScopeControl = (props: {
   value: string;
   setValue: (value: string) => void;
 }) => {
@@ -425,9 +415,11 @@ const ChatsTable = (props: {
   userId: string;
   organization: any;
   members: any[];
+  model: IAIModelDocument | null;
   setChats: (value: any) => void;
 }) => {
-  const { chats, pathname, userId, organization, members, setChats } = props;
+  const { chats, pathname, userId, organization, members, setChats, model } =
+    props;
   return (
     <Table mt={10} highlightOnHover verticalSpacing="sm">
       <Table.Tbody>
@@ -466,7 +458,7 @@ const ChatsTable = (props: {
             {chat.chatId === "" ? (
               <>
                 <Table.Td>
-                  <ScopeControll
+                  <ScopeControl
                     value={chat.scope}
                     setValue={(value) => {
                       setChats(
@@ -494,7 +486,8 @@ const ChatsTable = (props: {
                         chat,
                         userId || "",
                         organization?.id || "",
-                        members
+                        members,
+                        model
                       ).then((newChat) => {
                         setChats(
                           chats.map((c) => {
@@ -553,7 +546,8 @@ async function ImportChat(
   chat: any,
   createdBy: string,
   workspaceId: string,
-  members: any[]
+  members: any[],
+  model: IAIModelDocument | null
 ) {
   const res = await createChat(
     chat.scope,
@@ -562,7 +556,8 @@ async function ImportChat(
     workspaceId,
     members,
     chat.name,
-    chat.assistant
+    { type: "text", text: "", pageId: null },
+    model?._id
   );
 
   const notifications = showLoadingNotification("Loading Messages...");

@@ -20,13 +20,11 @@ import { BarChart } from "@mantine/charts";
 import { IconCalendar, IconClock, IconInfoCircle } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { getChatsReportData } from "@/app/controllers/chat";
-import { getAssistants } from "@/app/controllers/assistant";
 import { DatePicker } from "@mantine/dates";
 import { getWrokSpaceTokens } from "@/app/controllers/tokenLog";
 import ActiveUsers from "@/app/components/Reports/ActiveUsers";
 import LongestChats from "@/app/components/Reports/LongestChats";
 import TokenDistribution from "@/app/components/Reports/TokenDistribution";
-import { set } from "mongoose";
 import { useMediaQuery } from "@mantine/hooks";
 
 export default function Reports() {
@@ -41,7 +39,6 @@ export default function Reports() {
   ]);
   const [tokenLogs, setTokenLogs] = useState<any>([]);
   const [members, setMembers] = useState<any[]>([]);
-  const [assistants, setAssistants] = useState([]); // [TODO: add type
   const [chatEfficiency, setChatEfficiency] = useState([
     {
       name: "Aniket Rana",
@@ -64,21 +61,13 @@ export default function Reports() {
         const data = await getChatsReportData(organization.id);
         setChats(data.chats);
       };
-      const collectAssistants = async () => {
-        const data = await getAssistants();
-        setAssistants(data.assistants);
-      };
       const collectTokenLogs = async () => {
         const data = await getWrokSpaceTokens(organization.id);
         setTokenLogs(data.tokenLogs);
       };
 
       setIsLoading(true);
-      collectData().then(() =>
-        collectAssistants().then(() =>
-          collectTokenLogs().then(() => setIsLoading(false))
-        )
-      );
+      collectData();
       if (filter == "All time") {
         setDateRange([new Date(organization?.createdAt), new Date()]);
       }
@@ -243,7 +232,7 @@ export default function Reports() {
         <Paper my="3rem" mx="8vw">
           <Group justify="space-between" align="start">
             <div>
-              <Title order={1}>TeamGPT</Title>
+              <Title order={1}>Flamingo.ai</Title>
               <Title mt="1rem" order={2}>
                 Usage Reports for{" "}
                 {`${organization?.name} from ${
@@ -389,8 +378,8 @@ export default function Reports() {
             <LongestChats
               filteredChats={filteredChats}
               tokenLogs={tokenLogs}
-              assistants={assistants}
               members={members}
+              organizationId={organization?.id || ""}
             />
             <TokenDistribution dateRange={dateRange} tokenLogs={tokenLogs} />
             <Paper
@@ -540,7 +529,7 @@ export default function Reports() {
                 Some people do work which requires and benefits from long chats.
                 Others complete a lot of quick one-prompt tasks. This data is
                 best used for understanding your whole workspace&apos;s use of
-                Team-GPT, not evaluating an individual&apos;s performance.
+                Flamingo.ai, not evaluating an individual&apos;s performance.
               </Text>
             </Paper>
           </div>

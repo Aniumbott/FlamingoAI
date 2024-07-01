@@ -37,6 +37,7 @@ import medesk from "@/public/Medesk-Logo.webp";
 import charles from "@/public/Charles-Schwab-Logo.webp";
 import limechain from "@/public/Limechain-Logo.webp";
 import shift4 from "@/public/Shift-4-Logo.webp";
+import { streamTest } from "./controllers/aiModel";
 
 export default function Home() {
   const [isMonthly, setIsMonthly] = useState(false);
@@ -102,14 +103,15 @@ export default function Home() {
           </Title>
           <Text mt="xl" size="lg" ta={"center"}>
             <div>
-              <b>Team-GPT </b> guarantees ChatGPT adoption for teams between 2
-              and 20,000 people.
+              <b>Flamingo.ai </b> guarantees ChatGPT adoption for teams between
+              2 and 20,000 people.
             </div>
             <div>
               Organize knowledge, collaborate, and master AI in one shared
               workspace.
             </div>
           </Text>
+          {/* <Button onClick={() => streamTest()}>Click me</Button> */}
           <Anchor href="/workspace">
             <Button
               size="xl"
@@ -123,8 +125,8 @@ export default function Home() {
 
           <Text mt="5rem">
             {" "}
-            👇 See how Team-GPT works. Click the ‘Continue‘ button below for a
-            guided tour! 👇
+            👇 See how Flamingo.ai works. Click the ‘Continue‘ button below for
+            a guided tour! 👇
           </Text>
           <Image
             mt="3rem"
@@ -229,7 +231,7 @@ export default function Home() {
           <Title order={2} my="xl" fw="300" ta="center">
             Have pricing questions? Contact us at{" "}
             <span style={{ color: "var(--mantine-primary-color-filled)" }}>
-              <b>humans@team-gpt.com</b>
+              <b>humans@flamingo.ai</b>
             </span>
           </Title>
 
