@@ -33,8 +33,8 @@ import done from "@/public/done.svg";
 import NextImage from "next/image";
 import { useSearchParams } from "next/navigation";
 import { IconInfoCircle, IconLink } from "@tabler/icons-react";
-import { isValidOpenAIKey } from "../controllers/assistant";
 import { getWorkspace, updateWorkspace } from "../controllers/workspace";
+import { isValidOpenAIKey } from "../controllers/aiModel";
 
 export default function Home() {
   const isMobile = useMediaQuery("(max-width: 48em)");
@@ -43,7 +43,7 @@ export default function Home() {
   const [active, setActive] = useState(0);
   const { colorScheme } = useMantineColorScheme();
   const searchParams = useSearchParams();
-  const [apiKey, setApiKey] = useState("");
+  const [apiKeyInput, setApiKeyInput] = useState("");
 
   useEffect(() => {
     if (searchParams.get("step")) {
@@ -86,7 +86,7 @@ export default function Home() {
           p={isMobile ? "sm" : "xl"}
           justify="space-between"
         >
-          <Title order={isMobile ? 3 : 1}>TeamGPT</Title>
+          <Title order={isMobile ? 3 : 1}>Flamingo.ai</Title>
           <Group gap="0">
             {user && user.hasImage ? (
               <Avatar radius="sm" src={user.imageUrl} />
@@ -141,9 +141,9 @@ export default function Home() {
               radius="md"
               label="Enter your OpenAI API key here"
               placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-              defaultValue={apiKey}
+              defaultValue={apiKeyInput}
               onChange={(e) => {
-                setApiKey(e.target.value);
+                setApiKeyInput(e.target.value);
               }}
               style={{ width: "100%" }}
             />
@@ -160,28 +160,26 @@ export default function Home() {
                 radius="md"
                 type="submit"
                 onClick={() => {
-                  if (apiKey) {
+                  if (apiKeyInput) {
                     setActive(2);
-                    isValidOpenAIKey(apiKey).then((res) => {
+                    isValidOpenAIKey(apiKeyInput).then((res) => {
                       if (res) {
                         getWorkspace(organization?.id || "").then((res) => {
                           console.log(res);
                           updateWorkspace({
                             ...res.workspace,
-                            assistants: [
-                              ...res.workspace.assistants.map(
-                                (assistant: any) => {
-                                  if (
-                                    assistant.assistantId ==
-                                    "661a34b0bf589f58ba211c94"
-                                  )
-                                    return {
-                                      ...assistant,
-                                      apiKey: apiKey,
-                                    };
-                                  return assistant;
-                                }
-                              ),
+                            apiKeys: [
+                              ...res.workspace.apiKeys.map((apiKey: any) => {
+                                if (
+                                  apiKey.provider == "openai" &&
+                                  apiKey.scope == "public"
+                                )
+                                  return {
+                                    ...apiKey,
+                                    key: apiKeyInput,
+                                  };
+                                return apiKey;
+                              }),
                             ],
                           }).then(() => {
                             window.history.pushState(

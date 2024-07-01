@@ -18,9 +18,10 @@ import {
   IconInfoCircle,
   IconChecklist,
 } from "@tabler/icons-react";
-import { getAssistants } from "@/app/controllers/assistant";
+import { constructSelectModels, getAIModels } from "@/app/controllers/aiModel";
 import { updateWorkspace } from "@/app/controllers/workspace";
-import { useMediaQuery } from "@mantine/hooks";
+import { useListState, useMediaQuery } from "@mantine/hooks";
+import { IAIModelDocument } from "@/app/models/AIModel";
 
 export default function ChatAuth(props: {
   activeTab: string;
@@ -29,46 +30,45 @@ export default function ChatAuth(props: {
 }) {
   const { activeTab, setActiveTab, workspace } = props;
   const [update, setUpdate] = useState<boolean>(false);
-  const [assistants, setAssistants] = useState<any>([]);
-  const [selectAssistant, setSelectAssistants] = useState<string | null>();
+  const [models, handleModels] = useListState<IAIModelDocument>([]);
+  const [selectModel, setSelectModel] = useState<IAIModelDocument | null>();
   const [scope, setScope] = useState("public");
-  const [apiKey, setApiKey] = useState("");
-  const [model, setModel] = useState("gpt-3.5-turbo");
+  const [apiKeyInput, setApiKeyInput] = useState("");
   const isMobile = useMediaQuery(`(max-width: 48em)`);
 
   useEffect(() => {
-    const collectAssistants = async () => {
-      const res = await getAssistants();
-      // console.log("assitants", res);
-      setAssistants(res.assistants);
-    };
-    collectAssistants();
-    // console.log("workspace", workspace);
+    const collectModels = async () => {
+      const res = await getAIModels(workspace?._id);
+      console.log(res.aiModels);
 
-    if (workspace?.assistants.length > 0) {
-      // console.log(workspace.assistants[0]);
-      setSelectAssistants(workspace.assistants[0].assistantId);
-      setApiKey(workspace.assistants[0].apiKey);
-      // console.log("assistantID", workspace.assistants[0].assistantId);
-      setScope(workspace.assistants[0].scope);
-    }
+      handleModels.setState(res.aiModels);
+      return res.aiModels;
+    };
+    collectModels().then((res) => {
+      console.log(workspace?.apiKeys);
+      if (workspace?.apiKeys.length > 0) {
+        const apiKey = workspace.apiKeys.find(
+          (apiKey: any) => apiKey.provider == "openai" && apiKey.scope == scope
+        );
+        setSelectModel(res.find((model: any) => model._id == apiKey?.aiModel));
+        setApiKeyInput(apiKey.key || "");
+      }
+    });
   }, []);
 
-  // useEffect(() => {
-  //   setSelectAssistants(assistants[0]?._id || "");
-  // }, [assistants]);
-
   useEffect(() => {
-    if (selectAssistant) {
-      const key = workspace?.assistants.find(
-        (key: any) => key.assistantId == selectAssistant && key.scope == scope
+    if (selectModel) {
+      const apiKey = workspace?.apiKeys.find(
+        (apiKey: any) =>
+          apiKey.provider == selectModel.provider && apiKey.scope == scope
       );
-      if (key) {
-        setApiKey(key.apiKey || "");
-        setModel(key.model || "gpt-3.5-turbo");
+      if (apiKey) {
+        setApiKeyInput(apiKey.key || "");
+      } else {
+        setApiKeyInput("");
       }
     }
-  }, [selectAssistant, scope]);
+  }, [scope, selectModel]);
 
   return (
     <Paper
@@ -93,16 +93,19 @@ export default function ChatAuth(props: {
           }`}
         >
           <Select
-            disabled={update}
+            searchable
             allowDeselect={false}
-            data={assistants.map((assistant: any) => ({
-              label: assistant.name,
-              value: assistant._id,
-            }))}
-            value={selectAssistant}
-            onChange={setSelectAssistants}
-            w="60%"
+            placeholder="Select model"
+            value={selectModel?._id || ""}
+            data={constructSelectModels(models)}
+            onChange={(e) => {
+              setSelectModel(models.find((model) => model._id == e));
+            }}
+            style={{
+              flexGrow: 1,
+            }}
           />
+
           <SegmentedControl
             disabled={update}
             data={[
@@ -126,27 +129,26 @@ export default function ChatAuth(props: {
         </Text>
 
         {update ||
-        (selectAssistant &&
+        (selectModel &&
           workspace &&
-          (!workspace.assistants.some(
-            (assistant: any) =>
-              assistant.assistantId == selectAssistant &&
-              assistant.scope == scope
+          (!workspace.apiKeys.some(
+            (apiKey: any) =>
+              apiKey.provider == selectModel.provider && apiKey.scope == scope
           ) ||
-            workspace?.assistants.some(
-              (assistant: any) =>
-                assistant.assistantId == selectAssistant &&
-                assistant.scope == scope &&
-                assistant.apiKey == ""
+            workspace?.apiKeys.some(
+              (apiKey: any) =>
+                apiKey.provider == selectModel.provider &&
+                apiKey.scope == scope &&
+                apiKey.key == ""
             ))) ? (
           <Group mt={10} align="flex-end" justify="space-between">
             <div className="grow">
               <TextInput
                 w="100%"
-                label="Input your OpenAI API key"
-                placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-                value={apiKey}
-                onChange={(event) => setApiKey(event.currentTarget.value)}
+                label={`Input your ${selectModel?.provider} API key`}
+                placeholder="Get API key from your provider dashboard."
+                value={apiKeyInput}
+                onChange={(event) => setApiKeyInput(event.currentTarget.value)}
                 required
               />
             </div>
@@ -162,24 +164,33 @@ export default function ChatAuth(props: {
             <Button
               onClick={() => {
                 const key = {
-                  assistantId: selectAssistant,
-                  apiKey: apiKey,
+                  aiModel: selectModel?._id,
+                  key: apiKeyInput,
                   scope: scope,
-                  model: model,
+                  provider: selectModel?.provider,
                 };
-                updateWorkspace({
-                  ...workspace,
-                  assistants: [
-                    ...workspace.assistants.map((assistant: any) => {
-                      if (
-                        assistant.assistantId == selectAssistant &&
-                        assistant.scope == scope
-                      )
-                        return key;
-                      return assistant;
-                    }),
-                  ],
-                }).then(() => {
+                let wrksp = { ...workspace };
+                if (
+                  wrksp.apiKeys.find(
+                    (apiKey: any) =>
+                      apiKey.provider == selectModel?.provider &&
+                      apiKey.scope == scope
+                  )
+                ) {
+                  wrksp.apiKeys = wrksp.apiKeys.map((apiKey: any) => {
+                    if (
+                      apiKey.provider == selectModel?.provider &&
+                      apiKey.scope == scope
+                    ) {
+                      apiKey.key = apiKeyInput;
+                      return apiKey;
+                    }
+                    return apiKey;
+                  });
+                } else {
+                  wrksp.apiKeys.push(key);
+                }
+                updateWorkspace(wrksp).then(() => {
                   window.location.reload();
                 });
                 setUpdate(false);
@@ -190,41 +201,13 @@ export default function ChatAuth(props: {
           </Group>
         ) : null}
 
-        <Select
-          allowDeselect={false}
-          description="Default Assistant Model"
-          data={assistants.find((a: any) => a._id == selectAssistant)?.models}
-          value={model}
-          onChange={(value) => {
-            let key = workspace?.assistants.find((key: any) => {
-              return key.assistantId == selectAssistant && key.scope == scope;
-            });
-            key.model = value;
-            updateWorkspace({
-              ...workspace,
-              assistants: [
-                ...workspace.assistants.map((assistant: any) => {
-                  if (
-                    assistant.assistantId == selectAssistant &&
-                    assistant.scope == scope
-                  )
-                    return key;
-                  return assistant;
-                }),
-              ],
-            });
-            setModel(value || "gpt-3.5-turbo");
-          }}
-          mt={20}
-        />
-
-        {selectAssistant &&
+        {selectModel &&
         workspace &&
-        workspace?.assistants.find(
-          (key: any) =>
-            key.assistantId == selectAssistant &&
-            key.scope == scope &&
-            key.apiKey != ""
+        workspace?.apiKeys.find(
+          (apiKey: any) =>
+            apiKey.provider == selectModel.provider &&
+            apiKey.scope == scope &&
+            apiKey.key != ""
         ) ? (
           <>
             <Text
@@ -259,16 +242,16 @@ export default function ChatAuth(props: {
                     ) {
                       updateWorkspace({
                         ...workspace,
-                        assistants: [
-                          ...workspace.assistants.map((key: any) => {
+                        apiKeys: [
+                          ...workspace.apiKeys.map((apiKey: any) => {
                             if (
-                              key.assistantId == selectAssistant &&
-                              key.scope == scope
+                              apiKey.provider == selectModel.provider &&
+                              apiKey.scope == scope
                             ) {
-                              key.apiKey = "";
-                              return key;
+                              apiKey.key = "";
+                              return apiKey;
                             }
-                            return key;
+                            return apiKey;
                           }),
                         ],
                       });
@@ -282,7 +265,7 @@ export default function ChatAuth(props: {
           </>
         ) : null}
 
-        {selectAssistant && scope == "workspace" ? (
+        {selectModel && scope == "workspace" ? (
           <div>
             <Accordion mt={20} variant="filled" chevronPosition="left">
               <Accordion.Item value="0">

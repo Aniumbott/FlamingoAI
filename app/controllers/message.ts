@@ -1,7 +1,8 @@
 import { socket } from "@/socket";
-import { getAssistantResponse } from "./assistant";
 import { createTokenLog } from "./tokenLog";
 import { getPageById } from "./pages";
+import { getAIResponse } from "./aiModel";
+import { IAIModelDocument } from "../models/AIModel";
 
 // Function to get messages
 async function getMessages(chatId: String) {
@@ -102,7 +103,8 @@ async function sendAssistantMessage(
   message: any,
   instruction: any,
   workspaceId: string,
-  assistant: any // assistantId, scope, model
+  aiModel: IAIModelDocument,
+  scope: string
 ) {
   if (messages.length === 0) {
     const getMessages = await fetch(`/api/message/?chatId=${message.chatId}`, {
@@ -156,16 +158,11 @@ async function sendAssistantMessage(
     });
   }
 
-  await getAssistantResponse(messagesContent, workspaceId, assistant)
+  await getAIResponse(messagesContent, workspaceId, aiModel, scope)
     .then((res: any) => {
       console.log("res at sendAssistantMessage", res);
       if (res) {
-        createMessage(
-          message.createdBy,
-          res.gptRes.choices[0].message.content,
-          "assistant",
-          message.chatId
-        );
+        createMessage(message.createdBy, res.text, "assistant", message.chatId);
       }
       return res;
     })
@@ -175,8 +172,8 @@ async function sendAssistantMessage(
           message.createdBy,
           message.chatId,
           workspaceId,
-          res.gptRes.usage.prompt_tokens.toString(),
-          res.gptRes.usage.completion_tokens.toString()
+          res.tokenUsage.promptTokens.toString(),
+          res.tokenUsage.completionTokens.toString()
         );
       }
     });
@@ -191,28 +188,3 @@ export {
   deleteMessage,
   sendAssistantMessage,
 };
-
-/*
-{
-  "choices": [
-    {
-      "finish_reason": "stop",
-      "index": 0,
-      "message": {
-        "content": "The 2020 World Series was played in Texas at Globe Life Field in Arlington.",
-        "role": "assistant"
-      },
-      "logprobs": null
-    }
-  ],
-  "created": 1677664795,
-  "id": "chatcmpl-7QyqpwdfhqwajicIEznoc6Q47XAyW",
-  "model": "gpt-3.5-turbo-0613",
-  "object": "chat.completion",
-  "usage": {
-    "completion_tokens": 17,
-    "prompt_tokens": 57,
-    "total_tokens": 74
-  }
-}
-*/

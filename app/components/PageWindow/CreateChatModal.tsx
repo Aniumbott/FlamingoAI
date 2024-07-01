@@ -1,4 +1,6 @@
+import { constructSelectModels, getAIModels } from "@/app/controllers/aiModel";
 import { createChat } from "@/app/controllers/chat";
+import { IAIModelDocument } from "@/app/models/AIModel";
 import { IPageDocument } from "@/app/models/Page";
 import { useAuth, useOrganization } from "@clerk/nextjs";
 import {
@@ -11,72 +13,10 @@ import {
   TextInput,
   rem,
 } from "@mantine/core";
+import { useListState } from "@mantine/hooks";
 import { IconBuilding } from "@tabler/icons-react";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-
-const openAIModels = [
-  {
-    label: "Default (GPT-3.5-Turbo)",
-    value: "gpt-3.5-turbo",
-  },
-
-  {
-    label: "GPT-3.5-turbo-0613",
-    value: "gpt-3.5-turbo-0613",
-  },
-  {
-    label: "GPT-3.5-turbo (16k)",
-    value: "gpt-3.5-turbo-16k",
-  },
-  {
-    label: "GPT-3.5-turbo-1106 (16k)",
-    value: "gpt-3.5-turbo-1106-16k",
-  },
-  {
-    label: "GPT-3.5-turbo-0125 (16k)",
-    value: "gpt-3.5-turbo-0125-16k",
-  },
-  {
-    label: "GPT-4 (8k)",
-    value: "gpt-4-8k",
-  },
-  {
-    label: "GPT-4-0613 (8k)",
-    value: "gpt-4-0613-8k",
-  },
-  {
-    label: "GPT-4-turbo (128k)",
-    value: "gpt-4-turbo-128k",
-  },
-  {
-    label: "GPT-4-0125-preview (128k)",
-    value: "gpt-4-0125-preview-128k",
-  },
-  {
-    label: "GPT-4-turbo-preview (128k)",
-    value: "gpt-4-turbo-preview-128k",
-  },
-  {
-    label: "GPT-4-vison-preview (128k)",
-    value: "gpt-4-vison-preview-128k",
-  },
-  {
-    label: "GPT-4 (32k)",
-    value: "gpt-4-32k",
-    disabled: true,
-  },
-  {
-    label: "GPT-4-0613 (32k)",
-    value: "gpt-4-0613-32k",
-    disabled: true,
-  },
-  {
-    label: "GPT-4-1106-vison-preview (128k)",
-    value: "gpt-4-1106-vison-preview-128k",
-    disabled: true,
-  },
-];
 
 export default function CreateChatModal(props: {
   isOpen: boolean;
@@ -85,7 +25,8 @@ export default function CreateChatModal(props: {
 }) {
   const { isOpen, setIsOpen, page } = props;
   const [scope, setScope] = useState("viewOnly");
-  const [model, setModel] = useState(openAIModels[0].value);
+  const [models, handleModels] = useListState<IAIModelDocument>([]);
+  const [model, setModel] = useState<IAIModelDocument | null>(null);
   const { userId, orgId } = useAuth();
   const { organization } = useOrganization();
   const [chatName, setChatName] = useState(page.name);
@@ -93,6 +34,10 @@ export default function CreateChatModal(props: {
   const pathname = usePathname();
 
   useEffect(() => {
+    const fetchModels = async () => {
+      const res = await getAIModels(orgId || "");
+      handleModels.setState(res.aiModels);
+    };
     const getmembers = async () => {
       const userList =
         (await organization?.getMemberships())?.map((member: any) => {
@@ -100,8 +45,14 @@ export default function CreateChatModal(props: {
         }) ?? [];
       setMembers(userList);
     };
-    getmembers();
+    fetchModels().then(() => getmembers());
   }, []);
+
+  useEffect(() => {
+    if (models) {
+      setModel(models[0]);
+    }
+  }, [models]);
   // const [chat, setChat] = useState<any>({});
 
   return (
@@ -151,9 +102,9 @@ export default function CreateChatModal(props: {
         <Select
           required
           label="Model Name"
-          data={openAIModels}
-          defaultValue={model}
-          onChange={(value) => setModel(value || openAIModels[0].value)}
+          data={constructSelectModels(models)}
+          defaultValue={model?._id}
+          onChange={(e) => setModel(models.find((m) => m._id == e) || null)}
         />
         <TextInput
           required
@@ -179,7 +130,6 @@ export default function CreateChatModal(props: {
                 orgId || "",
                 members,
                 chatName,
-                null,
                 {
                   type: "page",
                   text: "",

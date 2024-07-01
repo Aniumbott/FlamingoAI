@@ -28,7 +28,6 @@ import Subscript from "@tiptap/extension-subscript";
 import Toolbar from "./ToolBar";
 import SidePanel from "./SidePanel";
 import DownloadModal from "./DownloadModal";
-import { IPage, IPageDocument } from "@/app/models/Page";
 import { getPageById, updatePage } from "@/app/controllers/pages";
 import { useAuth } from "@clerk/nextjs";
 import { IconMessage } from "@tabler/icons-react";
@@ -70,21 +69,20 @@ export default function PageWindow(props: {
     }),
   ]);
 
-  useEffect(() => {
-    console.log(isDragging);
-  }, [isDragging]);
-
   // useEffect(() => {
   //   console.log(editors[0]?.getText);
   // }, [editors]);
-
   // useEffect(() => {
   //   let htm = editors[0]?.getHTML();
   //   let jsn = editors[0]?.getJSON();
   //   console.log("html", htm);
   //   console.log("JSON", jsn);
   //   // console.log("Text", txt);
-  // }, [editors]);
+  //},ditors]);
+
+  useEffect(() => {
+    console.log(isDragging);
+  }, [isDragging]);
 
   useEffect(() => {
     const getCurrentPage = async () => {
