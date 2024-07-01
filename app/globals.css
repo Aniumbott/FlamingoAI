@@ -16,19 +16,11 @@
   }
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-}
-
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
 }
-
-/* .modal-body {
-  background-color: transparent !important;
-} */
 
 .cl-internal-rx251b,
 .cl-internal-1ee916m {
@@ -36,7 +28,9 @@ body {
 }
 
 .cl-internal-b3fm6y,
-.cl-internal-8nk38b {
+.cl-internal-8nk38b,
+.cl-dividerRow,
+.cl-internal-1xoyc7c {
   display: none;
 }
 
@@ -64,4 +58,23 @@ header {
 
 .mantine-Accordion-control {
   padding-right: 8px !important;
+}
+
+a {
+  text-decoration: none;
+  color: unset;
+}
+
+::selection {
+  color: white;
+  background: var(--mantine-primary-color-filled);
+}
+
+::-moz-selection {
+  color: white;
+  background: var(--mantine-primary-color-filled);
+}
+
+.cl-organizationSwitcher-root {
+  width: 100%;
 }

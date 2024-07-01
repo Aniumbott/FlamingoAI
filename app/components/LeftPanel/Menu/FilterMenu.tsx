@@ -1,5 +1,5 @@
 // Modules
-import { Menu, Button, Stack, Text } from "@mantine/core";
+import { Menu, Button, Stack, Text, Tooltip } from "@mantine/core";
 import { useHover } from "@mantine/hooks";
 import {
   IconArchive,
@@ -53,25 +53,28 @@ const FilterMenu = (props: {
         },
       }}
     >
-      <Menu.Target ref={ref}>
-        <Button
-          justify="space-between "
-          style={{
-            padding: "6px",
-          }}
-          styles={{
-            label: {
-              flexGrow: 1,
-            },
-          }}
-          leftSection={FilterMenuData[0].icon}
-          rightSection={<IconSelector color="gray" size={20} />}
-          {...(hovered ? { color: "gray" } : { color: "#9CA3AF" })}
-          variant="subtle"
-        >
-          {FilterMenuData[filterMenu].title}
-        </Button>
-      </Menu.Target>
+      <Tooltip label="Filter by" fz="xs">
+        <Menu.Target ref={ref}>
+          <Button
+            w="100%"
+            justify="space-between "
+            style={{
+              padding: "6px",
+            }}
+            styles={{
+              label: {
+                flexGrow: 1,
+              },
+            }}
+            leftSection={FilterMenuData[0].icon}
+            rightSection={<IconSelector color="grey" size={20} />}
+            color="grey"
+            variant="subtle"
+          >
+            {FilterMenuData[filterMenu].title}
+          </Button>
+        </Menu.Target>
+      </Tooltip>
       <Menu.Dropdown>
         <Menu.Item onClick={() => props.setFilterMenu(0)}>
           <MenuButton properties={FilterMenuData[0]} />
@@ -101,7 +104,11 @@ const MenuButton = (props: MenuButtonProps) => {
         leftSection={props.properties.icon}
         fullWidth
         {...(hovered
-          ? { color: "green", variant: "outline", fz: "xl" }
+          ? {
+              color: "var(--mantine-primary-color-filled)",
+              variant: "outline",
+              fz: "xl",
+            }
           : { color: "0F172A", variant: "transparent" })}
         justify="flex-start"
         styles={{

@@ -1,25 +1,25 @@
-"use client";
+// "use client";
 
-import { createSlice } from "@reduxjs/toolkit";
+// import { createSlice } from "@reduxjs/toolkit";
 
-export interface workspaceState {
-  id: String;
-}
+// export interface workspaceState {
+//   id: String;
+// }
 
-const initialState: workspaceState = {
-  id: "",
-};
+// const initialState: workspaceState = {
+//   id: "",
+// };
 
-export const workspaceSlice = createSlice({
-  name: "workspace",
-  initialState,
-  reducers: {
-    setWorkspace: (state, action) => {
-      state.id = action.payload;
-    },
-  },
-});
+// export const workspaceSlice = createSlice({
+//   name: "workspace",
+//   initialState,
+//   reducers: {
+//     setWorkspace: (state, action) => {
+//       state.id = action.payload;
+//     },
+//   },
+// });
 
-export const { setWorkspace } = workspaceSlice.actions;
+// export const { setWorkspace } = workspaceSlice.actions;
 
-export default workspaceSlice.reducer;
+// export default workspaceSlice.reducer;

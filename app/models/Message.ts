@@ -1,6 +1,11 @@
+// Modules
 import { Document, Model } from "mongoose";
 import * as Mongoose from "mongoose";
+
+// Dependencies
 require("./User.ts");
+require("./Comment.ts");
+require("./Chat.ts");
 
 const MessageSchema = new Mongoose.Schema(
   {
@@ -19,11 +24,17 @@ const MessageSchema = new Mongoose.Schema(
       ref: "chats",
       required: true,
     },
+    comments: {
+      type: [{ type: Mongoose.Types.ObjectId, ref: "comments", default: [] }],
+    },
     updatedAt: {
       type: Date,
       required: false,
     },
-
+    createdAt: {
+      type: Date,
+      required: false,
+    },
     // comments
   },
   {
@@ -36,7 +47,9 @@ interface IMessage {
   content: String;
   type: String;
   chatId: String;
+  comments: Mongoose.Types.ObjectId[];
   updatedAt: Date;
+  createdAt: Date;
 }
 
 interface IMessageDocument extends IMessage, Document {}
@@ -48,4 +61,4 @@ const Message: IMessageModel =
   Mongoose.model<IMessageDocument>("messages", MessageSchema);
 
 export default Message;
-export type { IMessageDocument };
+export type { IMessageDocument, IMessageModel };

@@ -1,0 +1,427 @@
+.z-ui-markdown {
+  font-family: Helvetica, arial, sans-serif;
+  font-size: var(--font-size-base);
+  line-height: 1.7;
+  word-wrap: break-word;
+}
+.z-ui-markdown > :first-child {
+  margin-top: 0 !important;
+}
+
+.z-ui-markdown > :last-child {
+  margin-bottom: 0 !important;
+}
+
+.markdown a {
+  color: var(--primary);
+  text-decoration: none;
+}
+
+.markdown a.absent {
+  color: #c00;
+}
+
+.markdown a.anchor {
+  display: block;
+  padding-right: 6px;
+  padding-left: 0.5rem;
+  margin-left: 0.5rem;
+  cursor: pointer;
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+}
+
+a.anchor:focus {
+  outline: none;
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
+.markdown h6 {
+  font-weight: 700;
+  line-height: 1.5;
+  cursor: text;
+  position: relative;
+  margin-top: 0.5rem;
+}
+
+.markdown h1 .octicon-link,
+.markdown h2 .octicon-link,
+.markdown h3 .octicon-link,
+.markdown h4 .octicon-link,
+.markdown h5 .octicon-link,
+.markdown h6 .octicon-link {
+  display: none;
+  color: #000;
+}
+
+.markdown h1:hover a.anchor,
+.markdown h2:hover a.anchor,
+.markdown h3:hover a.anchor,
+.markdown h4:hover a.anchor,
+.markdown h5:hover a.anchor,
+.markdown h6:hover a.anchor {
+  text-decoration: none;
+  line-height: 1;
+  padding-left: 8px;
+  margin-left: -30px;
+  top: 15%;
+}
+
+.markdown h1:hover a.anchor .octicon-link,
+.markdown h2:hover a.anchor .octicon-link,
+.markdown h3:hover a.anchor .octicon-link,
+.markdown h4:hover a.anchor .octicon-link,
+.markdown h5:hover a.anchor .octicon-link,
+.markdown h6:hover a.anchor .octicon-link {
+  display: inline-block;
+}
+
+.markdown h1 tt,
+.markdown h1 code,
+.markdown h2 tt,
+.markdown h2 code,
+.markdown h3 tt,
+.markdown h3 code,
+.markdown h4 tt,
+.markdown h4 code,
+.markdown h5 tt,
+.markdown h5 code,
+.markdown h6 tt,
+.markdown h6 code {
+  font-size: inherit;
+}
+
+.markdown h1 {
+  margin: 1rem 0;
+  margin-top: 2rem;
+  font-size: 20px;
+  position: relative;
+}
+
+.markdown h2 {
+  margin: 1rem 0;
+  margin-top: 2rem;
+  font-size: 18px;
+  position: relative;
+}
+
+.markdown h1:after,
+.markdown h2:after {
+  position: absolute;
+  content: "";
+  border-bottom: 3px solid var(--mantine-color-default-border);
+  width: 100%;
+  transform: translateX(-50%);
+  bottom: -10px;
+  left: 50%;
+}
+
+.markdown h3 {
+  font-size: 16px;
+}
+
+.markdown h4 {
+  font-size: 14px;
+}
+
+.markdown h5 {
+  font-size: 14px;
+}
+
+.markdown h6 {
+  font-size: 14px;
+}
+
+.markdown p,
+.markdown blockquote,
+.markdown ul,
+.markdown ol,
+.markdown dl,
+.markdown table {
+  margin: 0.5rem 0;
+}
+
+.markdown hr {
+  background: transparent;
+  border: 0 none;
+  color: var(--mantine-color-text);
+  height: 4px;
+  margin: 0.5rem 0;
+  padding: 0;
+}
+
+.markdown ul,
+.markdown ol {
+  padding-left: calc(0.5rem * 1.5);
+}
+
+.markdown ul.no-list,
+.markdown ol.no-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.markdown ul ul,
+.markdown ul ol,
+.markdown ol ol,
+.markdown ol ul {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.markdown dl {
+  padding: 0;
+}
+
+.markdown dl dt {
+  font-size: 14px;
+  font-weight: 700;
+  font-style: italic;
+  margin-top: 0.5rem;
+  padding: 0;
+}
+
+.markdown dl dd {
+  margin-bottom: 0.5rem;
+  padding: 0 0.5rem;
+}
+
+.markdown blockquote {
+  border-left: 4px solid var(--mantine-color-default-border);
+  color: var(--mantine-color-dimmed);
+  padding: 0 0.5rem;
+}
+
+.markdown blockquote > :first-child {
+  margin-top: 0;
+}
+
+.markdown blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.markdown table {
+  margin: 0.5rem 0;
+  width: 100%;
+  overflow: auto;
+  display: block;
+}
+
+.markdown table th {
+  font-weight: 700;
+}
+
+.markdown table th,
+.markdown table td {
+  border: 1px solid var(--table-border-color);
+  padding: 0.5rem;
+}
+
+.markdown table tr {
+  border-top: 1px solid var(--table-border-color);
+  background-color: var(--table-striped-color);
+}
+
+.markdown table tr:nth-child(2n) {
+  background-color: transparent;
+}
+
+.markdown .code-line {
+  padding: 2px 0.2rem;
+  margin: 0 0.2rem;
+  border-radius: 10px;
+  background: var(--mantine-color-body);
+  display: inline;
+}
+.markdown img {
+  max-width: 100%;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+.markdown span.frame {
+  display: block;
+  overflow: hidden;
+}
+
+.markdown span.frame > span {
+  border: 1px solid #ddd;
+  display: block;
+  float: left;
+  overflow: hidden;
+  width: auto;
+  margin: 0.2rem 0 0;
+  padding: 0.2rem;
+}
+
+.markdown span.frame span img {
+  display: block;
+  float: left;
+}
+
+.markdown span.frame span span {
+  clear: both;
+  color: #333;
+  display: block;
+  padding: 0.2rem 0 0;
+}
+
+.markdown span.align-center > span {
+  display: block;
+  overflow: hidden;
+  text-align: center;
+  margin: 0.5rem auto 0;
+}
+
+.markdown span.align-center span img {
+  text-align: center;
+  margin: 0 auto;
+}
+
+.markdown span.align-right > span {
+  display: block;
+  overflow: hidden;
+  text-align: right;
+  margin: 0.5rem 0 0;
+}
+
+.markdown span.align-right span img {
+  text-align: right;
+  margin: 0;
+}
+
+.markdown span.float-left {
+  display: block;
+  margin-right: 0.5rem;
+  overflow: hidden;
+  float: left;
+}
+
+.markdown span.float-left span {
+  margin: 0.5rem 0 0;
+}
+
+.markdown span.float-right {
+  display: block;
+  margin-left: 0.5rem;
+  overflow: hidden;
+  float: right;
+}
+
+.markdown span.float-right > span {
+  display: block;
+  overflow: hidden;
+  text-align: right;
+  margin: 0.5rem auto 0;
+}
+
+.markdown code,
+.markdown tt {
+  background-color: var(--mantine-color-default-border);
+  border-radius: 4px;
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+    Liberation Mono, monospace;
+}
+
+.markdown code:before,
+.markdown code:after,
+.markdown tt:before,
+.markdown tt:after {
+  content: "\00a0";
+  letter-spacing: -0.2em;
+}
+
+.markdown code br,
+.markdown tt br {
+  display: none;
+}
+
+.markdown del code {
+  text-decoration: inherit;
+  vertical-align: text-top;
+}
+
+.markdown pre div {
+  border: 1px solid var(--mantine-color-default-border);
+}
+
+.markdown pre > code {
+  white-space: pre;
+  border: none;
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Menlo, Consolas,
+    Liberation Mono, monospace;
+}
+.markdown pre code.code-line {
+  display: block;
+  padding: 1em;
+  font-size: 14px;
+  margin: 0.5rem 0;
+}
+.markdown pre code,
+.markdown pre tt {
+  background-color: transparent;
+  border: none;
+  word-wrap: normal;
+  max-width: initial;
+  display: inline;
+  overflow: initial;
+  line-height: inherit;
+  margin: 0;
+  padding: 0;
+}
+
+.markdown pre code:before,
+.markdown pre code:after,
+.markdown pre tt:before,
+.markdown pre tt:after {
+  content: normal;
+}
+
+.markdown span.align-center,
+.markdown span.align-right {
+  display: block;
+  overflow: hidden;
+  clear: both;
+}
+
+.csv-data td,
+body.csv-data th {
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 14px;
+  padding: 0.2rem;
+  text-align: left;
+  line-height: 1;
+}
+
+.csv-data .blob-line-nums {
+  line-height: 1;
+  padding: 0.2rem 0;
+  background: var(--mantine-color-body);
+  border-top: 0;
+  border: 0;
+}
+
+.csv-data .blob-line-nums span {
+  margin-top: 3px;
+}
+
+.csv-data tr.line {
+  border-top: 0;
+}
+
+.csv-data thead th {
+  font-weight: bold;
+  border-top: 0;
+  background: var(--mantine-color-body);
+}

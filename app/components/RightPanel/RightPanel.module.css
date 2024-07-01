@@ -14,18 +14,27 @@
   width: 100%;
 }
 
+.prompt {
+  padding: 0.5rem;
+  display: flex;
+  &:hover {
+    cursor: pointer;
+    background: var(--mantine-primary-color-light);
+  }
+}
+
 .parent .chevron {
   &[data-rotate] {
     transform: rotate(90deg);
   }
-  &[data-active]{
+  &[data-active] {
     background-color: aqua;
   }
   margin: 0.5rem 0.2rem;
 }
 
 .accordionControl[data-active] {
-  background-color: #404040;
+  background-color: #0000000f;
 }
 
 .parent {
@@ -34,13 +43,4 @@
 
 .parent * {
   border: 0;
-}
-
-.prompt {
-  padding: 0.5rem;
-  display: flex;
-  &:hover {
-    cursor: pointer;
-    background: #ffffff0a;
-  }
 }
