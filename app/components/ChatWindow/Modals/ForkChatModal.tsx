@@ -1,4 +1,6 @@
+import { getAIModels } from "@/app/controllers/aiModel";
 import { createChatFork } from "@/app/controllers/chat";
+import { IAIModelDocument } from "@/app/models/AIModel";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import {
   Button,
@@ -12,71 +14,9 @@ import {
   TextInput,
   rem,
 } from "@mantine/core";
+import { useListState } from "@mantine/hooks";
 import { IconBuilding } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-
-const openAIModels = [
-  {
-    label: "Default (GPT-3.5-Turbo)",
-    value: "gpt-3.5-turbo",
-  },
-
-  {
-    label: "GPT-3.5-turbo-0613",
-    value: "gpt-3.5-turbo-0613",
-  },
-  {
-    label: "GPT-3.5-turbo (16k)",
-    value: "gpt-3.5-turbo-16k",
-  },
-  {
-    label: "GPT-3.5-turbo-1106 (16k)",
-    value: "gpt-3.5-turbo-1106-16k",
-  },
-  {
-    label: "GPT-3.5-turbo-0125 (16k)",
-    value: "gpt-3.5-turbo-0125-16k",
-  },
-  {
-    label: "GPT-4 (8k)",
-    value: "gpt-4-8k",
-  },
-  {
-    label: "GPT-4-0613 (8k)",
-    value: "gpt-4-0613-8k",
-  },
-  {
-    label: "GPT-4-turbo (128k)",
-    value: "gpt-4-turbo-128k",
-  },
-  {
-    label: "GPT-4-0125-preview (128k)",
-    value: "gpt-4-0125-preview-128k",
-  },
-  {
-    label: "GPT-4-turbo-preview (128k)",
-    value: "gpt-4-turbo-preview-128k",
-  },
-  {
-    label: "GPT-4-vison-preview (128k)",
-    value: "gpt-4-vison-preview-128k",
-  },
-  {
-    label: "GPT-4 (32k)",
-    value: "gpt-4-32k",
-    disabled: true,
-  },
-  {
-    label: "GPT-4-0613 (32k)",
-    value: "gpt-4-0613-32k",
-    disabled: true,
-  },
-  {
-    label: "GPT-4-1106-vison-preview (128k)",
-    value: "gpt-4-1106-vison-preview-128k",
-    disabled: true,
-  },
-];
 
 export default function ForkChatModal(props: {
   isOpen: boolean;
@@ -86,7 +26,8 @@ export default function ForkChatModal(props: {
 }) {
   const { isOpen, setIsOpen, message, chat } = props;
   const [scope, setScope] = useState("viewOnly");
-  const [model, setModel] = useState(openAIModels[0].value);
+  const [models, handleModels] = useListState<IAIModelDocument>([]);
+  const [model, setModel] = useState<IAIModelDocument | null>(null);
   const { organization } = useOrganization();
   const [chatName, setChatName] = useState("Fork of Chat");
   // const [chat, setChat] = useState<any>({});
@@ -95,6 +36,12 @@ export default function ForkChatModal(props: {
 
   useEffect(() => {
     setChatName(`Fork of ${chat?.name}`);
+    const fetchModels = async () => {
+      const res = await getAIModels(organization?.id || "");
+      handleModels.setState(res.aiModels);
+      setModel(models.find((model) => model._id == chat.aiModel) || null);
+    };
+    fetchModels();
   }, [chat]);
 
   return (
@@ -144,9 +91,17 @@ export default function ForkChatModal(props: {
         <Select
           required
           label="Model Name"
-          data={openAIModels}
-          defaultValue={model}
-          onChange={(value) => setModel(value || openAIModels[0].value)}
+          data={models.map((model) => {
+            return {
+              value: model._id,
+              label: model.name,
+              group: model.provider,
+            };
+          })}
+          defaultValue={model?._id}
+          onChange={(e) =>
+            setModel(models.find((model) => model._id == e) || null)
+          }
         />
         <TextInput
           required
@@ -177,7 +132,8 @@ export default function ForkChatModal(props: {
                 chatName,
                 scope,
                 user?.id || "",
-                isCommentsIncluded
+                isCommentsIncluded,
+                model?._id
               );
               setIsOpen(false);
             }}

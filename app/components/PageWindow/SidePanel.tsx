@@ -1,5 +1,4 @@
-import { getAssistants } from "@/app/controllers/assistant";
-import { getFormatedResponse } from "@/app/controllers/pages";
+import { getFormattedResponse } from "@/app/controllers/pages";
 import { useAuth } from "@clerk/nextjs";
 import {
   ActionIcon,
@@ -33,7 +32,6 @@ import {
 } from "@tabler/icons-react";
 import { Editor } from "@tiptap/react";
 import { useEffect, useState } from "react";
-import { MessageRender } from "../ChatWindow/Items/MessageItem/MessageRenderer";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import Link from "@tiptap/extension-link";
@@ -45,14 +43,10 @@ import FontFamily from "@tiptap/extension-font-family";
 import TextAlign from "@tiptap/extension-text-align";
 import Highlight from "@tiptap/extension-highlight";
 import { RichTextEditor } from "@mantine/tiptap";
-
-type Assistant = {
-  assistantId: {
-    _id: string;
-  };
-  scope: "public";
-  model: string;
-};
+import { useListState } from "@mantine/hooks";
+import { IAIModelDocument } from "@/app/models/AIModel";
+import { getWorkspace } from "@/app/controllers/workspace";
+import { constructSelectModels, getAIModels } from "@/app/controllers/aiModel";
 
 export default function SidePanel(props: {
   setIsPanelOpened: (value: boolean) => void;
@@ -79,13 +73,8 @@ export default function SidePanel(props: {
   });
   const [response, setResponse] = useState<string | null>(null);
   const [act, setAct] = useState<string>("");
-  const [assistants, setAssistants] = useState<Assistant[]>([]);
-  const [selectAssistants, setSelectAssistants] = useState<
-    ComboboxData | undefined
-  >([]);
-  const [selectAssistant, setSelectAssistant] = useState<string | null>(
-    "gpt-3.5-turbo"
-  );
+  const [models, handleModels] = useListState<IAIModelDocument>([]);
+  const [selectModel, setSelectModel] = useState<IAIModelDocument | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const { orgId } = useAuth();
 
@@ -94,49 +83,31 @@ export default function SidePanel(props: {
   }, [response]);
 
   useEffect(() => {
-    const fetchAssistatnts = async () => {
-      const res = await getAssistants();
-      return res;
-    };
-    fetchAssistatnts().then((res) => {
-      let listofAssistants: Assistant[] = [];
+    const fetchAiModels = async () => {
+      const resModels = await getAIModels(orgId || "");
+      handleModels.setState(resModels.aiModels);
 
-      res.assistants.map((assistant: any) => {
-        assistant.models.map((model: any) => {
-          listofAssistants.push({
-            assistantId: {
-              _id: assistant._id,
-            },
-            scope: "public",
-            model: model.value,
-          });
-        });
-        // console.log(assistant);
+      const res = await getWorkspace(orgId || "");
+      res.workspace.apiKeys.map((apiKey: any) => {
+        if (apiKey.provider == "openai" && apiKey.scope == "public") {
+          setSelectModel(
+            resModels?.aiModels?.find(
+              (model: any) => model._id == apiKey.aiModel
+            ) || models[0]
+          );
+        }
       });
-      setAssistants(listofAssistants);
+    };
 
-      setSelectAssistants(
-        res.assistants.map((assistant: any) => {
-          return {
-            group: assistant.name,
-            items: assistant.models.map((model: any) => {
-              return {
-                label: model.label,
-                value: model.value,
-              };
-            }),
-          };
-        })
-      );
-    });
+    fetchAiModels();
   }, []);
 
-  async function getResponse(action: string, assistant: Assistant) {
+  async function getResponse(action: string, aiModel: IAIModelDocument) {
     setIsLoading(true);
-    await getFormatedResponse(
+    await getFormattedResponse(
       action,
       orgId || "",
-      assistant,
+      aiModel,
       editor?.getHTML() || ""
     ).then((res: any) => {
       setResponse(res);
@@ -182,11 +153,13 @@ export default function SidePanel(props: {
           <Select
             searchable
             allowDeselect={false}
-            placeholder="Select assistant"
-            value={selectAssistant}
-            data={selectAssistants}
+            placeholder="Select model"
+            value={selectModel?._id || ""}
+            data={constructSelectModels(models)}
             onChange={(e) => {
-              setSelectAssistant(e);
+              setSelectModel(
+                models.find((model) => model._id == e) || models[0]
+              );
             }}
             style={{
               flexGrow: 1,
@@ -202,9 +175,7 @@ export default function SidePanel(props: {
                   setAct("Make the content longer.");
                   getResponse(
                     "Make the content longer.",
-                    assistants.filter(
-                      (assistant) => assistant.model == selectAssistant
-                    )[0]
+                    selectModel || models[0]
                   );
                 }}
               >
@@ -218,9 +189,7 @@ export default function SidePanel(props: {
                   setAct("Make the content shorter.");
                   getResponse(
                     "Make the content shorter.",
-                    assistants.filter(
-                      (assistant) => assistant.model == selectAssistant
-                    )[0]
+                    selectModel || models[0]
                   );
                 }}
               >
@@ -234,9 +203,7 @@ export default function SidePanel(props: {
                   setAct("Simplify the content.");
                   getResponse(
                     "Simplify the content.",
-                    assistants.filter(
-                      (assistant) => assistant.model == selectAssistant
-                    )[0]
+                    selectModel || models[0]
                   );
                 }}
               >
@@ -250,9 +217,7 @@ export default function SidePanel(props: {
                   setAct("Summarize the content.");
                   getResponse(
                     "Summarize the content.",
-                    assistants.filter(
-                      (assistant) => assistant.model == selectAssistant
-                    )[0]
+                    selectModel || models[0]
                   );
                 }}
               >
@@ -266,9 +231,7 @@ export default function SidePanel(props: {
                   setAct("Improve the writing of the content.");
                   getResponse(
                     "Improve the writing of the content.",
-                    assistants.filter(
-                      (assistant) => assistant.model == selectAssistant
-                    )[0]
+                    selectModel || models[0]
                   );
                 }}
               >
@@ -284,9 +247,7 @@ export default function SidePanel(props: {
                   );
                   getResponse(
                     "Fix the grammar and spellings mistakes in the content.",
-                    assistants.filter(
-                      (assistant) => assistant.model == selectAssistant
-                    )[0]
+                    selectModel || models[0]
                   );
                 }}
               >
@@ -466,12 +427,7 @@ export default function SidePanel(props: {
                       h="5rem"
                       p="xs"
                       onClick={() => {
-                        getResponse(
-                          act,
-                          assistants.filter(
-                            (assistant) => assistant.model == selectAssistant
-                          )[0]
-                        );
+                        getResponse(act, selectModel || models[0]);
                       }}
                     >
                       <Container w="100%" p="0" m="0">
@@ -525,12 +481,7 @@ export default function SidePanel(props: {
             <Button
               w={"fit-content"}
               onClick={() => {
-                getResponse(
-                  act,
-                  assistants.filter(
-                    (assistant) => assistant.model == selectAssistant
-                  )[0]
-                );
+                getResponse(act, selectModel || models[0]);
               }}
             >
               Send

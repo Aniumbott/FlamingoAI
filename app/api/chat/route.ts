@@ -155,7 +155,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         encoding.free();
         break;
 
-      default: // Indipendent populated chat
+      default: // Independent populated chat
         if (id) {
           chats = await Chat.find({
             workspaceId: workspaceId,
@@ -177,17 +177,16 @@ export async function GET(req: NextRequest, res: NextResponse) {
                 ],
               },
             ],
-          })
-            .populate({
-              path: "messages",
+          }).populate({
+            path: "messages",
+            populate: {
+              path: "comments",
               populate: {
-                path: "comments",
-                populate: {
-                  path: "replies",
-                },
+                path: "replies",
               },
-            })
-            .populate("assistant.assistantId");
+            },
+          });
+          // .populate("aiModel"); // COMEBACK LATER
         }
         break;
     }
@@ -233,7 +232,7 @@ export async function POST(req: any, res: NextApiResponse) {
         participants: [body.createdBy],
         messages: [],
         instructions: chatToClone?.instructions,
-        assistant: chatToClone?.assistant,
+        aiModel: body.aiModel ? body.aiModel : chatToClone?.aiModel,
       });
 
       let messages = [];
@@ -325,13 +324,17 @@ export async function POST(req: any, res: NextApiResponse) {
           text: workspace?.instructions,
           pageId: body.instructions.pageId,
         },
-        assistant: body.assistant
-          ? body.assistant
-          : workspace?.assistants.find(
-              (assistant) =>
-                (assistant.scope == "private" && body.scope == "private") ||
-                (assistant.scope == "public" && body.scope != "private")
-            ),
+        aiModel:
+          body.aiModel ||
+          workspace?.apiKeys.find(
+            (apiKey) =>
+              (apiKey.scope == "private" &&
+                body.scope == "private" &&
+                apiKey.provider == "openai") ||
+              (apiKey.scope == "public" &&
+                body.scope != "private" &&
+                apiKey.provider == "openai")
+          ),
       });
 
       // If parentFolder was provided, add the new chat ID to the parent folder's chats array
@@ -425,7 +428,7 @@ export async function DELETE(req: any, res: NextApiResponse) {
     await dbConnect();
     const body = await req.json();
 
-    await deleteChatbyId(body.id, Chat, Message, Comment);
+    await deleteChatById(body.id, Chat, Message, Comment);
 
     return NextResponse.json(
       { message: "Chat deleted successfully" },
@@ -437,7 +440,7 @@ export async function DELETE(req: any, res: NextApiResponse) {
   }
 }
 
-export async function deleteChatbyId(
+export async function deleteChatById(
   chatId: string,
   Chat: IChatModel,
   Message: IMessageModel,

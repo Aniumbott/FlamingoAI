@@ -5,21 +5,12 @@ import {
   Stack,
   Group,
   Divider,
-  useMantineColorScheme,
   Tooltip,
   Card,
-  Alert,
   Text,
-  Box,
-  List,
 } from "@mantine/core";
 import { IconInfoCircle, IconPlus } from "@tabler/icons-react";
-import {
-  OrganizationSwitcher,
-  Protect,
-  useAuth,
-  useOrganization,
-} from "@clerk/nextjs";
+import { OrganizationSwitcher, useAuth, useOrganization } from "@clerk/nextjs";
 
 // Components
 import WorkspaceMenu from "./Menu/WorkspaceMenu";
@@ -150,7 +141,6 @@ export default function LeftPanel(props: { toggleLeft: () => void }) {
           />
         </Group>
       </Group>
-
       {(() => {
         switch (filterMenu) {
           case 0:

@@ -13,7 +13,6 @@ import {
   IconBrandInstagram,
   IconArrowRight,
 } from "@tabler/icons-react";
-// import { MantineLogo } from '@mantinex/mantine-logo';
 import classes from "./FooterLinks.module.css";
 import { Label } from "recharts";
 
@@ -21,7 +20,7 @@ const data = [
   {
     title: "Features",
     links: [
-      { label: "Team-GPT Enterprise", link: "#" },
+      { label: "Flamingo.ai Enterprise", link: "#" },
       { label: "Collaborative AI", link: "#" },
       { label: "Use prompt templates", link: "#" },
       { label: "Share chat results", link: "#" },
@@ -34,11 +33,11 @@ const data = [
     links: [
       { label: "10 Best AI Tools for Education", link: "#" },
       { label: "10 Best AI Marketing Tools", link: "#" },
-      { label: "Team-GPT vs ChatGPT", link: "#" },
-      { label: "Team-GPT vs Microsoft Copilot", link: "#" },
-      { label: "Team-GPT vs Google Gemini", link: "#" },
-      { label: "Team-GPT vs Perplexity Enterprise", link: "#" },
-      { label: "Team-GPT vs Langdock", link: "#" },
+      { label: "Flamingo.ai vs ChatGPT", link: "#" },
+      { label: "Flamingo.ai vs Microsoft Copilot", link: "#" },
+      { label: "Flamingo.ai vs Google Gemini", link: "#" },
+      { label: "Flamingo.ai vs Perplexity Enterprise", link: "#" },
+      { label: "Flamingo.ai vs Langdock", link: "#" },
     ],
   },
   {
@@ -82,7 +81,7 @@ export function FooterLinks() {
         <div className={classes.logo}>
           {/* <MantineLogo size={30} /> */}
           <Text size="xl" fw={500}>
-            Logo
+            Flamingo.ai
           </Text>
           <Text size="xs" c="dimmed" className={classes.description}>
             Can you afford to skip on AI adoption?
@@ -97,7 +96,7 @@ export function FooterLinks() {
       </Container>
       <Container className={classes.afterFooter}>
         <Text c="dimmed" size="sm">
-          © 2020 teamGPT.dev. All rights reserved.
+          © 2020 Flamingo.ai.dev. All rights reserved.
         </Text>
 
         <Group

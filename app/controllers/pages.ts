@@ -1,10 +1,11 @@
+import { IAIModelDocument } from "../models/AIModel";
 import { IPageDocument } from "../models/Page";
+import { getAIResponse } from "./aiModel";
 import {
   showErrorNotification,
   showLoadingNotification,
   showSuccessNotification,
 } from "./notification";
-import { getAssistantResponse } from "./assistant";
 import { socket } from "@/socket";
 
 async function getAllPages(workspaceId: string) {
@@ -107,14 +108,14 @@ async function deletePage(page: IPageDocument) {
   }
 }
 
-async function getFormatedResponse(
+async function getFormattedResponse(
   action: string,
   workspaceId: string,
-  assistant: any,
+  aiModel: IAIModelDocument,
   content: string
 ) {
   let notification = showLoadingNotification("Formatting Content...");
-  if (!assistant) {
+  if (!aiModel) {
     showErrorNotification(notification, "Assistant not found");
     return;
   }
@@ -136,9 +137,9 @@ async function getFormatedResponse(
 
   let response;
   try {
-    await getAssistantResponse(pageContent, workspaceId, assistant).then(
+    await getAIResponse(pageContent, workspaceId, aiModel, "public").then(
       (res: any) => {
-        console.log("res at getFormatedResponse", res);
+        console.log("res at getFormattedResponse", res);
         response = res.gptRes.choices[0].message.content;
       }
     );
@@ -172,5 +173,5 @@ export {
   createPage,
   updatePage,
   deletePage,
-  getFormatedResponse,
+  getFormattedResponse,
 };

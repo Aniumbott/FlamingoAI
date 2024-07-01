@@ -122,7 +122,6 @@ export default function Workspace() {
       notFound();
     }
   }, [organization]);
-
   return (
     <>
       <ClerkLoading>
@@ -166,7 +165,7 @@ export default function Workspace() {
           >
             <div className="flex justify-between my-2">
               <Title order={3} ml={5}>
-                TeamGPT
+                Flamingo.ai
               </Title>
               <Tooltip label="Collapse panel" fz="xs" position="right">
                 <ActionIcon
@@ -219,7 +218,7 @@ export default function Workspace() {
                   className="absolute top-3 flex flex-row items-center justify-between z-50"
                 >
                   <Title order={4} mr={10}>
-                    TeamGPT
+                    Flamingo.ai
                   </Title>
                   <Tooltip label="Expand panel" fz="xs" position="right">
                     <ActionIcon
@@ -255,7 +254,7 @@ export default function Workspace() {
                     </ActionIcon>
                   </Tooltip>
                   <Title order={4} mr={10}>
-                    TeamGPT
+                    Flamingo.ai
                   </Title>
                   <Tooltip label="Expand panel" fz="xs" position="right">
                     <ActionIcon

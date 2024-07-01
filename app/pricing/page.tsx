@@ -169,20 +169,20 @@ export default function Home() {
         <Title my="xl" fw="300" ta="center">
           Have pricing questions? Contact us at{" "}
           <span style={{ color: "var(--mantine-primary-color-filled)" }}>
-            <b>humans@team-gpt.com</b>
+            <b>humans@flamingo.ai</b>
           </span>
         </Title>
         <Card mt={"xl"} radius="md" w={1050} shadow="lg" withBorder>
           <Group justify="space-between">
             <Box maw={470}>
               <Title order={5} c="var(--mantine-primary-color-filled)">
-                TEAM-GPT ENTERPRISE
+                Flamingo.ai ENTERPRISE
               </Title>
               <Title mt="sm" mb="lg" order={3}>
                 Our flagship product
               </Title>
               <Text mt="xl">
-                Team-GPT Enterprise allows your organization to have the
+                Flamingo.ai Enterprise allows your organization to have the
                 software:
               </Text>
               <List mt="lg">
@@ -207,6 +207,7 @@ export default function Home() {
             <Image
               w="500"
               radius="md"
+              alt=""
               src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
             />
           </Group>

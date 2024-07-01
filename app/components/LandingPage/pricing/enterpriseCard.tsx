@@ -23,13 +23,14 @@ export default function EnterpriseCard() {
       <Group justify="space-between">
         <Box maw={470}>
           <Title order={5} c="var(--mantine-primary-color-filled)">
-            TEAM-GPT ENTERPRISE
+            Flamingo.ai ENTERPRISE
           </Title>
           <Title mt="sm" mb="lg" order={3}>
             Our flagship product
           </Title>
           <Text mt="xl">
-            Team-GPT Enterprise allows your organization to have the software:
+            Flamingo.ai Enterprise allows your organization to have the
+            software:
           </Text>
           <List mt="lg">
             <ListItem>on premises or private cloud deployment</ListItem>

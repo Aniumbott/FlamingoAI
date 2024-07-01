@@ -27,6 +27,9 @@ import {
   HoverCard,
   Card,
   Container,
+  Avatar,
+  ComboboxData,
+  ComboboxItemGroup,
 } from "@mantine/core";
 import {
   IconBuilding,
@@ -57,7 +60,7 @@ import {
   updateChatAccess,
 } from "@/app/controllers/chat";
 import { socket } from "@/socket";
-import { useMediaQuery, useScrollIntoView } from "@mantine/hooks";
+import { useListState, useMediaQuery, useScrollIntoView } from "@mantine/hooks";
 import { ICommentDocument } from "@/app/models/Comment";
 import ForkChatModal from "./Modals/ForkChatModal";
 import { getAllPrompts } from "@/app/controllers/prompt";
@@ -70,6 +73,9 @@ import SettingsModal from "./Modals/SettingsModal";
 import { usePathname, useRouter } from "next/navigation";
 import OnlineUsers from "./OnlineUsers";
 import MessageInput from "./MessageInput";
+import { IconRobotFace } from "@tabler/icons-react";
+import { IAIModelDocument } from "@/app/models/AIModel";
+import { constructSelectModels, getAIModels } from "@/app/controllers/aiModel";
 
 export default function ChatWindow(props: {
   currentChatId: string;
@@ -107,6 +113,10 @@ export default function ChatWindow(props: {
   const [shareChatOpened, setShareChatOpened] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
+  const [selectModels, setSelectModels] = useState<ComboboxData | undefined>(
+    []
+  );
+  const [models, handleModels] = useListState<IAIModelDocument>([]);
 
   function isViewOnly(chat: any) {
     const ans =
@@ -125,7 +135,7 @@ export default function ChatWindow(props: {
   }
 
   useEffect(() => {
-    // console.log("chat", chat);
+    console.log("chat", chat);
     socket.on("refreshChatWindow", () => {
       console.log("refreshing chat");
       getChat(currentChatId, organization?.id || "", userId || "").then(
@@ -167,7 +177,7 @@ export default function ChatWindow(props: {
       );
 
       if (comment.parent) {
-        message.comments = message.comments.map((c: any) => {
+        message.comments = message.comments?.map((c: any) => {
           if (c._id == comment.parent) {
             c.replies.push(comment);
             return c;
@@ -180,7 +190,7 @@ export default function ChatWindow(props: {
 
       setChat({
         ...chat,
-        messages: chat.messages.map((msg: any) => {
+        messages: chat.messages?.map((msg: any) => {
           if (msg._id == message._id) return message;
           return msg;
         }),
@@ -191,13 +201,13 @@ export default function ChatWindow(props: {
       let message = chat.messages.find(
         (msg: any) => msg._id == comment.messageId
       );
-      message.comments = message.comments.map((c: any) => {
+      message.comments = message.comments?.map((c: any) => {
         if (c._id == comment._id) return comment;
         return c;
       });
       setChat({
         ...chat,
-        messages: chat.messages.map((msg: any) => {
+        messages: chat.messages?.map((msg: any) => {
           if (msg._id == message._id) return message;
           return msg;
         }),
@@ -210,7 +220,7 @@ export default function ChatWindow(props: {
       );
 
       if (comment.parent) {
-        message.comments = message.comments.map((c: any) => {
+        message.comments = message.comments?.map((c: any) => {
           if (c._id == comment.parent) {
             c.replies = c.replies.filter((r: any) => r._id != comment._id);
             return c;
@@ -225,7 +235,7 @@ export default function ChatWindow(props: {
 
       setChat({
         ...chat,
-        messages: chat.messages.map((msg: any) => {
+        messages: chat.messages?.map((msg: any) => {
           if (msg._id == message._id) return message;
           return msg;
         }),
@@ -294,12 +304,40 @@ export default function ChatWindow(props: {
     }
   }, [currentChatId]);
 
+  // useEffect(() => {
+  //   let list: ComboboxItemGroup[] = [
+  //     {
+  //       group: "openai",
+  //       items: [],
+  //     },
+  //   ];
+  //   models.forEach((model) => {
+  //     list.find((i) => i.group == model.provider)
+  //       ? list
+  //           .find((i) => i.group == model.provider)
+  //           ?.items.push({ value: model._id, label: model.name })
+  //       : list.push({
+  //           group: model.provider,
+  //           items: [{ value: model._id, label: model.name }],
+  //         });
+  //   });
+  //   setSelectModels(list);
+  // }, [models]);
+
   useEffect(() => {
     socket.on("refreshPrompts", () => {
       getAllPrompts(organization?.id || "", userId || "").then((res) => {
         setPrompts(res.prompts);
       });
     });
+
+    const fetchModels = async () => {
+      const res = await getAIModels(organization?.id || "");
+      handleModels.setState(res.aiModels);
+      console.log("models", res.aiModels);
+    };
+
+    fetchModels();
 
     return () => {
       socket.off("refreshPrompts");
@@ -355,7 +393,7 @@ export default function ChatWindow(props: {
               </ActionIcon>
             </Tooltip>
             <Title order={4} mr={10}>
-              TeamGPT
+              Flamingo.ai
             </Title>
             <Tooltip label="Expand panel" fz="xs" position="right">
               <ActionIcon
@@ -386,7 +424,7 @@ export default function ChatWindow(props: {
                 className="flex flex-row items-center justify-between ml-2"
               >
                 <Title order={4} mr={10}>
-                  TeamGPT
+                  Flamingo.ai
                 </Title>
                 <Tooltip label="Expand panel" fz="xs" position="right">
                   <ActionIcon
@@ -511,6 +549,7 @@ export default function ChatWindow(props: {
                 opened={settingsOpen}
                 setOpened={setSettingsOpen}
                 chat={chat}
+                models={models}
               />
             )}
             {promptOpened && (
@@ -621,17 +660,15 @@ export default function ChatWindow(props: {
                   />
                   <Select
                     // variant="light"
+                    searchable
                     disabled={!isAllowed}
                     allowDeselect={false}
                     description="Assistant Model"
-                    data={chat?.assistant?.assistantId?.models}
-                    value={chat?.assistant?.model}
+                    data={constructSelectModels(models)}
+                    value={chat?.aiModel}
                     onChange={(e) => {
                       updateChat(chat?._id, {
-                        assistant: {
-                          assistantId: chat?.assistant?.assistantId,
-                          model: e,
-                        },
+                        aiModel: e,
                       });
                     }}
                     mt={20}
@@ -641,38 +678,95 @@ export default function ChatWindow(props: {
             ) : null}
 
             {!loading ? (
-              chat?.messages?.map((message: any, index: Number) => {
-                const user = participants.find(
-                  (participant: any) => participant.userId == message?.createdBy
-                ) || {
-                  hasImage: false,
-                  firstName: "Unknown",
-                  lastName: "User",
-                  imageUrl: "",
-                };
-                return (
-                  <div
-                    key={message._id}
-                    className="w-full mb-3 flex items-center justify-center max-w-[1300px]"
-                  >
-                    <MessageItem
-                      message={message}
-                      participants={participants}
-                      userId={userId || ""}
-                      orgId={organization?.id || ""}
-                      instructions={chat.instructions}
-                      assistant={{
-                        ...chat.assistant,
-                        scope: chat.scope == "private" ? "private" : "public",
+              <>
+                {chat?.messages?.map((message: any, index: Number) => {
+                  const user = participants.find(
+                    (participant: any) =>
+                      participant.userId == message?.createdBy
+                  ) || {
+                    hasImage: false,
+                    firstName: "Unknown",
+                    lastName: "User",
+                    imageUrl: "",
+                  };
+                  return (
+                    <div
+                      key={message._id}
+                      className="w-full mb-3 flex items-center justify-center max-w-[1300px]"
+                    >
+                      <MessageItem
+                        message={message}
+                        participants={participants}
+                        userId={userId || ""}
+                        orgId={organization?.id || ""}
+                        instructions={chat.instructions}
+                        aiModel={
+                          models.find((model) => model._id == chat.aiModel) ||
+                          models[0]
+                        }
+                        scope={chat.scope === "private" ? "private" : "public"}
+                        setPromptOpened={setPromptOpened}
+                        setPromptContent={setMessageContent}
+                        setForkMessage={setForkMessage}
+                        setIsForkModalOpen={setIsForkModalOpen}
+                      />
+                    </div>
+                  );
+                })}
+                {/* {!processing && (
+                  <Box mx={!isMobile ? "md" : ""} w="100%">
+                    <div
+                      className={`w-full flex justify-center items-start ${
+                        isMobile ? "py-5" : "py-10"
+                      }`}
+                      style={{
+                        background:
+                          colorScheme === "dark"
+                            ? "var(--mantine-color-dark-6)"
+                            : "var(--mantine-color-white)",
+                        borderRadius: isMobile
+                          ? "0"
+                          : "var(--mantine-radius-md)",
                       }}
-                      setPromptOpened={setPromptOpened}
-                      setPromptContent={setMessageContent}
-                      setForkMessage={setForkMessage}
-                      setIsForkModalOpen={setIsForkModalOpen}
-                    />
-                  </div>
-                );
-              })
+                    >
+                      <div className="w-full h-full max-w-[1000px] gap-2.5 px-2.5 flex flex-row overflow-y-scroll">
+                        {!isMobile && (
+                          <div className="flex flex-col">
+                            <Avatar size="md" radius="sm" mt={5}>
+                              <IconRobotFace
+                                size="24px"
+                                color="var(--mantine-primary-color-3)"
+                              />
+                            </Avatar>
+                          </div>
+                        )}
+                        <div className="w-full flex flex-col">
+                          <div className="flex flex-row justify-between items-center min-h-8">
+                            <div className="flex flex-row items-center">
+                              {isMobile && (
+                                <div className="flex items-center justify-center gap-1 mr-2">
+                                  <Avatar size="sm" radius="sm">
+                                    <IconRobotFace
+                                      size="20px"
+                                      color="var(--mantine-primary-color-3)"
+                                    />
+                                  </Avatar>
+                                </div>
+                              )}
+                              <Text size="md" fw={700}>
+                                Flamingo.ai
+                              </Text>
+                              <Text pl={10} size="xs">
+                                {new Date().toLocaleDateString()}
+                              </Text>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </Box>
+                )} */}
+              </>
             ) : (
               <Loader
                 style={{
@@ -767,6 +861,7 @@ export default function ChatWindow(props: {
                     userId={userId || ""}
                     currentChatId={currentChatId}
                     chat={chat}
+                    models={models}
                     processing={processing}
                     setProcessing={setProcessing}
                     setSearchTerm={setSearchTerm}
@@ -779,7 +874,7 @@ export default function ChatWindow(props: {
                 <Combobox.Options>
                   <ScrollArea.Autosize mah={200} type="scroll">
                     {filteredPrompts?.length > 0 ? (
-                      filteredPrompts.map((prompt) => (
+                      filteredPrompts?.map((prompt) => (
                         <Combobox.Option
                           key={prompt._id}
                           value={prompt._id}

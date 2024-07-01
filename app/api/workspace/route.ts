@@ -9,7 +9,7 @@ import { headers } from "next/headers";
 import { Webhook } from "svix";
 import { stripe } from "@/app/lib/stripe";
 import User from "@/app/models/User";
-import { deleteChatbyId } from "../chat/route";
+import { deleteChatById } from "../chat/route";
 import Message from "@/app/models/Message";
 import Comment from "@/app/models/Comment";
 import ImageGen from "@/app/models/ImageGen";
@@ -56,8 +56,9 @@ export async function POST(request: Request) {
   let user;
   switch (payload.type) {
     case "organization.created":
-      console.log("organization.created tirggered.");
+      console.log("organization.created triggered.");
       workspace = await Workspace.create(getWorkspaceDataFromEvent(payload));
+      console.log(workspace);
       user = await User.findById(workspace.createdBy);
       customer = await stripe.customers.create({
         name: workspace.name,
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
     case "organization.deleted":
       const chats = Chat.find({ workspaceId: payload.data.id });
       (await chats).forEach(async (chat) => {
-        await deleteChatbyId(chat._id, Chat, Message, Comment);
+        await deleteChatById(chat._id, Chat, Message, Comment);
       });
       await ImageGen.find({ workspaceId: payload.data.id }).deleteMany();
 
@@ -103,7 +104,7 @@ export async function POST(request: Request) {
       );
 
       customer = await stripe.customers.del(org?.customerId || "");
-      console.log(`Succesfully deleted customer: ${org?.customerId}`);
+      console.log(`Successfully deleted customer: ${org?.customerId}`);
 
       break;
   }

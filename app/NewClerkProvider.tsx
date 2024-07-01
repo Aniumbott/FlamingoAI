@@ -13,7 +13,7 @@ export default function NewClerkProvider({
     <ClerkProvider
       appearance={{
         baseTheme: colorScheme === "dark" ? dark : undefined,
-        variables: { colorPrimary: "#6bcb99" },
+        variables: { colorPrimary: "#9c36b5" },
       }}
     >
       {children}

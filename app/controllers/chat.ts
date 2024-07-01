@@ -6,6 +6,7 @@ import {
   showLoadingNotification,
   showSuccessNotification,
 } from "./notification";
+import { IAIModel, IAIModelDocument } from "../models/AIModel";
 type Scope = "public" | "private" | "viewOnly";
 
 // Function to get chats that has no parent
@@ -141,7 +142,8 @@ async function createChatFork(
   name: String,
   scope: String,
   createdBy: String,
-  isComments: Boolean
+  isComments: Boolean,
+  aiModel: string | null
 ) {
   const notificationId = showLoadingNotification("Forking chat...");
 
@@ -155,6 +157,7 @@ async function createChatFork(
       scope,
       createdBy,
       isComments,
+      aiModel,
       action: "fork",
     }),
     headers: {
@@ -177,12 +180,12 @@ async function createChat(
   workspaceId: string,
   members: any[],
   name: string = "New Chat",
-  assistant: any = null,
   instructions: {
     type: string;
     text: string;
     pageId: Mongoose.Types.ObjectId | null;
-  } = { type: "text", text: "", pageId: null }
+  } = { type: "text", text: "", pageId: null },
+  aiModel: string | null = null
 ) {
   const notificationId = showLoadingNotification("Creating chat...");
   try {
@@ -197,8 +200,8 @@ async function createChat(
         workspaceId,
         members: userIds,
         name,
-        assistant,
         instructions,
+        aiModel,
       }),
       headers: {
         "Content-Type": "application/json",

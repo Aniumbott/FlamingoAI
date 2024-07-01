@@ -1,3 +1,5 @@
+import { getAIModels } from "@/app/controllers/aiModel";
+import { IAIModelDocument } from "@/app/models/AIModel";
 import {
   Paper,
   Table,
@@ -7,25 +9,29 @@ import {
   Text,
   Avatar,
 } from "@mantine/core";
+import { useListState } from "@mantine/hooks";
 import { IconInfoCircle } from "@tabler/icons-react";
+import { useEffect } from "react";
 
 export default function LongestChats(props: {
   filteredChats: any[];
   tokenLogs: any[];
-  assistants: any[];
   members: any[];
+  organizationId: string;
 }) {
-  const { filteredChats, tokenLogs, assistants, members } = props;
+  const { filteredChats, tokenLogs, members, organizationId } = props;
+  const [models, handleModels] = useListState<IAIModelDocument>([]);
 
-  function getContexWIndow(assistantId: string, model: string) {
-    const assistant: any = assistants.find(
-      (assistant: any) => assistant._id === assistantId
-    );
-    if (assistant) {
-      const mdl = assistant.models.find((m: any) => m.value === model);
-      return mdl?.contextWindow;
-    }
-    return 0;
+  useEffect(() => {
+    const fetchModels = async () => {
+      const res = await getAIModels(organizationId);
+      handleModels.setState(res.aiModels);
+    };
+    fetchModels();
+  }, []);
+
+  function getContexWIndow(aiModel: IAIModelDocument) {
+    return models.find((model) => model._id == aiModel._id)?.contextWindow || 0;
   }
 
   function getRatio(chat: any) {
@@ -34,7 +40,7 @@ export default function LongestChats(props: {
         return sum + Number(message.content);
       }, 0) +
         chat.instructions.text.length) /
-        getContexWIndow(chat.assistant.assistantId, chat.assistant.model)) *
+        getContexWIndow(chat.aiModel)) *
       100;
 
     return (
@@ -200,13 +206,10 @@ export default function LongestChats(props: {
                       return sum + tokenLog.inputTokens + tokenLog.outputTokens;
                     }, 0)}
                 </Table.Td>
-                <Table.Td>{chat.assistant.model}</Table.Td>
                 <Table.Td>
-                  {getContexWIndow(
-                    chat.assistant.assistantId,
-                    chat.assistant.model
-                  )}
+                  {models?.find((model) => model == chat.aiModel)?.name || ""}
                 </Table.Td>
+                <Table.Td>{getContexWIndow(chat.aiModel)}</Table.Td>
                 <Table.Td>{getRatio(chat)}</Table.Td>
                 <Table.Td>{chat.messages.length}</Table.Td>
                 <Table.Td>{getParticipants(chat)}</Table.Td>
