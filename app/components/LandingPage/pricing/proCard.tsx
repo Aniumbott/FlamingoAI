@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Button,
   Card,
   Group,
@@ -48,9 +49,12 @@ export default function ProCard(props: { isMonthly: boolean }) {
         <ListItem>Azure OpenAI Integration</ListItem>
         <ListItem>Members roles and permissions</ListItem>
       </List>
+      <Anchor href="/workspace">
+
       <Button mt="xl" variant="outline">
         Upgrade Now
       </Button>
+      </Anchor>
     </Card>
   );
 }

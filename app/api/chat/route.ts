@@ -334,7 +334,7 @@ export async function POST(req: any, res: NextApiResponse) {
               (apiKey.scope == "public" &&
                 body.scope != "private" &&
                 apiKey.provider == "openai")
-          ),
+          )?.aiModel,
       });
 
       // If parentFolder was provided, add the new chat ID to the parent folder's chats array

@@ -15,8 +15,8 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
     const reqParam = req.nextUrl.searchParams;
     const workspaceId = reqParam.get("workspaceId");
     const workspace = await Workspace.findById(workspaceId);
-    console.log("WORKSPACE: ", workspace);
-    console.log("MAX PRODUCT ID: ", process.env.NEXT_PUBLIC_MAX_PLAN);
+    // console.log("WORKSPACE: ", workspace);
+    // console.log("MAX PRODUCT ID: ", process.env.NEXT_PUBLIC_MAX_PLAN);
     let aiModels;
     if (
       workspace?.subscription?.product_id === process.env.NEXT_PUBLIC_MAX_PLAN
@@ -45,8 +45,8 @@ export async function POST(req: any, res: NextApiResponse) {
       (key) => key.provider == model.provider && key.scope == scope
     )?.key;
 
-    console.log(model, workspace);
-    console.log("apiKey: ", apiKey);
+    // console.log(model, workspace);
+    // console.log("apiKey: ", apiKey);
 
     if (!apiKey) return NextResponse.json("API Key not found", { status: 404 });
 

@@ -13,6 +13,10 @@ import { deleteChatById } from "../chat/route";
 import Message from "@/app/models/Message";
 import Comment from "@/app/models/Comment";
 import ImageGen from "@/app/models/ImageGen";
+import Page from "@/app/models/Page";
+import Prompt from "@/app/models/Prompt";
+import ChatFolder from "@/app/models/ChatFolder";
+import PromptFolder from "@/app/models/PromptFolder";
 
 const webhookSecret = process.env.CLERK_WORKSPACE_WEBHOOK_SECRET || ``;
 
@@ -95,6 +99,10 @@ export async function POST(request: Request) {
         await deleteChatById(chat._id, Chat, Message, Comment);
       });
       await ImageGen.find({ workspaceId: payload.data.id }).deleteMany();
+      await Page.find({ workspaceId: payload.data.id }).deleteMany();
+      await Prompt.find({ workspaceId: payload.data.id }).deleteMany();
+      await ChatFolder.find({ workspaceId: payload.data.id }).deleteMany();
+      await PromptFolder.find({ workspaceId: payload.data.id }).deleteMany();
 
       const org = await Workspace.findById(payload.data.id);
 

@@ -45,7 +45,10 @@ export default function EnterpriseCard() {
             business!
           </Text>
           <Group mt="xl">
-            <Button size="md">Lets Talk</Button>
+            
+            <Button onClick={()=>{
+              window.location.href = "mailto:humans@flamingo.ai"
+            }} size="md">Lets Talk</Button>
             <Button variant="outline" size="md">
               Read More
             </Button>
