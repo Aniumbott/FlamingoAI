@@ -93,11 +93,11 @@ export default function MessageInput(props: {
             ? "0"
             : "var(--mantine-radius-sm) 0 0 var(--mantine-radius-sm)"
         }
-        w="66%"
+        w={isMobile ? "75%" : "66%"}
+        my={isMobile ? "xs" : "xl"}
         autoFocus={true}
         value={messageInput}
         disabled={processing}
-        my="xl"
         onChange={(e) => {
           setMessageInput(e.currentTarget.value);
 

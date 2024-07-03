@@ -137,6 +137,8 @@ const SettingsModal = (props: {
           ) : (
             <Textarea
               value={areaValue}
+              autosize
+              maxRows={10}
               onChange={(event) =>
                 setAreaValue(event.currentTarget.value || "")
               }

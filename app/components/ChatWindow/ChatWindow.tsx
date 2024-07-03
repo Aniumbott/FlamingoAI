@@ -113,9 +113,7 @@ export default function ChatWindow(props: {
   const [shareChatOpened, setShareChatOpened] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
-  const [selectModels, setSelectModels] = useState<ComboboxData | undefined>(
-    []
-  );
+
   const [models, handleModels] = useListState<IAIModelDocument>([]);
 
   function isViewOnly(chat: any) {
@@ -303,26 +301,6 @@ export default function ChatWindow(props: {
       });
     }
   }, [currentChatId]);
-
-  // useEffect(() => {
-  //   let list: ComboboxItemGroup[] = [
-  //     {
-  //       group: "openai",
-  //       items: [],
-  //     },
-  //   ];
-  //   models.forEach((model) => {
-  //     list.find((i) => i.group == model.provider)
-  //       ? list
-  //           .find((i) => i.group == model.provider)
-  //           ?.items.push({ value: model._id, label: model.name })
-  //       : list.push({
-  //           group: model.provider,
-  //           items: [{ value: model._id, label: model.name }],
-  //         });
-  //   });
-  //   setSelectModels(list);
-  // }, [models]);
 
   useEffect(() => {
     socket.on("refreshPrompts", () => {

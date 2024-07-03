@@ -198,29 +198,9 @@ function MessageItem(props: {
                       }`
                     : "Flamingo.ai"}
                 </Text>
-                <Text pl={10} size="xs">
-                  {getDate(message.updatedAt.toString())}
-                </Text>
               </div>
 
               <div className="flex flex-row gap-[1px] items-center">
-                {isMobile && !isEdit ? (
-                  <Tooltip label="Fork Chat" fz="xs" position="bottom">
-                    <ActionIcon
-                      size={"sm"}
-                      color="grey"
-                      variant="subtle"
-                      onClick={() => {
-                        setForkMessage(message);
-                        setIsForkModalOpen(true);
-                      }}
-                    >
-                      <IconArrowFork
-                        style={{ width: rem(24), rotate: "180deg" }}
-                      />
-                    </ActionIcon>
-                  </Tooltip>
-                ) : null}
                 {(hovered || isMobile) && !isEdit ? (
                   message.type === "user" ? (
                     <>
@@ -341,39 +321,61 @@ function MessageItem(props: {
               // <Text size="md">{message.content}</Text>
               <MessageRender>{message.content}</MessageRender>
             )}
-            <div className="flex flex-row mt-2">
-              <CopyButton value={String(message.content)} timeout={2000}>
-                {({ copied, copy }) => (
-                  <Tooltip
-                    label={copied ? "Copied message" : "Copy message text"}
-                    fz="xs"
-                    position="bottom"
-                  >
+            <div className="flex justify-between items-center mt-2">
+              <div className="flex gap-[1px] items-center ">
+                {isMobile && !isEdit ? (
+                  <Tooltip label="Fork Chat" fz="xs" position="bottom">
                     <ActionIcon
-                      color={!copied ? "grey" : ""}
+                      size={"sm"}
+                      color="grey"
                       variant="subtle"
-                      onClick={copy}
+                      onClick={() => {
+                        setForkMessage(message);
+                        setIsForkModalOpen(true);
+                      }}
                     >
-                      {copied ? (
-                        <IconCheck style={{ width: rem(16) }} />
-                      ) : (
-                        <IconCopy style={{ width: rem(16) }} />
-                      )}
+                      <IconArrowFork
+                        style={{ width: rem(16), rotate: "180deg" }}
+                      />
                     </ActionIcon>
                   </Tooltip>
-                )}
-              </CopyButton>
-              <Tooltip label="Show comments" fz="xs" position="bottom">
-                <ActionIcon
-                  color={showComments ? "" : "grey"}
-                  variant="subtle"
-                  onClick={() => {
-                    setShowComments(!showComments);
-                  }}
-                >
-                  <IconMessages style={{ width: rem(16) }} />
-                </ActionIcon>
-              </Tooltip>
+                ) : null}
+                <CopyButton value={String(message.content)} timeout={2000}>
+                  {({ copied, copy }) => (
+                    <Tooltip
+                      label={copied ? "Copied message" : "Copy message text"}
+                      fz="xs"
+                      position="bottom"
+                    >
+                      <ActionIcon
+                        color={!copied ? "grey" : ""}
+                        variant="subtle"
+                        onClick={copy}
+                      >
+                        {copied ? (
+                          <IconCheck style={{ width: rem(16) }} />
+                        ) : (
+                          <IconCopy style={{ width: rem(16) }} />
+                        )}
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                </CopyButton>
+                <Tooltip label="Show comments" fz="xs" position="bottom">
+                  <ActionIcon
+                    color={showComments ? "" : "grey"}
+                    variant="subtle"
+                    onClick={() => {
+                      setShowComments(!showComments);
+                    }}
+                  >
+                    <IconMessages style={{ width: rem(16) }} />
+                  </ActionIcon>
+                </Tooltip>
+              </div>
+              <Text pl={10} size="xs">
+                {getDate(message.updatedAt.toString())}
+              </Text>
             </div>
             <div className="flex flex-row mt-2 w-full">
               {showComments ? (
