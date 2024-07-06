@@ -19,7 +19,7 @@ Date.prototype.getWeek = function () {
       ((date.getTime() - week1.getTime()) / 86400000 -
         3 +
         ((week1.getDay() + 6) % 7)) /
-        7
+        7,
     )
   );
 };
@@ -27,10 +27,10 @@ Date.prototype.getWeek = function () {
 function constructActiveUsers(
   startDate: Date,
   endDate: Date,
-  tokenLogs: any[]
+  tokenLogs: any[],
 ): any[] {
   const rangeDays = Math.ceil(
-    (endDate.getTime() - startDate.getTime() + 1) / (1000 * 60 * 60 * 24)
+    (endDate.getTime() - startDate.getTime() + 1) / (1000 * 60 * 60 * 24),
   );
 
   const activeUsers = [];
@@ -46,9 +46,10 @@ function constructActiveUsers(
         tokenLogs
           .filter(
             (usage) =>
-              new Date(usage.createdAt).toLocaleDateString() === localDateString
+              new Date(usage.createdAt).toLocaleDateString() ===
+              localDateString,
           )
-          .map((usage) => usage.createdBy)
+          .map((usage) => usage.createdBy),
       ).size;
       activeUsers.push({ label: localDateString, users });
     }
@@ -60,7 +61,7 @@ function constructActiveUsers(
       const users = new Set(
         tokenLogs
           .filter((usage) => new Date(usage.createdAt).getWeek() === week)
-          .map((usage) => usage.createdBy)
+          .map((usage) => usage.createdBy),
       ).size;
       activeUsers.push({ label: `Week ${week}`, users });
     }
@@ -77,9 +78,9 @@ function constructActiveUsers(
             .filter(
               (usage) =>
                 new Date(usage.createdAt).getMonth() === month &&
-                new Date(usage.createdAt).getFullYear() === year
+                new Date(usage.createdAt).getFullYear() === year,
             )
-            .map((usage) => usage.createdBy)
+            .map((usage) => usage.createdBy),
         ).size;
         activeUsers.push({
           label: `${new Date(year, month, 1).toLocaleString("default", {
@@ -97,7 +98,7 @@ function constructActiveUsers(
       const users = new Set(
         tokenLogs
           .filter((usage) => new Date(usage.createdAt).getFullYear() === year)
-          .map((usage) => usage.createdBy)
+          .map((usage) => usage.createdBy),
       ).size;
       activeUsers.push({ label: `${year}`, users });
     }
@@ -117,8 +118,8 @@ export default function ActiveUsers(props: {
       constructActiveUsers(
         new Date(dateRange[0]),
         new Date(dateRange[1]),
-        tokenLogs
-      )
+        tokenLogs,
+      ),
     );
   }, [dateRange, tokenLogs]);
   return (

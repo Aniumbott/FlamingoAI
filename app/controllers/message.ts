@@ -172,8 +172,8 @@ async function sendAssistantMessage(
           message.createdBy,
           message.chatId,
           workspaceId,
-          res.tokenUsage.promptTokens.toString(),
-          res.tokenUsage.completionTokens.toString()
+          res.usage.promptTokens.toString(),
+          res.usage.completionTokens.toString()
         );
       }
     });

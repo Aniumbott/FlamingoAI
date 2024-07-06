@@ -185,7 +185,7 @@ export default function Home() {
                             window.history.pushState(
                               {},
                               "",
-                              "/onboarding?step=3"
+                              "/onboarding?step=3",
                             );
                           });
                         });
@@ -257,7 +257,7 @@ export default function Home() {
         )}
         {active == 4 && (
           <Box
-            mt="5rem"
+            mt={"md"}
             style={{
               overflowY: "scroll",
             }}

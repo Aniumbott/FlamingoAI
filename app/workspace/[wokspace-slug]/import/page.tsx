@@ -110,7 +110,7 @@ export default function ImportPage() {
           });
 
           chat.messages = messages.sort(
-            (a: any, b: any) => a.createdAt - b.createdAt
+            (a: any, b: any) => a.createdAt - b.createdAt,
           );
           chats.push(chat);
         });
@@ -129,7 +129,7 @@ export default function ImportPage() {
             ...chat,
             scope: allScope,
           };
-        })
+        }),
       );
     }
   }, [allScope]);
@@ -141,7 +141,7 @@ export default function ImportPage() {
           ...chat,
           aiModel: model?._id,
         };
-      })
+      }),
     );
   }, [model]);
 
@@ -175,8 +175,10 @@ export default function ImportPage() {
         className="sticky top-0 h-16 mb-3 px-5 flex flex-row justify-between items-center"
         style={{
           zIndex: 1000,
-          backgroundColor: "var(--mantine-color-body)",
-          borderBottom: "1px solid var(--mantine-color-default-border)",
+          background:
+            colorScheme === "dark"
+              ? "var(--mantine-color-dark-8)"
+              : "var(--mantine-color-gray-1)",
         }}
       >
         <div className="h-full flex flex-row items-center">
@@ -269,7 +271,7 @@ export default function ImportPage() {
                           ...chat,
                           selected: true,
                         };
-                      })
+                      }),
                     );
                   }}
                 >
@@ -287,7 +289,7 @@ export default function ImportPage() {
                           ...chat,
                           selected: false,
                         };
-                      })
+                      }),
                     );
                   }}
                 >
@@ -306,20 +308,20 @@ export default function ImportPage() {
                       userId || "",
                       organization?.id || "",
                       members,
-                      model
+                      model,
                     ).then((newChat) => {
                       chat.chatId = newChat._id;
                     });
                     setChats(
                       chats.map((c) => {
                         const updatedChat = selectedChats.find(
-                          (chat) => chat.id === c.id
+                          (chat) => chat.id === c.id,
                         );
                         if (updatedChat) {
                           return updatedChat;
                         }
                         return c;
-                      })
+                      }),
                     );
                   });
                 }}
@@ -438,7 +440,7 @@ const ChatsTable = (props: {
                         };
                       }
                       return c;
-                    })
+                    }),
                   );
                 }}
                 disabled={chat.chatId !== ""}
@@ -470,7 +472,7 @@ const ChatsTable = (props: {
                             };
                           }
                           return c;
-                        })
+                        }),
                       );
                     }}
                   />
@@ -487,7 +489,7 @@ const ChatsTable = (props: {
                         userId || "",
                         organization?.id || "",
                         members,
-                        model
+                        model,
                       ).then((newChat) => {
                         setChats(
                           chats.map((c) => {
@@ -498,7 +500,7 @@ const ChatsTable = (props: {
                               };
                             }
                             return c;
-                          })
+                          }),
                         );
                       });
                     }}
@@ -547,7 +549,7 @@ async function ImportChat(
   createdBy: string,
   workspaceId: string,
   members: any[],
-  model: IAIModelDocument | null
+  model: IAIModelDocument | null,
 ) {
   const res = await createChat(
     chat.scope,
@@ -557,7 +559,7 @@ async function ImportChat(
     members,
     chat.name,
     { type: "text", text: "", pageId: null },
-    model?._id
+    model?._id,
   );
 
   const notifications = showLoadingNotification("Loading Messages...");

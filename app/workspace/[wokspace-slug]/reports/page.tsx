@@ -66,8 +66,8 @@ export default function Reports() {
         setTokenLogs(data.tokenLogs);
       };
 
-      setIsLoading(true);
-      collectData();
+      setIsLoading(false);
+      collectData().then(() => collectTokenLogs());
       if (filter == "All time") {
         setDateRange([new Date(organization?.createdAt), new Date()]);
       }
@@ -112,7 +112,7 @@ export default function Reports() {
               }
             }
             return true;
-          })
+          }),
         );
       }
     }
@@ -154,10 +154,10 @@ export default function Reports() {
       case "Previous Week":
         setDateRange([
           new Date(
-            new Date().setDate(new Date().getDate() - new Date().getDay() - 6)
+            new Date().setDate(new Date().getDate() - new Date().getDay() - 6),
           ),
           new Date(
-            new Date().setDate(new Date().getDate() - new Date().getDay())
+            new Date().setDate(new Date().getDate() - new Date().getDay()),
           ),
         ]);
         break;
@@ -337,7 +337,7 @@ export default function Reports() {
                 <ActiveUsers dateRange={dateRange} tokenLogs={tokenLogs} />
               </div>
             </div>
-            <Paper
+            {/* <Paper
               withBorder
               mt="1rem"
               w="100%"
@@ -374,7 +374,7 @@ export default function Reports() {
                   { name: "inefficient", color: "red" },
                 ]}
               ></BarChart>
-            </Paper>
+            </Paper> */}
             <LongestChats
               filteredChats={filteredChats}
               tokenLogs={tokenLogs}
@@ -419,7 +419,7 @@ export default function Reports() {
                             new Date(tokenLog.createdAt) >= dateRange[0] &&
                             (new Date(tokenLog.createdAt) <= dateRange[1] ||
                               new Date(
-                                tokenLog.createdAt
+                                tokenLog.createdAt,
                               ).toLocaleDateString() ==
                                 dateRange[1].toLocaleDateString()) &&
                             tokenLog.createdBy == member.userId
@@ -494,14 +494,14 @@ export default function Reports() {
                         <Table.Td>
                           {
                             filteredChats.filter((chat: any) =>
-                              chat.participants.includes(member.userId)
+                              chat.participants.includes(member.userId),
                             ).length
                           }
                         </Table.Td>
                         <Table.Td>
                           {filteredChats
                             .filter((chat: any) =>
-                              chat.participants.includes(member.userId)
+                              chat.participants.includes(member.userId),
                             )
                             .reduce((acc: number, chat: any) => {
                               return acc + chat.messages.length;
