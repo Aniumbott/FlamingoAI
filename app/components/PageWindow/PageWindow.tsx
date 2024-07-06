@@ -9,11 +9,13 @@ import {
   Button,
   Select,
   TextInput,
+  Title,
+  Text,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { Editor } from "@tiptap/react";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
-import { useListState } from "@mantine/hooks";
+import { useListState, useMediaQuery } from "@mantine/hooks";
 import InputBlock from "./InputBlock";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -30,7 +32,7 @@ import SidePanel from "./SidePanel";
 import DownloadModal from "./DownloadModal";
 import { getPageById, updatePage } from "@/app/controllers/pages";
 import { useAuth } from "@clerk/nextjs";
-import { IconMessage } from "@tabler/icons-react";
+import { IconInfoCircle, IconMessage } from "@tabler/icons-react";
 import CreateChatModal from "./CreateChatModal";
 
 export default function PageWindow(props: {
@@ -51,7 +53,7 @@ export default function PageWindow(props: {
     content: [],
   });
   const [openDownload, setOpenDownload] = useState(false);
-
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
   const [editors, handleEditors] = useListState<Editor | null>([
     new Editor({
       extensions: [
@@ -68,17 +70,6 @@ export default function PageWindow(props: {
       ],
     }),
   ]);
-
-  // useEffect(() => {
-  //   console.log(editors[0]?.getText);
-  // }, [editors]);
-  // useEffect(() => {
-  //   let htm = editors[0]?.getHTML();
-  //   let jsn = editors[0]?.getJSON();
-  //   console.log("html", htm);
-  //   console.log("JSON", jsn);
-  //   // console.log("Text", txt);
-  //},ditors]);
 
   useEffect(() => {
     console.log(isDragging);
@@ -131,7 +122,7 @@ export default function PageWindow(props: {
     });
   };
 
-  return (
+  return !isMobile ? (
     <Group
       w={`calc(100% - 20px)`}
       align="flex-start"
@@ -260,5 +251,36 @@ export default function PageWindow(props: {
         <Loader type="dots" size="lg" h={"100%"} />
       )}
     </Group>
+  ) : (
+    <div className="h-screen w-screen flex flex-col items-center justify-center p-5">
+      <Card withBorder radius="md" p="lg">
+        <Group justify="space-between">
+          <Group gap={"xs"}>
+            <IconInfoCircle size="24px" />
+            <Title order={3}>Insufficient screen size !!!</Title>
+          </Group>
+          <Button
+            variant="default"
+            onClick={() => {
+              window.history.back();
+            }}
+          >
+            Back to Workspace
+          </Button>
+        </Group>
+        <Text size="md" c="dimmed" mt="md">
+          Pages are only visible on{" "}
+          <span
+            style={{
+              fontWeight: 700,
+              color: "var(--mantine-primary-color-filled)",
+            }}
+          >
+            landscape displays
+          </span>
+          . Kindly change the orientation of the device if possible.
+        </Text>
+      </Card>
+    </div>
   );
 }

@@ -113,7 +113,7 @@ export default function ChatWindow(props: {
   const [shareChatOpened, setShareChatOpened] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
-
+  const [processing, setProcessing] = useState(false);
   const [models, handleModels] = useListState<IAIModelDocument>([]);
 
   function isViewOnly(chat: any) {
@@ -252,7 +252,7 @@ export default function ChatWindow(props: {
 
   useEffect(() => {
     scrollIntoView();
-  }, [chat?.messages?.length]);
+  }, [chat?.messages?.length, processing]);
 
   useEffect(() => {
     const fetchParticipants = async () => {
@@ -329,7 +329,6 @@ export default function ChatWindow(props: {
   const [promptOpened, setPromptOpened] = useState(false);
   const [newPrompt, setnewPrompt] = useState<IPromptDocument | null>(null);
   const [messageContent, setMessageContent] = useState("");
-  const [processing, setProcessing] = useState(false);
   const [loading, setLoading] = useState(true);
   const [isForkModalOpen, setIsForkModalOpen] = useState(false);
   const router = useRouter();
@@ -691,59 +690,37 @@ export default function ChatWindow(props: {
                     </div>
                   );
                 })}
-                {/* {!processing && (
-                  <Box mx={!isMobile ? "md" : ""} w="100%">
-                    <div
-                      className={`w-full flex justify-center items-start ${
-                        isMobile ? "py-5" : "py-10"
-                      }`}
-                      style={{
-                        background:
-                          colorScheme === "dark"
-                            ? "var(--mantine-color-dark-6)"
-                            : "var(--mantine-color-white)",
-                        borderRadius: isMobile
-                          ? "0"
-                          : "var(--mantine-radius-md)",
-                      }}
-                    >
-                      <div className="w-full h-full max-w-[1000px] gap-2.5 px-2.5 flex flex-row overflow-y-scroll">
-                        {!isMobile && (
-                          <div className="flex flex-col">
-                            <Avatar size="md" radius="sm" mt={5}>
-                              <IconRobotFace
-                                size="24px"
-                                color="var(--mantine-primary-color-3)"
-                              />
-                            </Avatar>
-                          </div>
-                        )}
-                        <div className="w-full flex flex-col">
-                          <div className="flex flex-row justify-between items-center min-h-8">
-                            <div className="flex flex-row items-center">
-                              {isMobile && (
-                                <div className="flex items-center justify-center gap-1 mr-2">
-                                  <Avatar size="sm" radius="sm">
-                                    <IconRobotFace
-                                      size="20px"
-                                      color="var(--mantine-primary-color-3)"
-                                    />
-                                  </Avatar>
-                                </div>
-                              )}
-                              <Text size="md" fw={700}>
-                                Flamingo.ai
-                              </Text>
-                              <Text pl={10} size="xs">
-                                {new Date().toLocaleDateString()}
-                              </Text>
-                            </div>
-                          </div>
+                {processing && (
+                  <div className="w-full mb-3 flex items-center justify-center max-w-[1300px]">
+                    <Box mx={!isMobile ? "md" : ""} w="100%">
+                      <div
+                        className={`w-full flex justify-center items-start ${
+                          isMobile ? "py-5" : "py-10"
+                        }`}
+                        style={{
+                          background:
+                            colorScheme === "dark"
+                              ? "var(--mantine-color-dark-6)"
+                              : "var(--mantine-color-white)",
+                          borderRadius: isMobile
+                            ? "0"
+                            : "var(--mantine-radius-md)",
+                        }}
+                      >
+                        <div className="w-full h-full max-w-[1000px] gap-2.5 px-2.5 flex flex-row items-center justify-start">
+                          <Avatar size="md" radius="sm" mt={5}>
+                            <IconRobotFace
+                              size="24px"
+                              color="var(--mantine-primary-color-3)"
+                            />
+                          </Avatar>
+
+                          <Loader mx="xl" size={"xl"} type="dots" />
                         </div>
                       </div>
-                    </div>
-                  </Box>
-                )} */}
+                    </Box>
+                  </div>
+                )}
               </>
             ) : (
               <Loader

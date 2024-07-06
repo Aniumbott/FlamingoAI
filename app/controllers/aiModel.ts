@@ -96,35 +96,10 @@ async function isValidOpenAIKey(key: string) {
 
 async function streamTest() {
   try {
-    const response = await fetch("/api/chat", {
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const source = new EventSource("/api/aimodel/streaming");
+    source.addEventListener("my-event", (event) => {
+      console.log("event", event.data);
     });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const reader = response?.body?.getReader();
-    const decoder = new TextDecoder();
-    let accumulatedResponse = "";
-
-    while (true) {
-      const { value, done } = (await reader?.read()) || {
-        value: null,
-        done: true,
-      };
-      if (done) break;
-
-      const chunk = decoder.decode(value, { stream: true });
-      accumulatedResponse += chunk;
-
-      // Call the onProgress callback with the accumulated response
-      console.log("Accumulated response:", accumulatedResponse);
-    }
-
-    return accumulatedResponse;
   } catch (error) {
     console.error("Error:", error);
     throw error;

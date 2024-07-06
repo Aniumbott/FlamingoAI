@@ -1,4 +1,4 @@
-import { getAIModels } from "@/app/controllers/aiModel";
+import { constructSelectModels, getAIModels } from "@/app/controllers/aiModel";
 import { createChatFork } from "@/app/controllers/chat";
 import { IAIModelDocument } from "@/app/models/AIModel";
 import { useOrganization, useUser } from "@clerk/nextjs";
@@ -91,13 +91,7 @@ export default function ForkChatModal(props: {
         <Select
           required
           label="Model Name"
-          data={models.map((model) => {
-            return {
-              value: model._id,
-              label: model.name,
-              group: model.provider,
-            };
-          })}
+          data={constructSelectModels(models)}
           defaultValue={model?._id}
           onChange={(e) =>
             setModel(models.find((model) => model._id == e) || null)
@@ -133,7 +127,7 @@ export default function ForkChatModal(props: {
                 scope,
                 user?.id || "",
                 isCommentsIncluded,
-                model?._id
+                model?._id,
               );
               setIsOpen(false);
             }}

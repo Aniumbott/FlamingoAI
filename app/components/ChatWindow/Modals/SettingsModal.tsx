@@ -45,8 +45,8 @@ const SettingsModal = (props: {
           (await getAllPages(chat.workspaceId || "")).pages.map(
             (page: IPageDocument) => {
               return { value: page._id, label: page.name };
-            }
-          )
+            },
+          ),
         );
       } catch (error) {
         console.error("Failed to fetch pages:", error);
@@ -148,7 +148,7 @@ const SettingsModal = (props: {
 
         {/* </Stack> */}
         <Group justify="flex-end">
-          {model?.id != chat?.aiModel ||
+          {model?._id != chat?.aiModel ||
           type != chat?.instructions.type ||
           areaValue != chat?.instructions.text ||
           pageId != chat?.instructions.pageId ? (
@@ -157,14 +157,11 @@ const SettingsModal = (props: {
               variant="outline"
               onClick={() => {
                 setModel(
-                  models.find((model) => model._id == chat.aiModel) || null
+                  models.find((model) => model._id == chat.aiModel) || null,
                 );
-                setAreaValue(chat?.instructions.text || "");
                 setType(chat?.instructions.type);
+                setAreaValue(chat?.instructions.text || "");
                 setPageId(chat?.instructions.pageId);
-                setModel(
-                  models.find((model) => model._id == chat.aiModel) || null
-                );
               }}
             >
               Reset

@@ -30,8 +30,8 @@ export default function LongestChats(props: {
     fetchModels();
   }, []);
 
-  function getContexWIndow(aiModel: IAIModelDocument) {
-    return models.find((model) => model._id == aiModel._id)?.contextWindow || 0;
+  function getContexWIndow(aiModel: string) {
+    return models.find((model) => model._id == aiModel)?.contextWindow || 0;
   }
 
   function getRatio(chat: any) {
@@ -55,7 +55,7 @@ export default function LongestChats(props: {
       return chat.participants.includes(member.userId);
     });
 
-    console.log(participants);
+    // console.log(participants);
     return (
       <Avatar.Group>
         {participants.length <= 2 ? (
@@ -66,7 +66,7 @@ export default function LongestChats(props: {
               <Avatar radius="sm" key={key} size="sm" variant="white">
                 {member.firstName[0] + member.lastName[0]}
               </Avatar>
-            )
+            ),
           )
         ) : (
           <>
@@ -207,7 +207,8 @@ export default function LongestChats(props: {
                     }, 0)}
                 </Table.Td>
                 <Table.Td>
-                  {models?.find((model) => model == chat.aiModel)?.name || ""}
+                  {models?.find((model) => model._id == chat.aiModel)?.name ||
+                    ""}
                 </Table.Td>
                 <Table.Td>{getContexWIndow(chat.aiModel)}</Table.Td>
                 <Table.Td>{getRatio(chat)}</Table.Td>
