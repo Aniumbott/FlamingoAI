@@ -23,15 +23,14 @@ app.prepare().then(() => {
       socket.join(roomId);
       console.log(`User with ID: ${socket.id} joined Chat: ${roomId}`);
       // Remove user from all other rooms
-      if(!rooms.has(roomId)) {
+      if (!rooms.has(roomId)) {
         rooms.set(roomId, new Set());
       }
       rooms.forEach((users, id) => {
         if (id !== roomId) {
           users.delete(userId);
           io.to(id).emit("onlineUsers", Array.from(rooms.get(id)));
-        }
-        else{
+        } else {
           users.add(userId);
         }
       });
@@ -59,7 +58,7 @@ app.prepare().then(() => {
 
     socket.on("updateWorkspace", (roomId) => {
       console.log(
-        `User with ID: ${socket.id} updated workspace in room: ${roomId}`
+        `User with ID: ${socket.id} updated workspace in room: ${roomId}`,
       );
       io.to(roomId).emit("updateWorkspace");
     });
@@ -71,15 +70,15 @@ app.prepare().then(() => {
     // Chat and ChatFolders
     socket.on("updateChat", (roomId, item) => {
       console.log(
-        `User with ID: ${socket.id} updated chat: ${item} in room: ${roomId}`
+        `User with ID: ${socket.id} updated chat: ${item} in room: ${roomId}`,
       );
       io.to(roomId).emit("refreshChats");
       io.to(roomId).emit("refreshChatWindow");
     });
-    
+
     socket.on("updatePersonalChat", (item) => {
       console.log(
-        `User with ID: ${socket.id} updated private chat: ${item} to user: ${socket.id}`
+        `User with ID: ${socket.id} updated private chat: ${item} to user: ${socket.id}`,
       );
       io.to(socket.id).emit("refreshChats");
       io.to(socket.id).emit("refreshChatWindow");
@@ -88,21 +87,21 @@ app.prepare().then(() => {
     // Message
     socket.on("createMessage", (roomId, message) => {
       console.log(
-        `User with ID: ${socket.id} sent message: ${message} in room: ${roomId}`
+        `User with ID: ${socket.id} sent message: ${message} in room: ${roomId}`,
       );
       io.to(roomId).emit("newMessage", message);
     });
 
     socket.on("updateMessage", (roomId, message) => {
       console.log(
-        `User with ID: ${socket.id} updated message: ${message} in room: ${roomId}`
+        `User with ID: ${socket.id} updated message: ${message} in room: ${roomId}`,
       );
       io.to(roomId).emit("updateMessage", message);
     });
 
     socket.on("deleteMessage", (roomId, message) => {
       console.log(
-        `User with ID: ${socket.id} deleted message: ${message} in room: ${roomId}`
+        `User with ID: ${socket.id} deleted message: ${message} in room: ${roomId}`,
       );
       io.to(roomId).emit("deleteMessage", message);
     });
@@ -110,7 +109,7 @@ app.prepare().then(() => {
     // Comments
     socket.on("createComment", (roomId, comment) => {
       console.log(
-        `User with ID: ${socket.id} created comment: ${comment} in room: ${roomId}`
+        `User with ID: ${socket.id} created comment: ${comment} in room: ${roomId}`,
       );
       io.to(roomId).emit("newComment", comment);
       io.to(roomId).emit("newCommentInSection", comment);
@@ -118,7 +117,7 @@ app.prepare().then(() => {
 
     socket.on("updateComment", (roomId, comment) => {
       console.log(
-        `User with ID: ${socket.id} updated comment: ${comment._id} in room: ${roomId}`
+        `User with ID: ${socket.id} updated comment: ${comment._id} in room: ${roomId}`,
       );
       io.to(roomId).emit("updateComment", comment);
       io.to(roomId).emit("updateCommentInSection", comment);
@@ -126,7 +125,7 @@ app.prepare().then(() => {
 
     socket.on("deleteComment", (roomId, comment) => {
       console.log(
-        `User with ID: ${socket.id} deleted comment: ${comment} in room: ${roomId}`
+        `User with ID: ${socket.id} deleted comment: ${comment} in room: ${roomId}`,
       );
       io.to(roomId).emit("deleteComment", comment);
       io.to(roomId).emit("deleteCommentInSection", comment);
@@ -135,52 +134,52 @@ app.prepare().then(() => {
     // Prompts and PromptFolders
     socket.on("updatePrompt", (roomId, prompt) => {
       console.log(
-        `User with ID: ${socket.id} changed prompt: ${prompt} in room: ${roomId}`
+        `User with ID: ${socket.id} changed prompt: ${prompt} in room: ${roomId}`,
       );
       io.to(roomId).emit("refreshPrompts", prompt);
     });
 
     socket.on("updatePersonalPrompt", (prompt) => {
       console.log(
-        `User with ID: ${socket.id} changed prompt: ${prompt} in room: ${socket.id}`
+        `User with ID: ${socket.id} changed prompt: ${prompt} in room: ${socket.id}`,
       );
       io.to(socket.id).emit("refreshPrompts", prompt);
     });
 
-    socket.on("createImageGen", (roomId, prompt) =>{
+    socket.on("createImageGen", (roomId, prompt) => {
       console.log(
-        `User with ID: ${socket.id} created image: ${prompt} in room: ${roomId}`
+        `User with ID: ${socket.id} created image: ${prompt} in room: ${roomId}`,
       );
       io.to(roomId).emit("refreshImageGens", prompt);
-    })
+    });
 
-    socket.on("deleteImageGen", (roomId, prompt) =>{
+    socket.on("deleteImageGen", (roomId, prompt) => {
       console.log(
-        `User with ID: ${socket.id} deleted image: ${prompt} in room: ${roomId}`
+        `User with ID: ${socket.id} deleted image: ${prompt} in room: ${roomId}`,
       );
       io.to(roomId).emit("refreshImageGens", prompt);
-    })
+    });
 
     socket.on("createPage", (roomId, page) => {
       console.log(
-        `User with ID: ${socket.id} created page: ${page._id} in room: ${roomId}`
+        `User with ID: ${socket.id} created page: ${page._id} in room: ${roomId}`,
       );
       io.to(roomId).emit("refreshPages", page);
-    })
+    });
 
     socket.on("deletePage", (roomId, page) => {
       console.log(
-        `User with ID: ${socket.id} deleted page: ${page._id} in room: ${roomId}`
+        `User with ID: ${socket.id} deleted page: ${page._id} in room: ${roomId}`,
       );
       io.to(roomId).emit("refreshPages", page);
-    })
+    });
 
     socket.on("updatePage", (roomId, page) => {
       console.log(
-        `User with ID: ${socket.id} updated page: ${page._id} in room: ${roomId}`
+        `User with ID: ${socket.id} updated page: ${page._id} in room: ${roomId}`,
       );
       io.to(roomId).emit("refreshPages", page);
-    })
+    });
   });
 
   httpServer

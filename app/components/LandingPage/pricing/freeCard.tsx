@@ -1,4 +1,4 @@
-import { Button, Card, List, ListItem, Text, Title } from "@mantine/core";
+import {Anchor, Button, Card, List, ListItem, Text, Title } from "@mantine/core";
 import { IconCheck } from "@tabler/icons-react";
 
 export default function FreeCard() {
@@ -36,7 +36,10 @@ export default function FreeCard() {
       <Title order={5} c="dimmed" ta="center" mt="xl">
         No credit card required.
       </Title>
+      <Anchor href="/workspace">
+
       <Button mt="lg">Get Started</Button>
+      </Anchor>
     </Card>
   );
 }

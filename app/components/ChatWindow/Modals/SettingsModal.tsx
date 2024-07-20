@@ -14,21 +14,26 @@ import {
 import { updateChat } from "@/app/controllers/chat";
 import { IPageDocument } from "@/app/models/Page";
 import { getAllPages } from "@/app/controllers/pages";
+import { IAIModelDocument } from "@/app/models/AIModel";
+import { useListState } from "@mantine/hooks";
+import { constructSelectModels, getAIModels } from "@/app/controllers/aiModel";
 
 const SettingsModal = (props: {
   opened: boolean;
   setOpened: (value: boolean) => void;
   chat: any;
+  models: IAIModelDocument[];
 }) => {
-  const { opened, setOpened, chat } = props;
+  const { opened, setOpened, chat, models } = props;
   const [areaValue, setAreaValue] = useState("");
-  const [model, setModel] = useState("");
+  // const [models, handleModels] = useListState<IAIModelDocument>([]);
+  const [model, setModel] = useState<IAIModelDocument | null>(null);
   const [type, setType] = useState("text");
   const [pages, setPages] = useState<any[]>([]);
   const [pageId, setPageId] = useState<string | null>("Page 1");
   useEffect(() => {
     if (chat) {
-      setModel(chat?.assistant?.model);
+      setModel(models.find((model) => model._id == chat.aiModel) || null);
       setAreaValue(chat?.instructions.text || "");
       setType(chat?.instructions.type);
       setPageId(chat?.instructions.pageId);
@@ -40,13 +45,18 @@ const SettingsModal = (props: {
           (await getAllPages(chat.workspaceId || "")).pages.map(
             (page: IPageDocument) => {
               return { value: page._id, label: page.name };
-            }
-          )
+            },
+          ),
         );
       } catch (error) {
         console.error("Failed to fetch pages:", error);
       }
     };
+
+    // const fetchModels = async () => {
+    //   const res = await getAIModels(organization?.id || "");
+    //   handleModels.setState(res.aiModels);
+    // };
 
     fetchAllPages();
   }, [chat]);
@@ -67,12 +77,28 @@ const SettingsModal = (props: {
           <Text fz="sm" c="dimmed">
             Assistant Model
           </Text>
-          <Select
+          {/* <Select
             allowDeselect={false}
-            data={chat?.assistant?.assistantId?.models}
-            value={model}
+            data={models.map((model) => {
+              return {
+                value: model._id,
+                label: model.name,
+                group: model.provider,
+              };
+            })}
+            value={model?._id}
             onChange={(e) => {
-              setModel(e || "");
+              setModel(models.find((model) => model._id == e) || null);
+            }}
+          /> */}
+          <Select
+            // variant="light"
+            searchable
+            allowDeselect={false}
+            data={constructSelectModels(models)}
+            value={model?._id}
+            onChange={(e) => {
+              setModel(models.find((model) => model._id == e) || null);
             }}
           />
         </Box>
@@ -111,6 +137,8 @@ const SettingsModal = (props: {
           ) : (
             <Textarea
               value={areaValue}
+              autosize
+              maxRows={10}
               onChange={(event) =>
                 setAreaValue(event.currentTarget.value || "")
               }
@@ -120,7 +148,7 @@ const SettingsModal = (props: {
 
         {/* </Stack> */}
         <Group justify="flex-end">
-          {model != chat?.assistant?.model ||
+          {model?._id != chat?.aiModel ||
           type != chat?.instructions.type ||
           areaValue != chat?.instructions.text ||
           pageId != chat?.instructions.pageId ? (
@@ -128,9 +156,11 @@ const SettingsModal = (props: {
               size="md"
               variant="outline"
               onClick={() => {
-                setModel(chat?.assistant?.model);
-                setAreaValue(chat?.instructions.text || "");
+                setModel(
+                  models.find((model) => model._id == chat.aiModel) || null,
+                );
                 setType(chat?.instructions.type);
+                setAreaValue(chat?.instructions.text || "");
                 setPageId(chat?.instructions.pageId);
               }}
             >
@@ -141,10 +171,7 @@ const SettingsModal = (props: {
             size="md"
             onClick={() => {
               updateChat(chat._id, {
-                assistant: {
-                  assistantId: chat.assistant.assistantId._id,
-                  model: model,
-                },
+                aiModel: model?._id,
                 instructions: {
                   type: type,
                   text: areaValue,

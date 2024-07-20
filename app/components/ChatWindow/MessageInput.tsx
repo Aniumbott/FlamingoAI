@@ -1,4 +1,5 @@
 import { createMessage, sendAssistantMessage } from "@/app/controllers/message";
+import { IAIModelDocument } from "@/app/models/AIModel";
 import {
   Box,
   Textarea,
@@ -6,14 +7,15 @@ import {
   Tooltip,
   useMantineColorScheme,
 } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
+import { useListState, useMediaQuery } from "@mantine/hooks";
 import { IconRefresh, IconSend } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function MessageInput(props: {
   userId: string;
   currentChatId: string;
   chat: any;
+  models: IAIModelDocument[];
   processing: boolean;
   setProcessing: (processing: boolean) => void;
   setSearchTerm: (searchTerm: string) => void;
@@ -23,6 +25,7 @@ export default function MessageInput(props: {
     userId,
     currentChatId,
     chat,
+    models,
     processing,
     setProcessing,
     setSearchTerm,
@@ -71,10 +74,8 @@ export default function MessageInput(props: {
                 contexWindow[contexWindow.length - 1],
                 chat.instructions,
                 chat.workspaceId,
-                {
-                  ...chat.assistant,
-                  scope: chat.scope == "private" ? "private" : "public",
-                }
+                models.find((model) => model._id == chat.aiModel) || models[0],
+                chat.scope == "private" ? "private" : "public"
               );
             }}
           >
@@ -92,11 +93,11 @@ export default function MessageInput(props: {
             ? "0"
             : "var(--mantine-radius-sm) 0 0 var(--mantine-radius-sm)"
         }
-        w="66%"
+        w={isMobile ? "75%" : "66%"}
+        my={isMobile ? "xs" : "xl"}
         autoFocus={true}
         value={messageInput}
         disabled={processing}
-        my="xl"
         onChange={(e) => {
           setMessageInput(e.currentTarget.value);
 
@@ -126,10 +127,8 @@ export default function MessageInput(props: {
                 res.message,
                 chat.instructions,
                 chat.workspaceId,
-                {
-                  ...chat.assistant,
-                  scope: chat.scope == "private" ? "private" : "public",
-                }
+                models.find((model) => model._id == chat.aiModel) || models[0],
+                chat.scope == "private" ? "private" : "public"
               );
               setMessageInput("");
             });
@@ -161,7 +160,6 @@ export default function MessageInput(props: {
           onClick={() => {
             if (messageInput != "") {
               setProcessing(true);
-              console.log("chat assistant", chat.assistant);
               createMessage(
                 userId || "",
                 messageInput,
@@ -173,10 +171,9 @@ export default function MessageInput(props: {
                   res.message,
                   chat.instructions,
                   chat.workspaceId,
-                  {
-                    ...chat.assistant,
-                    scope: chat.scope == "private" ? "private" : "public",
-                  }
+                  models.find((model) => model._id == chat.aiModel) ||
+                    models[0],
+                  chat.scope == "private" ? "private" : "public"
                 );
                 setMessageInput("");
               });
