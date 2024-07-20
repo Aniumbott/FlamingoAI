@@ -23,7 +23,7 @@ export default function EnterpriseCard() {
       <Group justify="space-between">
         <Box maw={470}>
           <Title order={5} c="var(--mantine-primary-color-filled)">
-            Flamingo.ai ENTERPRISE
+            Flamingo.ai Enterprise
           </Title>
           <Title mt="sm" mb="lg" order={3}>
             Our flagship product
