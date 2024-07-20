@@ -1,5 +1,6 @@
 import {
   Anchor,
+  Badge,
   Button,
   Card,
   Group,
@@ -17,9 +18,12 @@ export default function ProCard(props: { isMonthly: boolean }) {
   const [proValue, setProValue] = useState(10);
   return (
     <Card mih={530} radius="md" w={330} shadow="lg" withBorder>
-      <Title order={4} c="var(--mantine-primary-color-filled)">
-        PRO
-      </Title>
+      <Group justify="space-between">
+        <Title order={4} c="var(--mantine-primary-color-filled)">
+          PRO
+        </Title>
+        <Badge variant="light">Save 17% yearly</Badge>
+      </Group>
       <Title order={2} mt="md">
         Collaborate
       </Title>
@@ -27,7 +31,7 @@ export default function ProCard(props: { isMonthly: boolean }) {
         {isMonthly ? "Billed per month" : "Billed per year"}
       </Text>
       <Group align="flex-end" gap={"5px"} mt="md">
-        <Title order={1}>${proValue * 2}</Title>
+        <Title order={1}>${proValue * (isMonthly ? 2 : 20)}</Title>
         <Text>/team/{isMonthly ? "month" : "year"}</Text>
       </Group>
       <Slider
@@ -50,10 +54,9 @@ export default function ProCard(props: { isMonthly: boolean }) {
         <ListItem>Members roles and permissions</ListItem>
       </List>
       <Anchor href="/workspace">
-
-      <Button mt="xl" variant="outline">
-        Upgrade Now
-      </Button>
+        <Button mt="xl" variant="outline">
+          Upgrade Now
+        </Button>
       </Anchor>
     </Card>
   );
