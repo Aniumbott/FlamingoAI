@@ -1,18 +1,5 @@
 import { updateWorkspace } from "@/app/controllers/workspace";
-import {
-  Badge,
-  Group,
-  Paper,
-  Select,
-  Text,
-  Button,
-  TextInput,
-  Accordion,
-  List,
-  Card,
-  Switch,
-  Textarea,
-} from "@mantine/core";
+import { Group, Paper, Text, Button, Textarea } from "@mantine/core";
 import { useEffect, useState } from "react";
 
 export default function AdvancedSetup(props: {
@@ -22,7 +9,7 @@ export default function AdvancedSetup(props: {
 }) {
   const { activeTab, setActiveTab, workspace } = props;
   const [areaValue, setAreaValue] = useState(
-    "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown."
+    "You are a large language model trained to provide helpful and informative responses. Please follow the user's instructions carefully and generate responses using markdown. Be specific, provide context when needed, and support your answers with sources or explanations when requested. If the initial response doesn't meet the user's expectations, iterate and try again. Avoid sharing personal, identifying, or sensitive information in your responses. Stay focused on providing accurate and reliable information to the best of your abilities."
   );
 
   useEffect(() => {
@@ -61,7 +48,7 @@ export default function AdvancedSetup(props: {
               variant="outline"
               onClick={() => {
                 setAreaValue(
-                  "You are ChatGPT, a large language model trained by OpenAI. Follow the user's instructions carefully. Respond using markdown."
+                  "You are a large language model trained to provide helpful and informative responses. Please follow the user's instructions carefully and generate responses using markdown. Be specific, provide context when needed, and support your answers with sources or explanations when requested. If the initial response doesn't meet the user's expectations, iterate and try again. Avoid sharing personal, identifying, or sensitive information in your responses. Stay focused on providing accurate and reliable information to the best of your abilities."
                 );
               }}
             >

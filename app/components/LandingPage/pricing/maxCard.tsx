@@ -1,4 +1,5 @@
 import {
+  Anchor,
   Badge,
   Button,
   Card,
@@ -60,9 +61,12 @@ export default function MaxCard(props: { isMonthly: boolean }) {
           Custom models (LLaMa, Mixtral)
         </ListItem>
       </List>
+      <Anchor href="/workspace">
+      
       <Button mt="xl" variant="outline">
         Upgrade Now
       </Button>
+      </Anchor>
     </Card>
   );
 }

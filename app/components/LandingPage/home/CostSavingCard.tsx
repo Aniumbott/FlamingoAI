@@ -55,7 +55,7 @@ const CostSavingCard = () => {
           </Text>
           <Text>
             Example for a team of 20: ChatGPT Plus costs $20 x 20 = $400/m,
-            while Team-GPT would cost ~ $40 + $110 (of API usage) /m
+            while Flamingo.ai would cost ~ $40 + $110 (of API usage) /m
           </Text>
           <List
             icon={
@@ -69,7 +69,9 @@ const CostSavingCard = () => {
           >
             <ListItem> Pay only for what you use</ListItem>
             <ListItem>Priority access to the OpenAI API</ListItem>
-            <ListItem>Team-GPT handles company billing and invoices</ListItem>
+            <ListItem>
+              Flamingo.ai handles company billing and invoices
+            </ListItem>
           </List>
           <Anchor href="/workspace">
             <Button size="lg" radius={"md"} rightSection={<IconArrowRight />}>
@@ -104,8 +106,8 @@ const CostSavingCard = () => {
             <Stack w={"70%"} gap={"xs"} align={"start"} justify={"center"}>
               <Title ta={isMobile ? "center" : "left"} order={4}>
                 &quot;6 hours of constant prompting cost me .33 cents. Kudos to
-                the developers of Team-GPT. This is a great app and is WORTH ITS
-                WEIGHT IN GOLD!&quot;
+                the developers of Flamingo.ai. This is a great app and is WORTH
+                ITS WEIGHT IN GOLD!&quot;
               </Title>
               <Text w="100%" ta={isMobile ? "center" : "left"}>
                 Tim Man

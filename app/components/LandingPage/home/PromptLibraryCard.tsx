@@ -56,8 +56,8 @@ const PromptLibraryCard = () => {
             <Avatar size="xl" radius={"md"}></Avatar>
             <Stack w={"70%"} gap={"xs"} align={"start"} justify={"center"}>
               <Title ta={isMobile ? "center" : "left"} order={4}>
-                &quot;I purchased Team-GPT and so far, love it! The interface is
-                incredibly user-friendly, making it easy for me to generate
+                &quot;I purchased Flamingo.ai and so far, love it! The interface
+                is incredibly user-friendly, making it easy for me to generate
                 high-quality content quickly.&quot;
               </Title>
               <Text w="100%" ta={isMobile ? "center" : "left"}>

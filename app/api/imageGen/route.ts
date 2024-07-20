@@ -39,10 +39,9 @@ export async function POST(req: any, res: NextApiResponse) {
     // First: gnerate the image
     const workspace = await Workspace.findById(body.workspaceId);
 
-    const apiKey = workspace?.assistants.find(
-      (a) =>
-        a.assistantId.toString() == process.env.NEXT_PUBLIC_OPENAI_ASSISTANT_ID
-    )?.apiKey;
+    const apiKey = workspace?.apiKeys.find(
+      (key) => key.provider == "openai" && key.scope == "public"
+    )?.key;
 
     if (!apiKey) return NextResponse.json("API Key not found", { status: 404 });
 

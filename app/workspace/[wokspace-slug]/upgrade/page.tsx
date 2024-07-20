@@ -215,9 +215,9 @@ export default function Upgrade() {
                 <HoverCard.Dropdown>
                   <Text size="sm">
                     Since you are utilizing an API infrastructure to power your
-                    AI interactions through Team-GPT, the service provider you
-                    choose will charge for their services based on usage. You
-                    will be billed for that separately by your GPT service
+                    AI interactions through Flamingo.ai, the service provider
+                    you choose will charge for their services based on usage.
+                    You will be billed for that separately by your GPT service
                     provider.
                   </Text>
                 </HoverCard.Dropdown>
@@ -306,7 +306,7 @@ export default function Upgrade() {
                   <HoverCard.Dropdown>
                     <Text size="sm">
                       Since you are utilizing an API infrastructure to power
-                      your AI interactions through Team-GPT, the service
+                      your AI interactions through Flamingo.ai, the service
                       provider you choose will charge for their services based
                       on usage. You will be billed for that separately by your
                       GPT service provider.
@@ -444,7 +444,7 @@ export default function Upgrade() {
                   <HoverCard.Dropdown>
                     <Text size="sm">
                       Since you are utilizing an API infrastructure to power
-                      your AI interactions through Team-GPT, the service
+                      your AI interactions through Flamingo.ai, the service
                       provider you choose will charge for their services based
                       on usage. You will be billed for that separately by your
                       GPT service provider.

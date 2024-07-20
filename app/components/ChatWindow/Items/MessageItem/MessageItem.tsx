@@ -34,6 +34,7 @@ import CommentItem from "../CommentItem/CommentItem";
 import { useOrganization, useUser } from "@clerk/nextjs";
 import MentionInput from "../CommentItem/MentionInput";
 import { MessageRender } from "./MessageRenderer";
+import { IAIModelDocument } from "@/app/models/AIModel";
 
 function getDate(date: string) {
   return new Date(date).toLocaleDateString();
@@ -45,7 +46,8 @@ function MessageItem(props: {
   userId: string;
   orgId: string;
   instructions: any;
-  assistant: any;
+  aiModel: IAIModelDocument;
+  scope: string;
   setPromptOpened: (value: boolean) => void;
   setPromptContent: (value: string) => void;
   setForkMessage: (value: any) => void;
@@ -57,7 +59,8 @@ function MessageItem(props: {
     userId,
     orgId,
     instructions,
-    assistant,
+    aiModel,
+    scope,
     setPromptOpened,
     setPromptContent,
     setForkMessage,
@@ -193,31 +196,11 @@ function MessageItem(props: {
                     ? `${createdBy?.firstName || ""} ${
                         createdBy?.lastName || ""
                       }`
-                    : "TeamGPT"}
-                </Text>
-                <Text pl={10} size="xs">
-                  {getDate(message.updatedAt.toString())}
+                    : "Flamingo.ai"}
                 </Text>
               </div>
 
               <div className="flex flex-row gap-[1px] items-center">
-                {isMobile && !isEdit ? (
-                  <Tooltip label="Fork Chat" fz="xs" position="bottom">
-                    <ActionIcon
-                      size={"sm"}
-                      color="grey"
-                      variant="subtle"
-                      onClick={() => {
-                        setForkMessage(message);
-                        setIsForkModalOpen(true);
-                      }}
-                    >
-                      <IconArrowFork
-                        style={{ width: rem(24), rotate: "180deg" }}
-                      />
-                    </ActionIcon>
-                  </Tooltip>
-                ) : null}
                 {(hovered || isMobile) && !isEdit ? (
                   message.type === "user" ? (
                     <>
@@ -308,7 +291,8 @@ function MessageItem(props: {
                               msg,
                               instructions,
                               orgId || "",
-                              assistant
+                              aiModel,
+                              scope
                             );
                           })
                           .then(() => {
@@ -337,39 +321,61 @@ function MessageItem(props: {
               // <Text size="md">{message.content}</Text>
               <MessageRender>{message.content}</MessageRender>
             )}
-            <div className="flex flex-row mt-2">
-              <CopyButton value={String(message.content)} timeout={2000}>
-                {({ copied, copy }) => (
-                  <Tooltip
-                    label={copied ? "Copied message" : "Copy message text"}
-                    fz="xs"
-                    position="bottom"
-                  >
+            <div className="flex justify-between items-center mt-2">
+              <div className="flex gap-[1px] items-center ">
+                {isMobile && !isEdit ? (
+                  <Tooltip label="Fork Chat" fz="xs" position="bottom">
                     <ActionIcon
-                      color={!copied ? "grey" : ""}
+                      size={"sm"}
+                      color="grey"
                       variant="subtle"
-                      onClick={copy}
+                      onClick={() => {
+                        setForkMessage(message);
+                        setIsForkModalOpen(true);
+                      }}
                     >
-                      {copied ? (
-                        <IconCheck style={{ width: rem(16) }} />
-                      ) : (
-                        <IconCopy style={{ width: rem(16) }} />
-                      )}
+                      <IconArrowFork
+                        style={{ width: rem(16), rotate: "180deg" }}
+                      />
                     </ActionIcon>
                   </Tooltip>
-                )}
-              </CopyButton>
-              <Tooltip label="Show comments" fz="xs" position="bottom">
-                <ActionIcon
-                  color={showComments ? "" : "grey"}
-                  variant="subtle"
-                  onClick={() => {
-                    setShowComments(!showComments);
-                  }}
-                >
-                  <IconMessages style={{ width: rem(16) }} />
-                </ActionIcon>
-              </Tooltip>
+                ) : null}
+                <CopyButton value={String(message.content)} timeout={2000}>
+                  {({ copied, copy }) => (
+                    <Tooltip
+                      label={copied ? "Copied message" : "Copy message text"}
+                      fz="xs"
+                      position="bottom"
+                    >
+                      <ActionIcon
+                        color={!copied ? "grey" : ""}
+                        variant="subtle"
+                        onClick={copy}
+                      >
+                        {copied ? (
+                          <IconCheck style={{ width: rem(16) }} />
+                        ) : (
+                          <IconCopy style={{ width: rem(16) }} />
+                        )}
+                      </ActionIcon>
+                    </Tooltip>
+                  )}
+                </CopyButton>
+                <Tooltip label="Show comments" fz="xs" position="bottom">
+                  <ActionIcon
+                    color={showComments ? "" : "grey"}
+                    variant="subtle"
+                    onClick={() => {
+                      setShowComments(!showComments);
+                    }}
+                  >
+                    <IconMessages style={{ width: rem(16) }} />
+                  </ActionIcon>
+                </Tooltip>
+              </div>
+              <Text pl={10} size="xs">
+                {getDate(message.updatedAt.toString())}
+              </Text>
             </div>
             <div className="flex flex-row mt-2 w-full">
               {showComments ? (

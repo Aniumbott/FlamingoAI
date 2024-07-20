@@ -7,8 +7,8 @@ require("./User.ts");
 require("./ChatFolder.ts");
 require("./Message.ts");
 require("./Workspace.ts");
-require("./Assistant.ts");
 require("./Page.ts");
+require("./AIModel.ts");
 
 const ChatSchema = new Mongoose.Schema(
   {
@@ -53,13 +53,10 @@ const ChatSchema = new Mongoose.Schema(
       text: { type: String, required: false },
       pageId: { type: Mongoose.Types.ObjectId, default: null, required: false },
     },
-    assistant: {
-      assistantId: {
-        type: Mongoose.Types.ObjectId,
-        ref: "assistants",
-        required: false,
-      },
-      model: { type: String, required: false },
+    aiModel: {
+      type: Mongoose.Types.ObjectId,
+      ref: "ai_models",
+      required: false,
     },
     // model
   },
@@ -87,10 +84,7 @@ interface IChat {
     text: string;
     pageId: Mongoose.Types.ObjectId;
   };
-  assistant: {
-    assistantId: Mongoose.Types.ObjectId;
-    model: string;
-  };
+  aiModel: Mongoose.Types.ObjectId;
 }
 
 interface IChatDocument extends IChat, Document {}

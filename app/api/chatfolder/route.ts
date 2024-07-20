@@ -1,10 +1,9 @@
 // Modules
+import { dbConnect } from "@/app/lib/db";
+import Chat from "@/app/models/Chat";
+import ChatFolder from "@/app/models/ChatFolder";
 import type { NextApiResponse } from "next";
 import { NextResponse } from "next/server";
-import { dbConnect } from "@/app/lib/db";
-import ChatFolder from "@/app/models/ChatFolder";
-import Chat from "@/app/models/Chat";
-import Message from "@/app/models/Message";
 
 // GET request handler
 export async function GET(req: any, res: NextApiResponse) {
@@ -109,7 +108,7 @@ export async function PUT(req: any, res: NextApiResponse) {
         },
         {
           new: true,
-        }
+        },
       );
 
       // Update the scope of all sub-folders and chats of the chat folder
@@ -136,7 +135,7 @@ export async function DELETE(req: any, res: NextApiResponse) {
     await deleteFolder(body.id);
     return NextResponse.json(
       { message: "Chat Folder deleted successfully" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error: any) {
     console.log("error at DELETE in Chatfolder route: ", error);

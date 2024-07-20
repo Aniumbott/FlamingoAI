@@ -24,7 +24,7 @@ export default function WorkspaceSetup(props: {
               Personal Chat
             </Text>
             <Text size="xs" c="dimmed">
-              Allow team members to creat personal chat
+              Allow team members to create personal chat
             </Text>
           </div>
           <Switch
@@ -44,7 +44,7 @@ export default function WorkspaceSetup(props: {
               Public Chat
             </Text>
             <Text size="xs" c="dimmed">
-              Allow team members to share chats publicaly.
+              Allow team members to share chats publicly.
             </Text>
           </div>
           <Switch

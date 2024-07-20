@@ -62,7 +62,7 @@ export default function HeaderMegaMenu(props: {
             }}
           >
             <Text size="xl" fw={500}>
-              Logo
+              Flamingo.ai
             </Text>
           </Link>
 
