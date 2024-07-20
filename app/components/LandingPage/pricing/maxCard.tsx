@@ -24,7 +24,7 @@ export default function MaxCard(props: { isMonthly: boolean }) {
         <Title order={4} c="var(--mantine-primary-color-filled)">
           MAX
         </Title>
-        <Badge variant="light">Save 20% yearly</Badge>
+        <Badge variant="light">Save 17% yearly</Badge>
       </Group>
       <Title order={2} mt="md">
         Step up
@@ -33,7 +33,7 @@ export default function MaxCard(props: { isMonthly: boolean }) {
         {isMonthly ? "Billed per month" : "Billed per year"}
       </Text>
       <Group align="flex-end" gap={"5px"} mt="md">
-        <Title order={1}>${maxValue * (isMonthly ? 5 : 4)}</Title>
+        <Title order={1}>${maxValue * (isMonthly ? 5 : 50)}</Title>
         <Text>/team/{isMonthly ? "month" : "year"}</Text>
       </Group>
       <Slider
@@ -62,10 +62,9 @@ export default function MaxCard(props: { isMonthly: boolean }) {
         </ListItem>
       </List>
       <Anchor href="/workspace">
-      
-      <Button mt="xl" variant="outline">
-        Upgrade Now
-      </Button>
+        <Button mt="xl" variant="outline">
+          Upgrade Now
+        </Button>
       </Anchor>
     </Card>
   );

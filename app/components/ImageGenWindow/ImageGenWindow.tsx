@@ -77,7 +77,7 @@ export default function ImageGenWindow(props: {
 
   const handleDownload = () => {
     const link = document.createElement("a");
-    link.href = `https://res.cloudinary.com/team-gpt/image/upload/fl_attachment/${imageGen?._id}.png`;
+    link.href = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/fl_attachment/${imageGen?._id}.png`;
     link.click();
   };
 
