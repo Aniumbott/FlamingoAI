@@ -31,6 +31,7 @@ import {
   Container,
   BackgroundImage,
   CloseButton,
+  Switch,
 } from "@mantine/core";
 import {
   createCheckoutSession,
@@ -71,12 +72,53 @@ export default function Upgrade() {
   const [clientSecret, setClientSecret] = useState(null);
   const [opened, setOpened] = useState(false);
 
-  const numbers = Array.from({ length: 50 }, (_, i) => (i + 1) * 10);
-  const [membersQuantity, setMembersQuantity] = useState("10");
   const [proQuantity, setProQuantity] = useState<string | number>(10);
   const [maxQuantity, setMaxQuantity] = useState<string | number>(10);
   const { organization } = useOrganization();
   const [workspace, setWorkspace] = useState<IWorkspaceDocument | null>(null);
+
+  const [isMonthly, setIsMonthly] = useState(false);
+
+  const buyPro = async () => {
+    let res;
+    if (isMonthly) {
+      res = await createCheckoutSession(
+        process.env.NEXT_PUBLIC_PRO_PRICE_MONTHLY || "",
+        String(proQuantity),
+        workspace?.customerId || "",
+        workspace?.slug || ""
+      );
+    } else {
+      res = await createCheckoutSession(
+        process.env.NEXT_PUBLIC_PRO_PRICE_YEARLY || "",
+        String(proQuantity),
+        workspace?.customerId || "",
+        workspace?.slug || ""
+      );
+    }
+    setClientSecret(res.session.client_secret);
+  };
+
+  const buyMax = async () => {
+    let res;
+    if (isMonthly) {
+      res = await createCheckoutSession(
+        process.env.NEXT_PUBLIC_MAX_PRICE_MONTHLY || "",
+        String(maxQuantity),
+        workspace?.customerId || "",
+        workspace?.slug || ""
+      );
+    } else {
+      res = await createCheckoutSession(
+        process.env.NEXT_PUBLIC_MAX_PRICE_YEARLY || "",
+        String(maxQuantity),
+        workspace?.customerId || "",
+        workspace?.slug || ""
+      );
+    }
+    setClientSecret(res.session.client_secret);
+  };
+
   useEffect(() => {
     const collectWorkspace = async () => {
       const res = await getWorkspace(organization?.id || "");
@@ -158,7 +200,23 @@ export default function Upgrade() {
         )}
       </Modal>
 
-      <Group gap={65} align="strech" justify="center" mt="6rem" wrap="wrap">
+      <Group mt="xl" justify="center" w="100%">
+        <Text c={!isMonthly ? "var(--mantine-primary-color-filled)" : ""}>
+          Yearly
+        </Text>
+        <Switch
+          size="md"
+          checked={isMonthly}
+          onClick={() => {
+            setIsMonthly(!isMonthly);
+          }}
+        />
+        <Text c={isMonthly ? "var(--mantine-primary-color-filled)" : ""}>
+          Monthly
+        </Text>
+      </Group>
+
+      <Group gap={65} align="strech" justify="center" wrap="wrap">
         {/* Free */}
         <Card
           h={590}
@@ -174,7 +232,6 @@ export default function Upgrade() {
         >
           {workspace && !workspace?.subscription ? (
             <Badge
-              color="teal"
               variant="light"
               size="lg"
               style={{
@@ -258,7 +315,6 @@ export default function Upgrade() {
           {workspace?.subscription?.product_id ==
           process.env.NEXT_PUBLIC_PRO_PLAN ? (
             <Badge
-              color="teal"
               variant="light"
               size="lg"
               style={{
@@ -291,9 +347,9 @@ export default function Upgrade() {
                 <List.Item mt={6}>Usage Reports</List.Item>
               </List>
               <div className="w-full mt-5">
-                <Title order={3}>20 INR</Title>
+                <Title order={3}>{isMonthly ? "$20" : "$200"}</Title>
                 <Text size="xs" c="dimmed">
-                  per month / per 10 seats
+                  per {isMonthly ? "month" : "year"} / per 10 seats
                 </Text>
               </div>
               <Group gap={5} align="center" c="dimmed" w="100%">
@@ -351,14 +407,7 @@ export default function Upgrade() {
                       window.open(res.portalSession.url, "_blank");
                     } else {
                       setOpened(true);
-                      createCheckoutSession(
-                        process.env.NEXT_PUBLIC_PRO_PRICE || "",
-                        String(proQuantity),
-                        workspace?.customerId || "",
-                        workspace?.slug || ""
-                      ).then((res) =>
-                        setClientSecret(res.session.client_secret)
-                      );
+                      buyPro();
                     }
                   }}
                 >
@@ -387,7 +436,6 @@ export default function Upgrade() {
           {workspace?.subscription?.product_id ==
           process.env.NEXT_PUBLIC_MAX_PLAN ? (
             <Badge
-              color="teal"
               variant="light"
               size="lg"
               style={{
@@ -429,9 +477,9 @@ export default function Upgrade() {
                 </List.Item>
               </List>
               <div className="w-full mt-5">
-                <Title order={3}>50 INR</Title>
+                <Title order={3}>{isMonthly ? "$50" : "$500"}</Title>
                 <Text size="xs" c="dimmed">
-                  per month / per 10 seats
+                  per {isMonthly ? "month" : "year"} / per 10 seats
                 </Text>
               </div>
               <Group gap={5} align="center" c="dimmed" w="100%">
@@ -489,14 +537,7 @@ export default function Upgrade() {
                       window.open(res.portalSession.url, "_blank");
                     } else {
                       setOpened(true);
-                      createCheckoutSession(
-                        process.env.NEXT_PUBLIC_MAX_PRICE || "",
-                        String(maxQuantity),
-                        workspace?.customerId || "",
-                        workspace?.slug || ""
-                      ).then((res) =>
-                        setClientSecret(res.session.client_secret)
-                      );
+                      buyMax();
                     }
                   }}
                 >

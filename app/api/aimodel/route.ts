@@ -40,7 +40,7 @@ export async function POST(req: any, res: NextApiResponse) {
     const { messages, workspaceId, model, scope } = body;
     const workspace = await Workspace.findById(workspaceId);
     const apiKey = workspace?.apiKeys.find(
-      (key) => key.provider == model.provider && key.scope == scope,
+      (key) => key.provider == model.provider && key.scope == scope
     )?.key;
 
     // console.log(model, workspace);
@@ -79,12 +79,18 @@ export async function POST(req: any, res: NextApiResponse) {
       messages: messages,
     });
 
+    // if (finishReason == "error") {
+    //   console.log(rawResponse);
+    // }
+
     return NextResponse.json({ text, usage }, { status: 200 });
   } catch (error: any) {
     console.log("error at POST in AIModels route: ", error);
     return NextResponse.json(error.message, { status: 500 });
   }
 }
+
+//
 
 /*
 Streaming code ------------------------------------------------------------------------------------------------->
