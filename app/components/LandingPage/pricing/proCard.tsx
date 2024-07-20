@@ -10,12 +10,15 @@ import {
   Text,
   Title,
 } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { IconCheck } from "@tabler/icons-react";
 import { useState } from "react";
 
 export default function ProCard(props: { isMonthly: boolean }) {
   const { isMonthly } = props;
   const [proValue, setProValue] = useState(10);
+  const isMobile = useMediaQuery("(max-width: 48em)");
+
   return (
     <Card mih={530} radius="md" w={330} shadow="lg" withBorder>
       <Group justify="space-between">
@@ -54,7 +57,7 @@ export default function ProCard(props: { isMonthly: boolean }) {
         <ListItem>Members roles and permissions</ListItem>
       </List>
       <Anchor href="/workspace">
-        <Button mt="xl" variant="outline">
+        <Button mt="xl" variant="outline" fullWidth={isMobile ? true : false}>
           Upgrade Now
         </Button>
       </Anchor>

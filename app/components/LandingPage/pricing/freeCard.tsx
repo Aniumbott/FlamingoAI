@@ -1,7 +1,10 @@
 import {Anchor, Button, Card, List, ListItem, Text, Title } from "@mantine/core";
+import { useMediaQuery } from "@mantine/hooks";
 import { IconCheck } from "@tabler/icons-react";
 
 export default function FreeCard() {
+  const isMobile = useMediaQuery("(max-width: 48em)");
+
   return (
     <Card
       mih={530}
@@ -38,7 +41,7 @@ export default function FreeCard() {
       </Title>
       <Anchor href="/workspace">
 
-      <Button mt="lg">Get Started</Button>
+      <Button mt="lg" fullWidth={isMobile ? true : false}>Get Started</Button>
       </Anchor>
     </Card>
   );

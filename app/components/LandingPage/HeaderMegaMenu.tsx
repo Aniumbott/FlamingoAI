@@ -49,11 +49,17 @@ export default function HeaderMegaMenu(props: {
         top: 0,
         background: "var(--mantine-color-white)",
         boxShadow: "var(--mantine-shadow-xl)",
-        zIndex: 1000,
+        zIndex: 100,
       }}
     >
       <header className={classes.header}>
-        <Group justify="space-between" h="100%">
+        <Group
+          justify="space-between"
+          h="100%"
+          style={{
+            flexWrap: "nowrap",
+          }}
+        >
           {/* <MantineLogo size={30} /> */}
           <Link
             href="#home"
@@ -101,8 +107,12 @@ export default function HeaderMegaMenu(props: {
 
           {isSignedIn ? (
             <Group>
-              <UserButton afterSignOutUrl="/" />
-              <Divider orientation="vertical" />
+              {!isMobile && (
+                <>
+                  <UserButton afterSignOutUrl="/" />
+                  <Divider orientation="vertical" />
+                </>
+              )}
               <Anchor href="/workspace">
                 <Button
                   variant="outline"
@@ -138,11 +148,12 @@ export default function HeaderMegaMenu(props: {
         size="100%"
         padding="md"
         hiddenFrom="sm"
-        zIndex={1000000}
+        zIndex={100}
       >
         <Drawer.Title p="sm">
           <Group justify="space-between">
             <Title order={3}>Navigation</Title>
+            {isMobile && <UserButton afterSignOutUrl="/"  />}
           </Group>
         </Drawer.Title>
         <ScrollArea h={`calc(100vh - ${rem(80)})`} mx="-md">
