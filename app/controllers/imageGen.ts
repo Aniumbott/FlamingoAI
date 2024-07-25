@@ -70,7 +70,7 @@ async function deleteImageGen(imageGenId: string, workspaceId: string) {
   try {
     const data = await fetch("/api/imageGen", {
       method: "DELETE",
-      body: JSON.stringify({ id: imageGenId }),
+      body: JSON.stringify({ id: imageGenId, workspaceId: workspaceId }),
       headers: {
         "Content-Type": "application/json",
       },

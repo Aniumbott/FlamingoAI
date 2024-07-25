@@ -62,7 +62,7 @@ const WorkspaceMenu = (props: { workspace: any }) => {
       >
         <Tooltip label="Settings" fz="xs">
           <Menu.Target ref={ref}>
-            <ActionIcon variant="subtle" color="grey" size="md">
+            <ActionIcon variant="subtle" mb={"6px"} color="grey" size="md">
               <IconSettings size="20px" />
             </ActionIcon>
           </Menu.Target>
