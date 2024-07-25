@@ -102,7 +102,7 @@ export default function ImageGenWindow(props: {
         setIsHD(res.imageGen.isHD);
         setImagePath(
           getCldImageUrl({
-            src: res.imageGen?._id || "",
+            src: `workspaces/${orgId}/${res.imageGen?._id}` || "",
           }) || ""
         );
       });

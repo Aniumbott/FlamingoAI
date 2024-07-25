@@ -158,7 +158,7 @@ async function sendAssistantMessage(
     });
   }
 
-  await getAIResponse(messagesContent, workspaceId, aiModel, scope)
+  return await getAIResponse(messagesContent, workspaceId, aiModel, scope)
     .then((res: any) => {
       console.log("res at sendAssistantMessage", res);
       if (res) {
@@ -176,6 +176,7 @@ async function sendAssistantMessage(
           res.usage.completionTokens.toString()
         );
       }
+      return res;
     });
 }
 

@@ -76,7 +76,11 @@ export default function MessageInput(props: {
                 chat.workspaceId,
                 models.find((model) => model._id == chat.aiModel) || models[0],
                 chat.scope == "private" ? "private" : "public"
-              );
+              ).then((res) => {
+                if (res === null) {
+                  setProcessing(false);
+                }
+              });
             }}
           >
             <IconRefresh size={isMobile ? "15px" : "20px"} />

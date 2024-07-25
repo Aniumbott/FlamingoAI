@@ -17,6 +17,14 @@ import Page from "@/app/models/Page";
 import Prompt from "@/app/models/Prompt";
 import ChatFolder from "@/app/models/ChatFolder";
 import PromptFolder from "@/app/models/PromptFolder";
+import { v2 as cloudinary } from "cloudinary";
+
+// Configuration
+cloudinary.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 const webhookSecret = process.env.CLERK_WORKSPACE_WEBHOOK_SECRET || ``;
 
@@ -98,7 +106,12 @@ export async function POST(request: Request) {
       (await chats).forEach(async (chat) => {
         await deleteChatById(chat._id, Chat, Message, Comment);
       });
+
       await ImageGen.find({ workspaceId: payload.data.id }).deleteMany();
+      await cloudinary.api.delete_resources_by_prefix(
+        `workspaces/${payload.data.id}`
+      );
+
       await Page.find({ workspaceId: payload.data.id }).deleteMany();
       await Prompt.find({ workspaceId: payload.data.id }).deleteMany();
       await ChatFolder.find({ workspaceId: payload.data.id }).deleteMany();
@@ -116,9 +129,7 @@ export async function POST(request: Request) {
 
       break;
   }
-
   // console.log(customer);
-
   return Response.json({ message: "Received" });
 }
 

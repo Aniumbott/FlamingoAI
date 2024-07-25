@@ -28,20 +28,20 @@ async function getAIResponse(
     },
   });
 
+  const response = await data.json();
+
   if (data.status !== 200) {
     notifications.show({
       icon: createElement(IconX),
       color: "red",
-      title: "Missing or invalid API key.",
-      message: "Kindly update in workspace settings.",
+      title: response,
+      message: "",
       withCloseButton: true,
       withBorder: true,
       loading: false,
     });
     return null;
   }
-  const response = await data.json();
-  // console.log("response at getAIResponse", response);
   return response;
 }
 

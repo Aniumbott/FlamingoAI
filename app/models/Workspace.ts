@@ -31,13 +31,17 @@ const workspaceSchema = new Mongoose.Schema(
         {
           key: "",
           provider: "openai",
-          aiModel: new Mongoose.Types.ObjectId("667e7ea9f9e460d48440784b"),
+          aiModel: new Mongoose.Types.ObjectId(
+            process.env.NEXT_PUBLIC_DEFAULT_AI_MODEL
+          ),
           scope: "public",
         },
         {
           key: "",
           provider: "openai",
-          aiModel: new Mongoose.Types.ObjectId("667e7ea9f9e460d48440784b"),
+          aiModel: new Mongoose.Types.ObjectId(
+            process.env.NEXT_PUBLIC_DEFAULT_AI_MODEL
+          ),
           scope: "private",
         },
       ],

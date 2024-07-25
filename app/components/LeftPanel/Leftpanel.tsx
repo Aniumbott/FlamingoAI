@@ -74,14 +74,14 @@ export default function LeftPanel(props: { toggleLeft: () => void }) {
   }, [workspace]);
 
   return (
-    <Stack h={"100%"} justify="flex-start" align="strech" mt={10} w="100%">
+    <Stack h={"100%"} justify="flex-start" align="stretch" mt={10} w="100%">
       <Group
         justify="space-between"
         align="center"
         preventGrowOverflow={false}
         gap={10}
       >
-        <div className="grow">
+        <div className="flex h-fit item-center self-center grow">
           <OrganizationSwitcher
             hidePersonal
             createOrganizationUrl="/onboarding/"

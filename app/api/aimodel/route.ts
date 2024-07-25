@@ -43,9 +43,6 @@ export async function POST(req: any, res: NextApiResponse) {
       (key) => key.provider == model.provider && key.scope == scope
     )?.key;
 
-    // console.log(model, workspace);
-    // console.log("apiKey: ", apiKey);
-
     if (!apiKey) return NextResponse.json("API Key not found", { status: 404 });
 
     let tokenUsage: {
@@ -74,16 +71,18 @@ export async function POST(req: any, res: NextApiResponse) {
         break;
     }
 
-    const { text, usage } = await generateText({
-      model: chatModel(model.value),
-      messages: messages,
-    });
-
-    // if (finishReason == "error") {
-    //   console.log(rawResponse);
-    // }
-
-    return NextResponse.json({ text, usage }, { status: 200 });
+    try {
+      const { text, usage } = await generateText({
+        model: chatModel(model.value),
+        messages: messages,
+      });
+      return NextResponse.json({ text, usage }, { status: 200 });
+    } catch (error: any) {
+      console.log("error", error);
+      return NextResponse.json(error.data.error.message, {
+        status: 500,
+      });
+    }
   } catch (error: any) {
     console.log("error at POST in AIModels route: ", error);
     return NextResponse.json(error.message, { status: 500 });
