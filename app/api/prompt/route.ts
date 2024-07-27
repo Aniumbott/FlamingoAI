@@ -55,8 +55,8 @@ export async function POST(req: NextRequest, res: NextResponse) {
   try {
     const body = await req.json();
     await dbConnect();
-    const {variables , updatedText} = fetchVariables(body.content);
-    
+    const { variables, updatedText } = fetchVariables(body.content);
+
     const prompt = await Prompt.create({
       name: body.name,
       content: updatedText,
@@ -136,9 +136,18 @@ export async function PUT(req: NextRequest, res: NextResponse) {
         );
       }
     } else {
-      prompt = await Prompt.findByIdAndUpdate(body.id, body, {
-        new: true,
-      });
+      const { variables, updatedText } = fetchVariables(body.content);
+      prompt = await Prompt.findByIdAndUpdate(
+        body.id,
+        {
+          ...body,
+          content: updatedText,
+          variables,
+        },
+        {
+          new: true,
+        }
+      );
     }
     return NextResponse.json({ prompt }, { status: 200 });
   } catch (error: any) {
@@ -179,14 +188,12 @@ export async function DELETE(req: NextRequest, res: NextResponse) {
 // }
 
 function fetchVariables(text: string) {
-    const variableRegex = /\{\{(.*?)\}\}/g;
-    let updatedText = text;
-
-    const variables = Array.from(text.matchAll(variableRegex)).map(match => {
-        const variable = match[1].trim();
-        updatedText = updatedText.replace(match[0], `{{${variable}}}`);
-        return variable;
-    });
-
-    return { variables, updatedText };
+  const variableRegex = /\{\{(.*?)\}\}/g;
+  let updatedText = text;
+  const variables = Array.from(text.matchAll(variableRegex)).map((match) => {
+    const variable = match[1].trim();
+    updatedText = updatedText.replace(match[0], `{{${variable}}}`);
+    return variable;
+  });
+  return { variables, updatedText };
 }

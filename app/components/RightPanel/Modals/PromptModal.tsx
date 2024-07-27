@@ -1,4 +1,4 @@
-import { createPrompt } from "@/app/controllers/prompt";
+import { createPrompt, updatePrompt } from "@/app/controllers/prompt";
 import { IPromptDocument } from "@/app/models/Prompt";
 import { useAuth } from "@clerk/nextjs";
 import {
@@ -142,7 +142,22 @@ const PromptModal = (props: {
               Create
             </Button>
           ) : (
-            <Button variant="default" fw={400} fullWidth disabled={!hasChanged}>
+            <Button
+              variant="default"
+              fw={400}
+              fullWidth
+              disabled={!hasChanged}
+              onClick={() => {
+                updatePrompt(modalItem._id, {
+                  name,
+                  description,
+                  content,
+                }).then((res)=>{
+                  console.log(res);
+                  setOpened(false);
+                });
+              }}
+            >
               Save
             </Button>
           )}
