@@ -20,6 +20,8 @@ export default function MessageInput(props: {
   setProcessing: (processing: boolean) => void;
   setSearchTerm: (searchTerm: string) => void;
   combobox: any;
+  messageInput: string;
+  setMessageInput: (messageInput: string) => void;
 }) {
   const {
     userId,
@@ -30,9 +32,10 @@ export default function MessageInput(props: {
     setProcessing,
     setSearchTerm,
     combobox,
+    messageInput,
+    setMessageInput
   } = props;
   const { colorScheme } = useMantineColorScheme();
-  const [messageInput, setMessageInput] = useState("");
   const isMobile = useMediaQuery(`(max-width: 48em)`);
 
   function tillLastUserMessage(messages: any[]) {
