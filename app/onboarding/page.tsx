@@ -185,7 +185,7 @@ export default function Home() {
                             window.history.pushState(
                               {},
                               "",
-                              "/onboarding?step=3",
+                              "/onboarding?step=3"
                             );
                           });
                         });
@@ -257,12 +257,11 @@ export default function Home() {
         )}
         {active == 4 && (
           <Box
-            mt={"md"}
             style={{
               overflowY: "scroll",
             }}
           >
-            <Title order={isMobile ? 2 : 1} ta={"center"} mt="xl" mb="xl">
+            <Title order={isMobile ? 2 : 1} mb="xl">
               Successfully Created{" "}
               <span
                 style={{
@@ -273,17 +272,16 @@ export default function Home() {
               </span>
               .
             </Title>
-            <Title order={3} mb="lg">
-              Invite people into your Workspace.
-            </Title>
-            <OrganizationProfile />
-            <Group mt="xl" justify="flex-end">
+
+            <Group w="100%" justify="space-between" align="center" mb="md">
+              <Title order={3}>Invite people into your Workspace.</Title>
               <Anchor href={`/workspace/${organization?.slug}`}>
-                <Button size="md" radius="md" mb="sm">
+                <Button size="sm" radius="md">
                   Go to your workspace
                 </Button>
               </Anchor>
             </Group>
+            <OrganizationProfile />
           </Box>
         )}
         <Stepper

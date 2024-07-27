@@ -438,6 +438,7 @@ const GeneralChats = (props: {
                       <ImageCard
                         key={imageGen._id}
                         imageGen={imageGen}
+                        orgId={orgId || ""}
                         createdBy={
                           members.filter(
                             (member) => member.userId == imageGen.createdBy
@@ -634,10 +635,14 @@ const AccordianLabelPages = (props: {
   );
 };
 
-const ImageCard = (props: { imageGen: IImageGenDocument; createdBy: any }) => {
+const ImageCard = (props: {
+  imageGen: IImageGenDocument;
+  createdBy: any;
+  orgId: string;
+}) => {
   const { hovered, ref } = useHover();
   const pathname = usePathname();
-  const { imageGen, createdBy } = props;
+  const { imageGen, createdBy, orgId } = props;
   // console.log("createdBy", createdBy);
   return (
     <Card
@@ -680,7 +685,7 @@ const ImageCard = (props: { imageGen: IImageGenDocument; createdBy: any }) => {
       <Flex align={"center"} justify={"center"}>
         <CldImage
           src={
-            imageGen?._id ||
+            `workspaces/${orgId}/${imageGen?._id}` ||
             "https://images.unsplash.com/photo-1667835949430-a2516cc93d27"
           } // Use this sample image or upload your own via the Media Explorer
           width="70"

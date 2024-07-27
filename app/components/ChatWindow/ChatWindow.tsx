@@ -821,6 +821,8 @@ export default function ChatWindow(props: {
                     setProcessing={setProcessing}
                     setSearchTerm={setSearchTerm}
                     combobox={combobox}
+                    messageInput={messageInput}
+                    setMessageInput={setMessageInput}
                   />
                 </Box>
               </Combobox.Target>
@@ -835,6 +837,8 @@ export default function ChatWindow(props: {
                           value={prompt._id}
                           onClick={() => {
                             let newMessageInput = messageInput;
+                            console.log(messageInput)
+                            console.log(newMessageInput , prompt.content)
                             if (newMessageInput.includes("/")) {
                               newMessageInput = newMessageInput.substring(
                                 0,
@@ -847,6 +851,7 @@ export default function ChatWindow(props: {
                               setPromptVariables(prompt.variables);
                               setPromptVariablesOpened(true);
                             } else {
+                              console.log(newMessageInput + prompt.content)
                               setMessageInput(newMessageInput + prompt.content);
                               setSearchTerm("");
                             }
