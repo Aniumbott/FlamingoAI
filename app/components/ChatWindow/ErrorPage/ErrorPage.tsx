@@ -20,7 +20,7 @@ export default function ErrorPage() {
             ta="center"
             className={classes.description}
           >
-            It seems like chat you are trying to acess is either ristricted or
+            It seems like chat you are trying to access is either restricted or
             does not exist.
           </Text>
           <Group justify="center">

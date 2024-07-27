@@ -5,6 +5,7 @@ import {
   ClerkLoading,
   OrganizationList,
   useOrganization,
+  useOrganizationList,
 } from "@clerk/nextjs";
 import {
   Anchor,
@@ -21,8 +22,17 @@ import { useEffect } from "react";
 
 export default function Page() {
   const { organization } = useOrganization();
+  const { userMemberships } = useOrganizationList({
+    userMemberships: true,
+  });
+  const { userInvitations } = useOrganizationList({
+    userInvitations: true,
+  });
   const router = useRouter();
   const isMobile = useMediaQuery(`(max-width: 48em)`);
+  const showOrganizationList =
+    userMemberships.count !== 0 || userInvitations.count !== 0;
+
   useEffect(() => {
     if (organization?.slug) {
       router.push("workspace/" + organization.slug);
@@ -60,12 +70,14 @@ export default function Page() {
             justifyContent: "flex-end",
           }}
         >
-          <OrganizationList
-            hidePersonal
-            afterCreateOrganizationUrl="/workspace/:slug"
-            afterSelectPersonalUrl="/user/:id"
-            afterSelectOrganizationUrl="/workspace/:slug"
-          />
+          {showOrganizationList && (
+            <OrganizationList
+              hidePersonal
+              afterCreateOrganizationUrl="/workspace/:slug"
+              afterSelectPersonalUrl="/user/:id"
+              afterSelectOrganizationUrl="/workspace/:slug"
+            />
+          )}
           <ClerkLoaded>
             <Anchor href="/onboarding">
               <Button size="md" radius={"md"} variant="outline" mt="lg">
