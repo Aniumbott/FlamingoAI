@@ -58,7 +58,7 @@ export default function Home() {
     }
     return localStorage.setItem(
       "mantine-color-scheme-value",
-      previousColorScheme
+      previousColorScheme,
     );
   }, []);
 
