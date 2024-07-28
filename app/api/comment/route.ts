@@ -82,9 +82,6 @@ export async function DELETE(req: any, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
-
-    console.log(body);
-
     if (body.replies.length > 0) {
       for (const replyId of body.replies) {
         await Comment.findByIdAndDelete(replyId);
