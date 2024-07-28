@@ -58,199 +58,207 @@ export default function Home() {
     }
     return localStorage.setItem(
       "mantine-color-scheme-value",
-      previousColorScheme
+      previousColorScheme,
     );
   }, []);
 
   return (
-    <Box bg="var(--mantine-color-gray-1)">
-      <HeaderMegaMenu
-        active={target == "pricing" ? 1 : target == "contact-us" ? 2 : 0}
-        setTarget={setTarget}
-      />
-      <Stack m={"auto"} p="xl" maw="1200px" align={"center"} justify={"center"}>
-        <Paper
-          ref={target == "home" ? targetRef : null}
-          w="100vw"
-          px="1rem"
-          py="5rem"
-          radius="0"
-          style={{
-            background: "white",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
+    colorScheme === "light" && (
+      <Box bg="var(--mantine-color-gray-1)">
+        <HeaderMegaMenu
+          active={target == "pricing" ? 1 : target == "contact-us" ? 2 : 0}
+          setTarget={setTarget}
+        />
+        <Stack
+          m={"auto"}
+          p="xl"
+          maw="1200px"
+          align={"center"}
+          justify={"center"}
         >
-          <Title
-            w="calc(min(1000px, 100%))"
-            mt={"calc(2rem + 5vw)"}
-            ta="center"
-            size={"4rem"}
+          <Paper
+            ref={target == "home" ? targetRef : null}
+            w="100vw"
+            px="1rem"
+            py="5rem"
+            radius="0"
+            style={{
+              background: "white",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
           >
-            Intuitive GPT chat for your{" "}
-            <span
-              style={{
-                padding: "0.5rem 1rem",
-                color: "white",
-                background: "var(--mantine-primary-color-filled)",
-              }}
+            <Title
+              w="calc(min(1000px, 100%))"
+              mt={"calc(2rem + 5vw)"}
+              ta="center"
+              size={"4rem"}
             >
-              whole
-            </span>{" "}
-            company
-          </Title>
-          <Text mt="xl" size="lg" ta={"center"}>
-            <div>
-              <b>Flamingo.ai </b> guarantees ChatGPT adoption for teams between
-              2 and 20,000 people.
-            </div>
-            <div>
-              Organize knowledge, collaborate, and master AI in one shared
-              workspace.
-            </div>
-          </Text>
-          {/* <Button onClick={() => streamTest()}>Click me</Button> */}
-          <Anchor href="/workspace">
-            <Button
-              size="xl"
+              Intuitive GPT chat for your{" "}
+              <span
+                style={{
+                  padding: "0.5rem 1rem",
+                  color: "white",
+                  background: "var(--mantine-primary-color-filled)",
+                }}
+              >
+                whole
+              </span>{" "}
+              company
+            </Title>
+            <Text mt="xl" size="lg" ta={"center"}>
+              <div>
+                <b>Flamingo.ai </b> guarantees ChatGPT adoption for teams
+                between 2 and 20,000 people.
+              </div>
+              <div>
+                Organize knowledge, collaborate, and master AI in one shared
+                workspace.
+              </div>
+            </Text>
+            {/* <Button onClick={() => streamTest()}>Click me</Button> */}
+            <Anchor href="/workspace">
+              <Button
+                size="xl"
+                mt="3rem"
+                radius={"lg"}
+                rightSection={<IconArrowRight />}
+              >
+                Start Free{" "}
+              </Button>
+            </Anchor>
+
+            <Text mt="5rem">
+              {" "}
+              👇 See how Flamingo.ai works. Click the ‘Continue‘ button below
+              for a guided tour! 👇
+            </Text>
+            <Image
               mt="3rem"
-              radius={"lg"}
-              rightSection={<IconArrowRight />}
-            >
-              Start Free{" "}
-            </Button>
-          </Anchor>
-
-          <Text mt="5rem">
-            {" "}
-            👇 See how Flamingo.ai works. Click the ‘Continue‘ button below for
-            a guided tour! 👇
-          </Text>
-          <Image
-            mt="3rem"
-            radius="md"
-            width="auto"
-            fit="contain"
-            maw={1100}
-            src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
-            alt=""
-          />
-        </Paper>
-        {/* -------------------------------------------------------------------------------------------- */}
-
-        <Title ta="center" mt="5rem" order={1}>
-          Companies that trust us
-        </Title>
-
-        <Group
-          gap={"3rem"}
-          pt="lg"
-          justify="center"
-          style={{
-            flexDirection: isMobile ? "column" : "row",
-          }}
-        >
-          {[merask, jhons, polk, medesk, charles, limechain, shift4].map(
-            (e, id) => (
-              <Image
-                mah={"1.5em"}
-                w="auto"
-                component={NextImage}
-                alt="sponsor"
-                src={e}
-                key={id}
-              ></Image>
-            )
-          )}
-        </Group>
-
-        {/* -------------------------------------------------------------------------------------------- */}
-        {/* <Divider w="100vw" variant="dashed" size={"sm"} /> */}
-        <FolderCard />
-        <Divider w="100vw" variant="dashed" size={"sm"} />
-        <PromptLibraryCard />
-        <Divider w="100vw" variant="dashed" size={"sm"} />
-        <CostSavingCard />
-        <Divider w="100vw" variant="dashed" size={"sm"} />
-        <ReportsCard />
-        {/* <Divider w="100vw" variant="dashed" size={"sm"} /> */}
-
-        {/* -------------------------------------------------------------------------------------------- */}
-        <Paper
-          ref={target == "pricing" ? targetRef : null}
-          mt="5rem"
-          w="100vw"
-          px="1rem"
-          py="5rem"
-          radius="0"
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            background: "white",
-          }}
-        >
-          <Title ta="center" order={1}>
-            A small price to pay.. to truly{" "}
-            <span
-              style={{
-                padding: "0.2rem 0.5rem",
-                color: "white",
-                background: "var(--mantine-primary-color-filled)",
-              }}
-            >
-              Adopt AI
-            </span>
-          </Title>
-          <Text ta="center" mt="md">
-            30-day money back guarantee
-          </Text>
-          <Group mt="lg" justify="center">
-            <Text c={!isMonthly ? "var(--mantine-primary-color-filled)" : ""}>
-              Yearly
-            </Text>
-            <Switch
-              size="md"
-              checked={isMonthly}
-              onClick={() => {
-                setIsMonthly(!isMonthly);
-              }}
+              radius="md"
+              width="auto"
+              fit="contain"
+              maw={1100}
+              src="https://raw.githubusercontent.com/mantinedev/mantine/master/.demo/images/bg-7.png"
+              alt=""
             />
-            <Text c={isMonthly ? "var(--mantine-primary-color-filled)" : ""}>
-              Monthly
-            </Text>
-          </Group>
-          <Group gap={"3rem"} my="xl" justify="center">
-            <FreeCard />
-            <ProCard isMonthly={isMonthly} />
-            <MaxCard isMonthly={isMonthly} />
-          </Group>
-          <Title order={2} my="xl" fw="300" ta="center">
-            Have pricing questions? Contact us at{" "}
-            <span style={{ color: "var(--mantine-primary-color-filled)" }}>
-              <b>humans@flamingo.ai</b>
-            </span>
+          </Paper>
+          {/* -------------------------------------------------------------------------------------------- */}
+
+          <Title ta="center" mt="5rem" order={1}>
+            Companies that trust us
           </Title>
 
-          <EnterpriseCard />
-        </Paper>
+          <Group
+            gap={"3rem"}
+            pt="lg"
+            justify="center"
+            style={{
+              flexDirection: isMobile ? "column" : "row",
+            }}
+          >
+            {[merask, jhons, polk, medesk, charles, limechain, shift4].map(
+              (e, id) => (
+                <Image
+                  mah={"1.5em"}
+                  w="auto"
+                  component={NextImage}
+                  alt="sponsor"
+                  src={e}
+                  key={id}
+                ></Image>
+              )
+            )}
+          </Group>
 
-        {/* -------------------------------------------------------------------------------------------- */}
-        <Title mt="5rem" order={1}>
-          How it works?
-        </Title>
-        <HowItWorks />
+          {/* -------------------------------------------------------------------------------------------- */}
+          {/* <Divider w="100vw" variant="dashed" size={"sm"} /> */}
+          <FolderCard />
+          <Divider w="100vw" variant="dashed" size={"sm"} />
+          <PromptLibraryCard />
+          <Divider w="100vw" variant="dashed" size={"sm"} />
+          <CostSavingCard />
+          <Divider w="100vw" variant="dashed" size={"sm"} />
+          <ReportsCard />
+          {/* <Divider w="100vw" variant="dashed" size={"sm"} /> */}
 
-        {/* <Divider color="grey" w={"100%"} size={"xs"} /> */}
+          {/* -------------------------------------------------------------------------------------------- */}
+          <Paper
+            ref={target == "pricing" ? targetRef : null}
+            mt="5rem"
+            w="100vw"
+            px="1rem"
+            py="5rem"
+            radius="0"
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              background: "white",
+            }}
+          >
+            <Title ta="center" order={1}>
+              A small price to pay.. to truly{" "}
+              <span
+                style={{
+                  padding: "0.2rem 0.5rem",
+                  color: "white",
+                  background: "var(--mantine-primary-color-filled)",
+                }}
+              >
+                Adopt AI
+              </span>
+            </Title>
+            <Text ta="center" mt="md">
+              30-day money back guarantee
+            </Text>
+            <Group mt="lg" justify="center">
+              <Text c={!isMonthly ? "var(--mantine-primary-color-filled)" : ""}>
+                Yearly
+              </Text>
+              <Switch
+                size="md"
+                checked={isMonthly}
+                onClick={() => {
+                  setIsMonthly(!isMonthly);
+                }}
+              />
+              <Text c={isMonthly ? "var(--mantine-primary-color-filled)" : ""}>
+                Monthly
+              </Text>
+            </Group>
+            <Group gap={"3rem"} my="xl" justify="center">
+              <FreeCard />
+              <ProCard isMonthly={isMonthly} />
+              <MaxCard isMonthly={isMonthly} />
+            </Group>
+            <Title order={2} my="xl" fw="300" ta="center">
+              Have pricing questions? Contact us at{" "}
+              <span style={{ color: "var(--mantine-primary-color-filled)" }}>
+                <b>humans@flamingo.ai</b>
+              </span>
+            </Title>
 
-        <Faq />
-      </Stack>
-      <Box ref={target == "contact-us" ? targetRef : null}>
-        <FooterLinks />
+            <EnterpriseCard />
+          </Paper>
+
+          {/* -------------------------------------------------------------------------------------------- */}
+          <Title mt="5rem" order={1}>
+            How it works?
+          </Title>
+          <HowItWorks />
+
+          {/* <Divider color="grey" w={"100%"} size={"xs"} /> */}
+
+          <Faq />
+        </Stack>
+        <Box ref={target == "contact-us" ? targetRef : null}>
+          <FooterLinks />
+        </Box>
       </Box>
-    </Box>
+    )
   );
 }
