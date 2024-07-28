@@ -57,7 +57,7 @@ function CommentItem(props: {
       return participant.userId === comment.createdBy;
     });
     setCreatedBy(getCreatedBy);
-  }, [participants]);
+  }, [participants, comment]);
 
   useEffect(() => {
     const user = participants.find((participant) => {
@@ -65,10 +65,10 @@ function CommentItem(props: {
     });
     if (user) {
       setIsAllowed(
-        user.userId == comment.createdBy || user.role == "org:admin"
+        user.userId == comment.createdBy || user.role == "org:admin",
       );
     }
-  }, [participants]);
+  }, [participants, comment]);
 
   return (
     <Paper withBorder w="100%" p="sm" mt="1rem" radius="md">
@@ -252,7 +252,7 @@ function CommentItem(props: {
                         replyContent,
                         comment.messageId,
                         chatId,
-                        comment._id
+                        comment._id,
                       ).then(() => {
                         setReplyContent("");
                       })
