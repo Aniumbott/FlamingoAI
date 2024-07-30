@@ -347,7 +347,7 @@ export default function Upgrade() {
                 <List.Item mt={6}>Usage Reports</List.Item>
               </List>
               <div className="w-full mt-5">
-                <Title order={3}>{isMonthly ? "$20" : "$200"}</Title>
+                <Title order={3}>${Number(proQuantity) * (isMonthly ? 2 : 20)}</Title>
                 <Text size="xs" c="dimmed">
                   per {isMonthly ? "month" : "year"} / per 10 seats
                 </Text>
@@ -477,7 +477,7 @@ export default function Upgrade() {
                 </List.Item>
               </List>
               <div className="w-full mt-5">
-                <Title order={3}>{isMonthly ? "$50" : "$500"}</Title>
+                <Title order={3}>${Number(maxQuantity) * (isMonthly ? 5 : 50)}</Title>
                 <Text size="xs" c="dimmed">
                   per {isMonthly ? "month" : "year"} / per 10 seats
                 </Text>
