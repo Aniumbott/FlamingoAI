@@ -139,7 +139,7 @@ export default function ChatWindow(props: {
       getChat(currentChatId, organization?.id || "", userId || "").then(
         (res) => {
           setChat(res.chats?.[0]);
-        }
+        },
       );
     });
 
@@ -171,7 +171,7 @@ export default function ChatWindow(props: {
 
     socket.on("newComment", (comment: ICommentDocument) => {
       let message = chat.messages.find(
-        (msg: any) => msg._id == comment.messageId
+        (msg: any) => msg._id == comment.messageId,
       );
 
       if (comment.parent) {
@@ -197,7 +197,7 @@ export default function ChatWindow(props: {
 
     socket.on("updateComment", (comment: ICommentDocument) => {
       let message = chat.messages.find(
-        (msg: any) => msg._id == comment.messageId
+        (msg: any) => msg._id == comment.messageId,
       );
       message.comments = message.comments?.map((c: any) => {
         if (c._id == comment._id) return comment;
@@ -214,7 +214,7 @@ export default function ChatWindow(props: {
 
     socket.on("deleteComment", (comment: ICommentDocument) => {
       let message = chat.messages.find(
-        (msg: any) => msg._id == comment.messageId
+        (msg: any) => msg._id == comment.messageId,
       );
 
       if (comment.parent) {
@@ -227,7 +227,7 @@ export default function ChatWindow(props: {
         });
       } else {
         message.comments = message.comments.filter(
-          (c: any) => c._id != comment._id
+          (c: any) => c._id != comment._id,
         );
       }
 
@@ -268,11 +268,11 @@ export default function ChatWindow(props: {
   useEffect(() => {
     if (participants) {
       const user = participants.find(
-        (participant: any) => participant.userId == userId
+        (participant: any) => participant.userId == userId,
       );
       if (user) {
         setIsAllowed(
-          user.userId == chat?.createdBy || user.role == "org:admin"
+          user.userId == chat?.createdBy || user.role == "org:admin",
         );
       }
     }
@@ -287,7 +287,7 @@ export default function ChatWindow(props: {
         return await getChat(
           currentChatId,
           organization?.id || "",
-          userId || ""
+          userId || "",
         );
       };
 
@@ -468,7 +468,7 @@ export default function ChatWindow(props: {
                               "",
                               pathname.split("/").slice(0, 3).join("/") +
                                 "/page/" +
-                                chat.instructions.pageId
+                                chat.instructions.pageId,
                             );
                           }}
                         >
@@ -659,7 +659,7 @@ export default function ChatWindow(props: {
                 {chat?.messages?.map((message: any, index: Number) => {
                   const user = participants.find(
                     (participant: any) =>
-                      participant.userId == message?.createdBy
+                      participant.userId == message?.createdBy,
                   ) || {
                     hasImage: false,
                     firstName: "Unknown",
@@ -686,6 +686,7 @@ export default function ChatWindow(props: {
                         setPromptContent={setMessageContent}
                         setForkMessage={setForkMessage}
                         setIsForkModalOpen={setIsForkModalOpen}
+                        setProcessing={setProcessing}
                       />
                     </div>
                   );
@@ -773,7 +774,7 @@ export default function ChatWindow(props: {
                           .then(() => {
                             if (pathname.split("/")[3] == chat._id) {
                               router.push(
-                                pathname.split("/").slice(0, 3).join("/")
+                                pathname.split("/").slice(0, 3).join("/"),
                               );
                             }
                           });
@@ -837,12 +838,12 @@ export default function ChatWindow(props: {
                           value={prompt._id}
                           onClick={() => {
                             let newMessageInput = messageInput;
-                            console.log(messageInput)
-                            console.log(newMessageInput , prompt.content)
+                            console.log(messageInput);
+                            console.log(newMessageInput, prompt.content);
                             if (newMessageInput.includes("/")) {
                               newMessageInput = newMessageInput.substring(
                                 0,
-                                newMessageInput.lastIndexOf("/")
+                                newMessageInput.lastIndexOf("/"),
                               );
                             }
                             if (prompt.variables.length > 0) {
@@ -851,7 +852,7 @@ export default function ChatWindow(props: {
                               setPromptVariables(prompt.variables);
                               setPromptVariablesOpened(true);
                             } else {
-                              console.log(newMessageInput + prompt.content)
+                              console.log(newMessageInput + prompt.content);
                               setMessageInput(newMessageInput + prompt.content);
                               setSearchTerm("");
                             }

@@ -33,7 +33,7 @@ export default function MessageInput(props: {
     setSearchTerm,
     combobox,
     messageInput,
-    setMessageInput
+    setMessageInput,
   } = props;
   const { colorScheme } = useMantineColorScheme();
   const isMobile = useMediaQuery(`(max-width: 48em)`);
@@ -78,7 +78,7 @@ export default function MessageInput(props: {
                 chat.instructions,
                 chat.workspaceId,
                 models.find((model) => model._id == chat.aiModel) || models[0],
-                chat.scope == "private" ? "private" : "public"
+                chat.scope == "private" ? "private" : "public",
               ).then((res) => {
                 if (res === null) {
                   setProcessing(false);
@@ -127,7 +127,7 @@ export default function MessageInput(props: {
               userId || "",
               messageInput,
               "user",
-              currentChatId
+              currentChatId,
             ).then((res) => {
               sendAssistantMessage(
                 chat.messages,
@@ -135,8 +135,12 @@ export default function MessageInput(props: {
                 chat.instructions,
                 chat.workspaceId,
                 models.find((model) => model._id == chat.aiModel) || models[0],
-                chat.scope == "private" ? "private" : "public"
-              );
+                chat.scope == "private" ? "private" : "public",
+              ).then((res) => {
+                if (res === null) {
+                  setProcessing(false);
+                }
+              });
               setMessageInput("");
             });
           }
@@ -171,7 +175,7 @@ export default function MessageInput(props: {
                 userId || "",
                 messageInput,
                 "user",
-                currentChatId
+                currentChatId,
               ).then((res) => {
                 sendAssistantMessage(
                   chat.messages,
@@ -180,8 +184,12 @@ export default function MessageInput(props: {
                   chat.workspaceId,
                   models.find((model) => model._id == chat.aiModel) ||
                     models[0],
-                  chat.scope == "private" ? "private" : "public"
-                );
+                  chat.scope == "private" ? "private" : "public",
+                ).then((res) => {
+                  if (res === null) {
+                    setProcessing(false);
+                  }
+                });
                 setMessageInput("");
               });
             }
