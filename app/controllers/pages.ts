@@ -33,7 +33,7 @@ async function getPageById(pageId: string, workspaceId: string) {
         headers: {
           "Content-Type": "application/json",
         },
-      }
+      },
     );
     const response = await data.json();
     return response;
@@ -112,7 +112,8 @@ async function getFormattedResponse(
   action: string,
   workspaceId: string,
   aiModel: IAIModelDocument,
-  content: string
+  content: string,
+  userId: string,
 ) {
   let notification = showLoadingNotification("Formatting Content...");
   if (!aiModel) {
@@ -137,12 +138,16 @@ async function getFormattedResponse(
 
   let response;
   try {
-    await getAIResponse(pageContent, workspaceId, aiModel, "public").then(
-      (res: any) => {
-        console.log("res at getFormattedResponse", res);
-        response = res.gptRes.choices[0].message.content;
-      }
-    );
+    await getAIResponse(
+      pageContent,
+      workspaceId,
+      aiModel,
+      "public",
+      userId,
+    ).then((res: any) => {
+      console.log("res at getFormattedResponse", res);
+      response = res.gptRes.choices[0].message.content;
+    });
   } catch (error) {
     console.log(error);
     showErrorNotification(notification, "Error Formatting Content");
