@@ -76,7 +76,7 @@ export default function SidePanel(props: {
   const [models, handleModels] = useListState<IAIModelDocument>([]);
   const [selectModel, setSelectModel] = useState<IAIModelDocument | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const { orgId } = useAuth();
+  const { orgId, userId } = useAuth();
 
   useEffect(() => {
     responseEditor.commands.setContent(response || "");
@@ -92,8 +92,8 @@ export default function SidePanel(props: {
         if (apiKey.provider == "openai" && apiKey.scope == "public") {
           setSelectModel(
             resModels?.aiModels?.find(
-              (model: any) => model._id == apiKey.aiModel
-            ) || models[0]
+              (model: any) => model._id == apiKey.aiModel,
+            ) || models[0],
           );
         }
       });
@@ -108,7 +108,8 @@ export default function SidePanel(props: {
       action,
       orgId || "",
       aiModel,
-      editor?.getHTML() || ""
+      editor?.getHTML() || "",
+      userId || "",
     ).then((res: any) => {
       setResponse(res);
       setIsLoading(false);
@@ -158,7 +159,7 @@ export default function SidePanel(props: {
             data={constructSelectModels(models)}
             onChange={(e) => {
               setSelectModel(
-                models.find((model) => model._id == e) || models[0]
+                models.find((model) => model._id == e) || models[0],
               );
             }}
             style={{
@@ -175,7 +176,7 @@ export default function SidePanel(props: {
                   setAct("Make the content longer.");
                   getResponse(
                     "Make the content longer.",
-                    selectModel || models[0]
+                    selectModel || models[0],
                   );
                 }}
               >
@@ -189,7 +190,7 @@ export default function SidePanel(props: {
                   setAct("Make the content shorter.");
                   getResponse(
                     "Make the content shorter.",
-                    selectModel || models[0]
+                    selectModel || models[0],
                   );
                 }}
               >
@@ -203,7 +204,7 @@ export default function SidePanel(props: {
                   setAct("Simplify the content.");
                   getResponse(
                     "Simplify the content.",
-                    selectModel || models[0]
+                    selectModel || models[0],
                   );
                 }}
               >
@@ -217,7 +218,7 @@ export default function SidePanel(props: {
                   setAct("Summarize the content.");
                   getResponse(
                     "Summarize the content.",
-                    selectModel || models[0]
+                    selectModel || models[0],
                   );
                 }}
               >
@@ -231,7 +232,7 @@ export default function SidePanel(props: {
                   setAct("Improve the writing of the content.");
                   getResponse(
                     "Improve the writing of the content.",
-                    selectModel || models[0]
+                    selectModel || models[0],
                   );
                 }}
               >
@@ -243,11 +244,11 @@ export default function SidePanel(props: {
                 leftSection={<IconTextSpellcheck />}
                 onClick={() => {
                   setAct(
-                    "Fix the grammar and spellings mistakes in the content."
+                    "Fix the grammar and spellings mistakes in the content.",
                   );
                   getResponse(
                     "Fix the grammar and spellings mistakes in the content.",
-                    selectModel || models[0]
+                    selectModel || models[0],
                   );
                 }}
               >
@@ -363,7 +364,7 @@ export default function SidePanel(props: {
                                 types: ["heading", "paragraph"],
                               }),
                             ],
-                          })
+                          }),
                         );
                         setResponse(null);
                         setAct("");
@@ -404,7 +405,7 @@ export default function SidePanel(props: {
                                 types: ["heading", "paragraph"],
                               }),
                             ],
-                          })
+                          }),
                         );
                         setResponse(null);
                         setAct("");

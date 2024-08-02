@@ -13,7 +13,8 @@ async function getAIResponse(
   message: any[],
   workspaceId: string,
   model: IAIModelDocument,
-  scope: string
+  scope: string,
+  userId: string,
 ) {
   const data = await fetch("/api/aimodel", {
     method: "POST",
@@ -22,6 +23,7 @@ async function getAIResponse(
       workspaceId: workspaceId,
       model: model,
       scope: scope,
+      userId: userId,
     }),
     headers: {
       "Content-Type": "application/json",
