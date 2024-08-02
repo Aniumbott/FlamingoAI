@@ -52,6 +52,7 @@ function MessageItem(props: {
   setPromptContent: (value: string) => void;
   setForkMessage: (value: any) => void;
   setIsForkModalOpen: (value: boolean) => void;
+  setProcessing: (value: boolean) => void;
 }) {
   const {
     message,
@@ -65,6 +66,7 @@ function MessageItem(props: {
     setPromptContent,
     setForkMessage,
     setIsForkModalOpen,
+    setProcessing,
   } = props;
   const { colorScheme } = useMantineColorScheme();
   const { hovered, ref } = useHover();
@@ -87,11 +89,11 @@ function MessageItem(props: {
 
   useEffect(() => {
     const user = participants.find(
-      (participant) => participant.userId === userId
+      (participant) => participant.userId === userId,
     );
     if (user) {
       setIsAllowed(
-        user.userId === message.createdBy || user.role === "org:admin"
+        user.userId === message.createdBy || user.role === "org:admin",
       );
     }
   }, [participants]);
@@ -276,7 +278,7 @@ function MessageItem(props: {
                       console.log(messageText);
                       if (
                         confirm(
-                          "All messages sent after the one you are about to edit will be deleted!"
+                          "All messages sent after the one you are about to edit will be deleted!",
                         ).valueOf()
                       ) {
                         let msg = message;
@@ -292,8 +294,12 @@ function MessageItem(props: {
                               instructions,
                               orgId || "",
                               aiModel,
-                              scope
-                            );
+                              scope,
+                            ).then((res) => {
+                              if (res === null) {
+                                setProcessing(false);
+                              }
+                            });
                           })
                           .then(() => {
                             setIsEdit(!isEdit);
@@ -407,7 +413,7 @@ function MessageItem(props: {
                             commentInput,
                             message._id,
                             message.chatId,
-                            null
+                            null,
                           );
                           setCommentInput("");
                         }}

@@ -34,7 +34,7 @@ async function createMessage(
   createdBy: String,
   content: String,
   type: String,
-  chatId: String
+  chatId: String,
 ) {
   const data = await fetch("/api/message", {
     method: "POST",
@@ -104,7 +104,7 @@ async function sendAssistantMessage(
   instruction: any,
   workspaceId: string,
   aiModel: IAIModelDocument,
-  scope: string
+  scope: string,
 ) {
   if (messages.length === 0) {
     const getMessages = await fetch(`/api/message/?chatId=${message.chatId}`, {
@@ -158,7 +158,13 @@ async function sendAssistantMessage(
     });
   }
 
-  return await getAIResponse(messagesContent, workspaceId, aiModel, scope)
+  return await getAIResponse(
+    messagesContent,
+    workspaceId,
+    aiModel,
+    scope,
+    message.createdBy,
+  )
     .then((res: any) => {
       console.log("res at sendAssistantMessage", res);
       if (res) {
@@ -173,7 +179,7 @@ async function sendAssistantMessage(
           message.chatId,
           workspaceId,
           res.usage.promptTokens.toString(),
-          res.usage.completionTokens.toString()
+          res.usage.completionTokens.toString(),
         );
       }
       return res;
