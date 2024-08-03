@@ -1,7 +1,5 @@
 // Modules
-import type { NextApiResponse } from "next";
 import { dbConnect } from "@/app/lib/db";
-import { NextRequest, NextResponse } from "next/server";
 import Workspace from "@/app/models/Workspace";
 import Chat from "@/app/models/Chat";
 import { WebhookEvent } from "@clerk/nextjs/server";
@@ -9,7 +7,7 @@ import { headers } from "next/headers";
 import { Webhook } from "svix";
 import { stripe } from "@/app/lib/stripe";
 import User from "@/app/models/User";
-import { deleteChatById } from "../chat/route";
+import { deleteChatById } from "../../../chat/route";
 import Message from "@/app/models/Message";
 import Comment from "@/app/models/Comment";
 import ImageGen from "@/app/models/ImageGen";
@@ -19,7 +17,6 @@ import ChatFolder from "@/app/models/ChatFolder";
 import PromptFolder from "@/app/models/PromptFolder";
 import { v2 as cloudinary } from "cloudinary";
 
-// Configuration
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -28,38 +25,6 @@ cloudinary.config({
 
 const webhookSecret = process.env.CLERK_WORKSPACE_WEBHOOK_SECRET || ``;
 
-// GET request handler
-export async function GET(req: NextRequest, res: NextApiResponse) {
-  try {
-    await dbConnect();
-    const reqParam = req.nextUrl.searchParams;
-    const id = reqParam.get("id");
-
-    const workspace = await Workspace.findById(id);
-
-    return NextResponse.json({ workspace }, { status: 200 });
-  } catch (error: any) {
-    console.log("error at GET in Workspace route: ", error);
-    return NextResponse.json(error.message, { status: 500 });
-  }
-}
-
-// PUt request handler
-export async function PUT(req: any, res: NextApiResponse) {
-  try {
-    await dbConnect();
-    const body = await req.json();
-    const workspace = await Workspace.findByIdAndUpdate(body._id, body, {
-      new: true,
-    });
-    return NextResponse.json({ workspace }, { status: 200 });
-  } catch (error: any) {
-    console.log("error at PUT in Workspace route: ", error);
-    return NextResponse.json(error.message, { status: 500 });
-  }
-}
-
-/*
 // All POST requests are handled by the CLERK webhook
 export async function POST(request: Request) {
   const payload = await validateRequest(request);
@@ -156,4 +121,4 @@ function getWorkspaceDataFromEvent(evt: any) {
     imageUrl: evt.data.image_url,
     createdBy: evt.data.created_by,
   };
-}*/
+}
