@@ -8,6 +8,7 @@ import {
   showSuccessNotification,
 } from "./notification";
 import { ComboboxItemGroup } from "@mantine/core";
+import { generateDynamicToken } from "./generateDynamicToken";
 
 async function getAIResponse(
   message: any[],
@@ -16,6 +17,8 @@ async function getAIResponse(
   scope: string,
   userId: string,
 ) {
+  const dynamicToken= generateDynamicToken();
+
   const data = await fetch("/api/aimodel", {
     method: "POST",
     body: JSON.stringify({
@@ -27,6 +30,7 @@ async function getAIResponse(
     }),
     headers: {
       "Content-Type": "application/json",
+      "X-Flamingo-Token": dynamicToken,
     },
   });
 
