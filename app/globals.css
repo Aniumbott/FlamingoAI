@@ -78,3 +78,71 @@ a {
 .cl-organizationSwitcher-root {
   width: 100%;
 }
+
+
+@layer base {
+    :root {
+      --swiper-theme-color: #000;
+      --swiper-navigation-size: 44px;
+      --swiper-pagination-bullet-size: 6px;
+      --swiper-pagination-bullet-horizontal-gap: 6px;
+    }
+  }
+  @layer components {
+    .underline-path {
+      stroke-dasharray: 2000;
+      stroke-dashoffset: 2000;
+      animation: draww 2.0s ease-in-out  forwards;
+    }
+  
+    @keyframes draww {
+      to {
+        stroke-dashoffset: 0;
+      }
+    }
+  }
+@layer utilities {
+    .animate-draw {
+      stroke-dasharray: 1500;
+      stroke-dashoffset: 1500;
+    }
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 100%, 0);
+    }
+  
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+  
+  .animate-fadeInUp {
+    animation: fadeInUp 1s ease-out;
+  }
+
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -100%, 0);
+    }
+  
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .animate-fadeInDown {
+    animation: fadeInDown 0.2s ease-out;
+  }
+  .custom-bg-transition {
+    transition: background-color 0.3s;
+  }
+
+li{
+  list-style-type: none;
+}
