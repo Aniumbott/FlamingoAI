@@ -9,6 +9,7 @@ import { createAnthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import {getOpenRouterResponse} from "@/app/controllers/openRouters";
+import {validateDynamicToken} from "@/app/controllers/validateDynamicToken";
 
 // Configure rate limiter
 const rateLimiter = new RateLimiterMemory({
@@ -53,6 +54,10 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
 
 export async function POST(req: NextRequest, res: NextApiResponse) {
   try {
+    const dynamicToken= req.headers.get("X-Flamingo-Token");
+    if (!dynamicToken) return NextResponse.json("Token not found", { status: 404 });
+    if(!validateDynamicToken(dynamicToken)) return NextResponse.json("Invalid Token", { status: 404 });
+
     await dbConnect();
     const body = await req.json();
     
