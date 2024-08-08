@@ -35,7 +35,11 @@ export default function ChatAuth(props: {
   const [scope, setScope] = useState("public");
   const [apiKeyInput, setApiKeyInput] = useState("");
   const isMobile = useMediaQuery(`(max-width: 48em)`);
+  const [routerUpdate, setRouterUpdate] = useState(false);
+  const [openRouterKey, setOpenRouterKey] = useState("");
 
+
+  
   useEffect(() => {
     const collectModels = async () => {
       const res = await getAIModels(workspace?._id);
@@ -50,8 +54,13 @@ export default function ChatAuth(props: {
         const apiKey = workspace.apiKeys.find(
           (apiKey: any) => apiKey.provider == "openai" && apiKey.scope == scope
         );
+        const openRouterKey= workspace.apiKeys.find(
+          (apiKey: any) => apiKey.provider == "open-router" && apiKey.scope == scope
+        );
+
         setSelectModel(res.find((model: any) => model._id == apiKey?.aiModel));
         setApiKeyInput(apiKey.key || "");
+        setOpenRouterKey(openRouterKey.key || "");
       }
     });
   }, []);
@@ -69,6 +78,7 @@ export default function ChatAuth(props: {
       }
     }
   }, [scope, selectModel]);
+
 
   return (
     <Paper
@@ -125,8 +135,151 @@ export default function ChatAuth(props: {
         </div>
 
         <Text size="lg" fw={600} mt={40}>
+          Open Router Connection Settings
+        </Text>
+
+        {routerUpdate ||
+        (selectModel &&
+          workspace &&
+          (!workspace.apiKeys.some(
+            (apiKey: any) =>
+              apiKey.provider == "open-router" && apiKey.scope == scope
+          ) ||
+            workspace?.apiKeys.some(
+              (apiKey: any) =>
+                apiKey.provider == "open-router" &&
+                apiKey.scope == scope &&
+                apiKey.key == ""
+            ))) ? (
+          <Group mt={10} align="flex-end" justify="space-between">
+            <div className="grow">
+              <TextInput
+                w="100%"
+                label={`Input your open-router API key`}
+                placeholder="Get API key from your provider dashboard."
+                value={openRouterKey}
+                onChange={(event) => setOpenRouterKey(event.currentTarget.value)}
+                required
+              />
+            </div>
+
+            <Button
+              variant="outline"
+              onClick={() => {
+                setUpdate(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={() => {
+                const key = {
+                  aiModel: selectModel?._id,
+                  key: openRouterKey,
+                  scope: scope,
+                  provider: "open-router",
+                };
+                let wrksp = { ...workspace };
+                if (
+                  wrksp.apiKeys.find(
+                    (apiKey: any) =>
+                      apiKey.provider == "open-router" &&
+                      apiKey.scope == scope
+                  )
+                ) {
+                  wrksp.apiKeys = wrksp.apiKeys.map((apiKey: any) => {
+                    if (
+                      apiKey.provider == "open-router" &&
+                      apiKey.scope == scope
+                    ) {
+                      apiKey.key = openRouterKey;
+                      return apiKey;
+                    }
+                    return apiKey;
+                  });
+                } else {
+                  wrksp.apiKeys.push(key);
+                }
+                updateWorkspace(wrksp).then(() => {
+                  window.location.reload();
+                });
+                setUpdate(false);
+              }}
+            >
+              Save
+            </Button>
+          </Group>
+        ) : null}
+
+    {selectModel &&
+        workspace &&
+        workspace?.apiKeys.find(
+          (apiKey: any) =>
+            apiKey.provider == "open-router" &&
+            apiKey.scope == scope &&
+            apiKey.key != ""
+        ) ? (
+          <>
+            <Text
+              p={20}
+              mt={20}
+              size="sm"
+              bg="var(--mantine-primary-color-light)"
+              style={{
+                borderRadius: "8px",
+                color: "var(--mantine-primary-color-filled)",
+              }}
+            >
+              API Key configured! You&apos;re all set!
+            </Text>
+
+            {!update ? (
+              <Group mt={20} justify="flex-end">
+                <Button
+                  onClick={() => {
+                    setRouterUpdate(true);
+                  }}
+                >
+                  Update API key
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    if (
+                      confirm(
+                        "Are you sure you want to clear your personal API key, Without API key you won't be able to communicate with AI models."
+                      )
+                    ) {
+                      updateWorkspace({
+                        ...workspace,
+                        apiKeys: [
+                          ...workspace.apiKeys.map((apiKey: any) => {
+                            if (
+                              apiKey.provider == "open-router" &&
+                              apiKey.scope == scope
+                            ) {
+                              apiKey.key = "";
+                              return apiKey;
+                            }
+                            return apiKey;
+                          }),
+                        ],
+                      });
+                    }
+                  }}
+                >
+                  Clear API key
+                </Button>
+              </Group>
+            ) : null}
+          </>
+        ) : null}
+
+        <Text size="lg" fw={600} mt={40}>
           OpenAI Connection Settings
         </Text>
+
+        
 
         {update ||
         (selectModel &&

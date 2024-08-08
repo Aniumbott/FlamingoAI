@@ -8,6 +8,7 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createAnthropic } from "@ai-sdk/anthropic";
 import { generateText } from "ai";
 import { RateLimiterMemory } from "rate-limiter-flexible";
+import {getOpenRouterResponse} from "@/app/controllers/openRouters";
 
 // Configure rate limiter
 const rateLimiter = new RateLimiterMemory({
@@ -54,8 +55,14 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
   try {
     await dbConnect();
     const body = await req.json();
+    
     const { messages, workspaceId, model, scope, userId } = body;
     const workspace = await Workspace.findById(workspaceId);
+
+    const openRouterApiKey = workspace?.apiKeys.find(
+      (key) => key.provider == "open-router" && key.scope == scope
+    )?.key
+
     const apiKey = workspace?.apiKeys.find(
       (key) => key.provider == model.provider && key.scope == scope,
     )?.key;
@@ -63,9 +70,14 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
     const rateLimitResponse = await rateLimitMiddleware(userId);
     if (rateLimitResponse) return rateLimitResponse;
 
-    if (!apiKey) return NextResponse.json("API Key not found", { status: 404 });
+    if (!apiKey && !openRouterApiKey) return NextResponse.json("API Key not found", { status: 404 });
 
     let chatModel: any;
+
+    if(openRouterApiKey) {
+      const openRouterResponse= await getOpenRouterResponse(openRouterApiKey, model.value, model.provider, messages);
+      return NextResponse.json({ text: openRouterResponse, usage:10 }, { status: 200 });
+    }
 
     switch (model.provider) {
       case "google":
