@@ -16,37 +16,40 @@ import Footer from "./components/HomePage/Footer";
 import Feedback from "./components/HomePage/Feedback";
 import HeaderMobile from "./components/HomePage/HeaderMobile";
 import "./globals.css";
+import NewHomePage from "./components/NewHomePage/NewHomePage";
 
 export default function Home() {
   return (
     <>
-    <Header />
-    <HeaderMobile />
-    <section className="w-[100vw]">
-      <div className="bg-[#0d2327]" >
-        <HeroSection />
-        {/* <Video /> */}
-      </div>
-      <div className="bg-gray-100">
-          <Spacer height={50} />
-          <Customer />
-          <FeatureSection />
-          <Testimonials />
-      </div>
-      <div className="bg-[#052727]">
-        <Pricing />
-      </div>
-      <div className="bg-[#F8F8FF]">
-        <HowItWorks />
-        <Feedback />
-        <Faqs />
-      </div>
-      <Footer />
-    </section>
+      <NewHomePage />
     </>
+    // <>
+    // <Header />
+    // <HeaderMobile />
+    // <section className="w-[100vw]">
+    //   <div className="bg-[#0d2327]" >
+    //     <HeroSection />
+    //     {/* <Video /> */}
+    //   </div>
+    //   <div className="bg-gray-100">
+    //       <Spacer height={50} />
+    //       <Customer />
+    //       <FeatureSection />
+    //       <Testimonials />
+    //   </div>
+    //   <div className="bg-[#052727]">
+    //     <Pricing />
+    //   </div>
+    //   <div className="bg-[#F8F8FF]">
+    //     <HowItWorks />
+    //     <Feedback />
+    //     <Faqs />
+    //   </div>
+    //   <Footer />
+    // </section>
+    // </>
   );
 }
-
 
 // "use client";
 // import React, { useEffect, useRef, useState } from "react";
