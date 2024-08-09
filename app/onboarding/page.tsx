@@ -35,6 +35,7 @@ import { useSearchParams } from "next/navigation";
 import { IconInfoCircle, IconLink } from "@tabler/icons-react";
 import { getWorkspace, updateWorkspace } from "../controllers/workspace";
 import { isValidOpenAIKey } from "../controllers/aiModel";
+import CustomCreateOrganization from "../components/PageWindow/CustomCreateOrganization";
 
 export default function Home() {
   const isMobile = useMediaQuery("(max-width: 48em)");
@@ -107,10 +108,11 @@ export default function Home() {
         </Group>
 
         {active === 0 && (
-          <CreateOrganization
-            skipInvitationScreen
-            afterCreateOrganizationUrl={"/onboarding?step=1"}
-          />
+          // <CreateOrganization
+          //   skipInvitationScreen
+          //   afterCreateOrganizationUrl={"/onboarding?step=1"}
+          // />
+          <CustomCreateOrganization />
         )}
         {(active === 1 || active == 2) && (
           <Card radius={"lg"} shadow="md" p="md">
