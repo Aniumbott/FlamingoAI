@@ -28,7 +28,7 @@ export default function ReplyItem(props: { reply: any; participants: any[] }) {
       return participant.userId === reply.createdBy;
     });
     setCreatedBy(getCreatedBy);
-  }, [participants]);
+  }, [participants, reply]);
 
   return (
     <Card mt="md" p="sm">

@@ -40,7 +40,7 @@ import {
   showLoadingNotification,
   showSuccessNotification,
 } from "@/app/controllers/notification";
-import { useListState } from "@mantine/hooks";
+import { useListState, useMediaQuery } from "@mantine/hooks";
 import { IAIModelDocument } from "@/app/models/AIModel";
 import { constructSelectModels, getAIModels } from "@/app/controllers/aiModel";
 import { model } from "mongoose";
@@ -58,6 +58,7 @@ export default function ImportPage() {
   const { userId, orgId } = useAuth();
   const { organization } = useOrganization();
   const [members, setMembers] = useState<any[]>([]);
+  const isMobile = useMediaQuery(`(max-width: 48em)`);
 
   useEffect(() => {
     const fetchModels = async () => {
@@ -172,7 +173,7 @@ export default function ImportPage() {
   return (
     <>
       <header
-        className="sticky top-0 h-16 mb-3 px-5 flex flex-row justify-between items-center"
+        className={`sticky top-0 min-h-16 mb-3 px-5 flex ${isMobile ? "flex-col gap-3 py-3" : "flex-row"} justify-between items-center`}
         style={{
           zIndex: 1000,
           background:
@@ -181,10 +182,12 @@ export default function ImportPage() {
               : "var(--mantine-color-gray-1)",
         }}
       >
-        <div className="h-full flex flex-row items-center">
+        <div>
           <Title order={3} mr="xl">
             Flamingo.ai
           </Title>
+        </div>
+        <div className={`${isMobile ? "w-full" : "gap-5"} h-full flex flex-row items-center justify-between" justify-between`}>
           <OrganizationSwitcher
             hidePersonal
             createOrganizationUrl="/onboarding/"
@@ -195,8 +198,7 @@ export default function ImportPage() {
               baseTheme: colorScheme === "dark" ? dark : undefined,
             }}
           />
-        </div>
-        <div>
+
           <UserButton
             afterSignOutUrl="/"
             appearance={{
@@ -204,7 +206,7 @@ export default function ImportPage() {
             }}
           />
         </div>
-      </header>
+      </header >
       <Stack
         gap={10}
         my="xl"

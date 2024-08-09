@@ -106,10 +106,7 @@ export default function ChatWindow(props: {
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const filteredPrompts = prompts?.filter((prompt) => {
-    return prompt.name.toLowerCase().includes(searchTerm.toLowerCase());
-  });
-
+  const [filteredPrompts, setFilteredPrompts] = useState<IPromptDocument[]>([])
   const [shareChatOpened, setShareChatOpened] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [isAllowed, setIsAllowed] = useState(false);
@@ -120,15 +117,15 @@ export default function ChatWindow(props: {
     const ans =
       (chat?.createdBy !== userId &&
         chat?.memberAccess?.find((m: any) => m.userId === userId)?.access ===
-          "view") ||
+        "view") ||
       (chat?.createdBy !== userId &&
         chat?.scope === "viewOnly" &&
         chat?.memberAccess?.find((m: any) => m.userId === userId)?.access !==
-          "edit") ||
+        "edit") ||
       (chat?.createdBy !== userId &&
         chat?.scope === "public" &&
         chat?.memberAccess?.find((m: any) => m.userId === userId)?.access ===
-          "viewOnly");
+        "viewOnly");
     return ans;
   }
 
@@ -322,6 +319,11 @@ export default function ChatWindow(props: {
     };
   }, []);
 
+
+  useEffect(() => {
+    setFilteredPrompts(prompts.filter((prompt) => prompt.name.toLowerCase().includes(searchTerm.toLowerCase())));
+  }, [searchTerm])
+
   const [promptVariables, setPromptVariables] = useState<string[]>([]);
   const [promptContent, setPromptContent] = useState("");
   const [newMessageInput, setNewMessageInput] = useState(messageInput);
@@ -467,8 +469,8 @@ export default function ChatWindow(props: {
                               {},
                               "",
                               pathname.split("/").slice(0, 3).join("/") +
-                                "/page/" +
-                                chat.instructions.pageId,
+                              "/page/" +
+                              chat.instructions.pageId,
                             );
                           }}
                         >
@@ -695,9 +697,8 @@ export default function ChatWindow(props: {
                   <div className="w-full mb-3 flex items-center justify-center max-w-[1300px]">
                     <Box mx={!isMobile ? "md" : ""} w="100%">
                       <div
-                        className={`w-full flex justify-center items-start ${
-                          isMobile ? "py-5" : "py-10"
-                        }`}
+                        className={`w-full flex justify-center items-start ${isMobile ? "py-5" : "py-10"
+                          }`}
                         style={{
                           background:
                             colorScheme === "dark"
