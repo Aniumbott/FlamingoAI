@@ -4,6 +4,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Link from 'next/link';
 import { faChevronDown, faUsers } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useRef, useState } from 'react';
+import {
+  Group,
+  Button,
+  Divider,
+  Anchor,
+} from "@mantine/core";
+import {SignInButton, SignUpButton, UserButton, useUser} from "@clerk/nextjs";
+import { IconArrowUpRight } from "@tabler/icons-react";
 
 const ChevronDownIcon = () => {
   return (
@@ -72,6 +80,7 @@ export default function Header() {
   const productButtonRef = useRef<HTMLDivElement>(null);
   const learnMenuRef = useRef<HTMLDivElement>(null);
   const learnButtonRef = useRef<HTMLDivElement>(null);
+  const { isSignedIn } = useUser();
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -170,12 +179,45 @@ export default function Header() {
           </ul>
         </nav>
         <div className="flex items-center space-x-4">
-          <Link href="/login" className="hover:underline">
+          {/* <Link href="/login" className="hover:underline">
             Log in
           </Link>
           <Link href="/signup" className="bg-[#f1da44] text-black text-[1rem] font-plex-sans font-[500] px-6 py-2 rounded-xl transition-transform duration-300 hover:scale-90 focus:scale-90 active:scale-90 hover:bg-[#f0d940]">
             Start free
-          </Link>
+          </Link> */}
+          {isSignedIn ? (
+            <Group>
+              { (
+                <>
+                  <UserButton afterSignOutUrl="/" />
+                  <Divider orientation="vertical" />
+                </>
+              )}
+              <Anchor href="/workspace">
+                <Button
+                  variant="outline"
+                  rightSection={<IconArrowUpRight size={20} />}
+                >
+                  Workspace
+                </Button>
+              </Anchor>
+            </Group>
+          ) : (
+            <Group visibleFrom="sm">
+              <SignInButton>
+                {/* <Button variant="default">Log in</Button> */}
+                <Link href="/login" className="hover:underline">
+                Log in
+              </Link>
+              </SignInButton>
+              <SignUpButton>
+                {/* <Button>Sign up</Button> */}
+                <Link href="/signup" className="bg-[#f1da44] text-black text-[1rem] font-plex-sans font-[500] px-6 py-2 rounded-xl transition-transform duration-300 hover:scale-90 focus:scale-90 active:scale-90 hover:bg-[#f0d940]">
+                  Start free
+                </Link>
+              </SignUpButton>
+            </Group>
+          )}
         </div>
       </div>
     </header>
