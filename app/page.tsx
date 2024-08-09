@@ -33,9 +33,9 @@ export default function Home() {
           <FeatureSection />
           <Testimonials />
       </div>
-      <div className="bg-[#052727]">
+      {/* <div className="bg-[#052727]">
         <Pricing />
-      </div>
+      </div> */}
       <div className="bg-[#F8F8FF]">
         <HowItWorks />
         <Feedback />
