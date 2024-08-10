@@ -1,10 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { StartFreeTrial } from "./tryfree";
 import { ViewDemo } from "./viewdemo";
+import { Group, Button, Divider, Anchor } from "@mantine/core";
+import { UserButton, useUser } from "@clerk/nextjs";
+import { IconArrowUpRight } from "@tabler/icons-react";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const { isSignedIn } = useUser();
+  console.log(isSignedIn);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -69,7 +74,7 @@ function Header() {
             {["Blog", "FAQs", "Pricing"].map((item) => (
               <a
                 key={item}
-                href="#"
+                href={`/${item.toLowerCase()}`}
                 className="text-lg font-medium text-gray-500 hover:text-gray-900 transition-colors duration-300"
               >
                 {item}
@@ -77,8 +82,29 @@ function Header() {
             ))}
           </nav>
           <div className="hidden md:flex md:space-x-5 items-center justify-end md:flex-1 lg:w-0">
-            <ViewDemo />
-            <StartFreeTrial />
+          {isSignedIn ? (
+              <Group>
+                {
+                  <>
+                    <UserButton afterSignOutUrl="/" />
+                    <Divider orientation="vertical" />
+                  </>
+                }
+                <Anchor href="/workspace">
+                  <Button
+                    variant="outline"
+                    rightSection={<IconArrowUpRight size={20} />}
+                  >
+                    Workspace
+                  </Button>
+                </Anchor>
+              </Group>
+            ) : (
+              <>
+                <ViewDemo />
+                <StartFreeTrial />
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -89,7 +115,7 @@ function Header() {
           {["Blog", "FAQs", "Pricing"].map((item) => (
             <a
               key={item}
-              href="#"
+              href={`/${item.toLowerCase()}`}
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-50"
             >
               {item}
@@ -98,8 +124,29 @@ function Header() {
         </div>
         <div className="pt-4 pb-3 border-t border-gray-200">
           <div className="flex items-center px-5">
-            <ViewDemo />
-            <StartFreeTrial />
+            {isSignedIn ? (
+              <Group>
+                {
+                  <>
+                    <UserButton afterSignOutUrl="/" />
+                    <Divider orientation="vertical" />
+                  </>
+                }
+                <Anchor href="/workspace">
+                  <Button
+                    variant="outline"
+                    rightSection={<IconArrowUpRight size={20} />}
+                  >
+                    Workspace
+                  </Button>
+                </Anchor>
+              </Group>
+            ) : (
+              <>
+                <ViewDemo />
+                <StartFreeTrial />
+              </>
+            )}
           </div>
         </div>
       </div>

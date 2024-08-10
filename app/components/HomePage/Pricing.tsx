@@ -24,7 +24,7 @@ const PricingHeading = () => {
         <div
             className="bg-[#052727] rounded-t-[24px] rounded-b-none flex flex-col w-full h-auto self-auto flex-wrap transition-all duration-300 basis-auto flex-shrink flex-grow-0 p-[10px]"
             >
-            <div className="flex flex-col flex-wrap justify-center items-center basis-auto flex-grow flex-shrink self-auto mx-auto my-0 h-full w-full gap-[20px]">
+            <div className="flex flex-col flex-wrap justify-center items-center basis-auto flex-grow flex-shrink self-auto mx-auto my-0 h-full w-full gap-[20px] mt-10">
                 <SpacerMain height={40} />
                 <div
                 className="w-full flex flex-row justify-center items-center pl-5 md:pl-0">
@@ -96,11 +96,12 @@ const PricingTier = ({ tier, monthly }) => {
         <h2 className="text-lg leading-6 font-medium text-[#21EFB8]">{tier.name}</h2>
         <p className="font-plex-sans font-[700] text-[2rem] text-white">{tier.title}</p>
         <p className="flex flex-row justify-end font-plex-sans font-[500] text-[1rem] text-[#AFAFAF] tracking-tight">Billed {monthly? "Monthly" : "Yearly"}</p>
-        <div className="mt-4">
+        <div className="mt-4 w-full mb-4">
           <span className="text-[3.5rem] font-[800] text-white font-plex-sans">
             {tier.name !== 'FLAGSHIP' ? '$' : ''}{tier.hasSlider ? calculatePrice(userCount)  : tier.price}
           </span>
-          {tier.period && <span className="text-white font-plex-sans block md:inline text-[1rem] text-[500]">/team/{monthly? "month" : "year"}</span>}
+          <br/>
+          {tier.period && <p className="text-white font-plex-sans block md:inline text-[1rem] text-[500] w-full">/team/{monthly? "month" : "year"}</p>}
         </div>
         <p className="text-[1rem] font-plex-sans font-[500] text-white">{tier.description}</p>
         
@@ -219,7 +220,7 @@ const PricingSection = () => {
   return (
     <div className="bg-[#052727] flex flex-col mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <Group justify="center" w="100%">
-        <Text c={isMonthly ? "" : "green" }>
+        <Text c={isMonthly ? "white" : "green" }>
           Yearly
         </Text>
         <Switch
@@ -230,7 +231,7 @@ const PricingSection = () => {
           }}
           color={isMonthly ? "green" : "gray"}
         />
-        <Text c={isMonthly ? "green" : ""}>
+        <Text c={isMonthly ? "green" : "white"}>
           Monthly
         </Text>
       </Group>
