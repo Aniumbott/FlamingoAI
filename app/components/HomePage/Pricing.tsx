@@ -4,7 +4,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import Spacer from "./Spacer"
 import SpacerMain from "./SpacerMain"
 import { faCheck } from "@fortawesome/free-solid-svg-icons"
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import {
+  Group,
+  Text,
+  Switch,
+} from "@mantine/core";
 
 const Pricing = () => {
     return (
@@ -41,7 +46,7 @@ const PricingHeading = () => {
                         </h2>
                     </div>
                 </div>
-                <SpacerMain height={20}/>
+                {/* <SpacerMain height={20}/> */}
             </div>
             </div>
     )
@@ -70,13 +75,14 @@ const Slider = ({ min, max, step, value, onChange }) => {
 };
 
 //@ts-ignore
-const PricingTier = ({ tier }) => {
+const PricingTier = ({ tier, monthly }) => {
   const [userCount, setUserCount] = useState(tier.minUsers || 0);
-
   const calculatePrice = (users: number) => {
+    
     if (tier.hasSlider) {
-      return tier.basePrice + (users - tier.minUsers) * tier.pricePerUser;
+      return (tier.basePrice + (users - tier.minUsers) * tier.pricePerUser) * (monthly ? 1 : 10);
     }
+
     return tier.price;
   };
 
@@ -89,12 +95,12 @@ const PricingTier = ({ tier }) => {
       <div>
         <h2 className="text-lg leading-6 font-medium text-[#21EFB8]">{tier.name}</h2>
         <p className="font-plex-sans font-[700] text-[2rem] text-white">{tier.title}</p>
-        <p className="flex flex-row justify-end font-plex-sans font-[500] text-[1rem] text-[#AFAFAF] tracking-tight">{tier.subtitle}</p>
+        <p className="flex flex-row justify-end font-plex-sans font-[500] text-[1rem] text-[#AFAFAF] tracking-tight">Billed {monthly? "Monthly" : "Yearly"}</p>
         <div className="mt-4">
           <span className="text-[3.5rem] font-[800] text-white font-plex-sans">
-            {tier.name !== 'FLAGSHIP' ? '$' : ''}{tier.hasSlider ? calculatePrice(userCount) : tier.price}
+            {tier.name !== 'FLAGSHIP' ? '$' : ''}{tier.hasSlider ? calculatePrice(userCount)  : tier.price}
           </span>
-          {tier.period && <span className="text-white font-plex-sans block md:inline text-[1rem] text-[500]">{tier.period}</span>}
+          {tier.period && <span className="text-white font-plex-sans block md:inline text-[1rem] text-[500]">/team/{monthly? "month" : "year"}</span>}
         </div>
         <p className="text-[1rem] font-plex-sans font-[500] text-white">{tier.description}</p>
         
@@ -114,7 +120,7 @@ const PricingTier = ({ tier }) => {
       
       <div className="mt-6">
         <ul className="space-y-2">
-          {tier.features.map((feature, index) => (
+          {tier.features.map((feature: any, index: any) => (
             <li key={index} className="flex items-center text-[#AFAFAF] text-[1rem] font-plex-sans font-[500]">
               <FontAwesomeIcon icon={faCheck} className="mr-2 text-[#21EFB8]" />
               <span>{feature}</span>
@@ -129,7 +135,9 @@ const PricingTier = ({ tier }) => {
             {tier.note}
           </p>
         )}
-        <button className={`w-full  border border-transparent rounded-xl py-4 px-4 text-[1.20rem] tracking-wide font-plex-mono font-medium text-black transition-transform duration-300 hover:scale-90 focus:scale-90 active:scale-90 bg-[${tier.buttonText === 'Buy Now' ? '#F8F8FF' : '#F1DA44'}]`}>
+        <button className={`w-full  border border-transparent rounded-xl py-4 px-4 text-[1.20rem] tracking-wide font-plex-mono font-medium text-black transition-transform duration-300 hover:scale-90 focus:scale-90 active:scale-90 bg-[${tier.buttonText === 'Buy Now' ? '#F8F8FF' : '#F1DA44'}]`}
+        onClick={()=>window.location.href="/workspace"}
+        >
           {tier.buttonText}
         </button>
       </div>
@@ -206,12 +214,29 @@ const PricingSection = () => {
       buttonText: "Get in touch"
     }
   ];
+  const [isMonthly, setIsMonthly] = useState(false);
 
   return (
     <div className="bg-[#052727] flex flex-col mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <Group justify="center" w="100%">
+        <Text c={isMonthly ? "" : "green" }>
+          Yearly
+        </Text>
+        <Switch
+          size="md"
+          checked={isMonthly}
+          onClick={() => {
+            setIsMonthly(!isMonthly);
+          }}
+          color={isMonthly ? "green" : "gray"}
+        />
+        <Text c={isMonthly ? "green" : ""}>
+          Monthly
+        </Text>
+      </Group>
       <div className="mt-12 space-y-4 sm:mt-16 sm:space-y-0 sm:grid sm:grid-cols-2 sm:gap-6 lg:max-w-4xl lg:mx-auto xl:max-w-none xl:grid-cols-4">
         {pricingTiers.map((tier) => (
-          <PricingTier key={tier.name} tier={tier} />
+          <PricingTier key={tier.name} tier={tier} monthly={isMonthly}/>
         ))}
       </div>
       <div className="mt-12 text-center">

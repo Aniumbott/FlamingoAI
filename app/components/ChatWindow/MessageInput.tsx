@@ -183,7 +183,7 @@ export default function MessageInput(props: {
                   chat.instructions,
                   chat.workspaceId,
                   models.find((model) => model._id == chat.aiModel) ||
-                  models[0],
+                    models[0],
                   chat.scope == "private" ? "private" : "public",
                 ).then((res) => {
                   if (res === null) {

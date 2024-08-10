@@ -78,6 +78,7 @@ const workspaceSchema = new Mongoose.Schema(
         } || null,
       default: null,
     },
+    workspaceModel: { type: String, required: false },
   },
   {
     timestamps: true,
@@ -108,6 +109,7 @@ interface IWorkspace {
     current_period_ends: number;
     quantity: number;
   } | null;
+  workspaceModel: string;
 }
 
 interface IWorkspaceDocument extends IWorkspace, Mongoose.Document {

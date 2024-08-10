@@ -36,10 +36,11 @@ export async function GET(req: NextRequest, res: NextApiResponse) {
     const reqParam = req.nextUrl.searchParams;
     const workspaceId = reqParam.get("workspaceId");
     const workspace = await Workspace.findById(workspaceId);
+
+    const openRouterApiKey = workspace?.apiKeys.find((key) => key.provider == "open-router")?.key
+
     let aiModels;
-    if (
-      workspace?.subscription?.product_id === process.env.NEXT_PUBLIC_MAX_PLAN
-    ) {
+    if ( workspace?.subscription?.product_id === process.env.NEXT_PUBLIC_MAX_PLAN || openRouterApiKey) {
       aiModels = await AIModel.find({});
     } else {
       aiModels = await AIModel.find({ provider: "openai" });

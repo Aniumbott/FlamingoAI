@@ -14,10 +14,17 @@ export const getOpenRouterResponse = async (
       break;
     case "anthropic":
       const modelName = model.substring(0, model.lastIndexOf("-"));
+      if(modelName === "claude-3-5-sonnet")
+        openRouterModel = `anthropic/claude-3.5-sonnet`;
+      else
       openRouterModel = `anthropic/${modelName}`;
+
+      break;
+    case "openai":
+      openRouterModel = `openai/${model}`;
       break;
     default:
-      openRouterModel = `openai/${model}`;
+      openRouterModel = model
       break;
   }
 

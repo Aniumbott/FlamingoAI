@@ -127,7 +127,7 @@ export default function Header() {
   return (
     <header className="hidden md:block sticky top-0 z-50 bg-[#0d2327] text-white">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-        <a href="https://team-gpt.com" className="no-underline" target="_blank">
+        <a href="/" className="no-underline" target="_blank">
           <img
             src="https://team-gpt.com/wp-content/uploads/2023/09/Rectangle-White-Transparent-Border.svg"
             className="w-[130px] inline-block align-middle h-auto"
@@ -174,7 +174,7 @@ export default function Header() {
               <div>Enterprise</div>
             </div>
             <div className="p-[15px] text-[1rem] font-[500] font-plex-sans flex flex-row items-center justify-center gap-x-1 hover:cursor-pointer hover:text-[#f1da44]">
-              <div>Pricing</div>
+              <Link href='/pricing'>Pricing</Link>
             </div>
           </ul>
         </nav>

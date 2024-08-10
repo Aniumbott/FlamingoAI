@@ -1,23 +1,26 @@
-"use client";
-import { motion } from "framer-motion";
-import Spacer from "./Spacer";
-import Link from "next/link";
-import { useRef } from "react";
-import { useInView } from "framer-motion";
+"use client"
+import {motion} from "framer-motion"
+import { faCheckCircle } from '@fortawesome/free-solid-svg-icons/faCheckCircle';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Spacer from './Spacer';
+import Link from 'next/link';
+import { useRef } from 'react';
+import { useInView } from 'framer-motion';
+
 
 const slideInUpVariants = {
   hidden: {
     opacity: 0,
-    y: 50,
+    y: 50
   },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
       duration: 0.6,
-      ease: [0.6, -0.05, 0.01, 0.99],
-    },
-  },
+      ease: [0.6, -0.05, 0.01, 0.99]
+    }
+  }
 };
 const testimonialsData = [
   {
@@ -43,8 +46,7 @@ const testimonialsData = [
       {
         text: "Perfect for team organisation, transparency & collaboration.",
         author: "George Willson",
-        image:
-          "https://team-gpt.com/wp-content/uploads/2023/10/download-10.jpeg",
+        image: "https://team-gpt.com/wp-content/uploads/2023/10/download-10.jpeg",
       },
     ],
   },
