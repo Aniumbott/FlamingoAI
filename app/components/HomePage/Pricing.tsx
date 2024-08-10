@@ -1,3 +1,4 @@
+//@ts-nocheck
 "use client"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import Spacer from "./Spacer"

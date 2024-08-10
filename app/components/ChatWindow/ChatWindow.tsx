@@ -123,15 +123,15 @@ export default function ChatWindow(props: {
     const ans =
       (chat?.createdBy !== userId &&
         chat?.memberAccess?.find((m: any) => m.userId === userId)?.access ===
-          "view") ||
+        "view") ||
       (chat?.createdBy !== userId &&
         chat?.scope === "viewOnly" &&
         chat?.memberAccess?.find((m: any) => m.userId === userId)?.access !==
-          "edit") ||
+        "edit") ||
       (chat?.createdBy !== userId &&
         chat?.scope === "public" &&
         chat?.memberAccess?.find((m: any) => m.userId === userId)?.access ===
-          "viewOnly");
+        "viewOnly");
     return ans;
   }
 
@@ -484,8 +484,8 @@ export default function ChatWindow(props: {
                               {},
                               "",
                               pathname.split("/").slice(0, 3).join("/") +
-                                "/page/" +
-                                chat.instructions.pageId,
+                              "/page/" +
+                              chat.instructions.pageId,
                             );
                           }}
                         >

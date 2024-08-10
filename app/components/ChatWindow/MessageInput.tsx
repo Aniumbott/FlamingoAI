@@ -60,7 +60,7 @@ export default function MessageInput(props: {
       }}
     >
       {chat?.messages?.length &&
-      chat.messages.some((message: any) => message.type === "user") ? (
+        chat.messages.some((message: any) => message.type === "user") ? (
         <Tooltip label="Regenerate" fz="xs">
           <ActionIcon
             {...(isMobile ? { size: 42 } : { size: 50 })}
@@ -96,7 +96,7 @@ export default function MessageInput(props: {
         maxRows={4}
         radius={
           chat?.messages?.length &&
-          chat.messages.some((message: any) => message.type === "user")
+            chat.messages.some((message: any) => message.type === "user")
             ? "0"
             : "var(--mantine-radius-sm) 0 0 var(--mantine-radius-sm)"
         }
@@ -108,7 +108,7 @@ export default function MessageInput(props: {
         onChange={(e) => {
           setMessageInput(e.currentTarget.value);
 
-          if (e.currentTarget.value.endsWith("/")) {
+          if (e.currentTarget.value.includes("/")) {
             setSearchTerm(e.currentTarget.value.split("/").pop() ?? "");
             combobox.openDropdown();
           } else {
@@ -147,17 +147,17 @@ export default function MessageInput(props: {
         }}
         {...(isMobile
           ? {
-              placeholder: "Type '/' to select a prompt",
-              size: "md",
-              hiddenFrom: "sm",
-            }
+            placeholder: "Type '/' to select a prompt",
+            size: "md",
+            hiddenFrom: "sm",
+          }
           : {
-              placeholder: "Type a message or type '/' to select a prompt",
-              size: "lg",
-              miw: "300px",
-              maw: "1100px",
-              visibleFrom: "sm",
-            })}
+            placeholder: "Type a message or type '/' to select a prompt",
+            size: "lg",
+            miw: "300px",
+            maw: "1100px",
+            visibleFrom: "sm",
+          })}
       />
       <Tooltip label="Send message" fz="xs">
         <ActionIcon

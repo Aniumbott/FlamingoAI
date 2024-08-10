@@ -18,6 +18,7 @@ import {
   TextInput,
   useCombobox,
   Tooltip,
+  ComboboxItemGroup,
 } from "@mantine/core";
 import {
   IconSearch,
@@ -43,6 +44,7 @@ import PromptModal from "../../Modals/PromptModal";
 import * as Mongoose from "mongoose";
 import { socket } from "@/socket";
 import { sortItems } from "@/app/controllers/chat";
+import { group } from "console";
 
 export type ModalControls = {
   setModalItem: (value: IPromptDocument | null) => void;
@@ -78,6 +80,24 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
 
+  const [combinedSystemPrompts, setCombinedSystemPrompts] = useState<IPromptDocument[]>([]);
+  const [combinedPublicPrompts, setCombinedPublicPrompts] = useState<IPromptDocument[]>([]);
+  const [combinedPersonalPrompts, setCombinedPersonalPrompts] = useState<IPromptDocument[]>([]);
+  const [comboBoxList, setComboBoxList] = useState<any[]>([
+    {
+      group: "System",
+      items: combinedSystemPrompts,
+    },
+    {
+      group: "Public",
+      items: combinedPublicPrompts,
+    },
+    {
+      group: "Private",
+      items: combinedPersonalPrompts,
+    },
+  ]);
+
   const searchPromptsInFolders = (folders: any[], searchTerm: string) => {
     let results: any = [];
     if (folders) {
@@ -97,43 +117,6 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
     }
     return results;
   };
-
-  const filteredSystemPrompts =
-    systemPrompt?.filter((prompt) =>
-      prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
-    ) || [];
-  const filteredSystemFolderPrompts = searchPromptsInFolders(
-    systemFolder,
-    searchTerm
-  );
-  const combinedSystemPrompts = [
-    ...filteredSystemPrompts,
-    ...filteredSystemFolderPrompts,
-  ];
-
-  const filteredPublicPrompt = publicPrompt?.filter((prompt) =>
-    prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const filterPublicFolderPrompts = searchPromptsInFolders(
-    publicFolder,
-    searchTerm
-  );
-  const combinedPublicPrompts = [
-    filteredPublicPrompt,
-    ...filterPublicFolderPrompts,
-  ];
-
-  const filteredPersonalPrompt = personalPrompt?.filter((prompt) =>
-    prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-  const filterPersonalFolderPrompts = searchPromptsInFolders(
-    personalFolder,
-    searchTerm
-  );
-  const combinedPersonalPrompts = [
-    filteredPersonalPrompt,
-    ...filterPersonalFolderPrompts,
-  ];
 
   const modalControls: ModalControls = {
     setModalItem,
@@ -219,6 +202,61 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
       setPersonalFolder(sortItems(personalFolder, privateSort));
   }, [privateSort]);
 
+  useEffect(() => {
+    const filteredSystemPrompts =
+      systemPrompt?.filter((prompt) =>
+        prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
+      ) || [];
+    const filteredSystemFolderPrompts = searchPromptsInFolders(
+      systemFolder,
+      searchTerm
+    );
+    setCombinedSystemPrompts([
+      ...filteredSystemPrompts,
+      ...filteredSystemFolderPrompts,
+    ]);
+
+    const filteredPublicPrompts = publicPrompt?.filter((prompt) =>
+      prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const filterPublicFolderPrompts = searchPromptsInFolders(
+      publicFolder,
+      searchTerm
+    );
+    setCombinedPublicPrompts([
+      ...filteredPublicPrompts,
+      ...filterPublicFolderPrompts,
+    ]);
+
+    const filteredPersonalPrompts = personalPrompt?.filter((prompt) =>
+      prompt.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+    const filterPersonalFolderPrompts = searchPromptsInFolders(
+      personalFolder,
+      searchTerm
+    );
+    setCombinedPersonalPrompts([
+      ...filteredPersonalPrompts,
+      ...filterPersonalFolderPrompts,
+    ]);
+  }, [searchTerm])
+  useEffect(() => {
+    setComboBoxList([
+      {
+        group: "System",
+        items: combinedSystemPrompts,
+      },
+      {
+        group: "Public",
+        items: combinedPublicPrompts,
+      },
+      {
+        group: "Private",
+        items: combinedPersonalPrompts,
+      },
+    ]);
+  }, [combinedPublicPrompts, combinedPersonalPrompts, combinedSystemPrompts])
+
   return (
     <>
       <div className={style.activeTitle}>
@@ -245,53 +283,27 @@ export default function PromptsPanel(props: { toggleRight: () => void }) {
             <Combobox.Dropdown>
               <Combobox.Options>
                 <ScrollArea.Autosize mah={200} type="scroll">
-                  {combinedSystemPrompts.length === 0 &&
-                    combinedPublicPrompts.length === 0 &&
-                    combinedPersonalPrompts.length === 0 && (
-                      <Combobox.Empty>Nothing found</Combobox.Empty>
-                    )}
-                  {combinedSystemPrompts.length > 0 && (
-                    <>
-                      <Text>System Prompts</Text>
-                      {combinedSystemPrompts.map((prompt, key) => (
-                        <PromptItem
-                          item={prompt}
-                          key={key}
-                          modalControls={modalControls}
-                          user={user}
-                          orgId={orgId || ""}
-                        />
-                      ))}
-                    </>
-                  )}
-                  {combinedPublicPrompts.length > 0 && (
-                    <>
-                      <Text mt={5}>Workspace Prompts</Text>
-                      {combinedPublicPrompts.map((prompt, key) => (
-                        <PromptItem
-                          item={prompt}
-                          key={key}
-                          modalControls={modalControls}
-                          user={user}
-                          orgId={orgId || ""}
-                        />
-                      ))}
-                    </>
-                  )}
-                  {combinedPersonalPrompts.length > 0 && (
-                    <>
-                      <Text mt={5}>Personal Prompts</Text>
-                      {combinedPersonalPrompts.map((prompt, key) => (
-                        <PromptItem
-                          item={prompt}
-                          key={key}
-                          modalControls={modalControls}
-                          user={user}
-                          orgId={orgId || ""}
-                        />
-                      ))}
-                    </>
-                  )}
+                  {
+                    (comboBoxList.every((group) => group.items.length === 0)) ?
+                      (
+                        <Combobox.Empty>Nothing found...</Combobox.Empty>
+                      ) :
+                      (comboBoxList.map((group, key) => (
+                        <Combobox.Group label={group.group} key={key}>
+                          {group.items.map((prompt: IPromptDocument, key: number) => (
+                            <Combobox.Option value={prompt._id} key={key}>
+                              <PromptItem
+                                item={prompt}
+                                key={key}
+                                modalControls={modalControls}
+                                user={user}
+                                orgId={orgId || ""}
+                              />
+                            </Combobox.Option>
+                          ))}
+                        </Combobox.Group>
+                      )))
+                  }
                 </ScrollArea.Autosize>
               </Combobox.Options>
             </Combobox.Dropdown>
