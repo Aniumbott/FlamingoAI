@@ -19,6 +19,7 @@ import {
 import { Protect, UserButton } from "@clerk/nextjs";
 import { useMediaQuery } from "@mantine/hooks";
 import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 export default function NavigationBar(props: {
   active: number;
@@ -47,6 +48,10 @@ export default function NavigationBar(props: {
       },
     };
   };
+
+  useEffect(()=>{
+    setColorScheme("light")
+  },[])
 
   return (
     <Paper
@@ -126,7 +131,7 @@ export default function NavigationBar(props: {
             isMobile ? "flex-row" : "flex-col"
           }`}
         >
-          {colorScheme == "dark" ? (
+          {/* {colorScheme == "dark" ? (
             <Tooltip label="Light Mode" position="left" fz="xs">
               <ActionIcon
                 {...ButtonProps(999)}
@@ -144,7 +149,7 @@ export default function NavigationBar(props: {
                 <IconMoon size={20} />
               </ActionIcon>
             </Tooltip>
-          )}
+          )} */}
           {pathname.split("/")[3] != "page" && !isMobile ? (
             rightOpened ? (
               <Tooltip label="Collapse panel" position="left" fz="xs">
