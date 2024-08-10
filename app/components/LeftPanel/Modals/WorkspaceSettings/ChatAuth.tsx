@@ -106,9 +106,11 @@ export default function ChatAuth(props: {
             searchable
             allowDeselect={false}
             placeholder="Select model"
-            value={selectModel?._id || ""}
+            value={workspace?.workspaceModel || selectModel?._id || ""}
             data={constructSelectModels(models)}
             onChange={(e) => {
+              workspace.workspaceModel = e;
+              updateWorkspace(workspace);
               setSelectModel(models.find((model) => model._id == e));
             }}
             style={{
@@ -275,15 +277,15 @@ export default function ChatAuth(props: {
           </>
         ) : null}
 
-        <Text size="lg" fw={600} mt={40}>
+        {!openRouterKey && <Text size="lg" fw={600} mt={40}>
           OpenAI Connection Settings
-        </Text>
+        </Text>}
 
         
 
         {update ||
         (selectModel &&
-          workspace &&
+          workspace && !openRouterKey &&
           (!workspace.apiKeys.some(
             (apiKey: any) =>
               apiKey.provider == selectModel.provider && apiKey.scope == scope
@@ -355,7 +357,7 @@ export default function ChatAuth(props: {
         ) : null}
 
         {selectModel &&
-        workspace &&
+        workspace && !openRouterKey &&
         workspace?.apiKeys.find(
           (apiKey: any) =>
             apiKey.provider == selectModel.provider &&

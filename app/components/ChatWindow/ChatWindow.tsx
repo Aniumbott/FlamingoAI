@@ -76,6 +76,7 @@ import MessageInput from "./MessageInput";
 import { IconRobotFace } from "@tabler/icons-react";
 import { IAIModelDocument } from "@/app/models/AIModel";
 import { constructSelectModels, getAIModels } from "@/app/controllers/aiModel";
+import { getWorkspace } from "@/app/controllers/workspace";
 
 export default function ChatWindow(props: {
   currentChatId: string;
@@ -106,6 +107,7 @@ export default function ChatWindow(props: {
     onDropdownClose: () => combobox.resetSelectedOption(),
   });
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [workspace, setWorkspace] = useState<any>(null);
   const filteredPrompts = prompts?.filter((prompt) => {
     return prompt.name.toLowerCase().includes(searchTerm.toLowerCase());
   });
@@ -115,6 +117,7 @@ export default function ChatWindow(props: {
   const [isAllowed, setIsAllowed] = useState(false);
   const [processing, setProcessing] = useState(false);
   const [models, handleModels] = useListState<IAIModelDocument>([]);
+
 
   function isViewOnly(chat: any) {
     const ans =
@@ -322,6 +325,18 @@ export default function ChatWindow(props: {
     };
   }, []);
 
+  useEffect(()=>{
+    if (organization?.id) {
+      const fetchWorkspace = async () => {
+        const res = await getWorkspace(organization.id);
+        setWorkspace(res.workspace);
+      };
+      fetchWorkspace();
+    }
+  }, [organization?.id])
+
+  
+
   const [promptVariables, setPromptVariables] = useState<string[]>([]);
   const [promptContent, setPromptContent] = useState("");
   const [newMessageInput, setNewMessageInput] = useState(messageInput);
@@ -334,6 +349,8 @@ export default function ChatWindow(props: {
   const router = useRouter();
   const pathname = usePathname();
   const isMobile = useMediaQuery(`(max-width: 48em)`);
+
+
 
   return (
     <>
@@ -642,7 +659,7 @@ export default function ChatWindow(props: {
                     allowDeselect={false}
                     description="Assistant Model"
                     data={constructSelectModels(models)}
-                    value={chat?.aiModel}
+                    value={workspace?.workspaceModel || chat?.aiModel}
                     onChange={(e) => {
                       updateChat(chat?._id, {
                         aiModel: e,
@@ -678,8 +695,7 @@ export default function ChatWindow(props: {
                         orgId={organization?.id || ""}
                         instructions={chat.instructions}
                         aiModel={
-                          models.find((model) => model._id == chat.aiModel) ||
-                          models[0]
+                          workspace?.workspaceModel || models.find((model) =>  model._id == chat.aiModel) || models[0]
                         }
                         scope={chat.scope === "private" ? "private" : "public"}
                         setPromptOpened={setPromptOpened}
