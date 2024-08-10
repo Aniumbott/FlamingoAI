@@ -4,6 +4,9 @@ import Hero from "./Hero";
 import { TrustedBy } from "./TrustedBy";
 import Footer from "./Footer";
 import Header from "./Header";
+import { AnimatedBeamMultipleOutputDemo } from "./allbeam";
+import Comparison from "./comparison";
+import FAQ from "./faqs";
 
 function NewHomePage() {
   return (
@@ -11,7 +14,9 @@ function NewHomePage() {
       <Header />
       <Hero />
       <TrustedBy />
+      <Comparison />
       <FeatureSections />
+      <FAQ />
       <Footer />
     </>
   );

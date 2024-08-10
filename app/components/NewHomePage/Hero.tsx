@@ -15,21 +15,22 @@ const Hero = () => {
       <div className="flex-grow flex items-center justify-center py-8 sm:py-12 md:py-16 lg:py-20">
         <div className="container mx-auto px-4 flex flex-col items-center gap-6 md:gap-8 lg:gap-10">
           <m.h1
-            className="flex flex-col md:mt-10 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-center"
+            className="flex flex-col pt-10 px-10 md:mt-10 text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-center"
             variants={{
               hidden: { opacity: 0, y: -10 },
               show: { opacity: 1, y: 0, transition: { type: "spring" } },
             }}
           >
             <span className="leading-tight tracking-tight">
-              <span className="bg-gradient-to-r from-purple-600 to-pink-400 bg-clip-text text-transparent">
-                All-in-one AI workspace for teams
-              </span>
+              <h1 className="bg-gradient-to-r from-purple-600 to-pink-400 bg-clip-text text-transparent">
+                All-in-one AI workspace <br />
+                for teams
+              </h1>
             </span>
           </m.h1>
 
           <m.p
-            className="text-gray-800 leading-relaxed text-lg sm:text-xl max-w-2xl text-center"
+            className="text-gray-800 leading-relaxed text-xl sm:text-xl max-w-2xl text-center"
             variants={{
               hidden: { opacity: 0, y: -10 },
               show: { opacity: 1, y: 0, transition: { type: "spring" } },

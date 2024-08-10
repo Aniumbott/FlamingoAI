@@ -9,7 +9,7 @@ function Footer() {
             <div className="mb-12 flex flex-col gap-4">
               <a className="flex items-center gap-2" href="/">
                 <img
-                  src="logo.svg"
+                  src="logo.png"
                   alt="Flamingo.ai Logo"
                   className="h-8 w-8"
                 />
@@ -17,7 +17,9 @@ function Footer() {
                   Flamingo.ai
                 </span>
               </a>
-              <p className="max-w-xs">All-in-one AI workspace for teams</p>
+              <p className="max-w-xs text-lg">
+                All-in-one AI workspace for teams
+              </p>
             </div>
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-4 sm:gap-6">
               <div>
@@ -30,7 +32,7 @@ function Footer() {
                       className="cursor-pointer text-gray-400 duration-200 hover:text-gray-600 hover:opacity-90"
                       href="#"
                     >
-                      OpenAI for Teams
+                      ChatGPT for Teams
                     </a>
                   </li>
                   <li>
@@ -173,7 +175,7 @@ function Footer() {
           </div>
           <div className="flex flex-col gap-2 border-t py-4 sm:flex sm:flex-row sm:items-center sm:justify-between">
             <div className="flex space-x-5 sm:mt-0 sm:justify-center">
-              <a
+              {/* <a
                 className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-600"
                 href="https://discord.gg/eVtDPmRWXm"
               >
@@ -193,7 +195,7 @@ function Footer() {
                   />
                 </svg>
                 <span className="sr-only">Discord</span>
-              </a>
+              </a> */}
               <a
                 className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-600"
                 href="#"
@@ -214,7 +216,7 @@ function Footer() {
                 </svg>
                 <span className="sr-only">Contact</span>
               </a>
-              <a
+              {/* <a
                 className="text-gray-500 hover:text-gray-900 dark:hover:text-gray-600"
                 href="https://github.com/dillionverma"
               >
@@ -230,7 +232,7 @@ function Footer() {
                   />
                 </svg>
                 <span className="sr-only">GitHub</span>
-              </a>
+              </a> */}
             </div>
             <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
               © {new Date().getFullYear()}{" "}

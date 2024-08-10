@@ -1,18 +1,18 @@
-"use client";
-
+import React from "react";
 import { cn } from "@/lib/utils";
 import { List } from "lucide-react";
 import Link from "next/link";
 import { Icons } from "../icons";
 import { buttonVariants } from "../ui/button";
+import ReactPlayer from "react-player/lazy";
 
 const features = [
   {
-    id: "feature-openai",
-    header: "Analyze",
-    name: "Advanced OpenAI API Dashboard",
+    id: "feature-work",
+    header: "Work together, simply",
+    name: "A no-nonsense AI workspace for your team",
     description:
-      "Just enter your OpenAI API key, and we fetch your data from the OpenAI API directly to create a dashboard. No need to install anything.",
+      "Chat, prompt, and discuss in one place. See how your team actually uses AI to get work done.",
     icon: Icons.openai,
     video: "https://cdn.llm.report/openai-demo.mp4",
     cta: "Get Started",
@@ -20,11 +20,11 @@ const features = [
     reverse: false,
   },
   {
-    id: "feature-logs",
-    header: "Optimize",
-    name: "Log your prompts and completions",
+    id: "feature-folders",
+    header: "Folders that make sense",
+    name: "Keep the good stuff, ditch the rest",
     description:
-      "Change 1 line in your code and start logging your API requests. Optimize your token usage and start saving money.",
+      "Organize chats that matter into simple folders. Find what you need without the clutter.",
     icon: List,
     video: "https://cdn.llm.report/logs-demo.mp4",
     cta: "Get Started",
@@ -32,16 +32,27 @@ const features = [
     reverse: true,
   },
   {
-    id: "feature-users",
-    header: "Minimize",
-    name: "Measure Cost Per User",
-    description:
-      "Analyze your cost per user and adjust your pricing to maximize revenue.",
+    id: "feature-prompts",
+    header: "Prompts that work",
+    name: "Stop guessing, start doing",
+    description: "Why reinvent the wheel? Use proven prompts that get results.",
     icon: Icons.user,
     video: "https://cdn.llm.report/users-demo.mp4",
     cta: "Get Started",
     href: "/login",
     reverse: false,
+  },
+  {
+    id: "feature-prompts",
+    header: "See if it's actually working",
+    name: "Know if your team is using AI or just talking about it.",
+    description:
+      "See who's using it, how much, and if it's making a difference.",
+    icon: Icons.user,
+    video: "https://cdn.llm.report/users-demo.mp4",
+    cta: "Get Started",
+    href: "/login",
+    reverse: true,
   },
 ];
 
@@ -50,20 +61,20 @@ const FeatureSections = () => {
     <>
       {features.map((feature) => (
         <section id={feature.id} key={feature.id}>
-          <div className="mx-auto px-6 py-6 sm:py-2">
+          <div className="mx-auto px-6 md:px-20 py-6 sm:py-2">
             <div className="mx-auto grid max-w-2xl grid-cols-1 gap-x-16 gap-y-16 sm:gap-y-20 lg:mx-0 lg:max-w-none lg:grid-cols-5">
               <div
                 className={cn("m-auto lg:col-span-2", {
                   "lg:order-last": feature.reverse,
                 })}
               >
-                <h2 className="text-base font-bold leading-7 text-purple-600">
+                <h2 className="text-lg font-bold leading-7 text-purple-600">
                   {feature.header}
                 </h2>
                 <p className="mt-2 text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                   {feature.name}
                 </p>
-                <p className="mt-6 text-lg leading-8 text-gray-600">
+                <p className="mt-6 text-xl leading-8 text-gray-600">
                   {feature.description}
                 </p>
                 <Link
@@ -79,13 +90,25 @@ const FeatureSections = () => {
                   {feature.cta}
                 </Link>
               </div>
-              <video
-                src={feature.video}
-                autoPlay
-                loop
-                muted
-                className="rounded-xl border m-auto lg:col-span-3 shadow-2xl"
-              />
+              <div className="m-auto lg:col-span-3 rounded-xl border shadow-2xl overflow-hidden">
+                <ReactPlayer
+                  url={feature.video}
+                  playing={true}
+                  loop={true}
+                  muted={true}
+                  controls={false}
+                  width="100%"
+                  height="100%"
+                  fallback={<div>Loading...</div>}
+                  config={{
+                    file: {
+                      attributes: {
+                        poster: "/logo.png",
+                      },
+                    },
+                  }}
+                />
+              </div>
             </div>
           </div>
         </section>

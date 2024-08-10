@@ -29,7 +29,7 @@ function Header() {
           <div className="flex justify-start lg:w-0 lg:flex-1">
             <a href="/" className="flex items-center space-x-2">
               <img
-                src="/logo.svg"
+                src="/logo.png"
                 className="h-8 w-auto sm:h-10"
                 alt="Flamingo Logo"
               />
