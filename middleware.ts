@@ -2,10 +2,16 @@ import { authMiddleware } from "@clerk/nextjs";
 
 export default authMiddleware({
   // Routes that can be accessed while signed out
-  publicRoutes: ["/anyone-can-visit-this-route", "/", "/api/webhooks/(.*)"],
-  // Routes that can always be accessed, and have
-  // no authentication information
-  ignoredRoutes: ["/no-auth-in-this-route"],
+  // publicRoutes: ["/blog", "/pricing", "", "/", "/api/webhooks/(.*)"],
+  // ignoredRoutes: ["/blog"]
+  publicRoutes: (req: any) => {
+
+    const path = req.nextUrl.pathname;
+    const protectedRoutes = ['/workspace', '/onboarding', '/login', '/signup'];
+    console.log('path', path);
+    // If the path is not in protectedRoutes, it's public
+    return !protectedRoutes.some(route => path.startsWith(route));
+  },
 });
 
 export const config = {
