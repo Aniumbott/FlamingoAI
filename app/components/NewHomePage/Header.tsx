@@ -4,20 +4,25 @@ import { ViewDemo } from "./viewdemo";
 import { Group, Button, Divider, Anchor } from "@mantine/core";
 import { UserButton, useUser } from "@clerk/nextjs";
 import { IconArrowUpRight } from "@tabler/icons-react";
+import { useRouter } from "next/navigation";
 
 function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const { isSignedIn } = useUser();
-  console.log(isSignedIn);
+  const router = useRouter();
+  
 
   useEffect(() => {
+    if(isSignedIn && window.location.pathname === "/"){
+      router.push("/workspace");
+    }
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [isSignedIn]);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
