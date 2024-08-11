@@ -53,23 +53,21 @@ const PricingHeading = () => {
 }
 //@ts-ignore
 const Slider = ({ min, max, step, value, onChange }) => {
+
   return (
-    <div className="relative w-full h-8 bg-gray-200 rounded-full cursor-pointer">
+    <div className="relative w-full bg-[#052727] h-[23px]  accent-zinc-700 rounded-full text-[#f1da44]  cursor-pointer border-[#afafaf] border-2">
       <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={onChange}
-        className="absolute w-full h-full opacity-0 cursor-pointer"
-      />
-      <div 
-        className="absolute h-full w-full bg-yellow-400 rounded-full"
-        style={{ width: `${(value - min) / (max - min) * 100}%` }}
-      >
-        <div className="absolute right-0 w-8 h-8 left-[0.09rem] bg-yellow-400 rounded-full shadow-2xl"></div>
-      </div>
+          id="price-range"
+          name="price-range"
+          type="range"
+          min={min}
+          max={max}
+          step={step}
+          value={value}
+          onChange={onChange}
+          className="w-full  rounded-lg appearance-none cursor-pointer bg-[#052727] dark:bg-zinc-700"
+        />
+      
     </div>
   );
 };
@@ -101,7 +99,7 @@ const PricingTier = ({ tier, monthly }) => {
             {tier.name !== 'FLAGSHIP' ? '$' : ''}{tier.hasSlider ? calculatePrice(userCount)  : tier.price}
           </span>
           <br/>
-          {tier.period && <p className="text-white font-plex-sans block md:inline text-[1rem] text-[500] w-full">/team/{monthly? "month" : "year"}</p>}
+          {tier.period && <p className="text-white font-plex-sans block md:inline text-[1rem] text-[500] w-full">/{monthly? "month" : "year"}/10 members</p>}
         </div>
         <p className="text-[1rem] font-plex-sans font-[500] text-white">{tier.description}</p>
         
@@ -182,9 +180,9 @@ const PricingSection = () => {
       name: "MAX",
       title: "Step Up",
       subtitle: "Billed Monthly",
-      basePrice: 2500,
+      basePrice: 50,
       pricePerUser: 5,
-      minUsers: 100,
+      minUsers: 10,
       maxUsers: 500,
       period: "/team/month",
       description: "+ AI usage costs",
@@ -243,8 +241,8 @@ const PricingSection = () => {
       <div className="mt-12 text-center">
         <p className="text-gray-300 text-[1.5rem] font-[400] font-plex-sans leading-[1.65rem]">
           Have pricing questions? Contact us at{' '}
-          <a href="mailto:humans@team-gpt.com" className="text-[#1CFFC3] hover:underline">
-            humans@team-gpt.com
+          <a href="mailto:contact@flamingo.ai" className="text-[#1CFFC3] hover:underline">
+            contact@flamingo.ai
           </a>
         </p>
       </div>
