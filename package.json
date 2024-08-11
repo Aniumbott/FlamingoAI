@@ -139,6 +139,7 @@
 		"@parcel/watcher": "^2.3.0",
 		"@starter-kit/eslint-config-custom": "workspace:*",
 		"@starter-kit/tsconfig": "workspace:*",
-		"concurrently": "^8.2.1"
+		"concurrently": "^8.2.1",
+    "@svgr/webpack": "^8.1.0"
   }
 }
