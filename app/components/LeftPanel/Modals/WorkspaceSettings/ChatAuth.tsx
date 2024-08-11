@@ -127,16 +127,18 @@ export default function ChatAuth(props: {
             value={workspace?.workspaceModel || selectModel?._id || ""}
             data={constructSelectModels(models)}
             onChange={(e) => {
-              workspace.workspaceModel = e;
               const selectedModel = models.find((model) => model._id == e);
 
               if(workspace?.subscription===null && selectedModel?.provider!=="openai"){
                 const notification = showLoadingNotification("Updating Workspace");
                 showErrorNotification(notification, "Upgrade your plan to use this model");
                 return
+              }else{
+                workspace.workspaceModel = e;
+                updateWorkspace(workspace);
+                setSelectModel(models.find((model) => model._id == e));
               }
-              updateWorkspace(workspace);
-              setSelectModel(models.find((model) => model._id == e));
+              
             }}
             style={{
               flexGrow: 1,
