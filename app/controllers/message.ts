@@ -36,6 +36,11 @@ async function createMessage(
   type: String,
   chatId: String,
 ) {
+
+  const userMessage = {
+    chatId, createdBy, content, type, createdAt: new Date(), updatedAt: new Date(),
+  }
+  socket.emit("createMessage", chatId, userMessage);
   const data = await fetch("/api/message", {
     method: "POST",
     body: JSON.stringify({ createdBy, content, type, chatId }),
@@ -45,7 +50,8 @@ async function createMessage(
   });
 
   const response = await data.json();
-  socket.emit("createMessage", chatId, response.message);
+  console.log("response at createMessage", response);
+  // socket.emit("createMessage", chatId, response.message);
   return response;
 }
 
