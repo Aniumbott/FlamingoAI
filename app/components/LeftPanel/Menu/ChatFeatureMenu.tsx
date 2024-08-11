@@ -195,6 +195,8 @@ export default function ChatFeatureMenu(props: {
                     }).then((res) => {
                       console.log(res);
                     });
+                    const workspaceId = pathname.split("/")[2];
+                    router.push(`/workspace/${workspaceId}`);
                   }}
                 >
                   <MenuButton properties={MenuData[4]} />
@@ -235,7 +237,7 @@ const MenuButton = (props: {
       >
         <Stack gap={1} align="start">
           <Text fw={"400"} fz={"xs"}>
-            {props.properties.title}
+            {props.properties.title }
           </Text>
         </Stack>
       </Button>
