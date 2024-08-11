@@ -20,8 +20,12 @@ async function getWorkspace(id: String) {
 }
 
 // Function to update the workspace
-async function updateWorkspace(body: any) {
-  const notification = showLoadingNotification("Updating Workspace");
+async function updateWorkspace(body: any, showNotification: boolean = true) {
+  let notification : any;
+  
+  if (showNotification) {
+    notification = showLoadingNotification("Updating workspace");
+  }
   const data = await fetch("/api/workspace", {
     method: "PUT",
     body: JSON.stringify(body),
@@ -30,9 +34,9 @@ async function updateWorkspace(body: any) {
     },
   });
 
-  if (data.status !== 200) {
+  if (data.status !== 200 && showNotification) {
     showErrorNotification(notification, "Failed to update workspace");
-  } else {
+  } else if (showNotification) {
     showSuccessNotification(notification, "Workspace updated successfully");
   }
 

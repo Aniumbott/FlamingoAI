@@ -77,6 +77,10 @@ import { IconRobotFace } from "@tabler/icons-react";
 import { IAIModelDocument } from "@/app/models/AIModel";
 import { constructSelectModels, getAIModels } from "@/app/controllers/aiModel";
 import { getWorkspace } from "@/app/controllers/workspace";
+import {
+  showErrorNotification,
+  showLoadingNotification
+} from "@/app/controllers/notification";
 
 export default function ChatWindow(props: {
   currentChatId: string;
@@ -661,6 +665,13 @@ export default function ChatWindow(props: {
                     data={constructSelectModels(models)}
                     value={workspace?.workspaceModel || chat?.aiModel}
                     onChange={(e) => {
+                      const selectedModel = models.find((model) => model._id == e);
+
+                      if(workspace?.subscription===null && selectedModel?.provider!=="openai"){
+                        const notification = showLoadingNotification("Updating Workspace");
+                        showErrorNotification(notification, "Upgrade your plan to use this model");
+                        return
+                      }
                       updateChat(chat?._id, {
                         aiModel: e,
                       });

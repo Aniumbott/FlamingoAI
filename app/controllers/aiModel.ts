@@ -100,6 +100,28 @@ async function isValidOpenAIKey(key: string) {
   return isValid;
 }
 
+async function isValidAPIKey( workspaceId:string, model: IAIModelDocument, userId: string, scope: string) {
+  let isValid= false;
+
+  const testMessage= [
+    {"role": "user", "content": "Test message"},
+  ]
+  await getAIResponse(testMessage, workspaceId, model, scope, userId)
+  .then((response) => {
+    if(response===null){
+      return;
+    } 
+    isValid= true;
+    console.log("response at isValidAPIKey", response);
+  })
+  .catch((error) => {
+    console.log("error at isValidAPI", error);
+    
+  });
+  
+  return isValid;
+}
+
 async function streamTest() {
   try {
     const source = new EventSource("/api/aimodel/streaming");
@@ -117,5 +139,6 @@ export {
   getAIModels,
   constructSelectModels,
   isValidOpenAIKey,
+  isValidAPIKey,
   streamTest,
 };

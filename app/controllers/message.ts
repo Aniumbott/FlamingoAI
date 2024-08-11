@@ -127,7 +127,7 @@ async function sendAssistantMessage(
     };
   });
 
-  if (instruction.type === "text") {
+  if (instruction?.type === "text") {
     messagesContent = [
       {
         role: "system",

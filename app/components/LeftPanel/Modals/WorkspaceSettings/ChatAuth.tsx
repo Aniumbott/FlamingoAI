@@ -22,6 +22,11 @@ import { constructSelectModels, getAIModels } from "@/app/controllers/aiModel";
 import { updateWorkspace } from "@/app/controllers/workspace";
 import { useListState, useMediaQuery } from "@mantine/hooks";
 import { IAIModelDocument } from "@/app/models/AIModel";
+import {
+  showErrorNotification,
+  showLoadingNotification
+} from "@/app/controllers/notification";
+import { isValidAPIKey } from "@/app/controllers/aiModel";
 
 export default function ChatAuth(props: {
   activeTab: string;
@@ -79,6 +84,12 @@ export default function ChatAuth(props: {
     }
   }, [scope, selectModel]);
 
+  const capitalizeFirstLetter = (string: string) => {
+    if(string===null || string===undefined) return "";
+    if (string?.length === 0) return string
+    return string?.charAt(0).toUpperCase() + string?.slice(1);
+  }
+
 
   return (
     <Paper
@@ -110,6 +121,13 @@ export default function ChatAuth(props: {
             data={constructSelectModels(models)}
             onChange={(e) => {
               workspace.workspaceModel = e;
+              const selectedModel = models.find((model) => model._id == e);
+
+              if(workspace?.subscription===null && selectedModel?.provider!=="openai"){
+                const notification = showLoadingNotification("Updating Workspace");
+                showErrorNotification(notification, "Upgrade your plan to use this model");
+                return
+              }
               updateWorkspace(workspace);
               setSelectModel(models.find((model) => model._id == e));
             }}
@@ -136,13 +154,14 @@ export default function ChatAuth(props: {
           />
         </div>
 
+        { workspace?.subscription && 
         <Text size="lg" fw={600} mt={40}>
           Open Router Connection Settings
-        </Text>
+        </Text>}
 
         {routerUpdate ||
-        (selectModel &&
-          workspace &&
+        (selectModel && 
+          workspace && workspace?.subscription && 
           (!workspace.apiKeys.some(
             (apiKey: any) =>
               apiKey.provider == "open-router" && apiKey.scope == scope
@@ -214,7 +233,7 @@ export default function ChatAuth(props: {
         ) : null}
 
     {selectModel &&
-        workspace &&
+        workspace && workspace?.subscription && 
         workspace?.apiKeys.find(
           (apiKey: any) =>
             apiKey.provider == "open-router" &&
@@ -278,7 +297,7 @@ export default function ChatAuth(props: {
         ) : null}
 
         {!openRouterKey && <Text size="lg" fw={600} mt={40}>
-          OpenAI Connection Settings
+          {selectModel?.provider==="openai" ? "OpenAI" : selectModel?.provider==="open-router" ? "Open Router" : capitalizeFirstLetter(selectModel?.provider as string)} Connection Settings
         </Text>}
 
         
@@ -317,7 +336,7 @@ export default function ChatAuth(props: {
               Cancel
             </Button>
             <Button
-              onClick={() => {
+              onClick={async() => {
                 const key = {
                   aiModel: selectModel?._id,
                   key: apiKeyInput,
@@ -325,6 +344,7 @@ export default function ChatAuth(props: {
                   provider: selectModel?.provider,
                 };
                 let wrksp = { ...workspace };
+
                 if (
                   wrksp.apiKeys.find(
                     (apiKey: any) =>
@@ -345,10 +365,20 @@ export default function ChatAuth(props: {
                 } else {
                   wrksp.apiKeys.push(key);
                 }
-                updateWorkspace(wrksp).then(() => {
-                  window.location.reload();
+
+                updateWorkspace(wrksp, false).then(async() => {
+                  const validKey= await isValidAPIKey(workspace._id, selectModel as any, scope, workspace.userId);
+                  if(!validKey){
+                    wrksp.apiKeys= []
+                    await updateWorkspace(wrksp, false);  
+                    return;
+                  }
+                  else{
+                    window.location.reload();
+                    setUpdate(false);
+                  }
                 });
-                setUpdate(false);
+                
               }}
             >
               Save

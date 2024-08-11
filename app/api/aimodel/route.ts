@@ -33,18 +33,7 @@ async function rateLimitMiddleware(
 export async function GET(req: NextRequest, res: NextApiResponse) {
   try {
     await dbConnect();
-    const reqParam = req.nextUrl.searchParams;
-    const workspaceId = reqParam.get("workspaceId");
-    const workspace = await Workspace.findById(workspaceId);
-
-    const openRouterApiKey = workspace?.apiKeys.find((key) => key.provider == "open-router")?.key
-
-    let aiModels;
-    if ( workspace?.subscription?.product_id === process.env.NEXT_PUBLIC_MAX_PLAN || openRouterApiKey) {
-      aiModels = await AIModel.find({});
-    } else {
-      aiModels = await AIModel.find({ provider: "openai" });
-    }
+    let aiModels = await AIModel.find({});;
 
     return NextResponse.json({ aiModels }, { status: 200 });
   } catch (error: any) {
@@ -105,6 +94,7 @@ export async function POST(req: NextRequest, res: NextApiResponse) {
       return NextResponse.json({ text, usage }, { status: 200 });
     } catch (error: any) {
       console.log("error", error);
+      if(error.data.error.message === "invalid x-api-key") return NextResponse.json("Invalid API Key", { status: 500 });
       return NextResponse.json(error.data.error.message, { status: 500 });
     }
   } catch (error: any) {
