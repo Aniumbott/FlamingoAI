@@ -100,7 +100,7 @@ async function isValidOpenAIKey(key: string) {
   return isValid;
 }
 
-async function isValidAPIKey( workspaceId:string, model: IAIModelDocument, userId: string, scope: string) {
+async function isValidAPIKey( workspaceId:string, model: IAIModelDocument, scope: string, userId: string) {
   let isValid= false;
 
   const testMessage= [

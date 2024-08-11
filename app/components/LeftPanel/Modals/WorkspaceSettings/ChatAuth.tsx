@@ -48,25 +48,32 @@ export default function ChatAuth(props: {
   useEffect(() => {
     const collectModels = async () => {
       const res = await getAIModels(workspace?._id);
-      console.log(res.aiModels);
-
       handleModels.setState(res.aiModels);
       return res.aiModels;
     };
+
     collectModels().then((res) => {
-      console.log(workspace?.apiKeys);
       if (workspace?.apiKeys.length > 0) {
         const apiKey = workspace.apiKeys.find(
-          (apiKey: any) => apiKey.provider == "openai" && apiKey.scope == scope
+          (apiKey: any) => apiKey.provider != "open-router" && apiKey.scope == scope
         );
+
         const openRouterKey= workspace.apiKeys.find(
           (apiKey: any) => apiKey.provider == "open-router" && apiKey.scope == scope
         );
 
         setSelectModel(res.find((model: any) => model._id == apiKey?.aiModel));
+
         setApiKeyInput(apiKey.key || "");
         setOpenRouterKey(openRouterKey.key || "");
+      } else{
+        setSelectModel(res.find((model: any) => model.value == "gpt-4o-mini"));
+        setApiKeyInput("");
+        setOpenRouterKey("");
+
       }
+    }).catch(e =>{
+      console.log("error at collectModels", e);
     });
   }, []);
 
